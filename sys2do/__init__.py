@@ -6,12 +6,21 @@
 #  Description:
 ###########################################
 '''
-from flask import Flask, Module
+from flask import Flask, Module, request
+from flaskext.babel import Babel
 
 __all__ = ["app"]
 
 app = Flask(__name__, static_path = '/static')
 app.config.from_object("sys2do.setting")
+babel = Babel(app)
+
+
+@babel.localeselector
+def get_locale():
+    return request.accept_languages.best_match(['zh_CN', 'zh_HK', 'en'])
+
+
 
 #if not app.debug:
 #    import logging
@@ -32,6 +41,9 @@ if app.config.get("LOGGING_FILE", True):
     Message:            %(message)s
     '''))
     app.logger.addHandler(file_handler)
+
+
+
 
 #===============================================================================
 # sys.py

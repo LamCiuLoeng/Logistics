@@ -1,0 +1,17 @@
+#extract i18n string
+pybabel extract -F babel.cfg -o messages.pot .
+
+
+#create the .po files
+pybabel init -i messages.pot -d translations -l en
+pybabel init -i messages.pot -d translations -l zh_CN
+pybabel init -i messages.pot -d translations -l zh_HK
+
+
+#compile the .po to .mo
+pybabel compile -d translations
+
+
+#update the existing .po
+pybabel extract -F babel.cfg -o messages.pot .
+pybabel update -i messages.pot -d translations

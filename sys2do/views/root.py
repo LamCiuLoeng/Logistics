@@ -3,6 +3,7 @@ import traceback
 import os
 from datetime import datetime as dt
 from flask import g, render_template, flash, session, redirect, url_for, request
+from flaskext.babel import gettext as _
 from sqlalchemy import and_
 
 from sys2do import app
@@ -21,7 +22,7 @@ def index():
 #    flash('hello!', MESSAGE_INFO)
 #    flash('SHIT!', MESSAGE_ERROR)
     app.logger.debug('A value for debugging')
-    return {"content" : "Hello,World!"}
+    return {"content" : _("Hello,World!")}
 
 
 

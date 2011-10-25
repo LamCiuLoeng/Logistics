@@ -33,6 +33,11 @@ LOGGING_FILE_PATH = os.path.join(os.path.dirname(__file__), "..", "system_log.tx
 LoGGING_LEVEL = logging.INFO
 
 
+
+#config for i18n
+BABEL_DEFAULT_LOCALE = 'en'
+BABEL_DEFAULT_TIMEZONE = 'UTC'
+
 #database setting
 #sqlite
 SQLALCHEMY_DATABASE_URI = 'sqlite:///%s' % (os.path.join(os.path.dirname(__file__), ".." , "logistics.db"))

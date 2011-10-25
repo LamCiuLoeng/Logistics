@@ -6,7 +6,7 @@
 		<meta content="" name="Keywords" /> 
 	{% endblock %}
 	
-	<title>{% block title %}Logistics Management{% block subtitle %}{% endblock %}{% endblock %}</title>
+	<title>{% block title %}{{_("Logistics Management")}}{% block subtitle %}{% endblock %}{% endblock %}</title>
 	
 	<link href="{{url_for('.static', filename='css/screen.css')}}" rel="stylesheet" type="text/css" />
 	{% block extCSS %}{% endblock %}

@@ -11,6 +11,7 @@ from datetime import datetime as dt
 from flask import g, render_template, flash, session, redirect, url_for, request
 from werkzeug import secure_filename
 from flask import current_app as app
+from flaskext import babel
 
 from sys2do.setting import UPLOAD_FOLDER, ALLOWED_EXTENSIONS, UPLOAD_FOLDER_URL
 from sys2do.model import DBSession, UploadFile
@@ -60,3 +61,6 @@ def makeException(msg):
         def __repr__(self): return self.msg
 
     return _ExceptionClz
+
+
+
