@@ -1,0 +1,39 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+ <head>
+  <title> New Document </title>
+  <meta name="Generator" content="EditPlus">
+  <meta name="Author" content="">
+  <meta name="Keywords" content="">
+  <meta name="Description" content="">
+  <link rel="stylesheet" type="text/css" href="" />
+  <style type="text/css">
+
+  </style>
+
+  <script type="text/javascript" src=""></script>
+  <script language="JavaScript" type="text/javascript">
+    //<![CDATA[
+          
+    //]]>
+   </script>
+ </head>
+
+ <body>
+ 		<div>
+ 			{% for category,message in get_flashed_messages(with_categories=true) %}
+				<p>{{message}}</p>
+			{% endfor %}
+ 		</div>
+		<form action="/auth" method="post">
+			<input type="hidden" name="action" value="check"/>
+			{% if request.values.get("next", None) %}
+				<input type="hidden" name="next" value="{{request.values['next']}}"/>
+			{% endif %}
+			<div class="row"><label class="label">User Name</label><input type="text" name="name" class="field" id="name"/></div>
+			<div class="row"><label class="label">Password</label><input type="password" name="password" class="field"/></div>
+			<div class="row" style="text-align:center"><input class="btn" type="submit" value="LOGIN"/>&nbsp;
+			<input type="button" value="REGISTER" class="btn" onclick="register()"/></div>
+		</form>
+ </body>
+</html>

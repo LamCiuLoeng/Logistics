@@ -8,4 +8,11 @@
 	{{content}}
 	
 	{{_("Hello,World!")}}
+	
+	
+	{%if session['login']%}
+		Welcome,{{session['user_profile']['name']}} | <a href="/auth?action=logout">{{_('Logout')}}</a>
+	{%else%}
+		<a href="/auth">{{_('Login')}}</a>
+	{%endif%}
 {% endblock %}

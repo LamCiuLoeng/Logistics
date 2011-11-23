@@ -1,0 +1,13 @@
+{% extends "master.html" %}
+
+{% block content %}
+
+<h1>New</h1>
+<form action="{{url_for(name_for_url)}}">
+	<input type="hidden" name="action" value="SAVE"/>
+	<input type="hidden" name="save_type" value="NEW"/>
+	
+</form>
+
+<a href="{{url_for(name_for_url)}}">{{_('Return')}}</a>
+{% endblock %}

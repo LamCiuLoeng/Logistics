@@ -16,10 +16,13 @@ sys.setdefaultencoding('utf8')
 def init():
     try:
         print "create tables"
+        metadata.drop_all(engine)
         metadata.create_all(engine)
 
         print "insert default value"
         #add the default value here
+
+        DBSession.add(User(name = 'admin', email = 'admin@text.com', password = 'admin', first_name = 'Admin', last_name = 'Test'))
 
         DBSession.commit()
         print "finish init!"

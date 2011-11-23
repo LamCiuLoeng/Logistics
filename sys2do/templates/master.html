@@ -8,21 +8,25 @@
 	
 	<title>{% block title %}{{_("Logistics Management")}}{% block subtitle %}{% endblock %}{% endblock %}</title>
 	
+	<link href="{{url_for('.static', filename='css/modaldialog/jquery.modaldialog.css')}}" rel="stylesheet" type="text/css" />
 	<link href="{{url_for('.static', filename='css/screen.css')}}" rel="stylesheet" type="text/css" />
 	{% block extCSS %}{% endblock %}
 
-	<script src="{{url_for('.static', filename='js/jquery-1.6.min.js')}}" type="text/javascript"></script>	
+	<script src="{{url_for('.static', filename='js/jquery-1.7.1.min.js')}}" type="text/javascript"></script>
+	<script src="{{url_for('.static', filename='js/modaldialog/jquery.modaldialog.js')}}" type="text/javascript"></script>
+	
+	
+		
 	<script language="JavaScript" type="text/javascript">
     //<![CDATA[
     	$(document).ready(function(){
-			var msgs = Array();
-			{% for category,message in get_flashed_messages(with_categories=true) %}								
-				msgs.push("[{{category}}]  {{message}}");
-			{% endfor %}
-			if(msgs.length>0){
-				alert(msgs.join("\n"));
-			}					
-				
+			{% for category,message in get_flashed_messages(with_categories=true) %}
+				{% if category == 'INFO'%}
+					$.modaldialog.success('{{message}}');
+				{% elif category == 'ERROR' %}
+					$.modaldialog.error('{{message}}');
+				{% endif %}
+			{% endfor %}	
 		});
     //]]>
    </script>

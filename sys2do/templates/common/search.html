@@ -1,0 +1,16 @@
+{% extends "master.html" %}
+
+{% block content %}
+	
+	<h1>{{_('Search Result')}}</h1>
+	<a href="{{url_for(name_for_url)}}?action=ADD">{{_('Add New Record')}}</a>
+	<table>
+		{%for record in result%}
+			<tr>
+				<td><a href="{{url_for(name_for_url)}}?action=UPDATE&id={{record.id}}">{{record}}</a></td>
+				<td><a href="{{url_for(name_for_url)}}?action=DELETE&id={{record.id}}">{{_('Delete')}}</a></td>
+			</tr>
+		{%endfor%}
+	</table>
+	
+{% endblock %}

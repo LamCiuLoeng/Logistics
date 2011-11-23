@@ -9,13 +9,14 @@
 import traceback
 from functools import wraps
 
+from flaskext.babel import gettext as _
 from flask import g, request, redirect, url_for, render_template, session, flash
 from flask import current_app as app
 
 from sys2do.util.common import MESSAGE_ERROR
 
 
-__all__ = ['login_required', 'templated', 'has_all_permissions', 'is_all_roles', 'is_any_roles']
+__all__ = ['login_required', 'templated', 'has_all_permissions', 'is_all_groups', 'is_any_groups']
 
 
 def login_required(f):
@@ -46,7 +47,7 @@ def templated(template = None):
     return decorator
 
 
-def has_all_permissions(ps = [], message = "You do not get the permissions !", url = "/index"):
+def has_all_permissions(ps = [], message = _("You do not get the permission!"), url = "/index"):
     def decorator(f):
         @wraps(f)
         def decorated_function(*args, **kwargs):
@@ -61,7 +62,7 @@ def has_all_permissions(ps = [], message = "You do not get the permissions !", u
     return decorator
 
 
-def has_any_permissions(ps = [], message = "You do not get the permissions !", url = "/index"):
+def has_any_permissions(ps = [], message = _("You do not get the permission!"), url = "/index"):
     def decorator(f):
         @wraps(f)
         def decorated_function(*args, **kwargs):
@@ -76,7 +77,7 @@ def has_any_permissions(ps = [], message = "You do not get the permissions !", u
     return decorator
 
 
-def is_all_roles(ps = [], message = "You do not get the the permissions !", url = "/index"):
+def is_all_groups(ps = [], message = _("You do not get the permission!"), url = "/index"):
     def decorator(f):
         @wraps(f)
         def decorated_function(*args, **kwargs):
@@ -92,7 +93,7 @@ def is_all_roles(ps = [], message = "You do not get the the permissions !", url 
 
 
 
-def is_any_roles(ps = [], message = "You do not get the permissions !", url = "/index"):
+def is_any_groups(ps = [], message = _("You do not get the permission!"), url = "/index"):
     def decorator(f):
         @wraps(f)
         def decorated_function(*args, **kwargs):

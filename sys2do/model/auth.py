@@ -22,10 +22,13 @@ from sqlalchemy.types import Unicode, Integer, DateTime, Date
 from sqlalchemy.orm import relation
 from sys2do.model import DeclarativeBase, metadata, DBSession
 
-__all__ = ['User', 'Group', 'Permission', 'SysMixin']
+__all__ = ['User', 'Group', 'Permission', 'SysMixin', 'CRUDMixin', ]
 
 def getUserID():
-    return session['user_profile']['id']
+    try:
+        return session['user_profile']['id']
+    except:
+        return None
 
 
 class SysMixin(object):
@@ -43,6 +46,22 @@ class SysMixin(object):
     def update_by(self):
         return DBSession.query(User).get(self.update_by_id)
 
+
+
+class CRUDMixin(object):
+
+    @classmethod
+    def get(clz, id):
+        return DBSession.query(clz).get(id)
+
+    def populate(self):
+        return None
+
+    def saveAsNew(self):
+        return None
+
+    def saveAsUpdate(self):
+        return None
 
 #{ Association tables
 
@@ -69,7 +88,7 @@ user_group_table = Table('system_user_group', metadata,
 #{ The auth* model itself
 
 
-class Group(DeclarativeBase, SysMixin):
+class Group(DeclarativeBase, SysMixin, CRUDMixin):
     __tablename__ = 'system_group'
 
     id = Column(Integer, autoincrement = True, primary_key = True)
@@ -88,11 +107,12 @@ class Group(DeclarativeBase, SysMixin):
 # The 'info' argument we're passing to the email_address and password columns
 # contain metadata that Rum (http://python-rum.org/) can use generate an
 # admin interface for your models.
-class User(DeclarativeBase, SysMixin):
+class User(DeclarativeBase, SysMixin, CRUDMixin):
     __tablename__ = 'system_user'
 
     id = Column(Integer, autoincrement = True, primary_key = True)
-    email = Column(Unicode(100), unique = True, nullable = False)
+    name = Column(Unicode(100), unique = True, nullable = False)
+    email = Column(Unicode(200), unique = True, nullable = False)
     password = Column(Unicode(50))
     first_name = Column(Unicode(50))
     last_name = Column(Unicode(50))
@@ -120,7 +140,7 @@ class User(DeclarativeBase, SysMixin):
     @classmethod
     def by_user_name(cls, username):
         """Return the user object whose user name is ``username``."""
-        return DBSession.query(cls).filter(cls.user_name == username).first()
+        return DBSession.query(cls).filter(cls.name == username).first()
 
     def validate_password(self, password):
         return self.password == password
@@ -132,16 +152,16 @@ class User(DeclarativeBase, SysMixin):
     def populate(self):
         return {
                 'id' : self.id,
+                'name' : self.name,
                 'email' : self.email,
                 'first_name' : self.first_name,
                 'last_name' : self.last_name,
                 'image_url' : self.image_url,
                 'phone' : self.phone,
-                'name' : unicode(self)
                 }
 
 
-class Permission(DeclarativeBase, SysMixin):
+class Permission(DeclarativeBase, SysMixin, CRUDMixin):
     __tablename__ = 'system_permission'
 
     id = Column(Integer, autoincrement = True, primary_key = True)
