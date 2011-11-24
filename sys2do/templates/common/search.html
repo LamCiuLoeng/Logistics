@@ -3,12 +3,12 @@
 {% block content %}
 	
 	<h1>{{_('Search Result')}}</h1>
-	<a href="{{url_for(name_for_url)}}?action=ADD">{{_('Add New Record')}}</a>
+	<a href="{{url_for(handler.__name__)}}?{{handler.action_name}}=ADD">{{_('Add New Record')}}</a>
 	<table>
 		{%for record in result%}
 			<tr>
-				<td><a href="{{url_for(name_for_url)}}?action=UPDATE&id={{record.id}}">{{record}}</a></td>
-				<td><a href="{{url_for(name_for_url)}}?action=DELETE&id={{record.id}}">{{_('Delete')}}</a></td>
+				<td><a href="{{url_for(handler.__name__)}}?{{handler.action_name}}=UPDATE&id={{record.id}}">{{record}}</a></td>
+				<td><a href="{{url_for(handler.__name__)}}?{{handler.action_name}}=DELETE&id={{record.id}}">{{_('Delete')}}</a></td>
 			</tr>
 		{%endfor%}
 	</table>

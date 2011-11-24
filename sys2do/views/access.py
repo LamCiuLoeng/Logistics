@@ -6,12 +6,12 @@
 #  Description:
 ###########################################
 '''
-from base import Handler
+from base import createHandler, Handler
 from sys2do.model import User, Group, Permission
 
 __all__ = ['userHandler', 'groupHandler', 'permissionHandler']
 
 
-userHandler = Handler(User, 'userHandler')
-groupHandler = Handler(Group, 'groupHandler')
-permissionHandler = Handler(Permission, 'permissionHandler',)
+userHandler = createHandler(User, name_for_url = 'userHandler')
+groupHandler = createHandler(Group, name_for_url = 'groupHandler')
+permissionHandler = createHandler(Permission, 'permissionHandler')

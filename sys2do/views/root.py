@@ -13,7 +13,7 @@ from sys2do.util.decorator import templated, login_required, has_all_permissions
 from sys2do.util.common import _g, MESSAGE_ERROR, MESSAGE_INFO, upload
 from sys2do.setting import UPLOAD_FOLDER, ALLOWED_EXTENSIONS, UPLOAD_FOLDER_URL
 
-from sys2do.views.base import Handler
+from sys2do.views.base import createHandler, Handler
 
 
 
@@ -64,9 +64,10 @@ def _logout():
     return redirect(url_for('authHandler'))
 
 
-authHandler = Handler(User,
+authHandler = createHandler(User,
                       name_for_url = 'authHandler',
                       default_action = 'login',
                       redirect_url = '/auth',
                       action_mapping = {'login' : _login, 'check' : _check, 'logout' : _logout}
                       )
+

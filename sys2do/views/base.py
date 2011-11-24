@@ -16,7 +16,7 @@ from sys2do.model.auth import CRUDMixin
 
 
 
-__all__ = ['Handler']
+__all__ = ['Handler', 'createHandler']
 
 
 class Handler(object):
@@ -26,6 +26,7 @@ class Handler(object):
                  name_for_url,
                  default_action = 'SEARCH',
                  action_name = 'action',
+                 save_type_name = 'save_type',
                  redirect_url = "/index",
                  action_mapping = {}):
 
@@ -33,6 +34,7 @@ class Handler(object):
         self.__name__ = name_for_url
         self.default_action = default_action
         self.action_name = action_name
+        self.save_type_name = save_type_name
         self.redirect_url = redirect_url
         self.action_mapping = {
                               'SEARCH' : self.search,
@@ -64,15 +66,15 @@ class Handler(object):
 
     def save(self) :
         if isinstance(self.dbClz, CRUDMixin):
-            save_type = _g('save_type')
+            save_type = _g(self.save_type_name)
             if save_type not in ['NEW', 'UPDATE']:
                 flash(_('No such operation!'), MESSAGE_ERROR)
                 return redirect(self.redirect_url)
             try:
-                if _g('save_type') == 'NEW':
+                if save_type == 'NEW':
                     DBSession.add(self.dbClz.saveAsNew())
                     msg = _('Save the new record successfully!')
-                elif _g('save_type') == 'UPDATE':
+                elif save_type == 'UPDATE':
                     obj = DBSession.query(self.dbClz).get(_g('id'))
                     obj.saveAsUpdate()
                     msg = _('Update the record successfully!')
@@ -102,15 +104,23 @@ class Handler(object):
 
 
     def _render_template(self, template_name, **context):
-        context['name_for_url'] = self.__name__
+        context['handler'] = self
         return render_template(template_name, **context)
 
 
 
     def __call__(self):
+        app.logger.info(id(self))
         action = _g(self.action_name) or self.default_action
         if action not in self.action_mapping:
             flash(_('No such operation!'), MESSAGE_ERROR)
             return redirect(self.redirect_url)
         return self.action_mapping[action]()
 
+
+
+
+def createHandler(dbClz, name_for_url, *args, **kw):
+    _rf = lambda : Handler(dbClz, name_for_url, *args, **kw)()
+    _rf.__name__ = name_for_url
+    return _rf
