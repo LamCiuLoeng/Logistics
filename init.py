@@ -22,7 +22,7 @@ def init():
         print "insert default value"
         #add the default value here
 
-        DBSession.add(User(name = 'admin', email = 'admin@text.com', password = 'admin', first_name = 'Admin', last_name = 'Test'))
+        DBSession.add(User(name = 'admin', email = 'admin@test.com', password = 'admin', first_name = 'Admin', last_name = 'Test'))
 
         DBSession.commit()
         print "finish init!"

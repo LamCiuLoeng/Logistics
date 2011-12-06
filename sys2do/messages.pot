@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2011-10-25 15:21+0800\n"
+"POT-Creation-Date: 2011-12-06 18:40+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,6 +16,40 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
+
+#: constant.py:19
+msgid "No such action!"
+msgstr ""
+
+#: constant.py:20
+msgid "Save the record successfully!"
+msgstr ""
+
+#: constant.py:21
+msgid "Update the record successfully!"
+msgstr ""
+
+#: constant.py:22
+msgid "Delete the record successfully!"
+msgstr ""
+
+#: constant.py:23
+msgid ""
+"The service is not available temporarily,please try it later or contact "
+"the administrator."
+msgstr ""
+
+#: constant.py:24
+msgid "No ID supply for this record!"
+msgstr ""
+
+#: constant.py:25
+msgid "The record does not exist!"
+msgstr ""
+
+#: constant.py:26
+msgid "The record already exist!"
+msgstr ""
 
 #: templates/404.html:6
 msgid "The page doesn't exist!"
@@ -25,11 +59,60 @@ msgstr ""
 msgid "Internal Server Error!"
 msgstr ""
 
-#: templates/index.html:8
-msgid "Hello,World!"
+#: templates/login.html:4 templates/login.html:34 templates/master.html:48
+msgid "Login"
+msgstr ""
+
+#: templates/login.html:32
+msgid "User Name"
+msgstr ""
+
+#: templates/login.html:33
+msgid "Password"
+msgstr ""
+
+#: templates/login.html:35
+msgid "Register"
 msgstr ""
 
 #: templates/master.html:9
 msgid "Logistics Management"
+msgstr ""
+
+#: templates/master.html:46
+msgid "Logout"
+msgstr ""
+
+#: templates/common/add.html:12 templates/common/update.html:13
+msgid "Return"
+msgstr ""
+
+#: templates/common/search.html:5
+msgid "Search Result"
+msgstr ""
+
+#: templates/common/search.html:6
+msgid "Add New Record"
+msgstr ""
+
+#: templates/common/search.html:11
+msgid "Delete"
+msgstr ""
+
+#: util/decorator.py:50 util/decorator.py:65 util/decorator.py:80
+#: util/decorator.py:96
+msgid "You do not get the permission!"
+msgstr ""
+
+#: views/auth.py:41
+msgid "This user does not exist!"
+msgstr ""
+
+#: views/auth.py:45
+msgid "The password is wrong!"
+msgstr ""
+
+#: views/root.py:25
+msgid "Hello,World!"
 msgstr ""
 

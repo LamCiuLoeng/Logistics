@@ -1,5 +1,5 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-US" lang="en-US"> 
+<html xmlns="http://www.w3.org/1999/xhtml"> 
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	{% block keyword %}
@@ -8,12 +8,12 @@
 	
 	<title>{% block title %}{{_("Logistics Management")}}{% block subtitle %}{% endblock %}{% endblock %}</title>
 	
-	<link href="{{url_for('.static', filename='css/modaldialog/jquery.modaldialog.css')}}" rel="stylesheet" type="text/css" />
-	<link href="{{url_for('.static', filename='css/screen.css')}}" rel="stylesheet" type="text/css" />
+	<link href="{{url_for('static', filename='css/modaldialog/jquery.modaldialog.css')}}" rel="stylesheet" type="text/css" />
+	<link href="{{url_for('static', filename='css/screen.css')}}" rel="stylesheet" type="text/css" />
 	{% block extCSS %}{% endblock %}
 
-	<script src="{{url_for('.static', filename='js/jquery-1.7.1.min.js')}}" type="text/javascript"></script>
-	<script src="{{url_for('.static', filename='js/modaldialog/jquery.modaldialog.js')}}" type="text/javascript"></script>
+	<script src="{{url_for('static', filename='js/jquery-1.7.1.min.js')}}" type="text/javascript"></script>
+	<script src="{{url_for('static', filename='js/modaldialog/jquery.modaldialog.js')}}" type="text/javascript"></script>
 	
 	
 		
@@ -39,6 +39,14 @@
 		{% block header %}
 			<div id="header">
 				<!-- header Here -->
+				<ul>
+					<li><a href="/index">首页</a></li>
+				</ul>
+				{%if session['login']%}
+					Welcome,{{session['user_profile']['name']}} | <a href="{{url_for('auth.logout')}}">{{_('Logout')}}</a>
+				{%else%}
+					<a href="{{url_for('auth.login')}}">{{_('Login')}}</a>
+				{%endif%}
 			</div>
 		{% endblock %}
 		

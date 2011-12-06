@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2011-10-25 15:21+0800\n"
-"PO-Revision-Date: 2011-10-25 15:24+0800\n"
+"POT-Creation-Date: 2011-12-06 18:40+0800\n"
+"PO-Revision-Date: 2011-12-06 18:47+0800\n"
 "Last-Translator: CL.Lam <lamciuloeng@gmail.com>\n"
 "Language-Team: zh_HK <LL@li.org>\n"
 "Plural-Forms: nplurals=1; plural=0\n"
@@ -17,19 +17,105 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
+#: constant.py:19
+msgid "No such action!"
+msgstr "沒有該操作！"
+
+#: constant.py:20
+msgid "Save the record successfully!"
+msgstr "成功保存記錄！"
+
+#: constant.py:21
+msgid "Update the record successfully!"
+msgstr "成功更新記錄！"
+
+#: constant.py:22
+msgid "Delete the record successfully!"
+msgstr "成功刪除記錄"
+
+#: constant.py:23
+msgid "The service is not available temporarily,please try it later or contact the administrator."
+msgstr "服務暫時不可用，請稍候再試或與管理員聯繫。"
+
+#: constant.py:24
+msgid "No ID supply for this record!"
+msgstr "沒有提供該記錄的ID！"
+
+#: constant.py:25
+msgid "The record does not exist!"
+msgstr "該記錄不存在！"
+
+#: constant.py:26
+msgid "The record already exist!"
+msgstr "該記錄已經存在！"
+
 #: templates/404.html:6
 msgid "The page doesn't exist!"
-msgstr "頁面不存在！"
+msgstr "該頁面不存在！"
 
 #: templates/500.html:6
 msgid "Internal Server Error!"
-msgstr "伺服器內部錯誤！"
+msgstr "內部伺服器錯誤！"
 
-#: templates/index.html:8
-msgid "Hello,World!"
-msgstr "你好，世界！"
+#: templates/login.html:4
+#: templates/login.html:34
+#: templates/master.html:48
+msgid "Login"
+msgstr "登錄"
+
+#: templates/login.html:32
+msgid "User Name"
+msgstr "用戶名"
+
+#: templates/login.html:33
+msgid "Password"
+msgstr "密碼"
+
+#: templates/login.html:35
+msgid "Register"
+msgstr "註冊"
 
 #: templates/master.html:9
 msgid "Logistics Management"
 msgstr "物流管理系統"
+
+#: templates/master.html:46
+msgid "Logout"
+msgstr "註銷"
+
+#: templates/common/add.html:12
+#: templates/common/update.html:13
+msgid "Return"
+msgstr "返回"
+
+#: templates/common/search.html:5
+msgid "Search Result"
+msgstr "查詢結果"
+
+#: templates/common/search.html:6
+msgid "Add New Record"
+msgstr "增新記錄"
+
+#: templates/common/search.html:11
+msgid "Delete"
+msgstr "刪除"
+
+#: util/decorator.py:50
+#: util/decorator.py:65
+#: util/decorator.py:80
+#: util/decorator.py:96
+msgid "You do not get the permission!"
+msgstr "你沒有該權限！"
+
+#: views/auth.py:41
+msgid "This user does not exist!"
+msgstr "用戶不存在！"
+
+#: views/auth.py:45
+msgid "The password is wrong!"
+msgstr "密碼錯誤！"
+
+#: views/root.py:25
+msgid "Hello,World!"
+msgstr ""
 

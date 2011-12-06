@@ -1,0 +1,25 @@
+{% extends "master.html" %}
+
+{% block extJS %}
+
+{% endblock %}
+
+{% block content %}
+	<p><a href="{{url_for('.view', action = 'add')}}">新建订单</a></p>
+	
+	<table border="1" cellpadding="3" cellspacing="3">
+		<thead>
+			<tr>
+				<td>订单号</td>
+				<td>下单公司</td>
+			</tr>
+			{% for r in result%}
+			<tr>
+				<td><a href="{{url_for('.view', action = 'revise',id=r.id)}}">{{r.no}}</a></td>
+				<td>{{r.source_company}}</td>
+			</tr>
+			{% endfor %}
+		</thead>
+	</table>
+	
+{% endblock %}

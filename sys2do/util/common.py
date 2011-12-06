@@ -15,11 +15,11 @@ from flaskext import babel
 
 from sys2do.setting import UPLOAD_FOLDER, ALLOWED_EXTENSIONS, UPLOAD_FOLDER_URL
 from sys2do.model import DBSession, UploadFile
+import traceback
 
-__all__ = ['MESSAGE_INFO', 'MESSAGE_ERROR', '_g', '_gl', 'upload', 'makeException']
+__all__ = ['_g', '_gl', 'getOr404', 'upload', 'makeException']
 
-MESSAGE_INFO = "INFO"
-MESSAGE_ERROR = "ERROR"
+
 
 
 def _g(name, default = None):
@@ -31,6 +31,18 @@ def _gl(name, default = []):
 
 def _allowedFile(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+
+def getOr404(obj, id, redirect_url = "/index", message = u"该记录不存在!"):
+    try:
+        v = DBSession.query(obj).get(id)
+        if v : return v
+        else : raise makeException("No such obj!")
+    except:
+        traceback.print_exc()
+        flash(message)
+        return redirect(redirect_url)
 
 
 def upload(name):

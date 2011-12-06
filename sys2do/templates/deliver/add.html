@@ -1,0 +1,32 @@
+{% extends "master.html" %}
+
+{% block extJS %}
+
+{% endblock %}
+
+{% block content %}
+	<form method="post" action="{{url_for('.view',action='add_deliver')}}">
+	<p>
+		<input type="submit" value="新增正单"/>
+	</p>
+	<table border="1" cellpadding="3" cellspacing="3">
+		<thead>
+			<tr>
+				<td><input type="checkbox" onclick=""/></td>
+				<td>订单号</td>
+				<td>下单公司</td>
+				<td>收货公司</td>
+			</tr>
+			{% for r in result%}
+			<tr>
+				<td><input type="checkbox" name="order_ids" value="{{r.id}}"/></td>
+				<td>{{r.no}}</td>
+				<td>{{r.source_company}}</td>
+				<td>{{r.target_company}}</td>
+			</tr>
+			{% endfor %}
+		</thead>
+	</table>
+	</form>
+	
+{% endblock %}

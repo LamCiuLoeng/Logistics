@@ -1,8 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html>
  <head>
-  <title> New Document </title>
-  <meta name="Generator" content="EditPlus">
+  <title>{{_('Login')}}</title>
   <meta name="Author" content="">
   <meta name="Keywords" content="">
   <meta name="Description" content="">
@@ -25,15 +24,15 @@
 				<p>{{message}}</p>
 			{% endfor %}
  		</div>
-		<form action="/auth" method="post">
+		<form action="{{url_for('auth.check')}}" method="post">
 			<input type="hidden" name="action" value="check"/>
 			{% if request.values.get("next", None) %}
 				<input type="hidden" name="next" value="{{request.values['next']}}"/>
 			{% endif %}
-			<div class="row"><label class="label">User Name</label><input type="text" name="name" class="field" id="name"/></div>
-			<div class="row"><label class="label">Password</label><input type="password" name="password" class="field"/></div>
-			<div class="row" style="text-align:center"><input class="btn" type="submit" value="LOGIN"/>&nbsp;
-			<input type="button" value="REGISTER" class="btn" onclick="register()"/></div>
+			<div class="row"><label class="label">{{_('User Name')}}</label><input type="text" name="name" class="field" id="name"/></div>
+			<div class="row"><label class="label">{{_('Password')}}</label><input type="password" name="password" class="field"/></div>
+			<div class="row" style="text-align:center"><input class="btn" type="submit" value="{{_('Login')}}"/>&nbsp;
+			<input type="button" value="{{_('Register')}}" class="btn" onclick="register()"/></div>
 		</form>
  </body>
 </html>

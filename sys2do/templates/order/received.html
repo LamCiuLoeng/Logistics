@@ -1,0 +1,26 @@
+{% extends "master.html" %}
+
+{% block extJS %}
+
+{% endblock %}
+
+{% block content %}
+	<form action="{{url_for('.view', action = 'received_save')}}" method="post">
+		<input type="hidden" name="id" value="{{values['id']}}"/>
+		<input type="submit" value="保存"/> 
+		<input type="reset" value="重置"/>
+		<input type="button" value="取消" onclick="location.href='{{url_for('.view', action = 'index')}}'"/>
+			
+		<p>订单信息</p>
+		<table>
+			<tr><td>订单号</td><td>{{values.get('no','')}}</td></tr>
+			<tr><td>下单公司</td><td>{{values.get('no','')}}</td></tr>
+		</table>
+		
+		<br />
+		
+		<table>
+			<tr><td>收货公司</td><td><input type="text" name="target_company" value="{{values.get('target_company')|ifFalse}}"/></td></tr>
+		</table>
+	</form>
+{% endblock %}
