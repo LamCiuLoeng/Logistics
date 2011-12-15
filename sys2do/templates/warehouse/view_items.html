@@ -1,0 +1,29 @@
+{% extends "master.html" %}
+
+{% block subtitle %} - 仓存管理{% endblock %}
+
+{% block extJS %}
+
+{% endblock %}
+
+{% block content %}
+	<p>{{warehouse}}</p>
+	
+	<table border="1" cellpadding="3" cellspacing="3">
+		<thead>
+			<tr>
+				<td>货物名称</td>
+				<td>货物数量</td>
+				<td>货物来源</td>
+			</tr>
+		</thead>
+		{% for r in result %}
+			<tr>
+				<td>{{r.item}}</td>
+				<td>{{r.qty}}</td>
+				<td>{{r.order_detail.header}}</td>
+			</tr>
+		{% endfor %}
+	</table>
+	
+{% endblock %}

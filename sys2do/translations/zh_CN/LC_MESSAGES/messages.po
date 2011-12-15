@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2011-12-06 18:40+0800\n"
-"PO-Revision-Date: 2011-12-06 18:44+0800\n"
+"POT-Creation-Date: 2011-12-13 17:02+0800\n"
+"PO-Revision-Date: 2011-12-13 17:04+0800\n"
 "Last-Translator: CL.Lam <lamciuloeng@gmail.com>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
 "Plural-Forms: nplurals=1; plural=0\n"
@@ -49,6 +49,64 @@ msgstr "该记录不存在！"
 msgid "The record already exist!"
 msgstr "该记录已经存在！"
 
+#: constant.py:30
+msgid "Cancelled"
+msgstr "已取消"
+
+#: constant.py:31
+msgid "New"
+msgstr ""
+
+#: constant.py:32
+msgid "Goods Received"
+msgstr "已收货"
+
+#: constant.py:33
+msgid "In Store"
+msgstr "入仓"
+
+#: constant.py:34
+msgid "Out Store"
+msgstr "出仓"
+
+#: constant.py:35
+msgid "Goods Loaded"
+msgstr "装载完成"
+
+#: constant.py:36
+msgid "In Travel"
+msgstr "在途"
+
+#: constant.py:37
+msgid "Goods Arrived"
+msgstr "货物到达"
+
+#: constant.py:38
+msgid "Goods Signed"
+msgstr "货物已签收"
+
+#: constant.py:48
+#: templates/register.html:32
+#: templates/order/update.html:10
+msgid "Save"
+msgstr "保存"
+
+#: constant.py:49
+#: templates/order/update.html:11
+msgid "Reset"
+msgstr "重置"
+
+#: constant.py:50
+#: templates/order/update.html:12
+msgid "Cancel"
+msgstr "取消"
+
+#: constant.py:51
+#: templates/common/add.html:12
+#: templates/common/update.html:13
+msgid "Return"
+msgstr "返回"
+
 #: templates/404.html:6
 msgid "The page doesn't exist!"
 msgstr "该页面不存在！"
@@ -57,21 +115,28 @@ msgstr "该页面不存在！"
 msgid "Internal Server Error!"
 msgstr "内部服务器错误！"
 
+#: templates/index.html:34
+msgid "Submit"
+msgstr "提交"
+
 #: templates/login.html:4
 #: templates/login.html:34
-#: templates/master.html:48
 msgid "Login"
 msgstr "登录"
 
 #: templates/login.html:32
+#: templates/register.html:29
+#: templates/admin/user_index.html:13
 msgid "User Name"
 msgstr "用户名"
 
 #: templates/login.html:33
+#: templates/register.html:30
 msgid "Password"
 msgstr "密码"
 
 #: templates/login.html:35
+#: templates/register.html:4
 msgid "Register"
 msgstr "注册"
 
@@ -79,14 +144,38 @@ msgstr "注册"
 msgid "Logistics Management"
 msgstr "物流管理系统"
 
-#: templates/master.html:46
-msgid "Logout"
-msgstr "注销"
+#: templates/register.html:31
+msgid "Confirmed Password"
+msgstr ""
 
-#: templates/common/add.html:12
-#: templates/common/update.html:13
-msgid "Return"
-msgstr "返回"
+#: templates/search_orders.html:12
+msgid "Time"
+msgstr ""
+
+#: templates/search_orders.html:13
+msgid "Content"
+msgstr ""
+
+#: templates/track.html:10
+msgid "Ordr No"
+msgstr ""
+
+#: templates/track.html:11
+msgid "Order Time"
+msgstr ""
+
+#: templates/track.html:12
+msgid "Status"
+msgstr ""
+
+#: templates/admin/user_index.html:8
+#, fuzzy
+msgid "New Record"
+msgstr "增加新记录"
+
+#: templates/admin/user_index.html:14
+msgid "Create Time"
+msgstr ""
 
 #: templates/common/search.html:5
 msgid "Search Result"
@@ -97,8 +186,21 @@ msgid "Add New Record"
 msgstr "增加新记录"
 
 #: templates/common/search.html:11
+#: templates/order/update.html:13
 msgid "Delete"
 msgstr "删除"
+
+#: templates/order/update.html:16
+msgid "Order Information"
+msgstr ""
+
+#: templates/order/update.html:18
+msgid "Order No"
+msgstr ""
+
+#: templates/order/update.html:19
+msgid "Order Company"
+msgstr ""
 
 #: util/decorator.py:50
 #: util/decorator.py:65
@@ -107,15 +209,17 @@ msgstr "删除"
 msgid "You do not get the permission!"
 msgstr "你没有权限"
 
-#: views/auth.py:41
+#: views/auth.py:46
 msgid "This user does not exist!"
 msgstr "用户不存在！"
 
-#: views/auth.py:45
+#: views/auth.py:50
 msgid "The password is wrong!"
 msgstr "密码错误！"
 
-#: views/root.py:25
+#: views/root.py:50
 msgid "Hello,World!"
 msgstr ""
 
+#~ msgid "Logout"
+#~ msgstr "注销"

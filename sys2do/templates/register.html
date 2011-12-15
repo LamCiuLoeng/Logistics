@@ -1,0 +1,36 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+ <head>
+  <title>{{_('Register')}}</title>
+  <meta name="Author" content="">
+  <meta name="Keywords" content="">
+  <meta name="Description" content="">
+  <link rel="stylesheet" type="text/css" href="" />
+  <style type="text/css">
+
+  </style>
+
+  <script type="text/javascript" src=""></script>
+  <script language="JavaScript" type="text/javascript">
+    //<![CDATA[
+          
+    //]]>
+   </script>
+ </head>
+
+ <body>
+ 		<div>
+ 			{% for category,message in get_flashed_messages(with_categories=true) %}
+				<p>{{message}}</p>
+			{% endfor %}
+ 		</div>
+		<form action="{{url_for('bpAuth.save_register')}}" method="post">
+			<table>
+				<tr><td>{{_('User Name')}}</td><td><input type="text" name="name" value=""/></td></tr>
+				<tr><td>{{_('Password')}}</td><td><input type="password" name="password" value=""/></td></tr>
+				<tr><td>{{_('Confirmed Password')}}</td><td><input type="password" name="repassword" value=""/></td></tr>
+				<tr><td colspan="2"><input type="submit" value="{{_('Save')}}" class="btn"/></td></tr>
+			</table>	
+		</form>
+ </body>
+</html>

@@ -6,40 +6,34 @@
 #  Description:
 ###########################################
 '''
-
+from datetime import datetime as dt
+from datetime import timedelta
 
 from flask import Blueprint
 
 from flask.views import View
 from werkzeug.utils import redirect
 from flask.helpers import url_for, flash
-from sys2do.model.logic import OrderHeader
+from sys2do.model.logic import OrderHeader, OrderLog, OrderDetail
 from sys2do.model import DBSession
 from sys2do.util.decorator import templated, login_required
 from sys2do import app
 from sys2do.constant import MESSAGE_ERROR, MESSAGE_INFO, MSG_UPDATE_SUCC, \
-    MSG_DELETE_SUCC, MSG_NO_ID_SUPPLIED, MSG_SERVER_ERROR, MSG_NO_SUCH_ACTION
-from sys2do.util.common import _g, getOr404
+    MSG_DELETE_SUCC, MSG_NO_ID_SUPPLIED, MSG_SERVER_ERROR, MSG_NO_SUCH_ACTION, \
+    MSG_SAVE_SUCC, ORDER_CANCELLED, RECEIVED_GOODS, STATUS_LIST, IN_TRAVEL, \
+    IN_STORE
+from sys2do.views import BasicView
+from sys2do.util.common import _g, getOr404, _gp
+from sys2do.model.master import CustomerProfile, WarehouseItem
+from sys2do.util.logic_helper import genSystemNo
+from sqlalchemy.sql.expression import and_
 
 
 __all__ = ['bpOrder']
 
 bpOrder = Blueprint('bpOrder', __name__)
 
-class OrderView(View):
-    methods = ['GET', 'POST']
-#    decorators = [login_required]
-
-    def default(self):  return url_for('.view', action = 'index')
-
-    def dispatch_request(self, action):
-        return getattr(self, action)()
-        try:
-            pass
-        except AttributeError, e:
-            flash(MSG_NO_SUCH_ACTION, MESSAGE_ERROR)
-            return redirect(self.default())
-
+class OrderView(BasicView):
 
     @templated('order/index.html')
     def index(self):
@@ -48,16 +42,34 @@ class OrderView(View):
 
     @templated('order/add.html')
     def add(self):
-        return {}
+        cps = DBSession.query(CustomerProfile).all()
+        companys = []
+        vendors = []
+        items = []
+        for cp in cps:
+            companys.extend(cp.customers)
+            vendors.extend(cp.vendors)
+            items.extend(cp.items)
+        return {'companys' :companys , 'vendors' : vendors, 'items' : items}
+
 
     def save_new(self):
-        params = {}
-        for f in ['no', 'source_company']:
-            params[f] = _g(f) or None
-        header = DBSession.add(OrderHeader(**params))
+        c = _g('company')
+        v = _g('vendor')
+
+        no = genSystemNo()
+        order = OrderHeader(no = no, customer_id = c, vendor_id = v)
+        DBSession.add(order)
+
+        for k, v in _gp('item_'):
+            n, id = k.split("_")
+            DBSession.add(OrderDetail(header = order, item_id = id, qty = v))
+
         DBSession.commit()
-        flash(MSG_UPDATE_SUCC, MESSAGE_INFO)
+        flash(MSG_SAVE_SUCC, MESSAGE_INFO)
         return redirect(url_for('.view', action = 'index'))
+
+
 
     @templated('order/update.html')
     def revise(self):
@@ -68,7 +80,7 @@ class OrderView(View):
 
         header = DBSession.query(OrderHeader).get(id)
         values = header.populate()
-        return {'values' : values }
+        return {'values' : values , 'details' : header.details}
 
 
     def save_update(self):
@@ -99,22 +111,35 @@ class OrderView(View):
             return redirect(self.default())
 
         header = DBSession.query(OrderHeader).get(id)
-        header.active = 1
+        header.status = ORDER_CANCELLED[0]
         DBSession.commit()
         flash(MSG_DELETE_SUCC, MESSAGE_INFO)
         return redirect(url_for('.view', action = 'index'))
 
-    @templated('order/received.html')
-    def received(self):
-        header = getOr404(OrderHeader, _g('id'), self.default())
-        return {'values' : header.populate()}
 
-    def received_save(self):
+    def do_action(self):
         header = getOr404(OrderHeader, _g('id'), self.default())
-        header.target_company = _g('target_company') or None
+        status = int(_g('sc'))
+        header.status = status
+
+        DBSession.add(OrderLog(order_id = _g('id'), remark = _g('remark')))
+
+        if status == IN_STORE[0]:
+            for d in header.details:
+                DBSession.add(WarehouseItem(item_id = d.item_id, warehouse_id = 1, qty = d.qty, order_detail_id = d.id))
+
         DBSession.commit()
         flash(MSG_UPDATE_SUCC, MESSAGE_INFO)
         return redirect(self.default())
+
+    @templated('order/warning.html')
+    def warning(self):
+        t = _g('t') or None
+        if not t : return {'result' : [] , 't' : t}
+
+        n = dt.now() + timedelta(int(t))
+        result = DBSession.query(OrderHeader).filter(and_(OrderHeader.status == IN_TRAVEL[0], OrderHeader.expect_time > n)).order_by(OrderHeader.expect_time)
+        return {'result' : result, 't' : t}
 
 
 bpOrder.add_url_rule('/', view_func = OrderView.as_view('view'), defaults = {'action':'index'})

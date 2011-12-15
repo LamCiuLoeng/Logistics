@@ -11,11 +11,204 @@ from sqlalchemy.types import Unicode, Integer, DateTime, Float
 from sqlalchemy.orm import relation, backref
 from sys2do.model import DeclarativeBase, metadata, DBSession
 from auth import SysMixin
+from sqlalchemy.sql.expression import and_
+
+
 
 #__all__ = ['']
 
 
+class Province(DeclarativeBase, SysMixin):
+    __tablename__ = 'master_province'
 
+    id = Column(Integer, autoincrement = True, primary_key = True)
+    name = Column(Unicode(100))
+    remark = Column(Unicode(10000))
+
+    def __str__(self): return self.name
+
+    def __repr__(self): return self.name
+
+    def __unicode__(self): return self.name
+
+
+
+
+class City(DeclarativeBase, SysMixin):
+    __tablename__ = 'master_city'
+
+    id = Column(Integer, autoincrement = True, primary_key = True)
+    name = Column(Unicode(100))
+    province_id = Column(Integer, ForeignKey('master_province.id'))
+    province = relation(Province, backref = backref("cities", order_by = id), primaryjoin = "and_(Province.id == City.province_id, City.active == 0)")
+
+    def __str__(self): return self.name
+
+    def __repr__(self): return self.name
+
+    def __unicode__(self): return self.name
+
+
+
+
+class District(DeclarativeBase, SysMixin):
+    __tablename__ = 'master_district'
+
+    id = Column(Integer, autoincrement = True, primary_key = True)
+    name = Column(Unicode(100))
+    city_id = Column(Integer, ForeignKey('master_city.id'))
+    city = relation(City, backref = backref("districts", order_by = id), primaryjoin = "and_(City.id == District.city_id, District.active == 0)")
+
+    def __str__(self): return self.name
+
+    def __repr__(self): return self.name
+
+    def __unicode__(self): return self.name
+
+
+
+class CustomerProfile(DeclarativeBase, SysMixin):
+    __tablename__ = 'master_customer_profile'
+
+    id = Column(Integer, autoincrement = True, primary_key = True)
+    name = Column(Unicode(1000))
+    remark = Column(Unicode(10000))
+
+    def __str__(self): return self.name
+
+    def __repr__(self): return self.name
+
+    def __unicode__(self): return self.name
+
+
+
+class Customer(DeclarativeBase, SysMixin):
+    __tablename__ = 'master_customer'
+
+    id = Column(Integer, autoincrement = True, primary_key = True)
+
+    name = Column(Unicode(1000))
+    address = Column(Unicode(5000))
+    phone = Column(Unicode(100))
+    contact_person = Column(Unicode(100))
+    remark = Column(Unicode(10000))
+
+    profile_id = Column(Integer, ForeignKey('master_customer_profile.id'))
+    prifile = relation(CustomerProfile, backref = backref("customers", order_by = id), primaryjoin = "and_(CustomerProfile.id == Customer.profile_id, Customer.active == 0)")
+
+    def __str__(self): return self.name
+
+    def __repr__(self): return self.name
+
+    def __unicode__(self): return self.name
+
+
+
+class Vendor(DeclarativeBase, SysMixin):
+    __tablename__ = 'master_vendor'
+
+    id = Column(Integer, autoincrement = True, primary_key = True)
+
+    name = Column(Unicode(1000))
+    address = Column(Unicode(5000))
+    phone = Column(Unicode(100))
+    contact_person = Column(Unicode(100))
+    remark = Column(Unicode(10000))
+
+    profile_id = Column(Integer, ForeignKey('master_customer_profile.id'))
+    prifile = relation(CustomerProfile, backref = backref("vendors", order_by = id), primaryjoin = "and_(CustomerProfile.id == Vendor.profile_id, Vendor.active == 0)")
+
+    def __str__(self): return self.name
+
+    def __repr__(self): return self.name
+
+    def __unicode__(self): return self.name
+
+
+
+class Item(DeclarativeBase, SysMixin):
+    __tablename__ = 'master_item'
+
+    id = Column(Integer, autoincrement = True, primary_key = True)
+    name = Column(Unicode(1000))
+    remark = Column(Unicode(10000))
+
+    profile_id = Column(Integer, ForeignKey('master_customer_profile.id'))
+    prifile = relation(CustomerProfile, backref = backref("items", order_by = id), primaryjoin = "and_(CustomerProfile.id == Item.profile_id, Item.active == 0)")
+
+    def __str__(self): return self.name
+
+    def __repr__(self): return self.name
+
+    def __unicode__(self): return self.name
+
+
+
+class ItemUnit(DeclarativeBase, SysMixin):
+    __tablename__ = 'master_item_unit'
+
+    id = Column(Integer, autoincrement = True, primary_key = True)
+    name = Column(Unicode(1000))
+    remark = Column(Unicode(10000))
+
+    profile_id = Column(Integer, ForeignKey('master_customer_profile.id'))
+    prifile = relation(CustomerProfile, backref = backref("itemunits", order_by = id), primaryjoin = "and_(CustomerProfile.id == ItemUnit.profile_id, ItemUnit.active == 0)")
+
+    def __str__(self): return self.name
+
+    def __repr__(self): return self.name
+
+    def __unicode__(self): return self.name
+
+
+
+
+class Warehouse(DeclarativeBase, SysMixin):
+    __tablename__ = 'master_warehouse'
+
+    id = Column(Integer, autoincrement = True, primary_key = True)
+    name = Column(Unicode(1000))
+    manager = Column(Unicode(1000))
+    address = Column(Unicode(10000))
+    remark = Column(Unicode(10000))
+
+    def __str__(self): return self.name
+
+    def __repr__(self): return self.name
+
+    def __unicode__(self): return self.name
+
+
+    @property
+    def items(self):
+        return DBSession.query(WarehouseItem).filter(and_(WarehouseItem.active == 0, WarehouseItem.warehouse_id == self.id))
+
+
+class WarehouseItem(DeclarativeBase, SysMixin):
+    __tablename__ = 'master_warehouse_item'
+
+    id = Column(Integer, autoincrement = True, primary_key = True)
+    item_id = Column(Integer, ForeignKey('master_item.id'))
+    item = relation(Item)
+    warehouse_id = Column(Integer, ForeignKey('master_warehouse.id'))
+    warehouse = relation(Warehouse)
+    qty = Column(Integer, default = 0)
+    order_detail_id = Column(Integer, ForeignKey('order_detail.id'))
+    remark = Column(Unicode(10000))
+
+
+    @property
+    def order_detail(self):
+        from sys2do.model.logic import OrderDetail
+        return DBSession.query(OrderDetail).get(self.order_detail_id)
+
+
+
+#===============================================================================
+# 
+#===============================================================================
+
+'''
 class Payment(DeclarativeBase, SysMixin):
     __tablename__ = 'master_payment'
 
@@ -25,35 +218,9 @@ class Payment(DeclarativeBase, SysMixin):
 
 
 
-class ItemUnit(DeclarativeBase, SysMixin):
-    __tablename__ = 'master_item_unit'
-
-    id = Column(Integer, autoincrement = True, primary_key = True)
-    name = Column(Unicode(1000))
-    type = Column(Unicode(100))
-    remark = Column(Unicode(10000))
 
 
 
-class Item(DeclarativeBase, SysMixin):
-    __tablename__ = 'master_item'
-
-    id = Column(Integer, autoincrement = True, primary_key = True)
-    item_no = Column(Unicode(100))
-    name = Column(Unicode(1000))
-#    unit_id = Column(Integer, ForeignKey('master_item_unit.id'))
-#    unit = relation(ItemUnit)
-    remark = Column(Unicode(10000))
-
-
-
-class Warehouse(DeclarativeBase, SysMixin):
-    __tablename__ = 'master_warehouse'
-
-    id = Column(Integer, autoincrement = True, primary_key = True)
-    name = Column(Unicode(1000))
-    address = Column(Unicode(10000))
-    remark = Column(Unicode(10000))
 
 
 
@@ -76,16 +243,7 @@ class WarehouseItem(DeclarativeBase, SysMixin):
 
 
 
-class Vendor(DeclarativeBase, SysMixin):
-    __tablename__ = 'master_vendor'
 
-    id = Column(Integer, autoincrement = True, primary_key = True)
-
-    name = Column(Unicode(1000))
-    contact_person = Column(Unicode(100))
-    contact_phone = Column(Unicode(100))
-    contact_address = Column(Unicode(5000))
-    remark = Column(Unicode(10000))
 
 
 
@@ -114,3 +272,6 @@ class ShipmentLogCategory(DeclarativeBase, SysMixin):
     id = Column(Integer, autoincrement = True, primary_key = True)
     name = Column(Unicode(1000))
     remark = Column(Unicode(10000))
+
+
+'''

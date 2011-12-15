@@ -1,0 +1,23 @@
+{% extends "master.html" %}
+
+{% block extJS %}
+
+{% endblock %}
+
+{% block content %}
+		<table border="1" cellpadding="3" cellspacing="3">
+			<tr>
+				<td>{{_('Ordr No')}}</td>
+				<td>{{_('Order Time')}}</td>
+				<td>{{_('Status')}}</td>
+			</tr>
+		{% for order in orders %}
+				<tr>
+					<td>{{order.no}}</td>
+					<td>{{order.create_time|ft}}</td>
+					<td>{{order.status|showStatus}}</td>
+				</tr>
+		{% endfor %}
+		</table>
+	
+{% endblock %}

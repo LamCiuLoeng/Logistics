@@ -17,7 +17,7 @@ from sys2do.setting import UPLOAD_FOLDER, ALLOWED_EXTENSIONS, UPLOAD_FOLDER_URL
 from sys2do.model import DBSession, UploadFile
 import traceback
 
-__all__ = ['_g', '_gl', 'getOr404', 'upload', 'makeException']
+__all__ = ['_g', '_gl', '_gp', 'getOr404', 'upload', 'makeException']
 
 
 
@@ -25,9 +25,11 @@ __all__ = ['_g', '_gl', 'getOr404', 'upload', 'makeException']
 def _g(name, default = None):
     return request.values.get(name, default)
 
-def _gl(name, default = []):
-    return request.form.getlist(name, default)
+def _gl(name):
+    return request.form.getlist(name)
 
+def _gp(prefix):
+    return [(k, v) for k, v in request.values.items() if k.startswith(prefix)]
 
 def _allowedFile(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS

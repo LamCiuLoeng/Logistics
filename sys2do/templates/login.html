@@ -24,7 +24,7 @@
 				<p>{{message}}</p>
 			{% endfor %}
  		</div>
-		<form action="{{url_for('auth.check')}}" method="post">
+		<form action="{{url_for('bpAuth.check')}}" method="post">
 			<input type="hidden" name="action" value="check"/>
 			{% if request.values.get("next", None) %}
 				<input type="hidden" name="next" value="{{request.values['next']}}"/>

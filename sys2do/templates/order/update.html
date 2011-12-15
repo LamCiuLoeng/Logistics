@@ -7,18 +7,38 @@
 {% block content %}
 	<form action="{{url_for('.view', action = 'save_update')}}" method="post">
 		<input type="hidden" name="id" value="{{values['id']}}"/>
-		<input type="submit" value="保存"/> 
-		<input type="reset" value="重置"/>
-		<input type="button" value="取消" onclick="location.href='{{url_for('.view', action = 'index')}}'"/>
-		<input type="button" value="作废" onclick="location.href='{{url_for('.view', action = 'cancel',id=values['id'])}}'">
-		<input type="button" value="收货开单" onclick="location.href='{{url_for('.view', action = 'received',id=values['id'])}}'">
+		<input type="submit" value="{{_('Save')}}"/> 
+		<input type="reset" value="{{_('Reset')}}"/>
+		<input type="button" value="{{_('Cancel')}}" onclick="location.href='{{url_for('.view', action = 'index')}}'"/>
+		<input type="button" value="{{_('Delete')}}" onclick="location.href='{{url_for('.view', action = 'cancel',id=values['id'])}}'">
 		
 		
-		<p>订单信息</p>
-		<table>
-			<tr><td>订单号</td><td><input type="text" name="no" value="{{values.get('no','')}}"/></td></tr>
-			<tr><td>下单公司</td><td><input type="text" name="source_company" value="{{values.get('source_company','')}}"/></td></tr>
-			
+		<p>{{_('Order Information')}}</p>
+		<table border="1" cellpadding="3" cellspacing="3">
+			<tr><td>{{_('Order No')}}</td><td>{{values.get('no','')}}</td></tr>
+			<tr><td>{{_('Order Company')}}</td><td><input type="text" name="customer" value="{{values.get('customer','')}}"/></td></tr>
+			<tr><td>{{_('Order Status')}}</td><td>{{values.get('status')|showStatus}}</td></tr>
+		</table>
+		
+		<table border="1" cellpadding="3" cellspacing="3">
+			{% for d in details %}
+				<tr><td>{{d.item}}</td><td>{{d.qty}}</td></tr>
+			{% endfor %}
 		</table>
 	</form>
+		
+		{% if values.get('status',None) in [0,1,6] %}
+		<form method="post" action="{{url_for('bpOrder.view',action='do_action')}}">
+			<input type="hidden" name="id" value="{{values['id']}}"/>
+			<input type="hidden" name="sc" value="{{values.get('status')+1}}"/>
+			<textarea name="remark"></textarea>
+			{% if values.get('status',None) == 0 %}
+				<input type="submit" value="确认收货">
+			{% elif values.get('status',None) == 1 %}
+				<input type="submit" value="确认入仓">
+			{% elif values.get('status',None) == 6 %}
+				<input type="submit" value="确认签收">
+			{% endif %}
+		</form>
+		{% endif %}			
 {% endblock %}

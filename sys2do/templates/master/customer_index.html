@@ -1,0 +1,32 @@
+{% extends "master.html" %}
+
+{% block extJS %}
+
+{% endblock %}
+
+{% block content %}
+	
+	
+	<table border="1" cellpadding="3" cellspacing="3">
+		<thead>
+			<tr>
+				<td>名称</td>
+				<td>创建人员</td>
+				<td>创建时间</td>
+				<td>最后修改人员</td>
+				<td>最后修改时间</td>
+			</tr>
+				
+			{% for r in result%}
+			<tr>
+				<td><a href="{{url_for('.view', action = 'update',id=r.id)}}">{{r}}</a></td>
+				<td></td>
+				<td>{{r.create_time|ft}}</td>
+				<td></td>
+				<td>{{r.update_time|ft}}</td>
+			</tr>
+			{% endfor %}
+		</thead>
+	</table>
+	
+{% endblock %}

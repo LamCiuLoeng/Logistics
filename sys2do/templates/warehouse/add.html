@@ -1,0 +1,21 @@
+{% extends "master.html" %}
+
+{% block subtitle %} - 仓存管理{% endblock %}
+
+{% block extJS %}
+
+{% endblock %}
+
+{% block content %}
+	
+	<form action="{{url_for('bpWarehouse.view',action='save_new')}}">
+		<table>
+			<tr><td>仓库名称</td><td><input type="text" name="name" /></td></tr>
+			<tr><td>仓库地址</td><td><textarea name="address"></textarea></td></tr>
+			<tr><td>仓库管理人员</td><td><input type="text" name="manager"/></td></tr>
+			<tr><td>备注</td><td><textarea name="remark"></textarea></td></tr>
+			<tr><td colspan="2"><input type="submit" value="Submit"/></td></tr>
+		</table>
+	</form>
+	
+{% endblock %}

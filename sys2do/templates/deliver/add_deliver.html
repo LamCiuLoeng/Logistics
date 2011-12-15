@@ -6,37 +6,43 @@
 
 {% block content %}
 	<form method="post" action="{{url_for('.view',action='deliver_save_new')}}">
-	<input type="hidden" name="ids" value="{{','.join(ids)}}"/>
-	
 	<p>
 		<input type="submit" value="保存"/>
 		<input type="reset" value="重置"/>
 		<input type="button" value="取消"/>
 	</p>
-		<table>
-			<tr><td>正单号</td><td><input type="text" name="no" value=""/></td></tr>
-		</table>
-		
-		
-		<table>
+		{% for r,ds in result %}
+		<table border="1" cellpadding="3" cellspacing="3">
 			<thead>
-				<tr>
-					<td>订单号</td>
-					<td>下单公司</td>
-					<td>收货公司</td>
-				</tr>
+				<tr><td>订单号</td><td>{{r.no}}</td></tr>
+				<tr><td>下单公司</td><td>{{r.customer}}</td></tr>
+				<tr><td>收货公司</td><td>{{r.vendor}}</td></tr>	
 			</thead>
-			<tbody>
-				{% for r in orders%}
 				<tr>
-					<td><input type="checkbox" name="order_ids" value="{{r.id}}"/></td>
-					<td>{{r.no}}</td>
-					<td>{{r.source_company}}</td>
-					<td>{{r.target_company}}</td>
+					<td>货物详情</td>
+					<td>
+						<table border="1" cellpadding="3" cellspacing="3">
+							<thead>
+								<tr>
+									<td>Item Name</td>
+									<td>Qty</td>
+	
+								</tr>
+							</thead>
+						{% for d in ds %}		
+							<tr>
+								<td>{{d.item}}<input type="hidden" name="detail_{{d.id}}" value="{{d.id}}"/></td>
+								<td>{{d.qty}}</td>
+					
+							</tr>
+						{% endfor %}
+						</table>
+					</td>
 				</tr>
-				{% endfor %}
-			</tbody>
 		</table>
+		<br />
+		{% endfor %}
+		
 	</form>
 	
 {% endblock %}

@@ -53,9 +53,9 @@ for error_code in [403, 404, 500] : app.error_handler_spec[None][error_code] = s
 #===============================================================================
 # root.py
 #===============================================================================
-import views.root as r
-app.add_url_rule("/", view_func = r.index, methods = ['GET', 'POST'])
-app.add_url_rule("/index", view_func = r.index, methods = ['GET', 'POST'])
+#import views.root as r
+#app.add_url_rule("/", view_func = r.index, methods = ['GET', 'POST'])
+#app.add_url_rule("/index", view_func = r.index, methods = ['GET', 'POST'])
 
 
 
@@ -67,15 +67,26 @@ app.add_url_rule("/index", view_func = r.index, methods = ['GET', 'POST'])
 #app.add_url_rule("/group", view_func = a.groupHandler, methods = ['GET', 'POST'])
 #app.add_url_rule("/permission", view_func = a.permissionHandler, methods = ['GET', 'POST'])
 
+import views.root
+app.register_blueprint(views.root.bpRoot)
 
 import views.auth
 app.register_blueprint(views.auth.bpAuth, url_prefix = '/auth')
+
+import views.admin
+app.register_blueprint(views.admin.bpAdmin, url_prefix = '/admin')
+
+import views.master
+app.register_blueprint(views.master.bpMaster, url_prefix = '/master')
 
 import views.order
 app.register_blueprint(views.order.bpOrder, url_prefix = '/order')
 
 import views.deliver
 app.register_blueprint(views.deliver.bpDeliver, url_prefix = '/deliver')
+
+import views.warehouse
+app.register_blueprint(views.warehouse.bpWarehouse, url_prefix = '/warehouse')
 
 #===============================================================================
 # import the customize filter and testing

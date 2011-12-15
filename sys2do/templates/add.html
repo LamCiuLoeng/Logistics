@@ -5,11 +5,7 @@
 {% endblock %}
 
 {% block content %}
-	<form action="{{url_for('.view', action = 'save_new')}}" method="post">
-		<input type="submit" value="保存"/> 
-		<input type="reset" value="重置"/>
-		<input type="button" value="取消" onclick="location.href='{{url_for('.view', action = 'index')}}'"/>
-		
+	<form method="post" action="{{url_for('bpRoot.view',action='save')}}">
 		<table border="1" cellpadding="3" cellspacing="3">
 			<tr>
 				<td>Company</td>
@@ -34,6 +30,7 @@
 			{% for item in items %}
 				<tr><td>{{item}}</td><td><input type="text" name="item_{{item.id}}" value=""/></td></tr>
 			{% endfor %}
+			<tr><td colspan="2"><input type="submit" value="Save"/> <input type="reset" value="Reset"/></td></tr>
 		</table>
 	</form>
 {% endblock %}

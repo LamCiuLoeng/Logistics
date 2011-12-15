@@ -1,0 +1,34 @@
+{% extends "master.html" %}
+
+{% block subtitle %} - 仓存管理{% endblock %}
+
+{% block extJS %}
+
+{% endblock %}
+
+{% block content %}
+	
+	<ul>
+		<li><a href="{{url_for('bpWarehouse.view',action='add')}}">新增仓库</a></li>
+	</ul>
+	
+	<table border="1" cellpadding="3" cellspacing="3">
+		<thead>
+			<tr>
+				<td>仓库名称</td>
+				<td>仓库管理人</td>
+				<td>仓库地址</td>
+				<td>查看货物</td>
+			</tr>
+		</thead>
+		{% for r in result %}
+			<tr>
+				<td>{{r}}</td>
+				<td>{{r.manager}}</td>
+				<td>{{r.address}}</td>
+				<td><a href="{{url_for('bpWarehouse.view',action='view_items',id=r.id)}}">查看</a></td>
+			</tr>
+		{% endfor %}
+	</table>
+	
+{% endblock %}

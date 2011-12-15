@@ -1,0 +1,58 @@
+{% extends "master.html" %}
+
+{% block extJS %}
+
+{% endblock %}
+
+{% block content %}
+	{% if header.status in [0,3,4,5,]%}
+	<form action="{{url_for('bpDeliver.view',action='update_status')}}" method="post">
+		<input type="hidden" name="id" value="{{header.id}}"/>
+		<textarea name="remark"></textarea>
+		{%if header.status==0%}
+			<input type="submit" value="确认出仓">
+			<input type="hidden" name="sc" value="3"/>
+		{%elif header.status==3%}
+			<input type="submit" value="装载完成">
+			<input type="hidden" name="sc" value="4"/>
+		{%elif header.status==4%}
+			<input type="submit" value="货物在途">
+			<input type="hidden" name="sc" value="5"/>
+		{%elif header.status==5%}
+			<input type="submit" value="货物到达">
+			<input type="hidden" name="sc" value="6"/>
+		{% endif %}
+	</form>
+	{% endif %}
+	
+	
+	<br />
+	
+	<table border="1" cellpadding="3" cellspacing="3">
+		<tr><td>正单号</td><td>{{header.no}}</td></tr>
+		<tr><td>创建时间</td><td>{{header.create_time|ft}}</td></tr>
+		<tr><td>状态</td><td>{{header.status|showStatus}}</td></tr>
+	</table>
+	<br />
+	<table border="1" cellpadding="3" cellspacing="3">
+		<thead>
+			<tr>
+				<td>订单号</td>
+				<td>下单公司</td>
+				<td>下单日期</td>
+				<td>货物名称</td>
+				<td>货物数量</td>
+			</tr>
+		</thead>
+		{% for d in header.details %}
+			<tr>
+				<td>{{d.order_detail.header.no}}</td>
+				<td>{{d.order_detail.header.customer}}</td>
+				<td>{{d.order_detail.header.create_time|ft}}</td>
+				<td>{{d.order_detail.item}}</td>
+				<td>{{d.order_detail.qty}}</td>
+			</tr>
+		{% endfor %}
+	</table>
+	
+{% endblock %}

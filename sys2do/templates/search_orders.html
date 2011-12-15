@@ -1,0 +1,24 @@
+{% extends "master.html" %}
+
+{% block extJS %}
+
+{% endblock %}
+
+{% block content %}
+	{% for (no,log) in logs %}
+		<h3>{{no}}</h3>
+		<table border="1" cellpadding="3" cellspacing="3">
+			<tr>
+				<td>{{_('Time')}}</td>
+				<td>{{_('Content')}}</td>
+			</tr>
+			{% for l in log %}
+				<tr>
+					<td>{{l.create_time|ft}}</td>
+					<td>{{l.remark}}</td>
+				</tr>
+			{% endfor %}
+		</table>
+	
+	{% endfor %}
+{% endblock %}

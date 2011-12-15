@@ -1,0 +1,25 @@
+{% extends "master.html" %}
+
+{% block extJS %}
+
+{% endblock %}
+
+{% block content %}
+	<p><a href="{{url_for('.view', action = 'add')}}">{{_('New Record')}}</a></p>
+	
+	<table border="1" cellpadding="3" cellspacing="3">
+		<thead>
+			<tr>
+				<td>{{_('User Name')}}</td>
+				<td>{{_('Create Time')}}</td>
+			</tr>
+			{% for r in records %}
+			<tr>
+				<td>{{r}}</td>
+				<td>{{r.create_time|ft}}</td>
+			</tr>
+			{% endfor %}
+		</thead>
+	</table>
+	
+{% endblock %}

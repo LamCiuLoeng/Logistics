@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2011-12-06 18:40+0800\n"
+"POT-Creation-Date: 2011-12-13 17:02+0800\n"
 "PO-Revision-Date: 2011-12-06 18:39+0800\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: en <LL@li.org>\n"
@@ -52,6 +52,58 @@ msgstr ""
 msgid "The record already exist!"
 msgstr ""
 
+#: constant.py:30
+msgid "Cancelled"
+msgstr ""
+
+#: constant.py:31
+msgid "New"
+msgstr ""
+
+#: constant.py:32
+msgid "Goods Received"
+msgstr ""
+
+#: constant.py:33
+msgid "In Store"
+msgstr ""
+
+#: constant.py:34
+msgid "Out Store"
+msgstr ""
+
+#: constant.py:35
+msgid "Goods Loaded"
+msgstr ""
+
+#: constant.py:36
+msgid "In Travel"
+msgstr ""
+
+#: constant.py:37
+msgid "Goods Arrived"
+msgstr ""
+
+#: constant.py:38
+msgid "Goods Signed"
+msgstr ""
+
+#: constant.py:48 templates/register.html:32 templates/order/update.html:10
+msgid "Save"
+msgstr ""
+
+#: constant.py:49 templates/order/update.html:11
+msgid "Reset"
+msgstr ""
+
+#: constant.py:50 templates/order/update.html:12
+msgid "Cancel"
+msgstr ""
+
+#: constant.py:51 templates/common/add.html:12 templates/common/update.html:13
+msgid "Return"
+msgstr ""
+
 #: templates/404.html:6
 msgid "The page doesn't exist!"
 msgstr ""
@@ -60,19 +112,24 @@ msgstr ""
 msgid "Internal Server Error!"
 msgstr ""
 
-#: templates/login.html:4 templates/login.html:34 templates/master.html:48
+#: templates/index.html:34
+msgid "Submit"
+msgstr ""
+
+#: templates/login.html:4 templates/login.html:34
 msgid "Login"
 msgstr ""
 
-#: templates/login.html:32
+#: templates/login.html:32 templates/register.html:29
+#: templates/admin/user_index.html:13
 msgid "User Name"
 msgstr ""
 
-#: templates/login.html:33
+#: templates/login.html:33 templates/register.html:30
 msgid "Password"
 msgstr ""
 
-#: templates/login.html:35
+#: templates/login.html:35 templates/register.html:4
 msgid "Register"
 msgstr ""
 
@@ -80,12 +137,36 @@ msgstr ""
 msgid "Logistics Management"
 msgstr ""
 
-#: templates/master.html:46
-msgid "Logout"
+#: templates/register.html:31
+msgid "Confirmed Password"
 msgstr ""
 
-#: templates/common/add.html:12 templates/common/update.html:13
-msgid "Return"
+#: templates/search_orders.html:12
+msgid "Time"
+msgstr ""
+
+#: templates/search_orders.html:13
+msgid "Content"
+msgstr ""
+
+#: templates/track.html:10
+msgid "Ordr No"
+msgstr ""
+
+#: templates/track.html:11
+msgid "Order Time"
+msgstr ""
+
+#: templates/track.html:12
+msgid "Status"
+msgstr ""
+
+#: templates/admin/user_index.html:8
+msgid "New Record"
+msgstr ""
+
+#: templates/admin/user_index.html:14
+msgid "Create Time"
 msgstr ""
 
 #: templates/common/search.html:5
@@ -96,8 +177,20 @@ msgstr ""
 msgid "Add New Record"
 msgstr ""
 
-#: templates/common/search.html:11
+#: templates/common/search.html:11 templates/order/update.html:13
 msgid "Delete"
+msgstr ""
+
+#: templates/order/update.html:16
+msgid "Order Information"
+msgstr ""
+
+#: templates/order/update.html:18
+msgid "Order No"
+msgstr ""
+
+#: templates/order/update.html:19
+msgid "Order Company"
 msgstr ""
 
 #: util/decorator.py:50 util/decorator.py:65 util/decorator.py:80
@@ -105,15 +198,18 @@ msgstr ""
 msgid "You do not get the permission!"
 msgstr ""
 
-#: views/auth.py:41
+#: views/auth.py:46
 msgid "This user does not exist!"
 msgstr ""
 
-#: views/auth.py:45
+#: views/auth.py:50
 msgid "The password is wrong!"
 msgstr ""
 
-#: views/root.py:25
+#: views/root.py:50
 msgid "Hello,World!"
 msgstr ""
+
+#~ msgid "Logout"
+#~ msgstr ""
 
