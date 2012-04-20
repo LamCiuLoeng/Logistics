@@ -19,24 +19,48 @@
 			<tr><td>{{_('Order Company')}}</td><td><input type="text" name="customer" value="{{values.get('customer','')}}"/></td></tr>
 			<tr><td>{{_('Order Status')}}</td><td>{{values.get('status')|showStatus}}</td></tr>
 		</table>
-		
+		<br />
 		<table border="1" cellpadding="3" cellspacing="3">
+			<thead>
+				<tr>
+					<td>货品名称</td>
+					<td>货品数量</td>
+					<td>货品状态</td>
+					<td>仓库数量</td>
+				</tr>
+			</thead>
 			{% for d in details %}
-				<tr><td>{{d.item}}</td><td>{{d.qty}}</td></tr>
+				<tr>
+					<td>{{d.item}}</td>
+					<td>{{d.order_qty}} {{d.item_unit}}</td>
+					<td>{{d.status|showStatus}}</td>
+					<td>{{d.warehouse_qty}} {{d.item_unit}}</td>
+				</tr>
 			{% endfor %}
 		</table>
 	</form>
 		
-		{% if values.get('status',None) in [0,1,6] %}
+		<br />
+		
+		{% if values.get('status',None) in [ORDER_NEW[0],RECEIVED_GOODS[0],GOODS_ARRIVED[0],] %}
 		<form method="post" action="{{url_for('bpOrder.view',action='do_action')}}">
 			<input type="hidden" name="id" value="{{values['id']}}"/>
-			<input type="hidden" name="sc" value="{{values.get('status')+1}}"/>
-			<textarea name="remark"></textarea>
-			{% if values.get('status',None) == 0 %}
+			{% if values.get('status',None) == ORDER_NEW[0] %}
+				<textarea name="remark">确认收货</textarea>
+				<input type="hidden" name="sc" value="{{RECEIVED_GOODS[0]}}"/>
 				<input type="submit" value="确认收货">
-			{% elif values.get('status',None) == 1 %}
+			{% elif values.get('status',None) == RECEIVED_GOODS[0] %}
+				<textarea name="remark">确认入仓</textarea>
+				<input type="hidden" name="sc" value="{{IN_STORE[0]}}"/>
+				<select name="warehouse_id">
+					{% for w in warehouses%}
+						<option value="{{w.id}}">{{w}}</option>
+					{% endfor %}
+				</select>
 				<input type="submit" value="确认入仓">
-			{% elif values.get('status',None) == 6 %}
+			{% elif values.get('status',None) == GOODS_ARRIVED[0] %}
+				<textarea name="remark">确认签收</textarea>
+				<input type="hidden" name="sc" value="{{GOODS_SIGNED[0]}}"/>
 				<input type="submit" value="确认签收">
 			{% endif %}
 		</form>

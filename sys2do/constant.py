@@ -29,13 +29,13 @@ MSG_RECORD_ALREADY_EXIST = _('The record already exist!')
 #order status
 ORDER_CANCELLED = (-1, _('Cancelled'))
 ORDER_NEW = (0, _('New'))
-RECEIVED_GOODS = (1, _('Goods Received'))
-IN_STORE = (2, _('In Store'))
-OUT_STORE = (3, _('Out Store'))
-LOADED_GOODS = (4, _('Goods Loaded'))
-IN_TRAVEL = (5, _('In Travel'))
-GOODS_ARRIVED = (6, _('Goods Arrived'))
-GOODS_SIGNED = (7, _('Goods Signed'))
+RECEIVED_GOODS = (10, _('Goods Received'))
+IN_STORE = (20, _('In Store'))
+OUT_STORE = (30, _('Out Store'))
+LOADED_GOODS = (40, _('Goods Loaded'))
+IN_TRAVEL = (50, _('In Travel'))
+GOODS_ARRIVED = (60, _('Goods Arrived'))
+GOODS_SIGNED = (90, _('Goods Signed'))
 
 STATUS_LIST = [
                ORDER_CANCELLED, ORDER_NEW, RECEIVED_GOODS, IN_STORE, OUT_STORE, LOADED_GOODS, IN_TRAVEL,
@@ -46,6 +46,7 @@ STATUS_LIST = [
 
 #button label
 BTN_SAVE = _('Save')
+BTN_SUBMIT = _('Submit')
 BTN_RESET = _('Reset')
 BTN_CANCEL = _('Cancel')
 BTN_RETURN = _('Return')

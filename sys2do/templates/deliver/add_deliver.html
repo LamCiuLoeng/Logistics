@@ -25,15 +25,17 @@
 							<thead>
 								<tr>
 									<td>Item Name</td>
-									<td>Qty</td>
-	
+									<td>Order Qty</td>
+									<td>Expected Warehouse Qty</td>
+									<td>Deliver Qty</td>
 								</tr>
 							</thead>
 						{% for d in ds %}		
 							<tr>
 								<td>{{d.item}}<input type="hidden" name="detail_{{d.id}}" value="{{d.id}}"/></td>
-								<td>{{d.qty}}</td>
-					
+								<td>{{d.order_qty}} {{d.item_unit}}</td>
+								<td>{{d.future_warehouse_qty}} {{d.item_unit}}</td>
+								<td><input type="text" name="deliver_qty_{{d.id}}" value="{{d.future_warehouse_qty}}"/> {{d.item_unit}}</td>
 							</tr>
 						{% endfor %}
 						</table>

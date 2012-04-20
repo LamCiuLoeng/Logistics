@@ -96,3 +96,12 @@ for f in filters.__all__ : app.jinja_env.filters[f] = getattr(filters, f)
 
 import util.tests as tests
 for t in tests.__all__ : app.jinja_env.tests[t] = getattr(tests, t)
+
+
+#===============================================================================
+# import the global vars into the template
+#===============================================================================
+import constant
+for c in dir(constant) :
+    if c.isupper() : app.jinja_env.globals[c] = getattr(constant, c)
+

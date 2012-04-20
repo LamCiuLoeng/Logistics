@@ -10,8 +10,8 @@ import traceback
 from sys2do.model import metadata, engine, DBSession, Permission, Group, User
 #import sys2do.model.logic as logic
 import sys
-from sys2do.model.master import CustomerProfile, Customer, Item, Vendor, \
-    ItemUnit, Warehouse
+from sys2do.model.master import CustomerProfile, Customer, Item, \
+    ItemUnit, Warehouse, WeightUnit, ShipmentType, Payment, Province
 reload(sys)
 sys.setdefaultencoding('utf8')
 
@@ -24,32 +24,86 @@ def init():
         print "insert default value"
         #add the default value here
 
-        DBSession.add(User(name = 'admin', email = 'admin@test.com', password = 'admin', first_name = 'Admin', last_name = 'Test'))
-        DBSession.add(User(name = 'customer', email = 'customer@test.com', password = 'customer', first_name = 'Customer', last_name = 'Test'))
+        uAdmin = User(name = 'admin', email = 'admin@test.com', password = 'admin', first_name = 'Admin', last_name = 'Test')
+        uCustomer = User(name = 'customer', email = 'customer@test.com', password = '123', first_name = 'Customer', last_name = 'Test')
+        uOfficer = User(name = 'officer', email = 'officer@test.com', password = '123', first_name = 'Officer', last_name = 'Test')
+        uSupplier = User(name = 'supplier', email = 'supplier@test.com', password = '123', first_name = 'Supplier', last_name = 'Test')
+        uWarehouse = User(name = 'warehouse', email = 'warehouse@test.com', password = '123', first_name = 'Warehouse', last_name = 'Test')
 
-#        sqlfile = file('AllCityData.sql')
-#        for index, sql in enumerate(sqlfile):
-#            if sql and not sql.startswith('--'):
-#                engine.execute(sql)
-#                print '------', index
-#        sqlfile.close()
+        pCreateUser = Permission(name = 'CREATE_USER')
+        pUpdateUser = Permission(name = 'UPDATE_USER')
+        pDeleteUser = Permission(name = 'DELETE_USER')
+        pSearchUser = Permission(name = 'SEARCH_USER')
+        pCreateOrder = Permission(name = 'CREATE_ORDER')
+        pUpdateOrder = Permission(name = 'UPDATE_ORDER')
+        pDeleteOrder = Permission(name = 'DELETE_ORDER')
+        pSearchOrder = Permission(name = 'SEARCH_ORDER')
+        pSearchAllOrder = Permission(name = 'SEARCH_ALL_ORDER')
+        pCreateCustomer = Permission(name = 'CREATE_CUSTOMER')
+        pUpdateCustomer = Permission(name = 'UPDATE_CUSTOMER')
+        pDeleteCustomer = Permission(name = 'DELETE_CUSTOMER')
+        pSearchCustomer = Permission(name = 'SEARCH_CUSTOMER')
+        pCreateSupplier = Permission(name = 'CREATE_SUPPLIER')
+        pUpdateSupplier = Permission(name = 'UPDATE_SUPPLIER')
+        pDeleteSupplier = Permission(name = 'DELETE_SUPPLIER')
+        pSearchSupplier = Permission(name = 'SEARCH_SUPPLIER')
+        pCreateWarehouse = Permission(name = 'CREATE_WAREHOUSE')
+        pUpdateWarehouse = Permission(name = 'UPDATE_WAREHOUSE')
+        pDeleteWarehouse = Permission(name = 'DELETE_WAREHOUSE')
+        pSearchWarehouse = Permission(name = 'SEARCH_WAREHOUSE')
+        pCreateDriver = Permission(name = 'CREATE_DRIVER')
+        pUpdateDriver = Permission(name = 'UPDATE_DRIVER')
+        pDeleteDriver = Permission(name = 'DELETE_DRIVER')
+        pSearchDriver = Permission(name = 'SEARCH_DRIVER')
 
-        #add test customer
-        pfTest = CustomerProfile(name = 'PF_TEST')
-        c1 = Customer(name = 'CUSTOMER COMPANY 1', address = 'CUSTOMER ADDRESS 1', phone = '12134567' , contact_person = 'CUSTOMER PERSON 1', prifile = pfTest)
-        c2 = Customer(name = 'CUSTOMER COMPANY 2', address = 'CUSTOMER ADDRESS 2', phone = '12134567' , contact_person = 'CUSTOMER PERSON 2', prifile = pfTest)
-        v1 = Vendor(name = 'VENDOR 1', address = 'VENDOR ADDRESS 1', phone = '1122334455', contact_person = 'VENDOR PERSON 1', prifile = pfTest)
-        v2 = Vendor(name = 'VENDOR 2', address = 'VENDOR ADDRESS 2', phone = '1122334455', contact_person = 'VENDOR PERSON 2', prifile = pfTest)
-        item1 = Item(name = 'ITEM 1', prifile = pfTest)
-        item2 = Item(name = 'ITEM 2', prifile = pfTest)
-        item3 = Item(name = 'ITEM 3', prifile = pfTest)
+        gAdmin = Group(name = 'ADMIN', display_name = 'Administrator')
+        gAdmin.permissions = [pCreateUser, pUpdateUser, pDeleteUser, pSearchUser,
+                              pCreateOrder, pUpdateOrder, pDeleteOrder, pSearchOrder, pSearchAllOrder,
+                              pCreateCustomer, pUpdateCustomer, pDeleteCustomer, pSearchCustomer,
+                              pCreateSupplier, pUpdateSupplier, pDeleteSupplier, pSearchSupplier,
+                              pCreateWarehouse, pUpdateWarehouse, pDeleteWarehouse, pSearchWarehouse,
+                              pCreateDriver, pUpdateDriver, pDeleteDriver, pSearchDriver]
+        gAdmin.users = [uAdmin, ]
+        gCustomer = Group(name = 'BUYER', display_name = 'Customer')
+        gCustomer.permissions = [pCreateOrder, pUpdateOrder, pDeleteOrder, pSearchOrder, ]
+        gCustomer.users = [uCustomer, ]
+        gOfficer = Group(name = 'OFFICER', display_name = 'Officer')
+        gOfficer.permissions = [pCreateOrder, pUpdateOrder, pDeleteOrder, pSearchOrder, pSearchAllOrder, ]
+        gOfficer.users = [uOfficer]
+        gSupplier = Group(name = 'SUPPLIER', display_name = 'Supplier')
+        gSupplier.permissions = [pUpdateOrder, pSearchOrder]
+        gSupplier.users = [uSupplier]
+        gWarehouse = Group(name = 'WAREHOUSE', display_name = 'Warehouse')
+        gWarehouse.permissions = [pUpdateOrder, pSearchOrder, pSearchAllOrder, ]
+        gWarehouse.users = [uWarehouse]
 
-        DBSession.add_all([pfTest, c1, c2, v1, v2, item1, item2, item3])
-        for unit in [u'米', u'分米', u'厘米', u'吨', u'千克', u'克', u'箱', u'瓶', u'支', u'打', ]:
-            DBSession.add(ItemUnit(name = unit, prifile = pfTest))
 
-        DBSession.add(Warehouse(name = "WAREHOUSE 1", address = "Address 1", manager = "MANAGER 1"))
-        DBSession.add(Warehouse(name = "WAREHOUSE 2", address = "Address 2", manager = "MANAGER 2"))
+        DBSession.add_all([
+                            uAdmin, uCustomer, uOfficer, uSupplier, uWarehouse,
+                            pCreateUser, pUpdateUser, pDeleteUser, pSearchUser,
+                            pCreateOrder, pUpdateOrder, pDeleteOrder, pSearchOrder, pSearchAllOrder,
+                            pCreateCustomer, pUpdateCustomer, pDeleteCustomer, pSearchCustomer,
+                            pCreateSupplier, pUpdateSupplier, pDeleteSupplier, pSearchSupplier,
+                            pCreateWarehouse, pUpdateWarehouse, pDeleteWarehouse, pSearchWarehouse,
+                            pCreateDriver, pUpdateDriver, pDeleteDriver, pSearchDriver,
+                            gAdmin, gCustomer, gOfficer, gSupplier, gWarehouse,
+                            ])
+
+        for n, en, tn in [(u'米', u'meter', u'米'), (u'分米', u'dm', u'分米'), (u'厘米', u'cm', u'釐米'), (u'吨', u'ton', u'噸'), (u'千克', u'kg', u'千克'), (u'克', u'g', u'克'),
+                     (u'箱', u'box', u'箱'), (u'瓶', u'bottle', u'瓶'), (u'只', u'pic', u'只'), (u'打', u'dozen', u'打'), ]:
+            DBSession.add(ItemUnit(name = n, english_name = en, tradition_name = tn))
+
+
+        for n, en, tn in [(u'吨', u'ton', u'噸'), (u'千克', u'kg', u'千克'), (u'克', u'g', u'克'), ]:
+            DBSession.add(WeightUnit(name = n, english_name = en, tradition_name = tn))
+
+        DBSession.add(Warehouse(name = u"仓库 1", address = u"仓库地址 1", manager = "MANAGER 1"))
+        DBSession.add(Warehouse(name = u"仓库 2", address = u"仓库地址 2", manager = "MANAGER 2"))
+        DBSession.add(ShipmentType(name = u"陆运"))
+        DBSession.add(ShipmentType(name = u"水运"))
+        DBSession.add(ShipmentType(name = u"空运"))
+        DBSession.add(Payment(name = u"月结"))
+
 
         DBSession.commit()
         print "finish init!"

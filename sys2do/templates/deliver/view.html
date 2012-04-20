@@ -5,22 +5,25 @@
 {% endblock %}
 
 {% block content %}
-	{% if header.status in [0,3,4,5,]%}
+	{% if header.status in [ORDER_NEW[0],OUT_STORE[0],LOADED_GOODS[0],IN_TRAVEL[0],  ]%}
 	<form action="{{url_for('bpDeliver.view',action='update_status')}}" method="post">
 		<input type="hidden" name="id" value="{{header.id}}"/>
-		<textarea name="remark"></textarea>
-		{%if header.status==0%}
+		{%if header.status==ORDER_NEW[0]%}
+			<textarea name="remark">确认出仓</textarea>
 			<input type="submit" value="确认出仓">
-			<input type="hidden" name="sc" value="3"/>
-		{%elif header.status==3%}
+			<input type="hidden" name="sc" value="30"/>
+		{%elif header.status==OUT_STORE[0]%}
+			<textarea name="remark">装载完成</textarea>
 			<input type="submit" value="装载完成">
-			<input type="hidden" name="sc" value="4"/>
-		{%elif header.status==4%}
+			<input type="hidden" name="sc" value="40"/>
+		{%elif header.status==LOADED_GOODS[0]%}
+			<textarea name="remark">货物在途</textarea>
 			<input type="submit" value="货物在途">
-			<input type="hidden" name="sc" value="5"/>
-		{%elif header.status==5%}
+			<input type="hidden" name="sc" value="50"/>
+		{%elif header.status==IN_TRAVEL[0]%}
+			<textarea name="remark">货物到达</textarea>
 			<input type="submit" value="货物到达">
-			<input type="hidden" name="sc" value="6"/>
+			<input type="hidden" name="sc" value="60"/>
 		{% endif %}
 	</form>
 	{% endif %}
@@ -42,6 +45,7 @@
 				<td>下单日期</td>
 				<td>货物名称</td>
 				<td>货物数量</td>
+				<td>配送数量</td>
 			</tr>
 		</thead>
 		{% for d in header.details %}
@@ -50,7 +54,8 @@
 				<td>{{d.order_detail.header.customer}}</td>
 				<td>{{d.order_detail.header.create_time|ft}}</td>
 				<td>{{d.order_detail.item}}</td>
-				<td>{{d.order_detail.qty}}</td>
+				<td>{{d.order_detail.order_qty}} {{d.order_detail.item_unit}}</td>
+				<td>{{d.deliver_qty}} {{d.order_detail.item_unit}}</td>
 			</tr>
 		{% endfor %}
 	</table>

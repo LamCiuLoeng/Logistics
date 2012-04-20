@@ -13,14 +13,14 @@ from sqlalchemy.sql.expression import and_
 from werkzeug.utils import redirect
 
 from sys2do.constant import MESSAGE_ERROR, MSG_NO_SUCH_ACTION, MESSAGE_INFO, \
-    MSG_SAVE_SUCC, IN_STORE, OUT_STORE, MSG_UPDATE_SUCC
+    MSG_SAVE_SUCC, IN_STORE, OUT_STORE, MSG_UPDATE_SUCC, ORDER_NEW
 from sys2do.util.decorator import templated
 from sys2do.model import DBSession
 from sys2do.views import BasicView
 from sys2do.model.logic import DeliverHeader, OrderHeader, OrderDetail, \
     DeliverDetail, OrderLog
 from sys2do.util.common import _gl, _g, _gp, getOr404
-from sys2do.util.logic_helper import getDeliverNo
+from sys2do.util.logic_helper import getDeliverNo, updateDeliverHeaderStatus
 from sys2do.model.master import WarehouseItem
 
 
@@ -36,10 +36,12 @@ class DeliverView(BasicView):
         result = DBSession.query(DeliverHeader).filter(DeliverHeader.active == 0)
         return {'result' : result}
 
-    @templated('deliver/add.html')
-    def add(self):
-        result = DBSession.query(OrderHeader).filter(and_(OrderHeader.active == 0, OrderDetail.status == 0 , OrderHeader.id == OrderDetail.header_id))
+    @templated('deliver/select_orders.html')
+    def select_orders(self):
+        result = DBSession.query(OrderHeader).filter(and_(OrderHeader.active == 0, OrderHeader.status == IN_STORE[0])).all()
         return {'result' : result}
+
+
 
     @templated('deliver/add_deliver.html')
     def add_deliver(self):
@@ -47,7 +49,7 @@ class DeliverView(BasicView):
         result = []
         for id in ids:
             header = DBSession.query(OrderHeader).get(id)
-            result.append((header, [d for d in header.details if d.status == 0]))
+            result.append((header, [d for d in header.details if d.status == IN_STORE[0]]))
 
         return {'result' : result, }
 
@@ -56,19 +58,27 @@ class DeliverView(BasicView):
     def deliver_save_new(self):
 
         header = DeliverHeader(no = getDeliverNo())
-        orders = []
-        for k, v in _gp('detail_'):
-            n, id = k.split("_")
-            detail = DBSession.query(OrderDetail).get(id)
-            DBSession.add(DeliverDetail(header = header, order_detail = detail))
-            detail.status = 1
-            if detail.header not in orders : orders.append(detail.header)
+#        orders = []
 
-        for order in orders:
-            if any(map(lambda d : d.status == IN_STORE, order.details)):
-                order.status = IN_STORE[0]
-            else:
-                order.status = OUT_STORE[0]
+        details = _gp('detail_')
+        deliver_qtys = _gp('deliver_qty_')
+
+
+        for (k, v), (dk, dv) in zip(details, deliver_qtys):
+            n, id = k.split("_")
+            deliver_qty = int(_g('deliver_qty_%s' % id))
+            if deliver_qty > 0 :
+                detail = DBSession.query(OrderDetail).get(id)
+                DBSession.add(DeliverDetail(header = header, order_detail = detail, deliver_qty = deliver_qty))
+                detail.future_warehouse_qty -= deliver_qty
+#            detail.status = 1
+#            if detail.header not in orders : orders.append(detail.header)
+
+#        for order in orders:
+#            if any(map(lambda d : d.status == IN_STORE, order.details)):
+#                order.status = IN_STORE[0]
+#            else:
+#                order.status = OUT_STORE[0]
 
         DBSession.commit()
         flash(MSG_SAVE_SUCC, MESSAGE_INFO)
@@ -84,20 +94,17 @@ class DeliverView(BasicView):
     def update_status(self):
         header = getOr404(DeliverHeader, _g('id'))
         status = int(_g('sc'))
-        header.status = status
+        (oheaders, odetails) = updateDeliverHeaderStatus(header.id, status)
 
-        for d in header.details:
-            d.order_detail.status = status
-            if status == OUT_STORE[0]:
+        if status == OUT_STORE[0]: #remove the item from warehouse if it's out store action
+            for d in header.details:
                 record = DBSession.query(WarehouseItem).filter(WarehouseItem.order_detail_id == d.order_detail_id).one()
-                record.active = 1
+                record.qty -= d.deliver_qty
+                if record.qty <= 0 : record.active = 1
+                d.order_detail.warehouse_qty -= d.deliver_qty
 
-
-        for order in header.get_related_orders():
-            if all(map(lambda d : d.status == status, order.details)):
-                order.status = status
-                DBSession.add(OrderLog(order = order, remark = _g('remark')))
-
+        for oheader in oheaders:
+            DBSession.add(OrderLog(order = oheader, remark = _g('remark')))
 
 
         DBSession.commit()

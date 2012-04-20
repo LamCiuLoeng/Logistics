@@ -13,7 +13,7 @@ from sys2do.constant import MESSAGE_ERROR, MSG_NO_SUCH_ACTION
 from werkzeug.utils import redirect
 from sys2do.util.common import _g
 from sys2do.views import BasicView
-from sys2do.model.master import Customer, Vendor, Item
+from sys2do.model.master import Customer, Item
 from sys2do.model import DBSession
 from flask.templating import render_template
 

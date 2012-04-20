@@ -43,11 +43,13 @@ class RootView(BasicView):
         companys = []
         vendors = []
         items = []
+        units = []
         for cp in cps:
             companys.extend(cp.customers)
             vendors.extend(cp.vendors)
             items.extend(cp.items)
-        return {'companys' :companys , 'vendors' : vendors, 'items' : items}
+            units.extend(cp.itemunits)
+        return {'companys' :companys , 'vendors' : vendors, 'items' : items, 'units' : units}
 
 
     def save(self):
@@ -58,9 +60,9 @@ class RootView(BasicView):
         order = OrderHeader(no = no, customer_id = c, vendor_id = v)
         DBSession.add(order)
 
-        for k, v in _gp('item_'):
+        for (k, v), (uk, uv) in zip(_gp('item_'), _gp('unit_')):
             n, id = k.split("_")
-            DBSession.add(OrderDetail(header = order, item_id = id, qty = v))
+            DBSession.add(OrderDetail(header = order, item_id = id, order_qty = v, item_unit_id = uv))
 
         DBSession.commit()
         flash(MSG_SAVE_SUCC, MESSAGE_INFO)

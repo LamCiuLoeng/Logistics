@@ -9,9 +9,9 @@
 		<select name="t">		
 			{%for tmp in ['',7,10,30]%}
 				{%if tmp == t %}
-					<option value="tmp" selected='selected'>{{tmp}}</option>
+					<option value="{{tmp}}" selected='selected'>{{tmp}}</option>
 				{%else%}
-					<option value="tmp">{{tmp}}</option>
+					<option value="{{tmp}}">{{tmp}}</option>
 				{%endif%}
 			{%endfor%}
 		</select>

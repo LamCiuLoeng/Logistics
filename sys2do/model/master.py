@@ -18,11 +18,25 @@ from sqlalchemy.sql.expression import and_
 #__all__ = ['']
 
 
+class ShipmentType(DeclarativeBase, SysMixin):
+    __tablename__ = 'master_shipment_type'
+
+    id = Column(Integer, autoincrement = True, primary_key = True)
+    name = Column(Unicode(100))
+
+    def __str__(self): return self.name
+
+    def __repr__(self): return self.name
+
+    def __unicode__(self): return self.name
+
+
 class Province(DeclarativeBase, SysMixin):
     __tablename__ = 'master_province'
 
     id = Column(Integer, autoincrement = True, primary_key = True)
     name = Column(Unicode(100))
+    is_direct = Column(Integer, default = 0)
     remark = Column(Unicode(10000))
 
     def __str__(self): return self.name
@@ -104,8 +118,8 @@ class Customer(DeclarativeBase, SysMixin):
 
 
 
-class Vendor(DeclarativeBase, SysMixin):
-    __tablename__ = 'master_vendor'
+class Supplier(DeclarativeBase, SysMixin):
+    __tablename__ = 'master_supplier'
 
     id = Column(Integer, autoincrement = True, primary_key = True)
 
@@ -116,7 +130,7 @@ class Vendor(DeclarativeBase, SysMixin):
     remark = Column(Unicode(10000))
 
     profile_id = Column(Integer, ForeignKey('master_customer_profile.id'))
-    prifile = relation(CustomerProfile, backref = backref("vendors", order_by = id), primaryjoin = "and_(CustomerProfile.id == Vendor.profile_id, Vendor.active == 0)")
+    prifile = relation(CustomerProfile, backref = backref("suppliers", order_by = id), primaryjoin = "and_(CustomerProfile.id == Supplier.profile_id, Supplier.active == 0)")
 
     def __str__(self): return self.name
 
@@ -148,11 +162,13 @@ class ItemUnit(DeclarativeBase, SysMixin):
     __tablename__ = 'master_item_unit'
 
     id = Column(Integer, autoincrement = True, primary_key = True)
-    name = Column(Unicode(1000))
+    name = Column(Unicode(1000)) #cn
+    english_name = Column(Unicode(1000)) #en
+    tradition_name = Column(Unicode(1000)) #zh
     remark = Column(Unicode(10000))
 
-    profile_id = Column(Integer, ForeignKey('master_customer_profile.id'))
-    prifile = relation(CustomerProfile, backref = backref("itemunits", order_by = id), primaryjoin = "and_(CustomerProfile.id == ItemUnit.profile_id, ItemUnit.active == 0)")
+#    profile_id = Column(Integer, ForeignKey('master_customer_profile.id'))
+#    prifile = relation(CustomerProfile, backref = backref("itemunits", order_by = id), primaryjoin = "and_(CustomerProfile.id == ItemUnit.profile_id, ItemUnit.active == 0)")
 
     def __str__(self): return self.name
 
@@ -160,6 +176,21 @@ class ItemUnit(DeclarativeBase, SysMixin):
 
     def __unicode__(self): return self.name
 
+
+class WeightUnit(DeclarativeBase, SysMixin):
+    __tablename__ = 'master_weight_unit'
+
+    id = Column(Integer, autoincrement = True, primary_key = True)
+    name = Column(Unicode(1000)) #cn
+    english_name = Column(Unicode(1000)) #en
+    tradition_name = Column(Unicode(1000)) #zh
+    remark = Column(Unicode(10000))
+
+    def __str__(self): return self.name
+
+    def __repr__(self): return self.name
+
+    def __unicode__(self): return self.name
 
 
 
@@ -203,12 +234,6 @@ class WarehouseItem(DeclarativeBase, SysMixin):
         return DBSession.query(OrderDetail).get(self.order_detail_id)
 
 
-
-#===============================================================================
-# 
-#===============================================================================
-
-'''
 class Payment(DeclarativeBase, SysMixin):
     __tablename__ = 'master_payment'
 
@@ -219,11 +244,11 @@ class Payment(DeclarativeBase, SysMixin):
 
 
 
+#===============================================================================
+# 
+#===============================================================================
 
-
-
-
-
+'''
 
 class WarehouseItem(DeclarativeBase, SysMixin):
     __tablename__ = 'warehouse_item'

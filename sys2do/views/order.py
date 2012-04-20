@@ -24,7 +24,7 @@ from sys2do.constant import MESSAGE_ERROR, MESSAGE_INFO, MSG_UPDATE_SUCC, \
     IN_STORE
 from sys2do.views import BasicView
 from sys2do.util.common import _g, getOr404, _gp
-from sys2do.model.master import CustomerProfile, WarehouseItem
+from sys2do.model.master import CustomerProfile, WarehouseItem, Warehouse
 from sys2do.util.logic_helper import genSystemNo
 from sqlalchemy.sql.expression import and_
 
@@ -71,7 +71,7 @@ class OrderView(BasicView):
 
 
 
-    @templated('order/update.html')
+    @templated('order/revise.html')
     def revise(self):
         id = _g('id') or None
         if not id :
@@ -80,7 +80,10 @@ class OrderView(BasicView):
 
         header = DBSession.query(OrderHeader).get(id)
         values = header.populate()
-        return {'values' : values , 'details' : header.details}
+
+        ws = DBSession.query(Warehouse).filter(Warehouse.active == 0).order_by(Warehouse.name)
+
+        return {'values' : values , 'details' : header.details , 'warehouses' : ws}
 
 
     def save_update(self):
@@ -91,7 +94,7 @@ class OrderView(BasicView):
 
         header = DBSession.query(OrderHeader).get(id)
 
-        fields = ['no', 'source_company', ]
+        fields = ['no', 'customer', ]
         try:
             for f in fields:
                 setattr(header, f, _g(f) or None)
@@ -103,6 +106,8 @@ class OrderView(BasicView):
         else:
             flash(MSG_UPDATE_SUCC, MESSAGE_INFO)
             return redirect(url_for('.view', action = 'index'))
+
+
 
     def cancel(self):
         id = _g('id') or None
@@ -120,13 +125,17 @@ class OrderView(BasicView):
     def do_action(self):
         header = getOr404(OrderHeader, _g('id'), self.default())
         status = int(_g('sc'))
-        header.status = status
+
+        #update the order and detail's status
+        header.update_status(status)
 
         DBSession.add(OrderLog(order_id = _g('id'), remark = _g('remark')))
 
+        #if it's in store, update the warehouse items qty
         if status == IN_STORE[0]:
             for d in header.details:
-                DBSession.add(WarehouseItem(item_id = d.item_id, warehouse_id = 1, qty = d.qty, order_detail_id = d.id))
+                DBSession.add(WarehouseItem(item_id = d.item_id, warehouse_id = _g('warehouse_id'), qty = d.order_qty, order_detail_id = d.id))
+                d.warehouse_qty = d.future_warehouse_qty = d.order_qty #make the warehouse qty
 
         DBSession.commit()
         flash(MSG_UPDATE_SUCC, MESSAGE_INFO)
