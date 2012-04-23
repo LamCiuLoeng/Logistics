@@ -1,44 +1,146 @@
 {% extends "master.html" %}
 
+{% block extCSS %}
+<style type="text/css">
+	.template{
+		display:none;
+	}
+</style>
+{% endblock %}
+
 {% block extJS %}
+<script language="JavaScript" type="text/javascript">
+//<![CDATA[
+	function changecustomer(obj){
+		
+	}
+
+	var index_count = 0;
+	function addline(){
+		var index = ++index_count;
+		var tr = $(".template").clone().removeClass("template");
+		$("input[type='text'],textarea,select",tr).each(function(){
+			var old_name = $(this).attr('name');
+			var new_name = old_name.replace('_x','_'+index);
+			$(this).attr('name',new_name);
+		});
+		
+		$("#item_table tbody").append(tr);
+	}
+		
+	function deleteline(obj){
+		$($(obj).parents('tr')[0]).remove(); 
+	}        
+	
+	function tosave(){
+		$(".template").remove();
+		$("form").submit();
+	}
+//]]>
+</script>
 
 {% endblock %}
 
 {% block content %}
 	<form action="{{url_for('.view', action = 'save_new')}}" method="post">
-		<input type="submit" value="保存"/> 
-		<input type="reset" value="重置"/>
-		<input type="button" value="取消" onclick="location.href='{{url_for('.view', action = 'index')}}'"/>
+		<input type="button" value="{{_('Save')}}" onclick="tosave()"/> 
+		<input type="reset" value="{{_('Reset')}}"/>
+		<input type="button" value="{{_('Cancel')}}" onclick="location.href='{{url_for('.view', action = 'index')}}'"/>
 		
 		<table border="1" cellpadding="3" cellspacing="3">
 			<tr>
-				<td>Company</td>
+				<td>{{_('Customer')}}</td>
 				<td>
-					<select name="company" id="company">
-						{% for c in companys%}
+					<select name="customer_id" id="customer_id" onchange="changecustomer(this)">
+						{% for c in customers%}
 							<option value="{{c.id}}">{{c.name}}</option>
 						{% endfor %}
+						<option value="OTHER">---- {{_('Other')}} ----</option>
 					</select>
 				</td>
 			</tr>
 			<tr>
-				<td>Vendor</td>
-				<td>
-					<select name="vendor" id="vendor">
-						{% for v in vendors %}
-							<option value="{{v.id}}">{{v.name}}</option>
-						{% endfor %}
-					</select>
-				</td>
+				<td>{{_('Address')}}</td>
+				<td><input type="text" name="source_address" id="source_address" value=""/></td>
 			</tr>
 			<tr>
-				<td>期望送达时间</td>
-				<td><input type="text" name="expect_time"/></td>
+				<td>{{_('Phone')}}</td>
+				<td><input type="text" name="source_tel" id="source_tel" value=""/></td>
+			</tr>
+			<tr>
+				<td>{{_('Contact')}}</td>
+				<td><input type="text" name="source_contact" id="source_contact" value=""/></td>
+			</tr>
+			<tr>
+				<td>{{_('Remark')}}</td>
+				<td><textarea name="remark" id="remark"></textarea></td>
 			</tr>
 			
 			{% for item in items %}
 				<tr><td>{{item}}</td><td><input type="text" name="item_{{item.id}}" value=""/></td></tr>
 			{% endfor %}
+		</table>
+		<br />
+		<br />
+		
+		<p><input type="button" value="{{_('Add Line')}}" onclick="addline();"/></p>
+		
+		<table border="1" cellpadding="3" cellspacing="3" id="item_table">
+			<thead>
+				<tr>
+					<td>{{_('Index')}}</td>
+					<td>{{_('Item')}}</td>
+					<td>{{_('Qty')}}</td>
+					<td>{{_('Unit')}}</td>
+					<td>{{_('Weight')}}</td>
+					<td>{{_('Weight Unit')}}</td>
+					<td>{{_('Shipment Type')}}</td>
+					<td>{{_('Destination')}}</td>
+					<td>{{_('Destination Contact')}}</td>
+					<td>{{_('Destination Tel')}}</td>
+					<td>{{_('Expect Time')}}</td>
+					<td>{{_('Remark')}}</td>
+					<td>{{_('Action')}}</td>
+				</tr>
+			</thead>
+			<tbody>
+				<tr class="template">
+					<td><input type="hidden" name="index_x" value=""/><span class="index_label"></span></td>
+					<td><input type="text" name="item_x" id="item_x" value=""/></td>
+					<td><input type="text" name="qty_x" id="qty_x" value=""/></td>
+					<td>
+						<select name="unit_x">
+							{% for unit in units %}
+								<option value="{{unit.id}}">{{unit}}</option>
+							{% endfor %}
+						</select>
+					</td>
+					<td><input type="text" name="weight_x" id="weight_x" value=""/></td>
+					
+					<td>
+						<select name="wunit_x">
+							{% for wunit in wunits %}
+								<option value="{{wunit.id}}">{{wunit}}</option>
+							{% endfor %}
+						</select>	
+					</td>
+					
+					<td>
+						<select name="shipment_type_x">
+							{% for st in shiptype %}
+								<option value="{{st.id}}">{{st}}</option>
+							{% endfor %}
+						</select>
+					</td>
+					<td><input type="text" name="dest_x" id="dest_x" value=""/></td>
+					<td><input type="text" name="contact_x" id="contact_x" value=""/></td>
+					<td><input type="text" name="tel_x" id="tel_x" value=""/></td>
+					<td><input type="text" name="expect_time_x" id="expect_time_x" value=""/></td>
+					
+					<td><textarea name="remark_x" id="remark_x"></textarea></td>
+					<td><input type="button" value="{{_('Del Line')}}" onclick="deleteline(this)"/></td>
+				</tr>
+			</tbody>
 		</table>
 	</form>
 {% endblock %}

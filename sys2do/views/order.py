@@ -23,8 +23,9 @@ from sys2do.constant import MESSAGE_ERROR, MESSAGE_INFO, MSG_UPDATE_SUCC, \
     MSG_SAVE_SUCC, ORDER_CANCELLED, RECEIVED_GOODS, STATUS_LIST, IN_TRAVEL, \
     IN_STORE
 from sys2do.views import BasicView
-from sys2do.util.common import _g, getOr404, _gp
-from sys2do.model.master import CustomerProfile, WarehouseItem, Warehouse
+from sys2do.util.common import _g, getOr404, _gp, getMasterAll, _debug
+from sys2do.model.master import CustomerProfile, WarehouseItem, Warehouse, \
+    Customer, ItemUnit, WeightUnit, ShipmentType
 from sys2do.util.logic_helper import genSystemNo
 from sqlalchemy.sql.expression import and_
 
@@ -40,35 +41,81 @@ class OrderView(BasicView):
         result = DBSession.query(OrderHeader).filter(OrderHeader.active == 0)
         return {'result' : result }
 
+
     @templated('order/add.html')
     def add(self):
-        cps = DBSession.query(CustomerProfile).all()
-        companys = []
-        vendors = []
-        items = []
-        for cp in cps:
-            companys.extend(cp.customers)
-            vendors.extend(cp.vendors)
-            items.extend(cp.items)
-        return {'companys' :companys , 'vendors' : vendors, 'items' : items}
+        return {'customers' :getMasterAll(Customer),
+                'units' : getMasterAll(ItemUnit),
+                'wunits' : getMasterAll(WeightUnit),
+                'shiptype' : getMasterAll(ShipmentType),
+                }
 
 
     def save_new(self):
-        c = _g('company')
-        v = _g('vendor')
+        try:
+            no = genSystemNo()
+            customer_id = _g('customer_id')
+            source_address = _g('source_address')
+            source_tel = _g('source_tel')
+            source_contact = _g('source_contact')
+            remark = _g('remark')
+            order = OrderHeader(no = no, customer_id = customer_id, source_address = source_address,
+                                source_tel = source_tel, source_contact = source_contact, remark = remark)
+            DBSession.add(order)
 
-        no = genSystemNo()
-        order = OrderHeader(no = no, customer_id = c, vendor_id = v)
-        DBSession.add(order)
+            item = _gp('item_')
+            qty = _gp('qty_')
+            unit = _gp('unit_')
+            weight = _gp('weight_')
+            wunit = _gp('wunit_')
+            shipment_type = _gp('shipment_type_')
+            dest = _gp('dest_')
+            contact = _gp('contact_')
+            tel = _gp('tel_')
+            expect_time = _gp('expect_time_')
+            remark = _gp('remark_')
 
-        for k, v in _gp('item_'):
-            n, id = k.split("_")
-            DBSession.add(OrderDetail(header = order, item_id = id, qty = v))
 
-        DBSession.commit()
-        flash(MSG_SAVE_SUCC, MESSAGE_INFO)
+            line_no = 0
+
+            _debug(item)
+            _debug(qty)
+
+            for rItem, rQty, rUnit, rWeight, rWunit, rShip, rDest, rCon, rTel, rExp, rRem \
+             in zip(item, qty, unit, weight, wunit, shipment_type, dest, contact, tel, expect_time, remark):
+                line_no += 1
+                _debug(line_no)
+                DBSession.add(OrderDetail(header = order,
+                                          line_no = line_no,
+                                          item = rItem[1],
+                                          order_qty = rQty[1],
+                                          delivered_qty = 0,
+                                          unit_id = rUnit[1],
+                                          weight = rWeight[1],
+                                          weight_unit_id = rWunit[1],
+                                          shipment_type_id = rShip[1],
+                                          destination_address = rDest[1],
+                                          destination_contact = rCon[1],
+                                          destination_tel = rTel[1],
+                                          expect_time = rExp[1],
+                                          remark = rRem[1]
+                                          ))
+
+            DBSession.commit()
+            flash(MSG_SAVE_SUCC, MESSAGE_INFO)
+        except:
+            DBSession.rollback()
+            flash(MSG_SERVER_ERROR, MESSAGE_ERROR)
         return redirect(url_for('.view', action = 'index'))
 
+    @templated('order/review.html')
+    def review(self):
+        app.logger.debug('go to review')
+        header = getOr404(OrderHeader, _g('id'))
+        app.logger.debug('go to review')
+        values = header.populate()
+        app.logger.debug('go to review')
+        return {'values' : values , 'details' : header.details}
 
 
     @templated('order/revise.html')
@@ -110,12 +157,7 @@ class OrderView(BasicView):
 
 
     def cancel(self):
-        id = _g('id') or None
-        if not id :
-            flash(MSG_NO_ID_SUPPLIED, MESSAGE_ERROR)
-            return redirect(self.default())
-
-        header = DBSession.query(OrderHeader).get(id)
+        header = getOr404(OrderHeader, _g('id'), redirect_url = self.default())
         header.status = ORDER_CANCELLED[0]
         DBSession.commit()
         flash(MSG_DELETE_SUCC, MESSAGE_INFO)

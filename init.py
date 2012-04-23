@@ -104,6 +104,10 @@ def init():
         DBSession.add(ShipmentType(name = u"空运"))
         DBSession.add(Payment(name = u"月结"))
 
+        DBSession.add(Customer(name = u"客户一", address = u"广东省深圳市福田区", phone = "0755-25311000", contact_person = u"李先生"))
+        DBSession.add(Customer(name = u"客户二", address = u"广东省深圳市罗湖区", phone = "0755-25141000", contact_person = u"陈小姐"))
+        DBSession.add(Customer(name = u"客户三", address = u"广东省深圳市南山区", phone = "0755-25340000", contact_person = u"张先生"))
+        DBSession.add(Customer(name = u"客户四", address = u"广东省深圳市龙岗区", phone = "0755-25361422", contact_person = u"王先生"))
 
         DBSession.commit()
         print "finish init!"

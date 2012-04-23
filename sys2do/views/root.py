@@ -17,7 +17,7 @@ from sys2do.util.common import _g, _gp, _gl
 from sys2do.constant import MESSAGE_ERROR, MESSAGE_INFO, MSG_NO_SUCH_ACTION, \
     MSG_SAVE_SUCC
 from sys2do.views import BasicView
-from sys2do.model.master import CustomerProfile
+from sys2do.model.master import CustomerProfile, Customer
 from sys2do.model.logic import OrderHeader, OrderLog, OrderDetail
 from sys2do.util.logic_helper import genSystemNo
 
@@ -88,6 +88,15 @@ class RootView(BasicView):
     def test(self):
         print _gp('aa_')
         return redirect(url_for('bpRoot.view', action = 'index'))
+
+
+    def ajax_master(self):
+        master = _g('m')
+        if(master == 'customer'):
+            cs = DBSession.query(Customer).filter(Customer.active == 0).order_by(Customer.name).all()
+            return jsonify({'status' : 0, 'msg' : '', 'data' : cs})
+        return
+
 
 bpRoot.add_url_rule('/', view_func = RootView.as_view('view'), defaults = {'action':'index'})
 bpRoot.add_url_rule('/<action>', view_func = RootView.as_view('view'))

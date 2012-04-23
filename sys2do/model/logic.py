@@ -50,7 +50,10 @@ class OrderHeader(DeclarativeBase, SysMixin):
                 'id' : self.id,
                 'no' : self.no,
                 'customer' : self.customer,
-                'supplier' : self.supplier,
+                'source_address' : self.source_address,
+                'source_contact' : self.source_contact,
+                'source_tel' : self.source_tel,
+                'remark' : self.remark,
                 'status' : self.status,
                 }
 
@@ -67,14 +70,16 @@ class OrderDetail(DeclarativeBase, SysMixin):
     header_id = Column(Integer, ForeignKey('order_header.id'))
     header = relation(OrderHeader, backref = backref("details", order_by = id), primaryjoin = "and_(OrderHeader.id == OrderDetail.header_id, OrderDetail.active == 0)")
 
-    item_id = Column(Integer, ForeignKey('master_item.id'))
-    item = relation(Item, backref = backref("details", order_by = id), primaryjoin = "and_(Item.id == OrderDetail.item_id, OrderDetail.active == 0)")
+#    item_id = Column(Integer, ForeignKey('master_item.id'))
+#    item = relation(Item, backref = backref("details", order_by = id), primaryjoin = "and_(Item.id == OrderDetail.item_id, OrderDetail.active == 0)")
+
 
     line_no = Column(Integer, default = 1)
+    item = Column(Unicode(1000))
     order_qty = Column(Float, default = 0) #client order qty
     delivered_qty = Column(Integer)
-    qty_unit_id = Column(Integer, ForeignKey('master_item_unit.id'))
-    qty_unit = relation(ItemUnit)
+    unit_id = Column(Integer, ForeignKey('master_item_unit.id'))
+    unit = relation(ItemUnit)
 
     weight = Column(Float, default = 0)
     weight_unit_id = Column(Integer, ForeignKey('master_weight_unit.id'))
@@ -82,7 +87,7 @@ class OrderDetail(DeclarativeBase, SysMixin):
 
     shipment_type_id = Column(Integer, ForeignKey('master_shipment_type.id'))
     shipment_type = relation(ShipmentType)
-    shipment_instruction = Column(Unicode(5000))
+#    shipment_instruction = Column(Unicode(5000))
 
     destination_address = Column(Unicode(5000))
     destination_contact = Column(Unicode(100))

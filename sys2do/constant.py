@@ -24,7 +24,8 @@ MSG_SERVER_ERROR = _('The service is not available temporarily,please try it lat
 MSG_NO_ID_SUPPLIED = _('No ID supply for this record!')
 MSG_RECORD_NOT_EXIST = _('The record does not exist!')
 MSG_RECORD_ALREADY_EXIST = _('The record already exist!')
-
+MSG_NO_FILE_UPLOADED = _('No file upload!')
+MSG_INVALID_FILE_TO_UPLOAD = _('Invalid file to upload!')
 
 #order status
 ORDER_CANCELLED = (-1, _('Cancelled'))

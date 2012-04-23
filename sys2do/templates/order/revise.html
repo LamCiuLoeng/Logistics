@@ -16,17 +16,26 @@
 		<p>{{_('Order Information')}}</p>
 		<table border="1" cellpadding="3" cellspacing="3">
 			<tr><td>{{_('Order No')}}</td><td>{{values.get('no','')}}</td></tr>
-			<tr><td>{{_('Order Company')}}</td><td><input type="text" name="customer" value="{{values.get('customer','')}}"/></td></tr>
+			<tr><td>{{_('Customer')}}</td><td>{{values.get('customer','')}}</td></tr>
+			<tr><td>{{_('Address')}}</td><td>{{values.get('source_address','')}}</td></tr>
+			<tr><td>{{_('Phone')}}</td><td>{{values.get('source_tel','')}}</td></tr>
+			<tr><td>{{_('Contact')}}</td><td>{{values.get('source_contact','')}}</td></tr>
+			<tr><td>{{_('Remark')}}</td><td>{{values.get('remark','')}}</td></tr>
 			<tr><td>{{_('Order Status')}}</td><td>{{values.get('status')|showStatus}}</td></tr>
 		</table>
 		<br />
 		<table border="1" cellpadding="3" cellspacing="3">
 			<thead>
 				<tr>
-					<td>货品名称</td>
-					<td>货品数量</td>
-					<td>货品状态</td>
-					<td>仓库数量</td>
+					<td>{{_('Item')}}</td>
+					<td>{{_('Qty')}}</td>
+					<td>{{_('Weight')}}</td>
+					<td>{{_('Shipment Type')}}</td>
+					<td>{{_('Destination')}}</td>
+					<td>{{_('Destination Contact')}}</td>
+					<td>{{_('Destination Tel')}}</td>
+					<td>{{_('Expect Time')}}</td>
+					<td>{{_('Remark')}}</td>
 				</tr>
 			</thead>
 			{% for d in details %}
@@ -40,29 +49,4 @@
 		</table>
 	</form>
 		
-		<br />
-		
-		{% if values.get('status',None) in [ORDER_NEW[0],RECEIVED_GOODS[0],GOODS_ARRIVED[0],] %}
-		<form method="post" action="{{url_for('bpOrder.view',action='do_action')}}">
-			<input type="hidden" name="id" value="{{values['id']}}"/>
-			{% if values.get('status',None) == ORDER_NEW[0] %}
-				<textarea name="remark">确认收货</textarea>
-				<input type="hidden" name="sc" value="{{RECEIVED_GOODS[0]}}"/>
-				<input type="submit" value="确认收货">
-			{% elif values.get('status',None) == RECEIVED_GOODS[0] %}
-				<textarea name="remark">确认入仓</textarea>
-				<input type="hidden" name="sc" value="{{IN_STORE[0]}}"/>
-				<select name="warehouse_id">
-					{% for w in warehouses%}
-						<option value="{{w.id}}">{{w}}</option>
-					{% endfor %}
-				</select>
-				<input type="submit" value="确认入仓">
-			{% elif values.get('status',None) == GOODS_ARRIVED[0] %}
-				<textarea name="remark">确认签收</textarea>
-				<input type="hidden" name="sc" value="{{GOODS_SIGNED[0]}}"/>
-				<input type="submit" value="确认签收">
-			{% endif %}
-		</form>
-		{% endif %}			
 {% endblock %}
