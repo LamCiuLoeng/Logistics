@@ -13,15 +13,16 @@ from sqlalchemy.sql.expression import and_
 from werkzeug.utils import redirect
 
 from sys2do.constant import MESSAGE_ERROR, MSG_NO_SUCH_ACTION, MESSAGE_INFO, \
-    MSG_SAVE_SUCC, IN_STORE, OUT_STORE, MSG_UPDATE_SUCC, ORDER_NEW
+    MSG_SAVE_SUCC, IN_STORE, OUT_STORE, MSG_UPDATE_SUCC, ORDER_NEW, \
+    ORDER_CANCELLED, MSG_DELETE_SUCC
 from sys2do.util.decorator import templated
 from sys2do.model import DBSession
 from sys2do.views import BasicView
 from sys2do.model.logic import DeliverHeader, OrderHeader, OrderDetail, \
     DeliverDetail, OrderLog
-from sys2do.util.common import _gl, _g, _gp, getOr404
-from sys2do.util.logic_helper import getDeliverNo, updateDeliverHeaderStatus
-from sys2do.model.master import WarehouseItem
+from sys2do.util.common import _gl, _g, _gp, getOr404, getMasterAll, _debug
+#from sys2do.util.logic_helper import updateDeliverHeaderStatus
+from sys2do.model.master import WarehouseItem, Supplier
 
 
 __all__ = ['bpDeliver']
@@ -38,48 +39,39 @@ class DeliverView(BasicView):
 
     @templated('deliver/select_orders.html')
     def select_orders(self):
-        result = DBSession.query(OrderHeader).filter(and_(OrderHeader.active == 0, OrderHeader.status == IN_STORE[0])).all()
+        result = DBSession.query(OrderDetail).filter(and_(OrderDetail.active == 0)).all()
         return {'result' : result}
 
 
 
     @templated('deliver/add_deliver.html')
     def add_deliver(self):
-        ids = _gl('order_ids')
-        result = []
-        for id in ids:
-            header = DBSession.query(OrderHeader).get(id)
-            result.append((header, [d for d in header.details if d.status == IN_STORE[0]]))
-
-        return {'result' : result, }
-
+        ids = _gl('order_detail_ids')
+        order_details = DBSession.query(OrderDetail).filter(OrderDetail.id.in_(ids))
+        suppliers = getMasterAll(Supplier)
+        return {'result' : order_details, 'suppliers' : suppliers}
 
 
     def deliver_save_new(self):
 
-        header = DeliverHeader(no = getDeliverNo())
-#        orders = []
+        header = DeliverHeader(no = _g('no'),
+                               destination_address = _g('destination_address'),
+                               supplier_id = _g('supplier_id'),
+                               supplier_contact = _g('supplier_contact'),
+                               supplier_tel = _g('supplier_tel'),
+                               expect_time = _g('expect_time'),
+                               remark = _g('remark'),
+                               )
 
-        details = _gp('detail_')
-        deliver_qtys = _gp('deliver_qty_')
-
-
-        for (k, v), (dk, dv) in zip(details, deliver_qtys):
-            n, id = k.split("_")
-            deliver_qty = int(_g('deliver_qty_%s' % id))
-            if deliver_qty > 0 :
-                detail = DBSession.query(OrderDetail).get(id)
-                DBSession.add(DeliverDetail(header = header, order_detail = detail, deliver_qty = deliver_qty))
-                detail.future_warehouse_qty -= deliver_qty
-#            detail.status = 1
-#            if detail.header not in orders : orders.append(detail.header)
-
-#        for order in orders:
-#            if any(map(lambda d : d.status == IN_STORE, order.details)):
-#                order.status = IN_STORE[0]
-#            else:
-#                order.status = OUT_STORE[0]
-
+        line_no = 1
+        for k, id in _gp('detail_'):
+            order_detail = DBSession.query(OrderDetail).get(id)
+            DBSession.add(DeliverDetail(header = header,
+                                        order_detail = order_detail,
+                                        order_detail_line_no = order_detail.line_no,
+                                        line_no = line_no))
+            line_no += 1
+            _debug('------- save detail')
         DBSession.commit()
         flash(MSG_SAVE_SUCC, MESSAGE_INFO)
         return redirect(self.default())
@@ -89,6 +81,23 @@ class DeliverView(BasicView):
         id = _g('id')
         h = DBSession.query(DeliverHeader).get(id)
         return {'header' : h}
+
+    @templated('deliver/revise_deliver.html')
+    def revise(self):
+        header = getOr404(DeliverHeader, _g('id'), redirect_url = self.default())
+
+        return {'values' : header.populate(), 'details' : header.details, 'suppliers' : getMasterAll(Supplier)}
+
+
+    def deliver_save_revise(self):
+        pass
+
+    def delete(self):
+        header = getOr404(DeliverHeader, _g('id'), redirect_url = self.default())
+        header.status = ORDER_CANCELLED[0]
+        DBSession.commit()
+        flash(MSG_DELETE_SUCC, MESSAGE_INFO)
+        return redirect(url_for('.view', action = 'index'))
 
 
     def update_status(self):

@@ -15,7 +15,7 @@ from sys2do.constant import STATUS_LIST
 __all__ = ['ft', 'fd', 'ifFalse', 'showStatus']
 
 
-def ft(t, f = "%Y-%m-%d %H:%M:%S"):
+def ft(t, f = "%Y-%m-%d %H:%M"):
     try:
         return t.strftime(f)
     except:

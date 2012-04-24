@@ -25,7 +25,7 @@ __all__ = ['_g', '_gl', '_gp', '_debug', '_info', 'getOr404', 'upload', 'makeExc
 
 
 def _g(name, default = None):
-    return request.values.get(name, default)
+    return request.values.get(name, default) or None
 
 def _gl(name):
     return request.form.getlist(name)

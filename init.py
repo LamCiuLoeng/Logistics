@@ -11,7 +11,7 @@ from sys2do.model import metadata, engine, DBSession, Permission, Group, User
 #import sys2do.model.logic as logic
 import sys
 from sys2do.model.master import CustomerProfile, Customer, Item, \
-    ItemUnit, Warehouse, WeightUnit, ShipmentType, Payment, Province
+    ItemUnit, Warehouse, WeightUnit, ShipmentType, Payment, Province, Supplier
 reload(sys)
 sys.setdefaultencoding('utf8')
 
@@ -108,6 +108,10 @@ def init():
         DBSession.add(Customer(name = u"客户二", address = u"广东省深圳市罗湖区", phone = "0755-25141000", contact_person = u"陈小姐"))
         DBSession.add(Customer(name = u"客户三", address = u"广东省深圳市南山区", phone = "0755-25340000", contact_person = u"张先生"))
         DBSession.add(Customer(name = u"客户四", address = u"广东省深圳市龙岗区", phone = "0755-25361422", contact_person = u"王先生"))
+
+        DBSession.add(Supplier(name = u"承运商一", address = u"广东省珠海市斗门区", phone = "0756-25361422", contact_person = u"林先生"))
+        DBSession.add(Supplier(name = u"承运商二", address = u"广东省珠海市金湾区", phone = "0756-25361422", contact_person = u"邓先生"))
+        DBSession.add(Supplier(name = u"承运商三", address = u"广东省珠海市拱北区", phone = "0756-25361422", contact_person = u"黄先生"))
 
         DBSession.commit()
         print "finish init!"

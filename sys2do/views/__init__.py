@@ -15,8 +15,10 @@ class BasicView(View):
     def default(self):  return url_for('.view', action = 'index')
 
     def dispatch_request(self, action):
-        try:
-            return getattr(self, action)()
-        except AttributeError, e:
-            flash(MSG_NO_SUCH_ACTION, MESSAGE_ERROR)
-            return redirect(self.default())
+#        try:
+#            return getattr(self, action)()
+#        except AttributeError, e:
+#            flash(MSG_NO_SUCH_ACTION, MESSAGE_ERROR)
+#            return redirect(self.default())
+
+        return getattr(self, action)()

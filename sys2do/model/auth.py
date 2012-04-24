@@ -40,11 +40,17 @@ class SysMixin(object):
 
     @property
     def create_by(self):
-        return DBSession.query(User).get(self.create_by_id)
+        try:
+            return DBSession.query(User).get(self.create_by_id)
+        except:
+            return None
 
     @property
     def update_by(self):
-        return DBSession.query(User).get(self.update_by_id)
+        try:
+            return DBSession.query(User).get(self.update_by_id)
+        except:
+            return None
 
 
 

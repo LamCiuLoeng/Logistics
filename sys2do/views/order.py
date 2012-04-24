@@ -156,7 +156,7 @@ class OrderView(BasicView):
 
 
 
-    def cancel(self):
+    def delete(self):
         header = getOr404(OrderHeader, _g('id'), redirect_url = self.default())
         header.status = ORDER_CANCELLED[0]
         DBSession.commit()

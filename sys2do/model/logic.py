@@ -93,7 +93,7 @@ class OrderDetail(DeclarativeBase, SysMixin):
     destination_contact = Column(Unicode(100))
     destination_tel = Column(Unicode(100))
 
-    expect_time = Column(Date)
+    expect_time = Column(Date, default = None)
     remark = Column(Unicode(10000))
     status = Column(Integer, default = 0)
 
@@ -107,12 +107,12 @@ class DeliverHeader(DeclarativeBase, SysMixin):
 
     destination_address = Column(Unicode(5000))
     supplier_id = Column(Integer, ForeignKey('master_supplier.id'))
-    Supplier = relation(Supplier)
+    supplier = relation(Supplier)
 
     supplier_contact = Column(Unicode(100))
     supplier_tel = Column(Unicode(100))
 
-    expect_time = Column(Date)
+    expect_time = Column(Date, default = None)
     remark = Column(Unicode(10000))
     status = Column(Integer, default = 0)
 
@@ -124,7 +124,19 @@ class DeliverHeader(DeclarativeBase, SysMixin):
             if d.order_detail.header not in orders : orders.append(d.order_detail.header)
         return orders
 
-
+    def populate(self):
+        return {
+                'id' : self.id,
+                'no' : self.no,
+                'destination_address' : self.destination_address,
+                'supplier_id' : self.supplier_id,
+                'supplier' : self.supplier,
+                'supplier_contact' : self.supplier_contact,
+                'supplier_tel' : self.supplier_tel,
+                'expect_time' : self.expect_time,
+                'remark' : self.remark,
+                'status' : self.status,
+                }
 
 
 class DeliverDetail(DeclarativeBase, SysMixin):

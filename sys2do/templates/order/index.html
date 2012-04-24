@@ -16,10 +16,10 @@
 			<tr>
 				<td>{{_('Order Number')}}</td>
 				<td>{{_('Customer')}}</td>
-				<td>{{_('Order Time')}}</td>
+				<td>{{_('Create Time')}}</td>
 				<td>{{_('Creator')}}</td>
 				<td>{{_('Last Updator')}}</td>
-				<td>{{_('Order Status')}}</td>
+				<td>{{_('Status')}}</td>
 				<td>{{_('Action')}}</td>
 			</tr>
 			{% for r in result%}
@@ -27,13 +27,13 @@
 				<td><a href="{{url_for('.view', action = 'review',id=r.id)}}">{{r.no}}</a></td>
 				<td>{{r.customer}}</td>
 				<td>{{r.create_time|ft}}</td>
-				<td></td>
-				<td></td>
+				<td>{{r.create_by}}</td>
+				<td><{{r.update_by}}/td>
 				<td>{{r.status|showStatus}}</td>
 				<td>
-					<a href="{{url_for('.view', action = 'revise',id=r.id)}}">{{_('Update')}}</a>
+					<a href="{{url_for('.view', action = 'revise',id=r.id)}}">{{_('Revise')}}</a>
 					&nbsp;&nbsp;
-					<a href="{{url_for('.view', action = 'cancel',id=r.id)}}">{{_('Cancel')}}</a>
+					<a href="{{url_for('.view', action = 'delete',id=r.id)}}">{{_('Delete')}}</a>
 				</td>
 			</tr>
 			{% endfor %}
