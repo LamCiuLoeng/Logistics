@@ -5,12 +5,12 @@
 {% endblock %}
 
 {% block content %}
-	<p><a href="{{url_for('.view', action = 'user',m = 'NEW')}}">{{_('New Record')}}</a></p>
+	<p><a href="{{url_for('.view', action = 'group',m = 'NEW')}}">{{_('New Record')}}</a></p>
 	
 	<table border="1" cellpadding="3" cellspacing="3">
 		<thead>
 			<tr>
-				<td>{{_('User Name')}}</td>
+				<td>{{_('Group Name')}}</td>
 				<td>{{_('Create Time')}}</td>
 				<td>{{_('Action')}}</td>
 			</tr>
@@ -18,7 +18,7 @@
 			<tr>
 				<td>{{r}}</td>
 				<td>{{r.create_time|ft}}</td>
-				<td><a href="{{url_for('.view', action = 'user',m = 'UPDATE',id=r.id)}}">{{_('Revise')}}</a>&nbsp|&nbsp;<a href="{{url_for('.view', action = 'user',m = 'DELETE',id=r.id)}}">{{_('Delete')}}</a></td>
+				<td><a href="{{url_for('.view', action = 'group',m = 'UPDATE',id=r.id)}}">{{_('Revise')}}</a>&nbsp|&nbsp;<a href="{{url_for('.view', action = 'group',m = 'DELETE',id=r.id)}}">{{_('Delete')}}</a></td>
 			</tr>
 			{% endfor %}
 		</thead>

@@ -1,0 +1,49 @@
+{% extends "master.html" %}
+
+{% block extJS %}
+
+{% endblock %}
+
+{% block content %}
+	<form action="{{url_for('.view', action = 'user',m='SAVE_UPDATE')}}" method="post">
+		<input type="hidden" name="id" value="{{v['id']}}"/>
+		<table>
+			<tr>
+				<td>{{_('User Name')}}</td>
+				<td><input type="text" name="name" value="{{v['name']}}"/></td>
+			</tr>
+			<tr>
+				<td>{{_('Password')}}</td>
+				<td><input type="password" name="password" value="{{v['password']}}"/></td>
+			</tr>
+			<tr>
+				<td>{{_('Confirm Password')}}</td>
+				<td><input type="password" name="repassword" value="{{v['password']}}"/></td>
+			</tr>
+			<tr>
+				<td>{{_('E-mail')}}</td>
+				<td><input type="text" name="email" value="{{v['email']|ifFalse}}"/></td>
+			</tr>
+			<tr>
+				<td>{{_('First Name')}}</td>
+				<td><input type="text" name="first_name" value="{{v['first_name']|ifFalse}}"/></td>
+			</tr>
+			<tr>
+				<td>{{_('Last Name')}}</td>
+				<td><input type="text" name="last_name" value="{{v['last_name']|ifFalse}}"/></td>
+			</tr>
+			<tr>
+				<td>{{_('Phone')}}</td>
+				<td><input type="text" name="phone" value="{{v['phone']|ifFalse}}"/></td>
+			</tr>
+			<tr>
+				<td>{{_('Birthday')}}</td>
+				<td><input type="text" name="birthday" value="{{v['birthday']|ifFalse}}"/></td>
+			</tr>
+			<tr>
+				<td colspan="2"><input type="submit" value="{{_('Submit')}}"/>&nbsp;&nbsp;&nbsp;<input type="button" value="{{_('Cancel')}}" onclick="redirect('{{url_for('.view', action = 'user')}}')"/></td>
+			</tr>
+		</table>
+	</form>
+	
+{% endblock %}

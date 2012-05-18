@@ -1,0 +1,30 @@
+{% extends "master.html" %}
+
+{% block extJS %}
+
+{% endblock %}
+
+{% block content %}
+	<form action="{{url_for('.view', action = 'group',m='SAVE_UPDATE')}}" method="post">
+		<input type="hidden" name="id" value="{{v['id']}}"/>
+		<table>
+			<tr>
+				<td>{{_('Group Name')}}</td>
+				<td><input type="text" name="name" value="{{v['name']}}"/></td>
+			</tr>
+			<tr>
+				<td>{{_('Display Name')}}</td>
+				<td><input type="text" name="display_name" value="{{v['display_name']}}"/></td>
+			</tr>
+			<tr>
+				<td>{{_('Description')}}</td>
+				<td><textarea name="desc">{{v['desc']}}</textarea></td>
+			</tr>
+			
+			<tr>
+				<td colspan="2"><input type="submit" value="{{_('Submit')}}"/>&nbsp;&nbsp;&nbsp;<input type="button" value="{{_('Cancel')}}" onclick="redirect('{{url_for('.view', action = 'user')}}')"/></td>
+			</tr>
+		</table>
+	</form>
+	
+{% endblock %}

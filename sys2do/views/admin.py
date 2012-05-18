@@ -6,16 +6,19 @@
 #  Description:
 ###########################################
 '''
-from flask.blueprints import Blueprint
+from flask import Blueprint, render_template, url_for, request
 from flask.views import View
-from flask.helpers import url_for, flash
+from flask.helpers import flash
 from werkzeug.utils import redirect
 
 from sys2do.util.decorator import templated
 from sys2do.views import BasicView
 from sys2do.model import DBSession
-from sys2do.model.auth import User
-from sys2do.constant import MESSAGE_ERROR, MSG_NO_SUCH_ACTION
+from sys2do.model.auth import User, Group, Permission
+from sys2do.constant import MESSAGE_ERROR, MSG_NO_SUCH_ACTION, \
+    MSG_NO_ID_SUPPLIED, MSG_RECORD_NOT_EXIST, MESSAGE_INFO, MSG_SAVE_SUCC, \
+    MSG_UPDATE_SUCC
+from sys2do.util.common import _g
 
 __all__ = ['bpAdmin']
 
@@ -27,12 +30,131 @@ class AdminView(BasicView):
     def index(self):
         return {}
 
-    @templated('admin/user_index.html')
-    def users(self):
-        users = DBSession.query(User).filter(User.active == 0).order_by(User.name).all()
-        return {'records' : users}
+
+    def user(self):
+        method = _g('m', 'LIST')
+        if method not in ['LIST', 'NEW', 'UPDATE', 'DELETE', 'SAVE_NEW', 'SAVE_UPDATE']:
+            flash(MSG_NO_SUCH_ACTION, MESSAGE_ERROR);
+            return redirect(url_for('.view', action = 'index'))
+        if method == 'LIST':
+            users = DBSession.query(User).filter(User.active == 0).order_by(User.name).all()
+            return render_template('admin/user_index.html', records = users)
+        elif method == 'NEW':
+            return render_template('admin/user_new.html')
+        elif method == 'UPDATE':
+            id = _g('id', None)
+            if not id :
+                flash(MSG_NO_ID_SUPPLIED, MESSAGE_ERROR)
+                return redirect(url_for('.view', action = 'user'))
+            user = User.get(id)
+            if not user :
+                flash(MSG_RECORD_NOT_EXIST, MESSAGE_ERROR)
+                return redirect(url_for('.view', action = 'user'))
+            return render_template('admin/user_update.html', v = user.populate())
+        elif method == 'DELETE':
+            pass
+        elif method == 'SAVE_NEW':
+            user = User.saveAsNew(request.values)
+            DBSession.commit()
+            flash(MSG_SAVE_SUCC, MESSAGE_INFO)
+            return redirect(url_for('.view', action = 'user'))
+        elif method == 'SAVE_UPDATE':
+            id = _g('id', None)
+            if not id :
+                flash(MSG_NO_ID_SUPPLIED, MESSAGE_ERROR)
+                return redirect(url_for('.view', action = 'user'))
+            user = User.get(id)
+            if not user :
+                flash(MSG_RECORD_NOT_EXIST, MESSAGE_ERROR)
+                return redirect(url_for('.view', action = 'user'))
+            user.saveAsUpdate(request.values)
+            DBSession.commit()
+            flash(MSG_UPDATE_SUCC, MESSAGE_INFO)
+            return redirect(url_for('.view', action = 'user'))
 
 
+    def group(self):
+        method = _g('m', 'LIST')
+        if method not in ['LIST', 'NEW', 'UPDATE', 'DELETE', 'SAVE_NEW', 'SAVE_UPDATE']:
+            flash(MSG_NO_SUCH_ACTION, MESSAGE_ERROR);
+            return redirect(url_for('.view', action = 'index'))
+        if method == 'LIST':
+            groups = DBSession.query(Group).filter(Group.active == 0).order_by(Group.name).all()
+            return render_template('admin/group_index.html', records = groups)
+        elif method == 'NEW':
+            return render_template('admin/group_new.html')
+        elif method == 'UPDATE':
+            id = _g('id', None)
+            if not id :
+                flash(MSG_NO_ID_SUPPLIED, MESSAGE_ERROR)
+                return redirect(url_for('.view', action = 'group'))
+            group = Group.get(id)
+            if not group :
+                flash(MSG_RECORD_NOT_EXIST, MESSAGE_ERROR)
+                return redirect(url_for('.view', action = 'group'))
+            return render_template('admin/group_update.html', v = group.populate())
+        elif method == 'DELETE':
+            pass
+        elif method == 'SAVE_NEW':
+            group = Group.saveAsNew(request.values)
+            DBSession.commit()
+            flash(MSG_SAVE_SUCC, MESSAGE_INFO)
+            return redirect(url_for('.view', action = 'group'))
+        elif method == 'SAVE_UPDATE':
+            id = _g('id', None)
+            if not id :
+                flash(MSG_NO_ID_SUPPLIED, MESSAGE_ERROR)
+                return redirect(url_for('.view', action = 'group'))
+            group = Group.get(id)
+            if not group :
+                flash(MSG_RECORD_NOT_EXIST, MESSAGE_ERROR)
+                return redirect(url_for('.view', action = 'group'))
+            group.saveAsUpdate(request.values)
+            DBSession.commit()
+            flash(MSG_UPDATE_SUCC, MESSAGE_INFO)
+            return redirect(url_for('.view', action = 'group'))
+
+
+    def permission(self):
+        method = _g('m', 'LIST')
+        if method not in ['LIST', 'NEW', 'UPDATE', 'DELETE', 'SAVE_NEW', 'SAVE_UPDATE']:
+            flash(MSG_NO_SUCH_ACTION, MESSAGE_ERROR);
+            return redirect(url_for('.view', action = 'index'))
+        if method == 'LIST':
+            permission = DBSession.query(Permission).filter(Permission.active == 0).order_by(Permission.name).all()
+            return render_template('admin/permission_index.html', records = permission)
+        elif method == 'NEW':
+            return render_template('admin/permission_new.html')
+        elif method == 'UPDATE':
+            id = _g('id', None)
+            if not id :
+                flash(MSG_NO_ID_SUPPLIED, MESSAGE_ERROR)
+                return redirect(url_for('.view', action = 'permission'))
+            permission = Permission.get(id)
+            if not permission :
+                flash(MSG_RECORD_NOT_EXIST, MESSAGE_ERROR)
+                return redirect(url_for('.view', action = 'permission'))
+            return render_template('admin/permission_update.html', v = permission.populate())
+        elif method == 'DELETE':
+            pass
+        elif method == 'SAVE_NEW':
+            permission = Permission.saveAsNew(request.values)
+            DBSession.commit()
+            flash(MSG_SAVE_SUCC, MESSAGE_INFO)
+            return redirect(url_for('.view', action = 'permission'))
+        elif method == 'SAVE_UPDATE':
+            id = _g('id', None)
+            if not id :
+                flash(MSG_NO_ID_SUPPLIED, MESSAGE_ERROR)
+                return redirect(url_for('.view', action = 'permission'))
+            permission = Permission.get(id)
+            if not permission :
+                flash(MSG_RECORD_NOT_EXIST, MESSAGE_ERROR)
+                return redirect(url_for('.view', action = 'permission'))
+            permission.saveAsUpdate(request.values)
+            DBSession.commit()
+            flash(MSG_UPDATE_SUCC, MESSAGE_INFO)
+            return redirect(url_for('.view', action = 'permission'))
 
 
 bpAdmin.add_url_rule('/', view_func = AdminView.as_view('view'), defaults = {'action':'index'})

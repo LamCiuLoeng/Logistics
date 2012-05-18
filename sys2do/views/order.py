@@ -9,11 +9,11 @@
 from datetime import datetime as dt
 from datetime import timedelta
 
-from flask import Blueprint
-
+from flask import Blueprint, render_template, url_for
 from flask.views import View
 from werkzeug.utils import redirect
-from flask.helpers import url_for, flash
+from flask.helpers import flash
+
 from sys2do.model.logic import OrderHeader, OrderLog, OrderDetail
 from sys2do.model import DBSession
 from sys2do.util.decorator import templated, login_required

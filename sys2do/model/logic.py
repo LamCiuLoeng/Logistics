@@ -8,7 +8,7 @@
 '''
 from datetime import datetime as dt
 from sqlalchemy import Table, Column, ForeignKey
-from sqlalchemy.types import Unicode, Integer, DateTime, Float, Date
+from sqlalchemy.types import Unicode, Integer, DateTime, Float, Date, Text
 from sqlalchemy.orm import relation, backref
 from sys2do.model import DeclarativeBase, metadata, DBSession
 from auth import SysMixin
@@ -26,16 +26,16 @@ class OrderHeader(DeclarativeBase, SysMixin):
     __tablename__ = 'order_header'
 
     id = Column(Integer, autoincrement = True, primary_key = True)
-    no = Column(Unicode(100))
+    no = Column(Text)
 
     customer_id = Column(Integer, ForeignKey('master_customer.id'))
     customer = relation(Customer, backref = backref("orders", order_by = id), primaryjoin = "and_(Customer.id == OrderHeader.customer_id, OrderHeader.active == 0)")
 
-    source_address = Column(Unicode(5000))
-    source_contact = Column(Unicode(100))
-    source_tel = Column(Unicode(100))
+    source_address = Column(Text)
+    source_contact = Column(Text)
+    source_tel = Column(Text)
 
-    remark = Column(Unicode(10000))
+    remark = Column(Text)
     status = Column(Integer, default = 0)
 
 
@@ -75,7 +75,7 @@ class OrderDetail(DeclarativeBase, SysMixin):
 
 
     line_no = Column(Integer, default = 1)
-    item = Column(Unicode(1000))
+    item = Column(Text)
     order_qty = Column(Float, default = 0) #client order qty
     delivered_qty = Column(Integer)
     unit_id = Column(Integer, ForeignKey('master_item_unit.id'))
@@ -89,12 +89,12 @@ class OrderDetail(DeclarativeBase, SysMixin):
     shipment_type = relation(ShipmentType)
 #    shipment_instruction = Column(Unicode(5000))
 
-    destination_address = Column(Unicode(5000))
-    destination_contact = Column(Unicode(100))
-    destination_tel = Column(Unicode(100))
+    destination_address = Column(Text)
+    destination_contact = Column(Text)
+    destination_tel = Column(Text)
 
     expect_time = Column(Date, default = None)
-    remark = Column(Unicode(10000))
+    remark = Column(Text)
     status = Column(Integer, default = 0)
 
 
@@ -103,17 +103,17 @@ class DeliverHeader(DeclarativeBase, SysMixin):
     __tablename__ = 'deliver_header'
 
     id = Column(Integer, autoincrement = True, primary_key = True)
-    no = Column(Unicode(100))
+    no = Column(Text)
 
-    destination_address = Column(Unicode(5000))
+    destination_address = Column(Text)
     supplier_id = Column(Integer, ForeignKey('master_supplier.id'))
     supplier = relation(Supplier)
 
-    supplier_contact = Column(Unicode(100))
-    supplier_tel = Column(Unicode(100))
+    supplier_contact = Column(Text)
+    supplier_tel = Column(Text)
 
     expect_time = Column(Date, default = None)
-    remark = Column(Unicode(10000))
+    remark = Column(Text)
     status = Column(Integer, default = 0)
 
 
@@ -154,7 +154,7 @@ class DeliverDetail(DeclarativeBase, SysMixin):
 
     deliver_qty = Column(Integer)
 
-    remark = Column(Unicode(10000))
+    remark = Column(Text)
     status = Column(Integer, default = 0)
 
 
@@ -170,4 +170,4 @@ class OrderLog(DeclarativeBase, SysMixin):
 
     order_detail_id = Column(Integer, ForeignKey('order_detail.id'))
     order_detail = relation(OrderDetail, backref = backref("logs", order_by = id), primaryjoin = "and_(OrderDetail.id == OrderLog.order_detail_id, OrderLog.active == 0)")
-    remark = Column(Unicode(5000))
+    remark = Column(Text)

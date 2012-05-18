@@ -18,7 +18,7 @@ except ImportError:
 
 from flask import session
 from sqlalchemy import Table, ForeignKey, Column
-from sqlalchemy.types import Unicode, Integer, DateTime, Date
+from sqlalchemy.types import Unicode, Integer, DateTime, Date, Text
 from sqlalchemy.orm import relation
 from sys2do.model import DeclarativeBase, metadata, DBSession
 
@@ -63,10 +63,11 @@ class CRUDMixin(object):
     def populate(self):
         return None
 
-    def saveAsNew(self):
+    @classmethod
+    def saveAsNew(clz, v):
         return None
 
-    def saveAsUpdate(self):
+    def saveAsUpdate(self, v):
         return None
 
 #{ Association tables
@@ -98,9 +99,9 @@ class Group(DeclarativeBase, SysMixin, CRUDMixin):
     __tablename__ = 'system_group'
 
     id = Column(Integer, autoincrement = True, primary_key = True)
-    name = Column(Unicode(100), unique = True, nullable = False)
-    display_name = Column(Unicode(100))
-    desc = Column(Unicode(1000))
+    name = Column(Text, unique = True, nullable = False)
+    display_name = Column(Text)
+    desc = Column(Text)
     users = relation('User', secondary = user_group_table, backref = 'groups')
 
     def __repr__(self):
@@ -109,6 +110,32 @@ class Group(DeclarativeBase, SysMixin, CRUDMixin):
     def __unicode__(self):
         return self.display_name or self.name
 
+    def populate(self):
+        return {
+                "id" : self.id,
+                "name" :self.name,
+                "display_name" : self.display_name,
+                "desc" : self.desc
+                }
+
+
+    @classmethod
+    def saveAsNew(clz, v):
+        params = {
+                  "name" : v.get("name", None) or None,
+                  "desc" : v.get("desc", None) or None,
+                  "display_name" : v.get("display_name", None) or None
+                  }
+        group = clz(**params)
+        DBSession.add(group)
+        return group
+
+
+    def saveAsUpdate(self, v):
+        self.name = v.get("name", None) or None
+        self.desc = v.get("desc", None) or None
+        self.display_name = v.get("display_name", None) or None
+        return self
 
 # The 'info' argument we're passing to the email_address and password columns
 # contain metadata that Rum (http://python-rum.org/) can use generate an
@@ -117,14 +144,14 @@ class User(DeclarativeBase, SysMixin, CRUDMixin):
     __tablename__ = 'system_user'
 
     id = Column(Integer, autoincrement = True, primary_key = True)
-    name = Column(Unicode(100), unique = True, nullable = False)
-    email = Column(Unicode(200), unique = True, nullable = False)
-    password = Column(Unicode(50))
-    first_name = Column(Unicode(50))
-    last_name = Column(Unicode(50))
-    phone = Column(Unicode(50))
+    name = Column(Text, unique = True, nullable = False)
+    email = Column(Text, unique = True, nullable = False)
+    password = Column(Text)
+    first_name = Column(Text)
+    last_name = Column(Text)
+    phone = Column(Text)
     birthday = Column(Date, default = None)
-    image_url = Column(Unicode(100))
+    image_url = Column(Text)
 
     def __repr__(self): return "%s %s" % (self.first_name, self.last_name)
 
@@ -159,22 +186,59 @@ class User(DeclarativeBase, SysMixin, CRUDMixin):
         return {
                 'id' : self.id,
                 'name' : self.name,
+                'password' : self.password,
                 'email' : self.email,
                 'first_name' : self.first_name,
                 'last_name' : self.last_name,
                 'image_url' : self.image_url,
                 'phone' : self.phone,
+                'birthday' : self.birthday,
                 }
+
+
+    @classmethod
+    def saveAsNew(clz, v):
+        params = {}
+        for f in ['name', 'password', 'email', 'first_name', 'last_name', 'image_url', 'phone', 'birthday']:
+            params[f] = v.get(f, None) or None
+        one = clz(**params)
+        DBSession.add(one)
+        return one
+
+    def saveAsUpdate(self, v):
+        for f in ['name', 'password', 'email', 'first_name', 'last_name', 'image_url', 'phone']:
+            setattr(self, f, v.get(f, None) or None)
+        return self
+
 
 
 class Permission(DeclarativeBase, SysMixin, CRUDMixin):
     __tablename__ = 'system_permission'
 
     id = Column(Integer, autoincrement = True, primary_key = True)
-    name = Column(Unicode(100), unique = True, nullable = False)
-    desc = Column(Unicode(1000))
+    name = Column(Text, unique = True, nullable = False)
+    desc = Column(Text)
     groups = relation(Group, secondary = group_permission_table, backref = 'permissions')
 
     def __repr__(self): return self.name
 
     def __unicode__(self): return self.name
+
+
+    def populate(self):
+        return {"id" : self.id , "name" : self.name, 'desc' : self.desc}
+
+    @classmethod
+    def saveAsNew(clz, v):
+        params = {
+                  'name' : v.get('name', None) or None,
+                  'desc' : v.get('desc', None) or None,
+                  }
+        one = clz(**params)
+        DBSession.add(one)
+        return one
+
+    def saveAsUpdate(self, v):
+        self.name = v.get("name", None) or None
+        self.desc = v.get("desc", None) or None
+        return self

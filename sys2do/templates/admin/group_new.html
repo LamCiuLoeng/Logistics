@@ -1,0 +1,29 @@
+{% extends "master.html" %}
+
+{% block extJS %}
+
+{% endblock %}
+
+{% block content %}
+	<form action="{{url_for('.view', action = 'group',m='SAVE_NEW')}}" method="post">
+		<table>
+			<tr>
+				<td>{{_('Group Name')}}</td>
+				<td><input type="text" name="name"/></td>
+			</tr>
+			<tr>
+				<td>{{_('Display Name')}}</td>
+				<td><input type="text" name="display_name"/></td>
+			</tr>
+			<tr>
+				<td>{{_('Description')}}</td>
+				<td><textarea name="desc"></textarea></td>
+			</tr>
+			
+			<tr>
+				<td colspan="2"><input type="submit" value="{{_('Submit')}}"/>&nbsp;&nbsp;&nbsp;<input type="button" value="{{_('Cancel')}}" onclick="redirect('{{url_for('.view', action = 'user')}}')"/></td>
+			</tr>
+		</table>
+	</form>
+	
+{% endblock %}

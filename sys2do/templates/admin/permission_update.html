@@ -1,0 +1,26 @@
+{% extends "master.html" %}
+
+{% block extJS %}
+
+{% endblock %}
+
+{% block content %}
+	<form action="{{url_for('.view', action = 'permission',m='SAVE_UPDATE')}}" method="post">
+		<input type="hidden" name="id" value="{{v['id']}}"/>
+		<table>
+			<tr>
+				<td>{{_('Permission Name')}}</td>
+				<td><input type="text" name="name" value="{{v['name']}}"/></td>
+			</tr>
+			<tr>
+				<td>{{_('Description')}}</td>
+				<td><textarea name="desc">{{v['desc']}}</textarea></td>
+			</tr>
+			
+			<tr>
+				<td colspan="2"><input type="submit" value="{{_('Submit')}}"/>&nbsp;&nbsp;&nbsp;<input type="button" value="{{_('Cancel')}}" onclick="redirect('{{url_for('.view', action = 'user')}}')"/></td>
+			</tr>
+		</table>
+	</form>
+	
+{% endblock %}
