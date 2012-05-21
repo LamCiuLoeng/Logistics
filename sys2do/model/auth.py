@@ -60,6 +60,10 @@ class CRUDMixin(object):
     def get(clz, id):
         return DBSession.query(clz).get(id)
 
+    @classmethod
+    def all(clz, order_by = "name"):
+        return DBSession.query(clz).filter(clz.active == 0).order_by(getattr(clz, order_by)).all()
+
     def populate(self):
         return None
 
@@ -104,11 +108,12 @@ class Group(DeclarativeBase, SysMixin, CRUDMixin):
     desc = Column(Text)
     users = relation('User', secondary = user_group_table, backref = 'groups')
 
-    def __repr__(self):
-        return self.display_name or self.name
+    def __repr__(self): return self.display_name or self.name
 
-    def __unicode__(self):
-        return self.display_name or self.name
+    def __str__(self): return self.display_name or self.name
+
+    def __unicode__(self): return self.display_name or self.name
+
 
     def populate(self):
         return {
@@ -145,7 +150,7 @@ class User(DeclarativeBase, SysMixin, CRUDMixin):
 
     id = Column(Integer, autoincrement = True, primary_key = True)
     name = Column(Text, unique = True, nullable = False)
-    email = Column(Text, unique = True, nullable = False)
+    email = Column(Text)
     password = Column(Text)
     first_name = Column(Text)
     last_name = Column(Text)
@@ -154,6 +159,8 @@ class User(DeclarativeBase, SysMixin, CRUDMixin):
     image_url = Column(Text)
 
     def __repr__(self): return "%s %s" % (self.first_name, self.last_name)
+
+    def __str__(self): return "%s %s" % (self.first_name, self.last_name)
 
     def __unicode__(self): return "%s %s" % (self.first_name, self.last_name)
 
@@ -221,6 +228,8 @@ class Permission(DeclarativeBase, SysMixin, CRUDMixin):
     groups = relation(Group, secondary = group_permission_table, backref = 'permissions')
 
     def __repr__(self): return self.name
+
+    def __str__(self): return self.name
 
     def __unicode__(self): return self.name
 

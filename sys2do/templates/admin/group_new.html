@@ -19,9 +19,41 @@
 				<td>{{_('Description')}}</td>
 				<td><textarea name="desc"></textarea></td>
 			</tr>
-			
 			<tr>
-				<td colspan="2"><input type="submit" value="{{_('Submit')}}"/>&nbsp;&nbsp;&nbsp;<input type="button" value="{{_('Cancel')}}" onclick="redirect('{{url_for('.view', action = 'user')}}')"/></td>
+				<td>{{_('User')}}</td>
+				<td>
+					<table>
+						<tr>
+							<td><input type="checkbox" class="allbox"/></td><td>{{_('User Name')}}</td>
+						</tr>
+						{% for u in users %}
+							<tr>
+								<td><input class="onebox" type="checkbox" name="uids" value="{{u.id}}"/></td>
+								<td>{{u}}</td>
+							</tr>
+						{% endfor %}
+					</table>
+				</td>
+			</tr>
+			<tr>
+				<td>{{_('Permission')}}</td>
+				<td>
+					<table>
+						<tr>
+							<td><input type="checkbox" class="allbox"/></td><td>{{_('Permission Name')}}</td><td>{{_('Description')}}</td>
+						</tr>
+						{% for p in permissions%}
+							<tr>
+								<td><input class="onebox" type="checkbox" name="pids" value="{{p.id}}"/></td>
+								<td>{{p}}</td>
+								<td>{{p.desc|ifFalse}}</td>
+							</tr>
+						{% endfor %}
+					</table>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2"><input type="submit" value="{{_('Submit')}}"/>&nbsp;&nbsp;&nbsp;<input type="button" value="{{_('Cancel')}}" onclick="redirect('{{url_for('.view', action = 'group')}}')"/></td>
 			</tr>
 		</table>
 	</form>

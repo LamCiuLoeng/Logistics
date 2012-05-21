@@ -16,9 +16,31 @@
 				<td>{{_('Description')}}</td>
 				<td><textarea name="desc">{{v['desc']}}</textarea></td>
 			</tr>
-			
 			<tr>
-				<td colspan="2"><input type="submit" value="{{_('Submit')}}"/>&nbsp;&nbsp;&nbsp;<input type="button" value="{{_('Cancel')}}" onclick="redirect('{{url_for('.view', action = 'user')}}')"/></td>
+				<td>{{_('Group')}}</td>
+				<td>
+					<table>
+						<tr>
+							<td><input type="checkbox" class="allbox"/></td><td>{{_('Group Name')}}</td><td>{{_('Description')}}</td>
+						</tr>
+						{% for g in all_groups%}
+							<tr>
+								<td>
+									{% if g.id in gids %}
+										<input class="onebox" type="checkbox" name="gids" value="{{g.id}}" checked="checked"/>
+									{% else %}
+										<input class="onebox" type="checkbox" name="gids" value="{{g.id}}"/>
+									{% endif %}
+								</td>
+								<td>{{g}}</td>
+								<td>{{g.desc|ifFalse}}</td>
+							</tr>
+						{% endfor %}
+					</table>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2"><input type="submit" value="{{_('Submit')}}"/>&nbsp;&nbsp;&nbsp;<input type="button" value="{{_('Cancel')}}" onclick="redirect('{{url_for('.view', action = 'permission')}}')"/></td>
 			</tr>
 		</table>
 	</form>

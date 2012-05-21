@@ -30,7 +30,7 @@ MSG_INVALID_FILE_TO_UPLOAD = _('Invalid file to upload!')
 #order status
 ORDER_CANCELLED = (-1, _('Cancelled'))
 ORDER_NEW = (0, _('New'))
-RECEIVED_GOODS = (10, _('Goods Received'))
+SEND_DRIVER = (10, _('Sent Driver'))
 IN_STORE = (20, _('In Store'))
 OUT_STORE = (30, _('Out Store'))
 LOADED_GOODS = (40, _('Goods Loaded'))
@@ -39,7 +39,7 @@ GOODS_ARRIVED = (60, _('Goods Arrived'))
 GOODS_SIGNED = (90, _('Goods Signed'))
 
 STATUS_LIST = [
-               ORDER_CANCELLED, ORDER_NEW, RECEIVED_GOODS, IN_STORE, OUT_STORE, LOADED_GOODS, IN_TRAVEL,
+               ORDER_CANCELLED, ORDER_NEW, SEND_DRIVER, IN_STORE, OUT_STORE, LOADED_GOODS, IN_TRAVEL,
                GOODS_ARRIVED, GOODS_SIGNED
                ]
 

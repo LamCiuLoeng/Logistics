@@ -6,7 +6,7 @@
 
 {% block content %}
 	
-	
+	<!-- 
 	<ul>
 		<li><a href="{{url_for('bpRoot.view', action = 'add')}}">客人新建订单</a></li>
 		<li><a href="{{url_for('bpRoot.view', action = 'track')}}">订单追踪</a></li>
@@ -21,16 +21,28 @@
 		<li><a href="{{url_for('bpOrder.view', action = 'add')}}">客服订单管理</a></li>
 		<li><a href="{{url_for('bpDeliver.view', action = 'index')}}">客服送货单管理</a></li>
 	</ul>
+	 -->
+	
+	<ul>
+		<li><a href="{{url_for('bpOrder.view', action = 'index')}}">订单管理</a></li>
+	</ul>
+	
 	
 	<ul>
 		<li><a href="{{url_for('bpWarehouse.view', action = 'index')}}">仓存管理</a></li>
 	</ul>
 	
 	<ul>
-		<li><a href="{{url_for('bpAdmin.view', action = 'users')}}">管理用户</a></li>
-		<li><a href="{{url_for('bpAdmin.view', action = 'groups')}}">管理组</a></li>
-		<li><a href="{{url_for('bpAdmin.view', action = 'permissions')}}">管理权限</a></li>
+		<li><a href="{{url_for('bpAdmin.view')}}">管理员</a></li>
+		<li>
+			<ul>
+				<li><a href="{{url_for('bpAdmin.view', action = 'user')}}">管理用户</a></li>
+				<li><a href="{{url_for('bpAdmin.view', action = 'group')}}">管理组</a></li>
+				<li><a href="{{url_for('bpAdmin.view', action = 'permission')}}">管理权限</a></li>
+			</ul>
+		</li>
 	</ul>
+	
 	
 	<div>
 		<form action="{{url_for('bpRoot.view', action = 'search_orders')}}" method="post">

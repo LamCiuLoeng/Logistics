@@ -54,7 +54,7 @@
 		
 		<br />
 		
-		{% if values.get('status',None) in [ORDER_NEW[0],RECEIVED_GOODS[0],GOODS_ARRIVED[0],] %}
+		{% if values.get('status',None) in [ORDER_NEW[0],SEND_DRIVER[0],GOODS_ARRIVED[0],] %}
 		<form method="post" action="{{url_for('bpOrder.view',action='do_action')}}">
 			<input type="hidden" name="id" value="{{values['id']}}"/>
 			{% if values.get('status',None) == ORDER_NEW[0] %}
