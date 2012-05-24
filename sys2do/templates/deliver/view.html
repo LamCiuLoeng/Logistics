@@ -9,33 +9,7 @@
 		<li><a href="{{url_for('.view', action = 'revise')}}">{{_('Update')}}</a></li>
 		<li><a href="{{url_for('.view', action = 'cancel')}}">{{_('Cancel')}}</a></li>
 		<li><a href="{{url_for('.view')}}">{{_('Return')}}</a></li>
-	</ul>
-
-	{% if header.status in [ORDER_NEW[0],OUT_STORE[0],LOADED_GOODS[0],IN_TRAVEL[0],  ]%}
-	<form action="{{url_for('bpDeliver.view',action='update_status')}}" method="post">
-		<input type="hidden" name="id" value="{{header.id}}"/>
-		{%if header.status==ORDER_NEW[0]%}
-			<textarea name="remark">确认出仓</textarea>
-			<input type="submit" value="确认出仓">
-			<input type="hidden" name="sc" value="30"/>
-		{%elif header.status==OUT_STORE[0]%}
-			<textarea name="remark">装载完成</textarea>
-			<input type="submit" value="装载完成">
-			<input type="hidden" name="sc" value="40"/>
-		{%elif header.status==LOADED_GOODS[0]%}
-			<textarea name="remark">货物在途</textarea>
-			<input type="submit" value="货物在途">
-			<input type="hidden" name="sc" value="50"/>
-		{%elif header.status==IN_TRAVEL[0]%}
-			<textarea name="remark">货物到达</textarea>
-			<input type="submit" value="货物到达">
-			<input type="hidden" name="sc" value="60"/>
-		{% endif %}
-	</form>
-	{% endif %}
-	
-	
-	<br />
+	</ul>	
 	
 	<table border="1" cellpadding="3" cellspacing="3">
 		<tr>
@@ -126,5 +100,41 @@
 			</tr>
 		{% endfor %}
 	</table>
+	
+	<br />
+	
+	{% if header.status in [SORTING[0],]%}
+		<p>确认发货</p>
+		<form action="{{url_for('.view', action = 'do_action',id=values.get('id',''),sc='SEND_OUT')}}" method="post">
+			<table>
+				<tr>
+					<td>{{_('Remark')}}</td>
+					<td><textarea name="send_out_remark"></textarea></td>
+				</tr>
+				<tr>
+					<td colspan="2"><input type="submit" value="{{_('Submit')}}"/></td>
+				</tr>
+			</table>
+		</form>
+	{% endif %}
+	
+	{% if header.status in [SEND_OUT[0],]%}
+		<p>确认货物到达</p>
+		<form action="{{url_for('.view', action = 'do_action',id=values.get('id',''),sc='GOODS_ARRIVED')}}" method="post">
+			<table>
+				<tr>
+					<td>{{_('Arrival Time')}}</td>
+					<td><input type="text" name="actual_time" /></td>
+				</tr>
+				<tr>
+					<td>{{_('Remark')}}</td>
+					<td><textarea name="arrived_remark"></textarea></td>
+				</tr>
+				<tr>
+					<td colspan="2"><input type="submit" value="{{_('Submit')}}"/></td>
+				</tr>
+			</table>
+		</form>
+	{% endif %}
 	
 {% endblock %}

@@ -8,7 +8,7 @@
 		<ul>
 			<li><a href="{{url_for('.view', action = 'add')}}">新建订单</a></li>
 			<li><a href="{{url_for('.view', action = 'revise',id=values.get('id',''))}}">修改订单</a></li>
-			<li><a href="{{url_for('.view', action = 'cancel',id=values.get('id',''))}}">删除订单</a></li>
+			<li><a href="{{url_for('.view', action = 'cancel',id=values.get('id',''))}}">删除订单</a></li>		
 		</ul>
 
 		<p>{{_('Order Information')}}</p>
@@ -54,27 +54,57 @@
 		
 		<br />
 		
-		{% if values.get('status',None) in [ORDER_NEW[0],SEND_DRIVER[0],GOODS_ARRIVED[0],] %}
-		<form method="post" action="{{url_for('bpOrder.view',action='do_action')}}">
-			<input type="hidden" name="id" value="{{values['id']}}"/>
-			{% if values.get('status',None) == ORDER_NEW[0] %}
-				<textarea name="remark">确认收货</textarea>
-				<input type="hidden" name="sc" value="{{RECEIVED_GOODS[0]}}"/>
-				<input type="submit" value="确认收货">
-			{% elif values.get('status',None) == RECEIVED_GOODS[0] %}
-				<textarea name="remark">确认入仓</textarea>
-				<input type="hidden" name="sc" value="{{IN_STORE[0]}}"/>
-				<select name="warehouse_id">
-					{% for w in warehouses%}
-						<option value="{{w.id}}">{{w}}</option>
-					{% endfor %}
-				</select>
-				<input type="submit" value="确认入仓">
-			{% elif values.get('status',None) == GOODS_ARRIVED[0] %}
-				<textarea name="remark">确认签收</textarea>
-				<input type="hidden" name="sc" value="{{GOODS_SIGNED[0]}}"/>
-				<input type="submit" value="确认签收">
-			{% endif %}
-		</form>
-		{% endif %}			
+		{% if values.get('status',None) in [ORDER_NEW[0],] %}
+			<p>指派司机收货</p>
+			<form action="{{url_for('.view', action = 'do_action',id=values.get('id',''),sc='ASSIGN_PICKER')}}" method="post">
+				<table>
+					<tr>
+						<td>{{_('Receiver')}}</td>
+						<td><input type="text" name="receiver"/></td>
+					</tr>
+					<tr>
+						<td>{{_('Receiver Contact')}}</td>
+						<td><input type="text" name="receiver_contact"/></td>
+					</tr>
+					<tr>
+						<td>{{_('Remark')}}</td>
+						<td><textarea name="receiver_remark"></textarea></td>
+					</tr>
+					<tr>
+						<td colspan="2"><input type="submit" value="{{_('Submit')}}"/></td>
+					</tr>
+				</table>
+			</form>
+		{% endif %}
+		
+		
+		{% if values.get('status',None) in [ASSIGN_PICKER[0],] %}
+			<table>
+					<tr>
+						<td>{{_('Picker')}}</td>
+						<td>{{values.get('picker','')|ifFalse}}</td>
+					</tr>
+					<tr>
+						<td>{{_('Picker Contact')}}</td>
+						<td>{{values.get('picker_contact','')|ifFalse}}</td>
+					</tr>
+					<tr>
+						<td>{{_('Remark')}}</td>
+						<td>{{values.get('picker_remark','')|ifFalse}}</td>
+					</tr>
+				</table>
+				<br />
+			<p>入仓</p>
+			<form action="{{url_for('.view', action = 'do_action',id=values.get('id',''),sc='IN_WAREHOUSE')}}" method="post">
+				<table>
+					<tr>
+						<td>{{_('Remark')}}</td>
+						<td><textarea name="in_warehouse_remark"></textarea></td>
+					</tr>
+					<tr>
+						<td colspan="2"><input type="submit" value="{{_('Submit')}}"/></td>
+					</tr>
+				</table>
+			</form>	
+		{% endif %}
 {% endblock %}

@@ -20,8 +20,8 @@ from sys2do.util.decorator import templated, login_required
 from sys2do import app
 from sys2do.constant import MESSAGE_ERROR, MESSAGE_INFO, MSG_UPDATE_SUCC, \
     MSG_DELETE_SUCC, MSG_NO_ID_SUPPLIED, MSG_SERVER_ERROR, MSG_NO_SUCH_ACTION, \
-    MSG_SAVE_SUCC, ORDER_CANCELLED, RECEIVED_GOODS, STATUS_LIST, IN_TRAVEL, \
-    IN_STORE
+    MSG_SAVE_SUCC, ORDER_CANCELLED, STATUS_LIST, IN_TRAVEL, \
+    MSG_RECORD_NOT_EXIST, ASSIGN_PICKER, IN_WAREHOUSE, ASSIGN_PICKER
 from sys2do.views import BasicView
 from sys2do.util.common import _g, getOr404, _gp, getMasterAll, _debug
 from sys2do.model.master import CustomerProfile, WarehouseItem, Warehouse, \
@@ -165,23 +165,29 @@ class OrderView(BasicView):
 
 
     def do_action(self):
-        header = getOr404(OrderHeader, _g('id'), self.default())
-        status = int(_g('sc'))
+        header = OrderHeader.get(_g('id'))
 
-        #update the order and detail's status
-        header.update_status(status)
+        if not header :
+            flash(MSG_RECORD_NOT_EXIST)
+            return redirect(self.default())
 
-        DBSession.add(OrderLog(order_id = _g('id'), remark = _g('remark')))
+        if _g('sc') == 'ASSIGN_PICKER' :
+            header.receiver = _g('receiver')
+            header.receiver_contact = _g('receiver_contact')
+            header.receiver_remark = _g('receiver_remark')
+            header.status = ASSIGN_PICKER[0]
+            for d in header.details: d.status = ASSIGN_PICKER[0]
 
-        #if it's in store, update the warehouse items qty
-        if status == IN_STORE[0]:
-            for d in header.details:
-                DBSession.add(WarehouseItem(item_id = d.item_id, warehouse_id = _g('warehouse_id'), qty = d.order_qty, order_detail_id = d.id))
-                d.warehouse_qty = d.future_warehouse_qty = d.order_qty #make the warehouse qty
+        elif _g('sc') == 'IN_WAREHOUSE' :
+            header.in_warehouse_remark = _g('in_warehouse_remark')
+            header.status = IN_WAREHOUSE[0]
+            for d in header.details: d.status = IN_WAREHOUSE[0]
 
         DBSession.commit()
         flash(MSG_UPDATE_SUCC, MESSAGE_INFO)
         return redirect(self.default())
+
+
 
     @templated('order/warning.html')
     def warning(self):

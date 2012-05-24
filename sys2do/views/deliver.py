@@ -13,8 +13,9 @@ from sqlalchemy.sql.expression import and_
 from werkzeug.utils import redirect
 
 from sys2do.constant import MESSAGE_ERROR, MSG_NO_SUCH_ACTION, MESSAGE_INFO, \
-    MSG_SAVE_SUCC, IN_STORE, OUT_STORE, MSG_UPDATE_SUCC, ORDER_NEW, \
-    ORDER_CANCELLED, MSG_DELETE_SUCC
+    MSG_SAVE_SUCC, IN_WAREHOUSE, MSG_UPDATE_SUCC, ORDER_NEW, \
+    ORDER_CANCELLED, MSG_DELETE_SUCC, SORTING, MSG_RECORD_NOT_EXIST, SEND_OUT, \
+    GOODS_ARRIVED
 from sys2do.util.decorator import templated
 from sys2do.model import DBSession
 from sys2do.views import BasicView
@@ -39,7 +40,7 @@ class DeliverView(BasicView):
 
     @templated('deliver/select_orders.html')
     def select_orders(self):
-        result = DBSession.query(OrderDetail).filter(and_(OrderDetail.active == 0)).all()
+        result = DBSession.query(OrderDetail).filter(and_(OrderDetail.active == 0, OrderDetail.status < SORTING[0])).all()
         return {'result' : result}
 
 
@@ -70,6 +71,7 @@ class DeliverView(BasicView):
                                         order_detail = order_detail,
                                         order_detail_line_no = order_detail.line_no,
                                         line_no = line_no))
+            order_detail.status = SORTING[0]
             line_no += 1
             _debug('------- save detail')
         DBSession.commit()
@@ -100,12 +102,39 @@ class DeliverView(BasicView):
         return redirect(url_for('.view', action = 'index'))
 
 
+    def do_action(self):
+        header = DeliverHeader.get(_g('id'))
+        if not header :
+            flash(MSG_RECORD_NOT_EXIST)
+            return redirect(self.default())
+
+        if _g('sc') == 'SEND_OUT' :
+            header.send_out_remark = _g('send_out_remark')
+            header.status = SEND_OUT[0]
+            for d in header.details :
+                d.status = SEND_OUT[0]
+                d.order_detail.status = SEND_OUT[0]
+        elif _g('se') == 'GOODS_ARRIVED':
+            header.actual_time = _g('actual_time')
+            header.  arrived_remark = _g('arrived_remark')
+            header.status = GOODS_ARRIVED[0]
+            for d in header.details :
+                d.status = GOODS_ARRIVED[0]
+                d.order_detail.status = GOODS_ARRIVED[0]
+
+
+        DBSession.commit()
+        flash(MSG_UPDATE_SUCC, MESSAGE_INFO)
+        return redirect(self.default())
+
+
+
     def update_status(self):
         header = getOr404(DeliverHeader, _g('id'))
         status = int(_g('sc'))
         (oheaders, odetails) = updateDeliverHeaderStatus(header.id, status)
 
-        if status == OUT_STORE[0]: #remove the item from warehouse if it's out store action
+        if status == OUT_WAREHOUSE[0]: #remove the item from warehouse if it's out store action
             for d in header.details:
                 record = DBSession.query(WarehouseItem).filter(WarehouseItem.order_detail_id == d.order_detail_id).one()
                 record.qty -= d.deliver_qty

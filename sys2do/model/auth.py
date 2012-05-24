@@ -58,7 +58,10 @@ class CRUDMixin(object):
 
     @classmethod
     def get(clz, id):
-        return DBSession.query(clz).get(id)
+        try:
+            return DBSession.query(clz).get(id)
+        except:
+            return None
 
     @classmethod
     def all(clz, order_by = "name"):

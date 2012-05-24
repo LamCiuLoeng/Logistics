@@ -26,8 +26,10 @@
 	<ul>
 		<li><a href="{{url_for('bpOrder.view', action = 'index')}}">订单管理</a></li>
 	</ul>
-	
-	
+	<ul>
+		<li><a href="{{url_for('bpDeliver.view', action = 'select_orders')}}">分拣</a></li>
+		<li><a href="{{url_for('bpDeliver.view', action = 'index')}}">送货单管理</a></li>
+	</ul>
 	<ul>
 		<li><a href="{{url_for('bpWarehouse.view', action = 'index')}}">仓存管理</a></li>
 	</ul>

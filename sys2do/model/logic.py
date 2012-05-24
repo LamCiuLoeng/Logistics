@@ -14,6 +14,7 @@ from sys2do.model import DeclarativeBase, metadata, DBSession
 from auth import SysMixin
 from sys2do.model.master import Customer, Supplier, Item, ItemUnit, ShipmentType, \
     WeightUnit
+from sys2do.model.auth import CRUDMixin
 
 
 
@@ -22,7 +23,7 @@ from sys2do.model.master import Customer, Supplier, Item, ItemUnit, ShipmentType
 
 
 
-class OrderHeader(DeclarativeBase, SysMixin):
+class OrderHeader(DeclarativeBase, SysMixin, CRUDMixin):
     __tablename__ = 'order_header'
 
     id = Column(Integer, autoincrement = True, primary_key = True)
@@ -34,6 +35,12 @@ class OrderHeader(DeclarativeBase, SysMixin):
     source_address = Column(Text)
     source_contact = Column(Text)
     source_tel = Column(Text)
+
+    picker = Column(Text)
+    picker_contact = Column(Text)
+    picker_remark = Column(Text)
+
+    in_warehouse_remark = Column(Text)
 
     remark = Column(Text)
     status = Column(Integer, default = 0)
@@ -53,13 +60,17 @@ class OrderHeader(DeclarativeBase, SysMixin):
                 'source_address' : self.source_address,
                 'source_contact' : self.source_contact,
                 'source_tel' : self.source_tel,
+                'picker' : self.picker,
+                'picker_contact' : self.picker_contact,
+                'picker_remark' : self.picker_remark,
+                'in_warehouse_remark' : self.in_warehouse_remark,
                 'remark' : self.remark,
                 'status' : self.status,
                 }
 
-    def update_status(self, status):
-        self.status = status
-        for d in self.details : d.status = status
+#    def update_status(self, status):
+#        self.status = status
+#        for d in self.details : d.status = status
 
 
 
@@ -99,7 +110,7 @@ class OrderDetail(DeclarativeBase, SysMixin):
 
 
 
-class DeliverHeader(DeclarativeBase, SysMixin):
+class DeliverHeader(DeclarativeBase, SysMixin, CRUDMixin):
     __tablename__ = 'deliver_header'
 
     id = Column(Integer, autoincrement = True, primary_key = True)
@@ -112,7 +123,14 @@ class DeliverHeader(DeclarativeBase, SysMixin):
     supplier_contact = Column(Text)
     supplier_tel = Column(Text)
 
+    need_transfer = Column(Text)
+
+    send_out_remark = Column(Text)
+    arrived_remark = Column(Text)
+
     expect_time = Column(Date, default = None)
+    actual_time = Column(Date, default = None)
+
     remark = Column(Text)
     status = Column(Integer, default = 0)
 
