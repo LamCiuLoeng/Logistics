@@ -11,7 +11,8 @@ import os, datetime, uuid, logging
 DEBUG = True
 
 #upload setting
-UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), "static", "upload")
+UPLOAD_FOLDER_PREFIX = os.path.dirname(__file__)
+UPLOAD_FOLDER = os.path.join("static", "upload")
 UPLOAD_FOLDER_URL = "/static/upload"
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'doc'])
 

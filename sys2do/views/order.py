@@ -8,6 +8,7 @@
 '''
 from datetime import datetime as dt
 from datetime import timedelta
+import traceback
 
 from flask import Blueprint, render_template, url_for
 from flask.views import View
@@ -28,6 +29,7 @@ from sys2do.model.master import CustomerProfile, WarehouseItem, Warehouse, \
     Customer, ItemUnit, WeightUnit, ShipmentType
 from sys2do.util.logic_helper import genSystemNo
 from sqlalchemy.sql.expression import and_
+from sys2do.util.barcode_helper import generate_barcode_file
 
 
 __all__ = ['bpOrder']
@@ -53,13 +55,13 @@ class OrderView(BasicView):
 
     def save_new(self):
         try:
-            no = genSystemNo()
+#            no = genSystemNo()
             customer_id = _g('customer_id')
             source_address = _g('source_address')
             source_tel = _g('source_tel')
             source_contact = _g('source_contact')
             remark = _g('remark')
-            order = OrderHeader(no = no, customer_id = customer_id, source_address = source_address,
+            order = OrderHeader(no = None, customer_id = customer_id, source_address = source_address,
                                 source_tel = source_tel, source_contact = source_contact, remark = remark)
             DBSession.add(order)
 
@@ -100,10 +102,14 @@ class OrderView(BasicView):
                                           expect_time = rExp[1],
                                           remark = rRem[1]
                                           ))
+            DBSession.flush()
+            order.no = genSystemNo(order.id)
+            order.barcode = generate_barcode_file(order.no)
 
             DBSession.commit()
             flash(MSG_SAVE_SUCC, MESSAGE_INFO)
         except:
+            _debug(traceback.format_exc())
             DBSession.rollback()
             flash(MSG_SERVER_ERROR, MESSAGE_ERROR)
         return redirect(url_for('.view', action = 'index'))
@@ -198,6 +204,24 @@ class OrderView(BasicView):
         result = DBSession.query(OrderHeader).filter(and_(OrderHeader.status == IN_TRAVEL[0], OrderHeader.expect_time > n)).order_by(OrderHeader.expect_time)
         return {'result' : result, 't' : t}
 
+
+    @templated('order/search_by_customer.html')
+    def search_by_customer(self):
+        conditions = [OrderHeader.active == 0, OrderDetail.active == 0, OrderHeader.id == OrderDetail.header_id]
+        if _g('no'):
+            conditions.append(OrderHeader.no.like('%%%s%%' % _g('no')))
+        if _g('destination_address'):
+            conditions.append(OrderDetail.destination_address == _g('destination_address'))
+        if _g('create_time_from'):
+            conditions.append(OrderHeader.create_time > _g('create_time_from'))
+        if _g('create_time_to'):
+            conditions.append(OrderHeader.create_time < _g('create_time_to'))
+
+        result = DBSession.query(OrderHeader, OrderDetail).filter(and_(*conditions)).order_by(OrderHeader.no)
+        return {'result' : result, 'values' : {
+                                              'no' : _g('no'), 'destination_address' : _g('destination_address'),
+                                              'create_time_from' : _g('create_time_from'), 'create_time_to' : _g('create_time_to')
+                                              }}
 
 bpOrder.add_url_rule('/', view_func = OrderView.as_view('view'), defaults = {'action':'index'})
 bpOrder.add_url_rule('/<action>', view_func = OrderView.as_view('view'))

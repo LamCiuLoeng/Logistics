@@ -35,7 +35,7 @@ IN_WAREHOUSE = (20, _('In Warehouse'))
 SORTING = (30, _('Sorting'))
 #OUT_WAREHOUSE = (40, _('Out Warehouse'))
 SEND_OUT = (50, _('Sent Out'))
-IN_TRAVEL = (60, _('In Trivel'))
+IN_TRAVEL = (60, _('In Travel'))
 GOODS_ARRIVED = (70, _('Goods Arrived'))
 GOODS_SIGNED = (90, _('Goods Signed'))
 

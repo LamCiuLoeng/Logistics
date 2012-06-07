@@ -14,6 +14,9 @@
 		
 		
 		<p>{{_('Order Information')}}</p>
+		{% if values.get('barcode',None) %}
+			<p><img src="{{values.get('barcode','').url}}"/></p>
+		{% endif %}
 		<table border="1" cellpadding="3" cellspacing="3">
 			<tr><td>{{_('Order No')}}</td><td>{{values.get('no','')}}</td></tr>
 			<tr><td>{{_('Customer')}}</td><td>{{values.get('customer','')}}</td></tr>

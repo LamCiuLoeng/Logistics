@@ -15,12 +15,12 @@ from werkzeug.utils import redirect
 from sys2do.constant import MESSAGE_ERROR, MSG_NO_SUCH_ACTION, MESSAGE_INFO, \
     MSG_SAVE_SUCC, IN_WAREHOUSE, MSG_UPDATE_SUCC, ORDER_NEW, \
     ORDER_CANCELLED, MSG_DELETE_SUCC, SORTING, MSG_RECORD_NOT_EXIST, SEND_OUT, \
-    GOODS_ARRIVED
+    GOODS_ARRIVED, IN_TRAVEL, GOODS_SIGNED
 from sys2do.util.decorator import templated
 from sys2do.model import DBSession
 from sys2do.views import BasicView
 from sys2do.model.logic import DeliverHeader, OrderHeader, OrderDetail, \
-    DeliverDetail, OrderLog
+    DeliverDetail, OrderLog, DeliverLog
 from sys2do.util.common import _gl, _g, _gp, getOr404, getMasterAll, _debug
 #from sys2do.util.logic_helper import updateDeliverHeaderStatus
 from sys2do.model.master import WarehouseItem, Supplier
@@ -82,12 +82,12 @@ class DeliverView(BasicView):
     def view(self):
         id = _g('id')
         h = DBSession.query(DeliverHeader).get(id)
-        return {'header' : h}
+        return {'header' : h, 'values' : h.populate() , 'details' : h.details}
+
 
     @templated('deliver/revise_deliver.html')
     def revise(self):
         header = getOr404(DeliverHeader, _g('id'), redirect_url = self.default())
-
         return {'values' : header.populate(), 'details' : header.details, 'suppliers' : getMasterAll(Supplier)}
 
 
@@ -108,20 +108,24 @@ class DeliverView(BasicView):
             flash(MSG_RECORD_NOT_EXIST)
             return redirect(self.default())
 
+        if _g('sc') not in ['SEND_OUT', 'GOODS_ARRIVED']:
+            flash(MSG_NO_SUCH_ACTION, MESSAGE_ERROR)
+            return redirect(self.default())
+
         if _g('sc') == 'SEND_OUT' :
             header.send_out_remark = _g('send_out_remark')
             header.status = SEND_OUT[0]
             for d in header.details :
                 d.status = SEND_OUT[0]
                 d.order_detail.status = SEND_OUT[0]
-        elif _g('se') == 'GOODS_ARRIVED':
+        elif _g('sc') == 'GOODS_ARRIVED':
             header.actual_time = _g('actual_time')
             header.  arrived_remark = _g('arrived_remark')
             header.status = GOODS_ARRIVED[0]
             for d in header.details :
                 d.status = GOODS_ARRIVED[0]
                 d.order_detail.status = GOODS_ARRIVED[0]
-
+                d.order_detail.actual_time = _g('actual_time')
 
         DBSession.commit()
         flash(MSG_UPDATE_SUCC, MESSAGE_INFO)
@@ -149,6 +153,51 @@ class DeliverView(BasicView):
         flash(MSG_UPDATE_SUCC, MESSAGE_INFO)
         return redirect(self.default())
 
+
+    @templated('deliver/vendor_select.html')
+    def vendor_select(self):
+        result = DBSession.query(DeliverHeader).filter(and_(DeliverHeader.active == 0, DeliverHeader.status.in_([SEND_OUT[0], IN_TRAVEL[0]]))).order_by(DeliverHeader.create_time)
+        return {'result' : result , 'values' : {
+                                                'no' : _g('no'),
+                                                'destination_address' : _g('destination_address'),
+                                                'create_time_from' : _g('create_time_from'),
+                                                'create_time_to' : _g('create_time_to'),
+                                                }}
+
+    @templated('deliver/vendor_input.html')
+    def vendor_input(self):
+        header = DeliverHeader.get(_g('id'))
+        if not header :
+            flash(MSG_RECORD_NOT_EXIST, MESSAGE_ERROR)
+            return redirect(url_for('.view', action = 'vendor_select'))
+
+        return {'values' : header.populate(), 'details' : header.details }
+
+
+    def vendor_input_save(self):
+        header = DeliverHeader.get(_g('id'))
+        if not header :
+            flash(MSG_RECORD_NOT_EXIST, MESSAGE_ERROR)
+            return redirect(url_for('.view', action = 'vendor_select'))
+
+
+        if _g('type') == "IN_TRAVEL" : new_status = IN_TRAVEL[0]
+        elif _g('type') == "GOODS_ARRIVED" : new_status = GOODS_ARRIVED[0]
+        elif _g('type') == "GOODS_SIGNED" : new_status = GOODS_SIGNED[0]
+        else:
+            flash(MSG_NO_SUCH_ACTION, MESSAGE_ERROR)
+            return redirect(url_for('.view', action = 'vendor_select'))
+
+        for d in header.details:
+            d.status = new_status
+            d.order_detail.status = new_status
+
+        log = DeliverLog(deliver_header_id = header.id, remark = _g('remark'))
+
+        DBSession.add(log)
+        DBSession.commit()
+        flash(MSG_SAVE_SUCC, MESSAGE_INFO)
+        return redirect(url_for('.view', action = 'vendor_select'))
 
 bpDeliver.add_url_rule('/', view_func = DeliverView.as_view('view'), defaults = {'action':'index'})
 bpDeliver.add_url_rule('/<action>', view_func = DeliverView.as_view('view'))

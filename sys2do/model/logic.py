@@ -15,6 +15,7 @@ from auth import SysMixin
 from sys2do.model.master import Customer, Supplier, Item, ItemUnit, ShipmentType, \
     WeightUnit
 from sys2do.model.auth import CRUDMixin
+from sys2do.model.system import UploadFile
 
 
 
@@ -43,6 +44,8 @@ class OrderHeader(DeclarativeBase, SysMixin, CRUDMixin):
     in_warehouse_remark = Column(Text)
 
     remark = Column(Text)
+    barcode_id = Column(Integer, ForeignKey('system_upload_file.id'))
+    barcode = relation(UploadFile)
     status = Column(Integer, default = 0)
 
 
@@ -66,6 +69,7 @@ class OrderHeader(DeclarativeBase, SysMixin, CRUDMixin):
                 'in_warehouse_remark' : self.in_warehouse_remark,
                 'remark' : self.remark,
                 'status' : self.status,
+                'barcode' : self.barcode,
                 }
 
 #    def update_status(self, status):
@@ -105,6 +109,7 @@ class OrderDetail(DeclarativeBase, SysMixin):
     destination_tel = Column(Text)
 
     expect_time = Column(Date, default = None)
+    actual_time = Column(Date, default = None)
     remark = Column(Text)
     status = Column(Integer, default = 0)
 
@@ -154,6 +159,10 @@ class DeliverHeader(DeclarativeBase, SysMixin, CRUDMixin):
                 'expect_time' : self.expect_time,
                 'remark' : self.remark,
                 'status' : self.status,
+                'create_time' : self.create_time,
+                'create_by' : self.create_by,
+                'update_time' : self.update_time,
+                'update_by' : self.update_by,
                 }
 
 
@@ -188,4 +197,14 @@ class OrderLog(DeclarativeBase, SysMixin):
 
     order_detail_id = Column(Integer, ForeignKey('order_detail.id'))
     order_detail = relation(OrderDetail, backref = backref("logs", order_by = id), primaryjoin = "and_(OrderDetail.id == OrderLog.order_detail_id, OrderLog.active == 0)")
+    remark = Column(Text)
+
+
+class DeliverLog(DeclarativeBase, SysMixin):
+    __tablename__ = 'deliver_log'
+
+    id = Column(Integer, autoincrement = True, primary_key = True)
+    deliver_header_id = Column(Integer, ForeignKey('deliver_header.id'))
+    deliver_header = relation(DeliverHeader, backref = backref("logs", order_by = id), primaryjoin = "and_(DeliverHeader.id == DeliverLog.deliver_header_id, DeliverLog.active == 0)")
+
     remark = Column(Text)

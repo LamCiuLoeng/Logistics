@@ -15,8 +15,8 @@ from sqlalchemy.sql.expression import and_
 
 __all__ = ['genSystemNo', 'getDeliverNo', 'updateDeliverHeaderStatus', 'updateDeliverDetailsStatus']
 
-def genSystemNo():
-    return 'DD%s%s' % (dt.now().strftime('%Y%m%d%H%M%S'), random.randint(0, 999))
+def genSystemNo(id):
+    return '%s%s' % (dt.now().strftime('%y%m%d'), "%06d" % (id % 1000000))
 
 
 def getDeliverNo():
@@ -76,3 +76,7 @@ def updateDeliverDetailsStatus(id, status):
 
     if affected_order_headers:
         if all(map(lambda d : d.status >= status, affected_order_headers.details)) : affected_order_headers.status = status
+
+
+if __name__ == "__main__":
+    print genSystemNo(1)

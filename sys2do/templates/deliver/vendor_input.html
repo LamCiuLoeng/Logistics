@@ -6,8 +6,6 @@
 
 {% block content %}
 	<ul>
-		<li><a href="{{url_for('.view', action = 'revise')}}">{{_('Revise')}}</a></li>
-		<li><a href="{{url_for('.view', action = 'cancel')}}">{{_('Cancel')}}</a></li>
 		<li><a href="{{url_for('.view')}}">{{_('Return')}}</a></li>
 	</ul>	
 	
@@ -65,8 +63,6 @@
 	<table border="1" cellpadding="3" cellspacing="3">
 		<thead>
 			<tr>
-				<td>{{_('Customer')}}</td>
-				<td>{{_('Order Number')}}</td>
 				<td>{{_('Destination')}}</td>
 				<td>{{_('Item')}}</td>
 				<td>{{_('Qty')}}</td>
@@ -83,8 +79,6 @@
 		</thead>
 		{% for d in details %}
 			<tr>
-				<td>{{d.order_detail.header.customer}}</td>
-				<td>{{d.order_detail.header.no}}</td>
 				<td>{{d.order_detail.destination_address}}</td>
 				<td>{{d.order_detail.item}}</td>
 				<td>{{d.order_detail.order_qty}}&nbsp;{{d.order_detail.unit}}</td>
@@ -103,38 +97,29 @@
 	
 	<br />
 	
-	{% if values.get('status','') in [ORDER_NEW[0],]%}
-		<p>确认发货</p>
-		<form action="{{url_for('.view', action = 'do_action',id=values.get('id',''),sc='SEND_OUT')}}" method="post">
-			<table>
-				<tr>
-					<td>{{_('Remark')}}</td>
-					<td><textarea name="send_out_remark"></textarea></td>
-				</tr>
-				<tr>
-					<td colspan="2"><input type="submit" value="{{_('Submit')}}"/></td>
-				</tr>
-			</table>
-		</form>
-	{% endif %}
-	
-	{% if header.status in [SEND_OUT[0],]%}
-		<p>确认货物到达</p>
-		<form action="{{url_for('.view', action = 'do_action',id=values.get('id',''),sc='GOODS_ARRIVED')}}" method="post">
-			<table>
-				<tr>
-					<td>{{_('Arrival Time')}}</td>
-					<td><input type="text" name="actual_time" /></td>
-				</tr>
-				<tr>
-					<td>{{_('Remark')}}</td>
-					<td><textarea name="arrived_remark"></textarea></td>
-				</tr>
-				<tr>
-					<td colspan="2"><input type="submit" value="{{_('Submit')}}"/></td>
-				</tr>
-			</table>
-		</form>
-	{% endif %}
+	<form action="{{url_for('.view', action = 'vendor_input_save')}}" method="post">
+		<input type="hidden" name="id" value="{{values.get('id','')}}"/>
+		<table>
+			<tr>
+				<td>{{_('Date')}}</td><td><input type="text" name="date"/></td>
+			</tr>
+			<tr>
+				<td>{{_('Type')}}</td>
+				<td>
+					<select name="type">
+						<option value="IN_TRAVEL">{{_('In Travel')}}</option>
+						<option value="GOODS_ARRIVED">{{_('Goods Arrived')}}</option>
+						<option value="GOODS_SIGNED">{{_('Goods Signed')}}</option>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td>{{_('Remark')}}</td><td><textarea name="remark"></textarea></td>
+			</tr>
+			<tr>
+				<td colspan="2"><input type="submit" value="{{_('Submit')}}"/></td>
+			</tr>
+		</table>
+	</form>
 	
 {% endblock %}

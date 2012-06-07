@@ -1,0 +1,54 @@
+{% extends "master.html" %}
+
+{% block extJS %}
+
+{% endblock %}
+
+{% block content %}
+	<form method="post">
+		<table>
+			<tr>
+				<tr><td>{{_('Order No')}}</td>
+				<td><input type="text" name="no" value="{{values.get('no','')|ifFalse}}"/></td>
+			</tr>
+			<tr>
+				<td>{{_('Create Time(From)')}}</td>
+				<td><input type="text" name="create_time_from" value="{{values.get('create_time_from','')|ifFalse}}"/></td>
+			</tr>
+			<tr>
+				<td>{{_('Create Time(To)')}}</td>
+				<td><input type="text" name="create_time_to" value="{{values.get('create_time_to','')|ifFalse}}"/></td>
+			</tr>
+			<tr>
+				<td>{{_('Destination')}}</td>
+				<td><input type="text" name="destination_address" value="{{values.get('destination_address','')|ifFalse}}"/></td>
+			</tr>
+			<tr>
+				<td colspan="2"><input type="submit" value="{{_('Submit')}}"/></td>
+			</tr>
+		</table>
+	</form>
+	
+	
+	<table border="1" cellpadding="3" cellspacing="3">
+		<thead>
+			<tr>
+				<td>{{_('Order Number')}}</td>
+				<td>{{_('Customer')}}</td>
+				<td>{{_('Destination')}}</td>
+				<td>{{_('create_time')}}</td>
+				<td>{{_('Status')}}</td>
+			</tr>
+			{% for (h,d) in result%}
+			<tr>
+				<td><a href="{{url_for('.view', action = 'review',id=h.id)}}">{{h.no}}</a></td>
+				<td>{{h.customer}}</td>
+				<td>{{d.destination_address}}</td>
+				<td>{{h.create_time|ft}}</td>
+				<td>{{d.status|showStatus}}</td>
+			</tr>
+			{% endfor %}
+		</thead>
+	</table>
+	
+{% endblock %}

@@ -6,11 +6,12 @@
 #  Description:
 ###########################################
 '''
-
+import os
 from sqlalchemy import Column
-from sqlalchemy.types import Unicode, Integer
+from sqlalchemy.types import Unicode, Integer, Text
 from sys2do.model import DeclarativeBase
 from auth import SysMixin
+from sys2do.setting import UPLOAD_FOLDER_PREFIX
 
 
 __all__ = ['DataDictionary', 'SystemLog', 'UploadFile']
@@ -23,28 +24,34 @@ class DataDictionary(DeclarativeBase):
     __tablename__ = 'system_data_dictionary'
 
     id = Column(Integer, autoincrement = True, primary_key = True)
-    name = Column(Unicode(100))
-    value = Column(Unicode(1000))
+    name = Column(Text)
+    value = Column(Text)
 
 
 class SystemLog(DeclarativeBase, SysMixin):
     __tablename__ = 'system_log'
 
     id = Column(Integer, autoincrement = True, primary_key = True)
-    type = Column(Unicode(100))
-    remark = Column(Unicode(5000))
+    type = Column(Text)
+    remark = Column(Text)
 
 
 class UploadFile(DeclarativeBase, SysMixin):
     __tablename__ = 'system_upload_file'
 
     id = Column(Integer, autoincrement = True, primary_key = True)
-    name = Column(Unicode(100))
-    path = Column(Unicode(1000))
-    url = Column(Unicode(1000))
+    name = Column(Text)
+    path = Column(Text)
+    url = Column(Text)
     size = Column(Integer, default = None)
-    type = Column(Unicode(20))
-    remark = Column(Unicode(5000))
+    type = Column(Text)
+    remark = Column(Text)
+
+    @property
+    def real_path(self):
+        return os.path.join(UPLOAD_FOLDER_PREFIX, self.path)
+
+
 
 #===============================================================================
 # 
