@@ -7,7 +7,7 @@
 ###########################################
 '''
 from sqlalchemy import Table, Column, ForeignKey
-from sqlalchemy.types import Unicode, Integer, DateTime, Float
+from sqlalchemy.types import Unicode, Integer, DateTime, Float, Text
 from sqlalchemy.orm import relation, backref
 from sys2do.model import DeclarativeBase, metadata, DBSession
 from auth import SysMixin
@@ -22,7 +22,7 @@ class ShipmentType(DeclarativeBase, SysMixin):
     __tablename__ = 'master_shipment_type'
 
     id = Column(Integer, autoincrement = True, primary_key = True)
-    name = Column(Unicode(100))
+    name = Column(Text)
 
     def __str__(self): return self.name
 
@@ -35,9 +35,9 @@ class Province(DeclarativeBase, SysMixin):
     __tablename__ = 'master_province'
 
     id = Column(Integer, autoincrement = True, primary_key = True)
-    name = Column(Unicode(100))
+    name = Column(Text)
     is_direct = Column(Integer, default = 0)
-    remark = Column(Unicode(10000))
+    remark = Column(Text)
 
     def __str__(self): return self.name
 
@@ -52,7 +52,7 @@ class City(DeclarativeBase, SysMixin):
     __tablename__ = 'master_city'
 
     id = Column(Integer, autoincrement = True, primary_key = True)
-    name = Column(Unicode(100))
+    name = Column(Text)
     province_id = Column(Integer, ForeignKey('master_province.id'))
     province = relation(Province, backref = backref("cities", order_by = id), primaryjoin = "and_(Province.id == City.province_id, City.active == 0)")
 
@@ -69,7 +69,7 @@ class District(DeclarativeBase, SysMixin):
     __tablename__ = 'master_district'
 
     id = Column(Integer, autoincrement = True, primary_key = True)
-    name = Column(Unicode(100))
+    name = Column(Text)
     city_id = Column(Integer, ForeignKey('master_city.id'))
     city = relation(City, backref = backref("districts", order_by = id), primaryjoin = "and_(City.id == District.city_id, District.active == 0)")
 
@@ -85,8 +85,8 @@ class CustomerProfile(DeclarativeBase, SysMixin):
     __tablename__ = 'master_customer_profile'
 
     id = Column(Integer, autoincrement = True, primary_key = True)
-    name = Column(Unicode(1000))
-    remark = Column(Unicode(10000))
+    name = Column(Text)
+    remark = Column(Text)
 
     def __str__(self): return self.name
 
@@ -101,11 +101,11 @@ class Customer(DeclarativeBase, SysMixin):
 
     id = Column(Integer, autoincrement = True, primary_key = True)
 
-    name = Column(Unicode(1000))
-    address = Column(Unicode(5000))
-    phone = Column(Unicode(100))
-    contact_person = Column(Unicode(100))
-    remark = Column(Unicode(10000))
+    name = Column(Text)
+    address = Column(Text)
+    phone = Column(Text)
+    contact_person = Column(Text)
+    remark = Column(Text)
 
     profile_id = Column(Integer, ForeignKey('master_customer_profile.id'))
     prifile = relation(CustomerProfile, backref = backref("customers", order_by = id), primaryjoin = "and_(CustomerProfile.id == Customer.profile_id, Customer.active == 0)")
@@ -123,11 +123,11 @@ class Supplier(DeclarativeBase, SysMixin):
 
     id = Column(Integer, autoincrement = True, primary_key = True)
 
-    name = Column(Unicode(1000))
-    address = Column(Unicode(5000))
-    phone = Column(Unicode(100))
-    contact_person = Column(Unicode(100))
-    remark = Column(Unicode(10000))
+    name = Column(Text)
+    address = Column(Text)
+    phone = Column(Text)
+    contact_person = Column(Text)
+    remark = Column(Text)
 
     profile_id = Column(Integer, ForeignKey('master_customer_profile.id'))
     prifile = relation(CustomerProfile, backref = backref("suppliers", order_by = id), primaryjoin = "and_(CustomerProfile.id == Supplier.profile_id, Supplier.active == 0)")
@@ -144,8 +144,8 @@ class Item(DeclarativeBase, SysMixin):
     __tablename__ = 'master_item'
 
     id = Column(Integer, autoincrement = True, primary_key = True)
-    name = Column(Unicode(1000))
-    remark = Column(Unicode(10000))
+    name = Column(Text)
+    remark = Column(Text)
 
     profile_id = Column(Integer, ForeignKey('master_customer_profile.id'))
     prifile = relation(CustomerProfile, backref = backref("items", order_by = id), primaryjoin = "and_(CustomerProfile.id == Item.profile_id, Item.active == 0)")
@@ -162,10 +162,10 @@ class ItemUnit(DeclarativeBase, SysMixin):
     __tablename__ = 'master_item_unit'
 
     id = Column(Integer, autoincrement = True, primary_key = True)
-    name = Column(Unicode(1000)) #cn
-    english_name = Column(Unicode(1000)) #en
-    tradition_name = Column(Unicode(1000)) #zh
-    remark = Column(Unicode(10000))
+    name = Column(Text) #cn
+    english_name = Column(Text) #en
+    tradition_name = Column(Text) #zh
+    remark = Column(Text)
 
 #    profile_id = Column(Integer, ForeignKey('master_customer_profile.id'))
 #    prifile = relation(CustomerProfile, backref = backref("itemunits", order_by = id), primaryjoin = "and_(CustomerProfile.id == ItemUnit.profile_id, ItemUnit.active == 0)")
@@ -181,10 +181,10 @@ class WeightUnit(DeclarativeBase, SysMixin):
     __tablename__ = 'master_weight_unit'
 
     id = Column(Integer, autoincrement = True, primary_key = True)
-    name = Column(Unicode(1000)) #cn
-    english_name = Column(Unicode(1000)) #en
-    tradition_name = Column(Unicode(1000)) #zh
-    remark = Column(Unicode(10000))
+    name = Column(Text) #cn
+    english_name = Column(Text) #en
+    tradition_name = Column(Text) #zh
+    remark = Column(Text)
 
     def __str__(self): return self.name
 
@@ -198,10 +198,10 @@ class Warehouse(DeclarativeBase, SysMixin):
     __tablename__ = 'master_warehouse'
 
     id = Column(Integer, autoincrement = True, primary_key = True)
-    name = Column(Unicode(1000))
-    manager = Column(Unicode(1000))
-    address = Column(Unicode(10000))
-    remark = Column(Unicode(10000))
+    name = Column(Text)
+    manager = Column(Text)
+    address = Column(Text)
+    remark = Column(Text)
 
     def __str__(self): return self.name
 
@@ -225,7 +225,7 @@ class WarehouseItem(DeclarativeBase, SysMixin):
     warehouse = relation(Warehouse)
     qty = Column(Integer, default = 0)
     order_detail_id = Column(Integer, ForeignKey('order_detail.id'))
-    remark = Column(Unicode(10000))
+    remark = Column(Text)
 
 
     @property
@@ -238,8 +238,8 @@ class Payment(DeclarativeBase, SysMixin):
     __tablename__ = 'master_payment'
 
     id = Column(Integer, autoincrement = True, primary_key = True)
-    name = Column(Unicode(1000))
-    remark = Column(Unicode(10000))
+    name = Column(Text)
+    remark = Column(Text)
 
 
 

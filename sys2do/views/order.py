@@ -15,7 +15,8 @@ from flask.views import View
 from werkzeug.utils import redirect
 from flask.helpers import flash
 
-from sys2do.model.logic import OrderHeader, OrderLog, OrderDetail
+from sys2do.model.logic import OrderHeader, OrderDetail, TransferLog, \
+    DeliverDetail
 from sys2do.model import DBSession
 from sys2do.util.decorator import templated, login_required
 from sys2do import app
@@ -106,6 +107,13 @@ class OrderView(BasicView):
             order.no = genSystemNo(order.id)
             order.barcode = generate_barcode_file(order.no)
 
+            DBSession.add(TransferLog(
+                                      refer_id = order.id,
+                                      transfer_date = dt.now().strftime("%Y-%m-%d"),
+                                      type = 0,
+                                      remark = u"创建订单"
+                                      ))
+
             DBSession.commit()
             flash(MSG_SAVE_SUCC, MESSAGE_INFO)
         except:
@@ -184,10 +192,23 @@ class OrderView(BasicView):
             header.status = ASSIGN_PICKER[0]
             for d in header.details: d.status = ASSIGN_PICKER[0]
 
+            DBSession.add(TransferLog(
+                                      refer_id = header.id,
+                                      transfer_date = dt.now().strftime("%Y-%m-%d"),
+                                      type = 0,
+                                      remark = u"已派工作人员收货"
+                                      ))
+
         elif _g('sc') == 'IN_WAREHOUSE' :
             header.in_warehouse_remark = _g('in_warehouse_remark')
             header.status = IN_WAREHOUSE[0]
             for d in header.details: d.status = IN_WAREHOUSE[0]
+            DBSession.add(TransferLog(
+                                      refer_id = header.id,
+                                      transfer_date = dt.now().strftime("%Y-%m-%d"),
+                                      type = 0,
+                                      remark = u"货物已入仓"
+                                      ))
 
         DBSession.commit()
         flash(MSG_UPDATE_SUCC, MESSAGE_INFO)
@@ -222,6 +243,26 @@ class OrderView(BasicView):
                                               'no' : _g('no'), 'destination_address' : _g('destination_address'),
                                               'create_time_from' : _g('create_time_from'), 'create_time_to' : _g('create_time_to')
                                               }}
+
+    @templated('order/search_transfer_log.html')
+    def search_transfer_log(self):
+        header = OrderHeader.get(_g('id'))
+
+        if not header :
+            flash(MSG_RECORD_NOT_EXIST)
+            return redirect(self.default())
+
+        order_log = header.get_logs()
+        detail_log = {}
+        for d in header.details:
+            logs = []
+            for dd in DBSession.query(DeliverDetail).filter(and_(DeliverDetail.active == 0, DeliverDetail.order_detail_id == d.id)).order_by(DeliverDetail.id):
+                logs.extend(dd.header.get_logs())
+            detail_log[d.id] = logs
+
+        return {'order_log' : order_log, 'detail_log' : detail_log}
+
+
 
 bpOrder.add_url_rule('/', view_func = OrderView.as_view('view'), defaults = {'action':'index'})
 bpOrder.add_url_rule('/<action>', view_func = OrderView.as_view('view'))

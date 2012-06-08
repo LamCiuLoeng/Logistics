@@ -1,0 +1,32 @@
+{% extends "master.html" %}
+
+{% block extJS %}
+
+{% endblock %}
+
+{% block content %}
+	<table border="1" cellpadding="3" cellspacing="3">
+		<tr>
+			<td>时间</td>
+			<td>记录</td>		
+		</tr>
+		{% for l in order_log %}
+			<tr>
+				<td>{{l.transfer_date}}</td>
+				<td>{{l.remark}}</td>
+			</tr>
+		{% endfor %}
+		{% for id,dls in detail_log.items() %}
+			<tr>
+				<td colspan="2">{{id}}</td>			
+			</tr>
+			{% for dl in dls %}
+				<tr>
+					<td>{{dl.transfer_date}}</td>
+					<td>{{dl.remark}}</td>
+				</tr>
+			{% endfor %}
+		{% endfor %}
+	</table>
+	
+{% endblock %}

@@ -41,7 +41,7 @@
 			</tr>
 			{% for (h,d) in result%}
 			<tr>
-				<td><a href="{{url_for('.view', action = 'review',id=h.id)}}">{{h.no}}</a></td>
+				<td><a href="{{url_for('.view', action = 'search_transfer_log',id=h.id)}}">{{h.no}}</a></td>
 				<td>{{h.customer}}</td>
 				<td>{{d.destination_address}}</td>
 				<td>{{h.create_time|ft}}</td>

@@ -16,6 +16,7 @@ from sys2do.model.master import Customer, Supplier, Item, ItemUnit, ShipmentType
     WeightUnit
 from sys2do.model.auth import CRUDMixin
 from sys2do.model.system import UploadFile
+from sqlalchemy.sql.expression import and_
 
 
 
@@ -72,10 +73,17 @@ class OrderHeader(DeclarativeBase, SysMixin, CRUDMixin):
                 'barcode' : self.barcode,
                 }
 
-#    def update_status(self, status):
-#        self.status = status
-#        for d in self.details : d.status = status
+    def update_status(self, status):
+        self.status = status
+        for d in self.details :
+            if d.status < self.status : d.status = status
 
+    def get_logs(self):
+        return DBSession.query(TransferLog).filter(and_(
+                                                TransferLog.active == 0,
+                                                TransferLog.type == 0,
+                                                TransferLog.refer_id == self.id
+                                                )).order_by(TransferLog.id)
 
 
 class OrderDetail(DeclarativeBase, SysMixin):
@@ -113,6 +121,10 @@ class OrderDetail(DeclarativeBase, SysMixin):
     remark = Column(Text)
     status = Column(Integer, default = 0)
 
+
+    def update_status(self, status):
+        self.status = status
+        self.header.status = min([d.status for d in self.header.details])
 
 
 class DeliverHeader(DeclarativeBase, SysMixin, CRUDMixin):
@@ -165,6 +177,19 @@ class DeliverHeader(DeclarativeBase, SysMixin, CRUDMixin):
                 'update_by' : self.update_by,
                 }
 
+    def update_status(self, status):
+        self.status = status
+        for d in self.details :
+            if d.status < self.status : d.status = status
+
+
+    def get_logs(self):
+        return DBSession.query(TransferLog).filter(and_(
+                                                TransferLog.active == 0,
+                                                TransferLog.type == 1,
+                                                TransferLog.refer_id == self.id
+                                                )).order_by(TransferLog.id)
+
 
 class DeliverDetail(DeclarativeBase, SysMixin):
     __tablename__ = 'deliver_detail'
@@ -185,26 +210,39 @@ class DeliverDetail(DeclarativeBase, SysMixin):
     status = Column(Integer, default = 0)
 
 
+    def update_status(self, status):
+        self.status = status
+        self.header.status = min([d.status for d in self.header.details])
+
+
+#class OrderLog(DeclarativeBase, SysMixin):
+#    __tablename__ = 'order_log'
+#
+#    id = Column(Integer, autoincrement = True, primary_key = True)
+#    order_header_id = Column(Integer, ForeignKey('order_header.id'))
+#    order_header = relation(OrderHeader, backref = backref("logs", order_by = id), primaryjoin = "and_(OrderHeader.id == OrderLog.order_header_id, OrderLog.active == 0)")
+#
+#    order_detail_id = Column(Integer, ForeignKey('order_detail.id'))
+#    order_detail = relation(OrderDetail, backref = backref("logs", order_by = id), primaryjoin = "and_(OrderDetail.id == OrderLog.order_detail_id, OrderLog.active == 0)")
+#    remark = Column(Text)
+#
+#
+#class DeliverLog(DeclarativeBase, SysMixin):
+#    __tablename__ = 'deliver_log'
+#
+#    id = Column(Integer, autoincrement = True, primary_key = True)
+#    deliver_header_id = Column(Integer, ForeignKey('deliver_header.id'))
+#    deliver_header = relation(DeliverHeader, backref = backref("logs", order_by = id), primaryjoin = "and_(DeliverHeader.id == DeliverLog.deliver_header_id, DeliverLog.active == 0)")
+#
+#    remark = Column(Text)
 
 
 
-class OrderLog(DeclarativeBase, SysMixin):
-    __tablename__ = 'order_log'
+class TransferLog(DeclarativeBase, SysMixin):
+    __tablename__ = 'transfer_log'
 
     id = Column(Integer, autoincrement = True, primary_key = True)
-    order_header_id = Column(Integer, ForeignKey('order_header.id'))
-    order_header = relation(OrderHeader, backref = backref("logs", order_by = id), primaryjoin = "and_(OrderHeader.id == OrderLog.order_header_id, OrderLog.active == 0)")
-
-    order_detail_id = Column(Integer, ForeignKey('order_detail.id'))
-    order_detail = relation(OrderDetail, backref = backref("logs", order_by = id), primaryjoin = "and_(OrderDetail.id == OrderLog.order_detail_id, OrderLog.active == 0)")
-    remark = Column(Text)
-
-
-class DeliverLog(DeclarativeBase, SysMixin):
-    __tablename__ = 'deliver_log'
-
-    id = Column(Integer, autoincrement = True, primary_key = True)
-    deliver_header_id = Column(Integer, ForeignKey('deliver_header.id'))
-    deliver_header = relation(DeliverHeader, backref = backref("logs", order_by = id), primaryjoin = "and_(DeliverHeader.id == DeliverLog.deliver_header_id, DeliverLog.active == 0)")
-
+    refer_id = Column(Integer)
+    transfer_date = Column(Text)
+    type = Column(Integer, default = 0) # 0 is order ,1 is deliver
     remark = Column(Text)

@@ -19,7 +19,7 @@ import traceback
 from sys2do.constant import MSG_RECORD_NOT_EXIST, MSG_NO_FILE_UPLOADED, \
     MSG_INVALID_FILE_TO_UPLOAD
 
-__all__ = ['_g', '_gl', '_gp', '_debug', '_info', 'getOr404', 'upload', 'makeException']
+__all__ = ['_g', '_gl', '_gp', '_debug', '_info', '_error', 'getOr404', 'upload', 'makeException']
 
 
 
@@ -36,13 +36,20 @@ def _gp(prefix):
 def _allowedFile(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-def _debug(msg):
-    app.logger.debug(msg)
+#def _debug(msg):
+#    app.logger.debug(msg)
+#
+#def _info(msg):
+#    app.logger.debug(msg)
+#
+#def _error(msg):
+#    app.logger.debug(msg)
 
-def _info(msg):
-    app.logger.debug(msg)
+_debug = lambda msg : app.logger.debug(msg)
 
+_info = lambda msg : app.logger.debug(msg)
 
+_error = lambda msg : app.logger.debug(msg)
 
 
 def getMasterAll(obj, order_by = 'name'):

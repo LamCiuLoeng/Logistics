@@ -18,7 +18,7 @@ from sys2do.constant import MESSAGE_ERROR, MESSAGE_INFO, MSG_NO_SUCH_ACTION, \
     MSG_SAVE_SUCC
 from sys2do.views import BasicView
 from sys2do.model.master import CustomerProfile, Customer
-from sys2do.model.logic import OrderHeader, OrderLog, OrderDetail
+from sys2do.model.logic import OrderHeader, OrderDetail
 from sys2do.util.logic_helper import genSystemNo
 
 
@@ -33,7 +33,8 @@ class RootView(BasicView):
     def index(self):
     #    flash('hello!', MESSAGE_INFO)
     #    flash('SHIT!', MESSAGE_ERROR)
-        app.logger.debug('A value for debugging')
+#        app.logger.debug('A value for debugging')
+#        flash(TEST_MSG, MESSAGE_INFO)
         return {"content" : _("Hello,World!")}
 
 
@@ -75,14 +76,14 @@ class RootView(BasicView):
         return {'orders' : orders}
 
 
-    @templated('search_orders.html')
-    def search_orders(self):
-        nos = _g('nos')
-        logs = []
-        for no in nos.split(','):
-            log = DBSession.query(OrderLog).filter(and_(OrderHeader.id == OrderLog.order_id, OrderHeader.no == no, OrderLog.active == 0)).all()
-            logs.append((no, log))
-        return {'logs' : logs}
+#    @templated('search_orders.html')
+#    def search_orders(self):
+#        nos = _g('nos')
+#        logs = []
+#        for no in nos.split(','):
+#            log = DBSession.query(OrderLog).filter(and_(OrderHeader.id == OrderLog.order_id, OrderHeader.no == no, OrderLog.active == 0)).all()
+#            logs.append((no, log))
+#        return {'logs' : logs}
 
 
     def test(self):

@@ -43,10 +43,10 @@
 
 {% block content %}
 	<form action="{{url_for('.view', action = 'save_new')}}" method="post">
-		<input type="button" value="{{_('Save')}}" onclick="tosave()"/> 
-		<input type="reset" value="{{_('Reset')}}"/>
-		<input type="button" value="{{_('Cancel')}}" onclick="location.href='{{url_for('.view', action = 'index')}}'"/>
-		
+		<input type="button" value="{{BTN_SAVE}}" onclick="tosave()"/> 
+		<input type="reset" value="{{BTN_RESET}}"/>
+		<input type="button" value="{{BTN_CANCEL}}" onclick="location.href='{{url_for('.view', action = 'index')}}'"/>
+		<input type="button" value="{{BTN_RETURN}}" onclick="location.href='{{url_for('.view', action = 'index')}}'"/>
 		<table border="1" cellpadding="3" cellspacing="3">
 			<tr>
 				<td>{{_('Customer')}}</td>
