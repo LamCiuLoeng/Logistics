@@ -41,14 +41,13 @@
 				<!-- header Here -->
 				<ul>
 					<li><a href="/index">首页</a></li>
+					{% if not session.get('login',None)%}
+						<li><a href="{{url_for('bpAuth.login')}}">{{_('Login')}}</a></li>
+						<li><a href="{{url_for('bpAuth.register')}}">{{_('Register')}}</a></li>
+					{% else %}
+						<li><a href="{{url_for('bpAuth.logout')}}">{{_('Logout')}}</a></li>
+					{% endif %}
 				</ul>
-				<!-- 
-				<ul>
-					<li><a href="{{url_for('bpAuth.login')}}">客人登录</a></li>
-					<li><a href="{{url_for('bpAuth.register')}}">客人注册</a></li>
-					<li><a href="{{url_for('bpAuth.login',type='kf')}}">客人登录</a></li>
-				</ul>
-				 -->
 			</div>
 		{% endblock %}
 		

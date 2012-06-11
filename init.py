@@ -38,7 +38,14 @@ def init():
         pUpdateOrder = Permission(name = 'UPDATE_ORDER')
         pDeleteOrder = Permission(name = 'DELETE_ORDER')
         pSearchOrder = Permission(name = 'SEARCH_ORDER')
+        pManageOrder = Permission(name = 'MANAGE_ORDER')
         pSearchAllOrder = Permission(name = 'SEARCH_ALL_ORDER')
+        pCreateDeliver = Permission(name = 'CREATE_DELIVER')
+        pUpdateDeliver = Permission(name = 'UPDATE_DELIVER')
+        pDeleteDeliver = Permission(name = 'DELETE_DELIVER')
+        pSearchDeliver = Permission(name = 'SEARCH_DELIVER')
+        pManageDeliver = Permission(name = 'MANAGE_DELIVER')
+        pSearchAllDeliver = Permission(name = 'SEARCH_ALL_ELIVER')
         pCreateCustomer = Permission(name = 'CREATE_CUSTOMER')
         pUpdateCustomer = Permission(name = 'UPDATE_CUSTOMER')
         pDeleteCustomer = Permission(name = 'DELETE_CUSTOMER')
@@ -58,7 +65,8 @@ def init():
 
         gAdmin = Group(name = 'ADMIN', display_name = 'Administrator')
         gAdmin.permissions = [pCreateUser, pUpdateUser, pDeleteUser, pSearchUser,
-                              pCreateOrder, pUpdateOrder, pDeleteOrder, pSearchOrder, pSearchAllOrder,
+                              pCreateOrder, pUpdateOrder, pDeleteOrder, pSearchOrder, pSearchAllOrder, pManageOrder,
+                              pCreateDeliver, pUpdateDeliver, pDeleteDeliver, pSearchDeliver, pSearchAllDeliver, pManageDeliver,
                               pCreateCustomer, pUpdateCustomer, pDeleteCustomer, pSearchCustomer,
                               pCreateSupplier, pUpdateSupplier, pDeleteSupplier, pSearchSupplier,
                               pCreateWarehouse, pUpdateWarehouse, pDeleteWarehouse, pSearchWarehouse,
@@ -68,20 +76,24 @@ def init():
         gCustomer.permissions = [pCreateOrder, pUpdateOrder, pDeleteOrder, pSearchOrder, ]
         gCustomer.users = [uCustomer, ]
         gOfficer = Group(name = 'OFFICER', display_name = 'Officer')
-        gOfficer.permissions = [pCreateOrder, pUpdateOrder, pDeleteOrder, pSearchOrder, pSearchAllOrder, ]
+        gOfficer.permissions = [pCreateOrder, pUpdateOrder, pDeleteOrder, pSearchOrder, pSearchAllOrder,
+                                pCreateDeliver, pUpdateDeliver, pDeleteDeliver, pSearchDeliver, pManageDeliver, pSearchAllDeliver,
+                                ]
         gOfficer.users = [uOfficer]
         gSupplier = Group(name = 'SUPPLIER', display_name = 'Supplier')
-        gSupplier.permissions = [pUpdateOrder, pSearchOrder]
+        gSupplier.permissions = [pUpdateDeliver, pSearchDeliver ]
         gSupplier.users = [uSupplier]
         gWarehouse = Group(name = 'WAREHOUSE', display_name = 'Warehouse')
-        gWarehouse.permissions = [pUpdateOrder, pSearchOrder, pSearchAllOrder, ]
+        gWarehouse.permissions = [pUpdateOrder, pSearchOrder, pSearchAllOrder,
+                                  pUpdateDeliver, pSearchDeliver, pSearchAllDeliver, ]
         gWarehouse.users = [uWarehouse]
 
 
         DBSession.add_all([
                             uAdmin, uCustomer, uOfficer, uSupplier, uWarehouse,
                             pCreateUser, pUpdateUser, pDeleteUser, pSearchUser,
-                            pCreateOrder, pUpdateOrder, pDeleteOrder, pSearchOrder, pSearchAllOrder,
+                            pCreateOrder, pUpdateOrder, pDeleteOrder, pSearchOrder, pSearchAllOrder, pManageOrder,
+                            pCreateDeliver, pUpdateDeliver, pDeleteDeliver, pSearchDeliver, pSearchAllDeliver, pManageDeliver,
                             pCreateCustomer, pUpdateCustomer, pDeleteCustomer, pSearchCustomer,
                             pCreateSupplier, pUpdateSupplier, pDeleteSupplier, pSearchSupplier,
                             pCreateWarehouse, pUpdateWarehouse, pDeleteWarehouse, pSearchWarehouse,

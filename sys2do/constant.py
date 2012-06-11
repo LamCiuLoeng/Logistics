@@ -34,6 +34,8 @@ MSG_RECORD_NOT_EXIST = T('The record does not exist!')
 MSG_RECORD_ALREADY_EXIST = T('The record already exist!')
 MSG_NO_FILE_UPLOADED = T('No file upload!')
 MSG_INVALID_FILE_TO_UPLOAD = T('Invalid file to upload!')
+MSG_USER_NOT_EXIST = T('This user does not exist!')
+MSG_WRONG_PASSWORD = T('The password is wrong!')
 
 #order status
 ORDER_CANCELLED = (-1, T('Cancelled'))
@@ -56,7 +58,7 @@ STATUS_LIST = [
 
 #button label
 BTN_SAVE = T('Save')
-BTN_SAVE = T('Input')
+BTN_INPUT = T('Input')
 BTN_REVISE = T('Revise')
 BTN_DELETE = T('Delete')
 BTN_SUBMIT = T('Submit')

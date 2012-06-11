@@ -8,7 +8,7 @@
 '''
 from sys2do.views import BasicView
 from flask.blueprints import Blueprint
-from sys2do.util.decorator import templated
+from sys2do.util.decorator import templated, login_required
 from sys2do.model.master import Warehouse
 from sys2do.model import DBSession
 from sys2do.util.common import _g
@@ -23,6 +23,8 @@ __all__ = ['bpWarehouse']
 bpWarehouse = Blueprint('bpWarehouse', __name__)
 
 class WarehouseView(BasicView):
+
+    decorators = [login_required]
 
     @templated('warehouse/index.html')
     def index(self):

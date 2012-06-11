@@ -39,7 +39,10 @@ bpOrder = Blueprint('bpOrder', __name__)
 
 class OrderView(BasicView):
 
+#    decorators = [login_required]
+
     @templated('order/index.html')
+#    @login_required
     def index(self):
         result = DBSession.query(OrderHeader).filter(OrderHeader.active == 0)
         return {'result' : result }

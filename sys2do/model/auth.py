@@ -10,6 +10,7 @@
 from datetime import datetime as dt
 import os
 import sys
+
 try:
     from hashlib import sha1
 except ImportError:
@@ -20,7 +21,7 @@ except ImportError:
 from flask import session
 from sqlalchemy import Table, ForeignKey, Column
 from sqlalchemy.types import Unicode, Integer, DateTime, Date, Text
-from sqlalchemy.orm import relation, synonym
+from sqlalchemy.orm import relation, synonym, backref
 from sys2do.model import DeclarativeBase, metadata, DBSession
 
 __all__ = ['User', 'Group', 'Permission', 'SysMixin', 'CRUDMixin', ]
@@ -159,8 +160,13 @@ class User(DeclarativeBase, SysMixin, CRUDMixin):
     first_name = Column(Text)
     last_name = Column(Text)
     phone = Column(Text)
-    birthday = Column(Date, default = None)
+    mobile = Column(Text)
+#    birthday = Column(Date, default = None)
     image_url = Column(Text)
+    last_login = Column(DateTime, default = dt.now)
+
+    customer_profile_id = Column(Integer, ForeignKey('order_detail.id'))
+#    customer_profile = relation(CustomerProfile, backref = backref("users", order_by = id), primaryjoin = "and_(CustomerProfile.id == User.customer_profile_id, User.active == 0)")
 
     def __repr__(self): return "%s %s" % (self.first_name, self.last_name)
 
@@ -252,14 +258,14 @@ class User(DeclarativeBase, SysMixin, CRUDMixin):
                 'last_name' : self.last_name,
                 'image_url' : self.image_url,
                 'phone' : self.phone,
-                'birthday' : self.birthday,
+#                'birthday' : self.birthday,
                 }
 
 
     @classmethod
     def saveAsNew(clz, v):
         params = {}
-        for f in ['name', 'password', 'email', 'first_name', 'last_name', 'image_url', 'phone', 'birthday']:
+        for f in ['name', 'password', 'email', 'first_name', 'last_name', 'image_url', 'phone', ]:
             params[f] = v.get(f, None) or None
         one = clz(**params)
         DBSession.add(one)
@@ -270,6 +276,11 @@ class User(DeclarativeBase, SysMixin, CRUDMixin):
             setattr(self, f, v.get(f, None) or None)
         return self
 
+
+    @property
+    def customer_profile(self):
+        from sys2do.model.master import CustomerProfile
+        return DBSession.query(CustomerProfile).get(self.customer_profile_id)
 
 
 class Permission(DeclarativeBase, SysMixin, CRUDMixin):

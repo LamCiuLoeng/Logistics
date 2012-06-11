@@ -11,7 +11,7 @@ from flask.views import View
 from flask.helpers import flash
 from werkzeug.utils import redirect
 
-from sys2do.util.decorator import templated
+from sys2do.util.decorator import templated, login_required
 from sys2do.views import BasicView
 from sys2do.model import DBSession
 from sys2do.model.auth import User, Group, Permission
@@ -25,6 +25,8 @@ __all__ = ['bpAdmin']
 bpAdmin = Blueprint('bpAdmin', __name__)
 
 class AdminView(BasicView):
+
+    decorators = [login_required, ]
 
     @templated('admin/index.html')
     def index(self):

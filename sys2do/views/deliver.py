@@ -18,7 +18,7 @@ from sys2do.constant import MESSAGE_ERROR, MSG_NO_SUCH_ACTION, MESSAGE_INFO, \
     MSG_SAVE_SUCC, IN_WAREHOUSE, MSG_UPDATE_SUCC, ORDER_NEW, \
     ORDER_CANCELLED, MSG_DELETE_SUCC, SORTING, MSG_RECORD_NOT_EXIST, SEND_OUT, \
     GOODS_ARRIVED, IN_TRAVEL, GOODS_SIGNED, MSG_SERVER_ERROR
-from sys2do.util.decorator import templated
+from sys2do.util.decorator import templated, login_required
 from sys2do.model import DBSession
 from sys2do.views import BasicView
 from sys2do.model.logic import DeliverHeader, OrderHeader, OrderDetail, \
@@ -35,6 +35,8 @@ __all__ = ['bpDeliver']
 bpDeliver = Blueprint('bpDeliver', __name__)
 
 class DeliverView(BasicView):
+
+    decorators = [login_required]
 
     @templated('deliver/index.html')
     def index(self):

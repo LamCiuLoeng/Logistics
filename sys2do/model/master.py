@@ -104,11 +104,12 @@ class Customer(DeclarativeBase, SysMixin):
     name = Column(Text)
     address = Column(Text)
     phone = Column(Text)
+    mobile = Column(Text)
     contact_person = Column(Text)
     remark = Column(Text)
 
     profile_id = Column(Integer, ForeignKey('master_customer_profile.id'))
-    prifile = relation(CustomerProfile, backref = backref("customers", order_by = id), primaryjoin = "and_(CustomerProfile.id == Customer.profile_id, Customer.active == 0)")
+    profile = relation(CustomerProfile, backref = backref("customers", order_by = id))
 
     def __str__(self): return self.name
 

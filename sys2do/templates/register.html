@@ -26,9 +26,59 @@
  		</div>
 		<form action="{{url_for('bpAuth.save_register')}}" method="post">
 			<table>
-				<tr><td>{{_('User Name')}}</td><td><input type="text" name="name" value=""/></td></tr>
-				<tr><td>{{_('Password')}}</td><td><input type="password" name="password" value=""/></td></tr>
-				<tr><td>{{_('Confirmed Password')}}</td><td><input type="password" name="repassword" value=""/></td></tr>
+				<tr>
+					<td>{{_('Customer')}}</td>
+					<td>
+						<select name="customer_id" id="customer_id" onchange="changecustomer(this)">
+							{% for c in customers%}
+								<option value="{{c.id}}">{{c.name}}</option>
+							{% endfor %}
+							<option value="OTHER">---- {{_('Other')}} ----</option>
+						</select>
+					</td>
+				</tr>
+				<tr>
+					<td>{{_('Customer Name')}}</td>
+					<td><input type="text" name="customer_name" id="customer_name" value=""/></td>
+				</tr>
+				<tr>
+					<td>{{_('Address')}}</td>
+					<td><input type="text" name="source_address" id="source_address" value=""/></td>
+				</tr>
+			</table>
+			<br />
+			<table>
+				<tr>
+					<td>{{_('User Name')}}</td>
+					<td><input type="text" name="name" id="name" value=""/></td>
+				</tr>
+				<tr>
+					<td>{{_('E-mail')}}</td>
+					<td><input type="text" name="email" id="email" value=""/></td>
+				</tr>
+				<tr>
+					<td>{{_('Password')}}</td><td><input type="password" name="password" value=""/></td>
+				</tr>
+				<tr>
+					<td>{{_('Confirmed Password')}}</td>
+					<td><input type="password" name="repassword" value=""/></td>
+				</tr>
+				<tr>
+					<td>{{_('First Name')}}</td>
+					<td><input type="text" name="first_name" id="first_name" value=""/></td>
+				</tr>
+				<tr>
+					<td>{{_('Last Name')}}</td>
+					<td><input type="text" name="last_name" id="last_name" value=""/></td>
+				</tr>
+				<tr>
+					<td>{{_('Phone')}}</td>
+					<td><input type="text" name="phone" id="phone" value=""/></td>
+				</tr>
+				<tr>
+					<td>{{_('Mobile')}}</td>
+					<td><input type="text" name="mobile" id="mobile" value=""/></td>
+				</tr>
 				<tr><td colspan="2"><input type="submit" value="{{_('Save')}}" class="btn"/></td></tr>
 			</table>	
 		</form>

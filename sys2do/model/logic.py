@@ -37,6 +37,7 @@ class OrderHeader(DeclarativeBase, SysMixin, CRUDMixin):
     source_address = Column(Text)
     source_contact = Column(Text)
     source_tel = Column(Text)
+    source_mobile = Column(Text)
 
     picker = Column(Text)
     picker_contact = Column(Text)
@@ -47,8 +48,8 @@ class OrderHeader(DeclarativeBase, SysMixin, CRUDMixin):
     remark = Column(Text)
     barcode_id = Column(Integer, ForeignKey('system_upload_file.id'))
     barcode = relation(UploadFile)
+    amount = Column(Float, default = 0)
     status = Column(Integer, default = 0)
-
 
     def __str__(self): return self.no
 
@@ -115,10 +116,12 @@ class OrderDetail(DeclarativeBase, SysMixin):
     destination_address = Column(Text)
     destination_contact = Column(Text)
     destination_tel = Column(Text)
+    destination_mobile = Column(Text)
 
     expect_time = Column(Date, default = None)
     actual_time = Column(Date, default = None)
     remark = Column(Text)
+    amount = Column(Float, default = 0)
     status = Column(Integer, default = 0)
 
 
@@ -147,6 +150,8 @@ class DeliverHeader(DeclarativeBase, SysMixin, CRUDMixin):
 
     expect_time = Column(Date, default = None)
     actual_time = Column(Date, default = None)
+
+    cost = Column(Float, default = 0)
 
     remark = Column(Text)
     status = Column(Integer, default = 0)
@@ -207,6 +212,7 @@ class DeliverDetail(DeclarativeBase, SysMixin):
     deliver_qty = Column(Integer)
 
     remark = Column(Text)
+    cost = Column(Float, default = 0)
     status = Column(Integer, default = 0)
 
 

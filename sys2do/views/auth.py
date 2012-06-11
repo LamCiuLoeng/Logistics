@@ -6,6 +6,7 @@
 #  Description:
 ###########################################
 '''
+from datetime import datetime as dt
 from flask import session
 from flask.helpers import url_for, flash
 from werkzeug.utils import redirect
@@ -15,8 +16,11 @@ from sqlalchemy.sql.expression import and_
 
 
 from sys2do.util.decorator import templated
-from sys2do.util.common import _g
+from sys2do.util.common import _g, getMasterAll
 from sys2do.model import DBSession, User
+from sys2do.constant import MESSAGE_ERROR, MSG_USER_NOT_EXIST, \
+    MSG_WRONG_PASSWORD, MESSAGE_INFO, MSG_SAVE_SUCC
+from sys2do.model.master import Customer, CustomerProfile
 
 
 __all__ = ['bpAuth']
@@ -43,12 +47,12 @@ def check():
     try:
         u = DBSession.query(User).filter(and_(User.active == 0, User.name == _g('name'))).one()
     except:
-        flash(_('This user does not exist!'))
-        return redirect(url_for('bpAuth.login'))
+        flash(MSG_USER_NOT_EXIST, MESSAGE_ERROR)
+        return redirect(url_for('bpAuth.login', next = _g('next')))
     else:
-        if u.password != _g('password'):
-            flash(_('The password is wrong!'))
-            return redirect(url_for('bpAuth.login'))
+        if not u.validate_password(_g('password')):
+            flash(MSG_WRONG_PASSWORD, MESSAGE_ERROR)
+            return redirect(url_for('bpAuth.login', next = _g('next')))
         else:
             #fill the info into the session
             session['login'] = True
@@ -59,7 +63,10 @@ def check():
                     permissions.add(p.name)
             session['user_profile']['groups'] = [g.name for g in u.groups]
             session['user_profile']['permissions'] = list(permissions)
-        return redirect(index_url())
+            u.last_login = dt.now()
+            DBSession.commit()
+            if _g('next') : return redirect(_g('next'))
+            return redirect(index_url())
 
 
 @bpAuth.route('/logout')
@@ -72,9 +79,44 @@ def logout():
 @bpAuth.route('/register')
 @templated("register.html")
 def register():
-    return {}
+
+
+    return {'customers' : getMasterAll(Customer), }
+
 
 
 @bpAuth.route('/save_register', methods = ['GET', 'POST'])
 def save_register():
-    return 'OK'
+    cid = _g('customer_id' , None)
+    user_params = {
+                "name" : _g('name'),
+                "password" : _g('password'),
+                "email" : _g('email'),
+                "first_name" : _g('first_name'),
+                "last_name" : _g('last_name'),
+                "phone" : _g('phone'),
+                "mobile" : _g('mobile'),
+                   }
+
+
+    if cid and cid != 'OTHER':
+        c = DBSession.query(Customer).get(cid)
+        user_params['customer_profile_id'] = c.profile.id
+    else:
+        cname = _g('name').strip()
+        cp = CustomerProfile(name = "PROFILE_%s" % cname.strip().upper().replace(' ', '_'))
+        DBSession.add(cp)
+        DBSession.flush()
+        c = Customer(
+                     name = cname,
+                     address = _g('address'),
+                     profile = cp
+                     )
+        user_params['customer_profile_id'] = cp.id
+        DBSession.add(c)
+
+    DBSession.add(User(**user_params))
+
+    DBSession.commit()
+    flash(MSG_SAVE_SUCC, MESSAGE_INFO)
+    return redirect(url_for('bpAuth.login'))

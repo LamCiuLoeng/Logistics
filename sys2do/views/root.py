@@ -38,36 +38,36 @@ class RootView(BasicView):
         return {"content" : _("Hello,World!")}
 
 
-    @templated('add.html')
-    def add(self):
-        cps = DBSession.query(CustomerProfile).all()
-        companys = []
-        vendors = []
-        items = []
-        units = []
-        for cp in cps:
-            companys.extend(cp.customers)
-            vendors.extend(cp.vendors)
-            items.extend(cp.items)
-            units.extend(cp.itemunits)
-        return {'companys' :companys , 'vendors' : vendors, 'items' : items, 'units' : units}
+#    @templated('add.html')
+#    def add(self):
+#        cps = DBSession.query(CustomerProfile).all()
+#        companys = []
+#        vendors = []
+#        items = []
+#        units = []
+#        for cp in cps:
+#            companys.extend(cp.customers)
+#            vendors.extend(cp.vendors)
+#            items.extend(cp.items)
+#            units.extend(cp.itemunits)
+#        return {'companys' :companys , 'vendors' : vendors, 'items' : items, 'units' : units}
 
 
-    def save(self):
-        c = _g('company')
-        v = _g('vendor')
-
-        no = genSystemNo()
-        order = OrderHeader(no = no, customer_id = c, vendor_id = v)
-        DBSession.add(order)
-
-        for (k, v), (uk, uv) in zip(_gp('item_'), _gp('unit_')):
-            n, id = k.split("_")
-            DBSession.add(OrderDetail(header = order, item_id = id, order_qty = v, item_unit_id = uv))
-
-        DBSession.commit()
-        flash(MSG_SAVE_SUCC, MESSAGE_INFO)
-        return redirect(url_for('bpRoot.view', action = 'index'))
+#    def save(self):
+#        c = _g('company')
+#        v = _g('vendor')
+#
+#        no = genSystemNo()
+#        order = OrderHeader(no = no, customer_id = c, vendor_id = v)
+#        DBSession.add(order)
+#
+#        for (k, v), (uk, uv) in zip(_gp('item_'), _gp('unit_')):
+#            n, id = k.split("_")
+#            DBSession.add(OrderDetail(header = order, item_id = id, order_qty = v, item_unit_id = uv))
+#
+#        DBSession.commit()
+#        flash(MSG_SAVE_SUCC, MESSAGE_INFO)
+#        return redirect(url_for('bpRoot.view', action = 'index'))
 
 
     @templated('track.html')
