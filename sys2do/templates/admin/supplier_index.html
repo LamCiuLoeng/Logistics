@@ -1,0 +1,31 @@
+{% extends "master.html" %}
+
+{% block extJS %}
+
+{% endblock %}
+
+{% block content %}
+	<p><a href="{{url_for('.view', action = 'supplier',m = 'NEW')}}">{{_('New Record')}}</a></p>
+	
+	<table border="1" cellpadding="3" cellspacing="3">
+		<thead>
+			<tr>
+				<td>{{_('Supplier Name')}}</td>
+				<td>{{_('Address')}}</td>
+				<td>{{_('Contact Person')}}</td>
+				<td>{{_('Phone')}}</td>
+				<td>{{_('Action')}}</td>
+			</tr>
+			{% for r in records %}
+			<tr>
+				<td>{{r}}</td>
+				<td>{{r.provice|ifFalse}}{{r.city|ifFalse}}{{r.district|ifFalse}}{{r.address|ifFalse}}</td>
+				<td>{{r.contact_person|ifFalse}}</td>
+				<td>{{r.phone|ifFalse}}</td>
+				<td><a href="{{url_for('.view', action = 'supplier',m = 'UPDATE',id=r.id)}}">{{_('Revise')}}</a>&nbsp|&nbsp;<a href="{{url_for('.view', action = 'supplier',m = 'DELETE',id=r.id)}}">{{_('Delete')}}</a></td>
+			</tr>
+			{% endfor %}
+		</thead>
+	</table>
+	
+{% endblock %}

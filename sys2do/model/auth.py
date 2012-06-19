@@ -111,6 +111,7 @@ class Group(DeclarativeBase, SysMixin, CRUDMixin):
     name = Column(Text, unique = True, nullable = False)
     display_name = Column(Text)
     desc = Column(Text)
+    type = Column(Integer, default = 1) #0 is for system use, 1 is for normal use
     users = relation('User', secondary = user_group_table, backref = 'groups')
 
     def __repr__(self): return self.display_name or self.name
@@ -125,7 +126,8 @@ class Group(DeclarativeBase, SysMixin, CRUDMixin):
                 "id" : self.id,
                 "name" :self.name,
                 "display_name" : self.display_name,
-                "desc" : self.desc
+                "desc" : self.desc,
+                "type" : self.type,
                 }
 
 

@@ -11,7 +11,8 @@ from sys2do.model import metadata, engine, DBSession, Permission, Group, User
 #import sys2do.model.logic as logic
 import sys
 from sys2do.model.master import CustomerProfile, Customer, Item, \
-    ItemUnit, Warehouse, WeightUnit, ShipmentType, Payment, Province, Supplier
+    ItemUnit, Warehouse, WeightUnit, ShipmentType, Payment, Province, Supplier, \
+    ChargeType
 reload(sys)
 sys.setdefaultencoding('utf8')
 
@@ -63,7 +64,7 @@ def init():
         pDeleteDriver = Permission(name = 'DELETE_DRIVER')
         pSearchDriver = Permission(name = 'SEARCH_DRIVER')
 
-        gAdmin = Group(name = 'ADMIN', display_name = 'Administrator')
+        gAdmin = Group(name = 'ADMIN', display_name = 'Administrator', type = 0)
         gAdmin.permissions = [pCreateUser, pUpdateUser, pDeleteUser, pSearchUser,
                               pCreateOrder, pUpdateOrder, pDeleteOrder, pSearchOrder, pSearchAllOrder, pManageOrder,
                               pCreateDeliver, pUpdateDeliver, pDeleteDeliver, pSearchDeliver, pSearchAllDeliver, pManageDeliver,
@@ -72,18 +73,18 @@ def init():
                               pCreateWarehouse, pUpdateWarehouse, pDeleteWarehouse, pSearchWarehouse,
                               pCreateDriver, pUpdateDriver, pDeleteDriver, pSearchDriver]
         gAdmin.users = [uAdmin, ]
-        gCustomer = Group(name = 'BUYER', display_name = 'Customer')
+        gCustomer = Group(name = 'CUSTOMER', display_name = 'Customer', type = 0)
         gCustomer.permissions = [pCreateOrder, pUpdateOrder, pDeleteOrder, pSearchOrder, ]
         gCustomer.users = [uCustomer, ]
-        gOfficer = Group(name = 'OFFICER', display_name = 'Officer')
+        gOfficer = Group(name = 'OFFICER', display_name = 'Officer', type = 0)
         gOfficer.permissions = [pCreateOrder, pUpdateOrder, pDeleteOrder, pSearchOrder, pSearchAllOrder,
                                 pCreateDeliver, pUpdateDeliver, pDeleteDeliver, pSearchDeliver, pManageDeliver, pSearchAllDeliver,
                                 ]
         gOfficer.users = [uOfficer]
-        gSupplier = Group(name = 'SUPPLIER', display_name = 'Supplier')
+        gSupplier = Group(name = 'SUPPLIER', display_name = 'Supplier', type = 0)
         gSupplier.permissions = [pUpdateDeliver, pSearchDeliver ]
         gSupplier.users = [uSupplier]
-        gWarehouse = Group(name = 'WAREHOUSE', display_name = 'Warehouse')
+        gWarehouse = Group(name = 'WAREHOUSE', display_name = 'Warehouse', type = 0)
         gWarehouse.permissions = [pUpdateOrder, pSearchOrder, pSearchAllOrder,
                                   pUpdateDeliver, pSearchDeliver, pSearchAllDeliver, ]
         gWarehouse.users = [uWarehouse]
@@ -115,6 +116,10 @@ def init():
         DBSession.add(ShipmentType(name = u"水运"))
         DBSession.add(ShipmentType(name = u"空运"))
         DBSession.add(Payment(name = u"月结"))
+        DBSession.add(ChargeType(name = u"按件",))
+        DBSession.add(ChargeType(name = u"按体积",))
+        DBSession.add(ChargeType(name = u"按重量",))
+
 
         DBSession.add(Customer(name = u"客户一", address = u"广东省深圳市福田区", phone = "0755-25311000", contact_person = u"李先生"))
         DBSession.add(Customer(name = u"客户二", address = u"广东省深圳市罗湖区", phone = "0755-25141000", contact_person = u"陈小姐"))

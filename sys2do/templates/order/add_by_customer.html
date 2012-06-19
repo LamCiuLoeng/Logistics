@@ -54,7 +54,7 @@
 {% endblock %}
 
 {% block content %}
-	<form action="{{url_for('.view', action = 'save_new')}}" method="post">
+	<form action="{{url_for('.view', action = 'save_new_by_customer')}}" method="post">
 		<input type="button" value="{{BTN_SAVE}}" onclick="tosave()"/> 
 		<input type="reset" value="{{BTN_RESET}}"/>
 		<input type="button" value="{{BTN_CANCEL}}" onclick="location.href='{{url_for('.view', action = 'index')}}'"/>
@@ -63,13 +63,8 @@
 			<tr>
 				<td>{{_('Customer')}}</td>
 				<td>
-					<select name="customer_id" id="customer_id" onchange="changecustomer(this)">
-						<option>{{_('Please Select One')}}</option>
-						{% for c in customers%}
-							<option value="{{c.id}}">{{c.name}}</option>
-						{% endfor %}
-						<option value="OTHER">---- {{_('Other')}} ----</option>
-					</select>
+					{{session.get('customer_profile',{}).get('name','')}}
+					<input type="hidden" name="customer_id" value="{{session.get('customer_profile',{}).get('id','')}}"/>
 				</td>
 			</tr>
 			<tr>
@@ -87,11 +82,11 @@
 			</tr>
 			<tr>
 				<td>{{_('Phone')}}</td>
-				<td><input type="text" name="source_tel" id="source_tel" value=""/></td>
+				<td><input type="text" name="source_tel" id="source_tel" value="{{session.get('customer_profile',{}).get('phone','')}}"/></td>
 			</tr>
 			<tr>
 				<td>{{_('Contact')}}</td>
-				<td><input type="text" name="source_contact" id="source_contact" value=""/></td>
+				<td><input type="text" name="source_contact" id="source_contact" value="{{session.get('customer_profile',{}).get('contact_person','')}}"/></td>
 			</tr>
 			<tr>
 				<td>{{_('Remark')}}</td>
@@ -118,7 +113,6 @@
 					<td>{{_('Destination Contact')}}</td>
 					<td>{{_('Destination Tel')}}</td>
 					<td>{{_('Expect Time')}}</td>
-					<td>{{_('Charge')}}</td>
 					<td>{{_('Remark')}}</td>
 				</tr>
 			</thead>
@@ -173,7 +167,6 @@
 					<td><input type="text" name="contact_x" id="contact_x" value=""/></td>
 					<td><input type="text" name="tel_x" id="tel_x" value=""/></td>
 					<td><input type="text" name="expect_time_x" id="expect_time_x" value=""/></td>
-					<td><input type="text" name="charge_x" id="charge_x" value=""/></td>
 					<td><textarea name="remark_x" id="remark_x"></textarea></td>
 					
 				</tr>

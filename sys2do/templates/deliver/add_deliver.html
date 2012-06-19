@@ -1,7 +1,13 @@
 {% extends "master.html" %}
 
 {% block extJS %}
-
+<script language="JavaScript" type="text/javascript">
+//<![CDATA[
+	$(document).ready(function(){
+		bind_province_city_district("#destination_province_id","#destination_city_id","");		
+	});
+//]]>
+</script>
 {% endblock %}
 
 {% block content %}
@@ -30,7 +36,16 @@
 				</tr>
 				<tr>
 					<td>{{_('Destination')}}</td>
-					<td><input type="text" name="destination_address" id="destination_address" /></td>
+					<td>
+						<select name="destination_province_id" id="destination_province_id">
+							<option>{{_('Please Select One')}}</option>
+							{% for p in provinces %}
+								<option value="{{p.id}}">{{p}}</option>
+							{% endfor %}
+						</select>
+						<select name="destination_city_id" id="destination_city_id"></select>
+						<input type="text" name="destination_address" id="destination_address" />
+					</td>
 				</tr>
 				<tr>
 					<td>{{_('Supplier Contact')}}</td>
@@ -43,6 +58,10 @@
 				<tr>
 					<td>{{_('Expect Time')}}</td>
 					<td><input type="text" name="expect_time" id="expect_time" /></td>
+				</tr>
+				<tr>
+					<td>{{_('Charge')}}</td>
+					<td><input type="text" name="amount" id="amount" /></td>
 				</tr>
 				<tr>
 					<td>{{_('Remark')}}</td>
@@ -76,7 +95,7 @@
 				<tr>
 					<td>{{d.header.customer}}<input type="hidden" name="detail_{{d.id}}" value="{{d.id}}"/></td>
 					<td>{{d.header.no}}</td>
-					<td>{{d.destination_address}}</td>
+					<td>{{d.destination_provice|ifFalse}}{{d.destination_city|ifFalse}}{{d.destination_district|ifFalse}}{{d.destination_address|ifFalse}}</td>
 					<td>{{d.item}}</td>
 					<td>{{d.order_qty}}&nbsp;{{d.unit}}</td>
 					<td>{{d.weight}}&nbsp;{{d.weight_unit}}</td>

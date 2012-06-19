@@ -21,6 +21,7 @@ from sys2do.model import DBSession, User
 from sys2do.constant import MESSAGE_ERROR, MSG_USER_NOT_EXIST, \
     MSG_WRONG_PASSWORD, MESSAGE_INFO, MSG_SAVE_SUCC
 from sys2do.model.master import Customer, CustomerProfile
+from sys2do.util.tests import in_group
 
 
 __all__ = ['bpAuth']
@@ -63,6 +64,23 @@ def check():
                     permissions.add(p.name)
             session['user_profile']['groups'] = [g.name for g in u.groups]
             session['user_profile']['permissions'] = list(permissions)
+
+            if in_group('CUSTOMER'):
+                for g in u.groups:
+                    if g.type != 0 :
+                        for p in g.customer_profile:
+                            if p and p.customer_id:
+                                session['customer_profile'] = p.customer.populate()
+                                break
+
+            if in_group('SUPPLIER'):
+                for g in u.groups:
+                    if g.type != 0 :
+                        for p in g.supplier_profile:
+                            if p and p.supplier_id:
+                                session['supplier_profile'] = p.supplier.populate()
+                                break
+
             u.last_login = dt.now()
             DBSession.commit()
             if _g('next') : return redirect(_g('next'))
@@ -79,8 +97,6 @@ def logout():
 @bpAuth.route('/register')
 @templated("register.html")
 def register():
-
-
     return {'customers' : getMasterAll(Customer), }
 
 

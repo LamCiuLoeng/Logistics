@@ -29,7 +29,7 @@
 				<td><input type="checkbox" name="order_detail_ids" value="{{r.id}}"/></td>
 				<td>{{r.header.no}}</td>
 				<td>{{r.header.customer}}</td>
-				<td>{{r.destination_address|ifFalse}}</td>
+				<td>{{r.destination_provice|ifFalse}}{{r.destination_city|ifFalse}}{{r.destination_district|ifFalse}}{{r.destination_address|ifFalse}}</td>
 				<td>{{r.item|ifFalse}}</td>
 				<td>{{r.order_qty}}&nbsp;{{r.unit}}</td>
 				<td>{{r.weight}}&nbsp;{{r.weight_unit}}</td>

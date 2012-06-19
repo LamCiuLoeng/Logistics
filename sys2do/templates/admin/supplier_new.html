@@ -1,0 +1,46 @@
+{% extends "master.html" %}
+
+{% block extJS %}
+
+{% endblock %}
+
+{% block content %}
+	<form action="{{url_for('.view', action = 'supplier',m='SAVE_NEW')}}" method="post">
+		<table>
+			<tr>
+				<td>{{_('Supplier Name')}}</td>
+				<td><input type="text" name="name"/></td>
+			</tr>
+			<tr>
+				<td>{{_('Address')}}</td>
+				<td>
+					<select name="source_province_id" id="source_province_id">
+						<option>{{_('Please Select One')}}</option>
+						{% for p in provinces %}
+							<option value="{{p.id}}">{{p}}</option>
+						{% endfor %}
+					</select>
+					<select name="source_city_id" id="source_city_id"></select>
+					<select name="source_district_id" id="source_district_id"></select>
+					<input type="text" name="source_address" id="source_address" value=""/>
+				</td>
+			</tr>
+			<tr>
+				<td>{{_('Phone')}}</td>
+				<td><input type="text" name="phone" id="phone" value=""/></td>
+			</tr>
+			<tr>
+				<td>{{_('Contact Person')}}</td>
+				<td><input type="text" name="contact_person" id="contact_person" value=""/></td>
+			</tr>
+			<tr>
+				<td>{{_('Remark')}}</td>
+				<td><textarea id="remark" name="remark"></textarea></td>
+			</tr>
+			<tr>
+				<td colspan="2"><input type="submit" value="{{_('Submit')}}"/>&nbsp;&nbsp;&nbsp;<input type="button" value="{{_('Cancel')}}" onclick="redirect('{{url_for('.view', action = 'supplier')}}')"/></td>
+			</tr>
+		</table>
+	</form>
+	
+{% endblock %}

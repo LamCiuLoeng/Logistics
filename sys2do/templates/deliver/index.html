@@ -25,8 +25,8 @@
 			{% for r in result%}
 			<tr>
 				<td>{{r.no}}</td>
-				<td>{{r.destination_address}}</td>
-				<td>{{r.Supplier}}</td>
+				<td>{{r.destination_provice|ifFalse}}{{r.destination_city|ifFalse}}{{r.destination_address|ifFalse}}</td>
+				<td>{{r.supplier}}</td>
 				<td>{{r.supplier_contact}}</td>
 				<td>{{r.supplier_tel}}</td>
 				<td>{{r.create_time|ft}}</td>

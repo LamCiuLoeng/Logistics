@@ -4103,3 +4103,6 @@ INSERT INTO master_district(name,city_id) values('额济纳旗','362');
 --369	嘉义市(无)
 --370	澳门特别行政区(无)
 
+update master_province set active = 0;
+update master_city set active = 0;
+update master_district set active = 0;

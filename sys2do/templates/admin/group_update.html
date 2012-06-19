@@ -10,7 +10,13 @@
 		<table>
 			<tr>
 				<td>{{_('Group Name')}}</td>
-				<td><input type="text" name="name" value="{{v['name']}}"/></td>
+				<td>
+					{% if v['type'] != 0 %}
+						<input type="text" name="name" value="{{v['name']}}"/>
+					{% else %}
+						{{v['name']}} <input type="hidden" name="name" value="{{v['name']}}"/>
+					{% endif %}
+				</td>
 			</tr>
 			<tr>
 				<td>{{_('Display Name')}}</td>

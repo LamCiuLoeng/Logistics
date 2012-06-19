@@ -1,0 +1,47 @@
+{% extends "master.html" %}
+
+{% block extJS %}
+
+{% endblock %}
+
+{% block content %}
+	<form action="{{url_for('.view', action = 'profile',m='SAVE_NEW')}}" method="post">
+		<table>
+			<tr>
+				<td>{{_('Profile Name')}}</td>
+				<td><input type="text" name="name"/></td>
+			</tr>
+			<tr>
+				<td>{{_('Supplier')}}</td>
+				<td>
+					<select name="supplier_id" id="supplier_id">
+						<option>{{_('Please Select One')}}</option>
+						{% for p in suppliers %}
+							<option value="{{p.id}}">{{p}}</option>
+						{% endfor %}
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td>{{_('Group')}}</td>
+				<td>
+					<select name="group_id" id="group_id">
+						<option>{{_('Please Select One')}}</option>
+						{% for g in groups %}
+							<option value="{{g.id}}">{{g}}</option>
+						{% endfor %}
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td>{{_('Remark')}}</td>
+				<td><textarea id="remark" name="remark"></textarea></td>
+			</tr>
+			<tr>
+				<td colspan="2"><input type="submit" value="{{_('Submit')}}"/>&nbsp;&nbsp;&nbsp;<input type="button" value="{{_('Cancel')}}" onclick="redirect('{{url_for('.view', action = 'sprofile')}}')"/></td>
+			</tr>
+		</table>
+	</form>
+	
+{% endblock %}
+					

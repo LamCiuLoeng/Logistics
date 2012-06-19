@@ -24,15 +24,19 @@
 	 -->
 	
 	<ul>
-		
-		<li><a href="{{url_for('bpOrder.view', action = 'index')}}">订单管理</a></li>
-		
+		<li><a href="{{url_for('bpOrder.view', action = 'add_by_customer')}}">客人订单录入</a></li>
 		<li><a href="{{url_for('bpOrder.view', action = 'search_by_customer')}}">客人订单追踪</a></li>
 	</ul>
+
 	<ul>
+		<li><a href="{{url_for('bpDeliver.view', action = 'vendor_select')}}">承运商录入</a></li>
+	</ul>
+			
+		
+	<ul>
+		<li><a href="{{url_for('bpOrder.view', action = 'index')}}">订单管理</a></li>
 		<li><a href="{{url_for('bpDeliver.view', action = 'select_orders')}}">分拣</a></li>
 		<li><a href="{{url_for('bpDeliver.view', action = 'index')}}">送货单管理</a></li>
-		<li><a href="{{url_for('bpDeliver.view', action = 'vendor_select')}}">承运商录入</a></li>
 	</ul>
 	<ul>
 		<li><a href="{{url_for('bpWarehouse.view', action = 'index')}}">仓存管理</a></li>
@@ -42,9 +46,17 @@
 		<li><a href="{{url_for('bpAdmin.view')}}">管理员</a></li>
 		<li>
 			<ul>
-				<li><a href="{{url_for('bpAdmin.view', action = 'user')}}">管理用户</a></li>
-				<li><a href="{{url_for('bpAdmin.view', action = 'group')}}">管理组</a></li>
-				<li><a href="{{url_for('bpAdmin.view', action = 'permission')}}">管理权限</a></li>
+				<li><a href="{{url_for('bpAdmin.view', action = 'user')}}">用户管理</a></li>
+				<li><a href="{{url_for('bpAdmin.view', action = 'group')}}">组管理</a></li>
+				<li><a href="{{url_for('bpAdmin.view', action = 'permission')}}">权限管理</a></li>
+				<li><a href="{{url_for('bpAdmin.view', action = 'customer')}}">客户管理</a></li>
+				<li><a href="{{url_for('bpAdmin.view', action = 'cprofile')}}">客户与用户关系管理</a></li>
+				<li><a href="{{url_for('bpAdmin.view', action = 'supplier')}}">承运商管理</a></li>
+				<li><a href="{{url_for('bpAdmin.view', action = 'sprofile')}}">承运商与用户关系管理</a></li>
+				<li><a href="{{url_for('bpAdmin.view', action = 'location')}}">省份/城市/地区管理</a></li>
+				<li><a href="{{url_for('bpAdmin.view', action = 'charge')}}">计费方式管理</a></li>
+				<li><a href="{{url_for('bpAdmin.view', action = 'unit')}}">计量单位管理</a></li>
+				<li><a href="{{url_for('bpAdmin.view', action = 'system')}}">系统设置管理</a></li>
 			</ul>
 		</li>
 	</ul>

@@ -17,8 +17,10 @@ from sys2do.model import DBSession
 from sys2do.model.auth import User, Group, Permission
 from sys2do.constant import MESSAGE_ERROR, MSG_NO_SUCH_ACTION, \
     MSG_NO_ID_SUPPLIED, MSG_RECORD_NOT_EXIST, MESSAGE_INFO, MSG_SAVE_SUCC, \
-    MSG_UPDATE_SUCC
-from sys2do.util.common import _g, _gl
+    MSG_UPDATE_SUCC, MSG_DELETE_SUCC
+from sys2do.util.common import _g, _gl, getMasterAll
+from sys2do.model.master import Customer, Province, CustomerProfile, \
+    SupplierProfile, Supplier
 
 __all__ = ['bpAdmin']
 
@@ -26,7 +28,7 @@ bpAdmin = Blueprint('bpAdmin', __name__)
 
 class AdminView(BasicView):
 
-    decorators = [login_required, ]
+#    decorators = [login_required, ]
 
     @templated('admin/index.html')
     def index(self):
@@ -49,19 +51,31 @@ class AdminView(BasicView):
             if not id :
                 flash(MSG_NO_ID_SUPPLIED, MESSAGE_ERROR)
                 return redirect(url_for('.view', action = 'user'))
-            user = User.get(id)
-            if not user :
+            obj = User.get(id)
+            if not obj :
                 flash(MSG_RECORD_NOT_EXIST, MESSAGE_ERROR)
                 return redirect(url_for('.view', action = 'user'))
-            gids = map(lambda v:v.id, user.groups)
+            gids = map(lambda v:v.id, obj.groups)
             all_groups = Group.all()
-            return render_template('admin/user_update.html', v = user.populate(), gids = gids, all_groups = all_groups)
+            return render_template('admin/user_update.html', v = obj.populate(), gids = gids, all_groups = all_groups)
         elif method == 'DELETE':
-            pass
+            id = _g('id', None)
+            if not id :
+                flash(MSG_NO_ID_SUPPLIED, MESSAGE_ERROR)
+                return redirect(url_for('.view', action = 'user'))
+            obj = User.get(id)
+            if not obj :
+                flash(MSG_RECORD_NOT_EXIST, MESSAGE_ERROR)
+                return redirect(url_for('.view', action = 'user'))
+            obj.active = 1
+            obj.group = []
+            DBSession.commit()
+            flash(MSG_DELETE_SUCC, MESSAGE_INFO)
+            return redirect(url_for('.view', action = 'user'))
         elif method == 'SAVE_NEW':
-            user = User.saveAsNew(request.values)
+            obj = User.saveAsNew(request.values)
             gids = _gl('gids')
-            user.groups = DBSession.query(Group).filter(Group.id.in_(gids)).all()
+            obj.groups = DBSession.query(Group).filter(Group.id.in_(gids)).all()
             DBSession.commit()
             flash(MSG_SAVE_SUCC, MESSAGE_INFO)
             return redirect(url_for('.view', action = 'user'))
@@ -70,12 +84,12 @@ class AdminView(BasicView):
             if not id :
                 flash(MSG_NO_ID_SUPPLIED, MESSAGE_ERROR)
                 return redirect(url_for('.view', action = 'user'))
-            user = User.get(id)
-            if not user :
+            obj = User.get(id)
+            if not obj :
                 flash(MSG_RECORD_NOT_EXIST, MESSAGE_ERROR)
                 return redirect(url_for('.view', action = 'user'))
-            user.saveAsUpdate(request.values)
-            user.groups = DBSession.query(Group).filter(Group.id.in_(_gl('gids'))).all()
+            obj.saveAsUpdate(request.values)
+            obj.groups = DBSession.query(Group).filter(Group.id.in_(_gl('gids'))).all()
             DBSession.commit()
             flash(MSG_UPDATE_SUCC, MESSAGE_INFO)
             return redirect(url_for('.view', action = 'user'))
@@ -96,22 +110,35 @@ class AdminView(BasicView):
             if not id :
                 flash(MSG_NO_ID_SUPPLIED, MESSAGE_ERROR)
                 return redirect(url_for('.view', action = 'group'))
-            group = Group.get(id)
-            if not group :
+            obj = Group.get(id)
+            if not obj :
                 flash(MSG_RECORD_NOT_EXIST, MESSAGE_ERROR)
                 return redirect(url_for('.view', action = 'group'))
             return render_template('admin/group_update.html',
-                                   v = group.populate(),
-                                   uids = map(lambda v:v.id, group.users),
+                                   v = obj.populate(),
+                                   uids = map(lambda v:v.id, obj.users),
                                    all_users = User.all(),
-                                   pids = map(lambda v:v.id, group.permissions),
+                                   pids = map(lambda v:v.id, obj.permissions),
                                    all_permissions = Permission.all())
         elif method == 'DELETE':
-            pass
+            id = _g('id', None)
+            if not id :
+                flash(MSG_NO_ID_SUPPLIED, MESSAGE_ERROR)
+                return redirect(url_for('.view', action = 'group'))
+            obj = Group.get(id)
+            if not obj :
+                flash(MSG_RECORD_NOT_EXIST, MESSAGE_ERROR)
+                return redirect(url_for('.view', action = 'group'))
+            obj.active = 1
+            obj.users = []
+            obj.permissions = []
+            DBSession.commit()
+            flash(MSG_DELETE_SUCC, MESSAGE_INFO)
+            return redirect(url_for('.view', action = 'group'))
         elif method == 'SAVE_NEW':
-            group = Group.saveAsNew(request.values)
-            group.users = DBSession.query(User).filter(User.id.in_(_gl("uids"))).all()
-            group.permissions = DBSession.query(Permission).filter(Permission.id.in_(_gl("pids"))).all()
+            obj = Group.saveAsNew(request.values)
+            obj.users = DBSession.query(User).filter(User.id.in_(_gl("uids"))).all()
+            obj.permissions = DBSession.query(Permission).filter(Permission.id.in_(_gl("pids"))).all()
             DBSession.commit()
             flash(MSG_SAVE_SUCC, MESSAGE_INFO)
             return redirect(url_for('.view', action = 'group'))
@@ -120,13 +147,13 @@ class AdminView(BasicView):
             if not id :
                 flash(MSG_NO_ID_SUPPLIED, MESSAGE_ERROR)
                 return redirect(url_for('.view', action = 'group'))
-            group = Group.get(id)
-            if not group :
+            obj = Group.get(id)
+            if not obj :
                 flash(MSG_RECORD_NOT_EXIST, MESSAGE_ERROR)
                 return redirect(url_for('.view', action = 'group'))
-            group.saveAsUpdate(request.values)
-            group.users = DBSession.query(User).filter(User.id.in_(_gl("uids"))).all()
-            group.permissions = DBSession.query(Permission).filter(Permission.id.in_(_gl("pids"))).all()
+            obj.saveAsUpdate(request.values)
+            obj.users = DBSession.query(User).filter(User.id.in_(_gl("uids"))).all()
+            obj.permissions = DBSession.query(Permission).filter(Permission.id.in_(_gl("pids"))).all()
             DBSession.commit()
             flash(MSG_UPDATE_SUCC, MESSAGE_INFO)
             return redirect(url_for('.view', action = 'group'))
@@ -138,8 +165,8 @@ class AdminView(BasicView):
             flash(MSG_NO_SUCH_ACTION, MESSAGE_ERROR);
             return redirect(url_for('.view', action = 'index'))
         if method == 'LIST':
-            permission = DBSession.query(Permission).filter(Permission.active == 0).order_by(Permission.name).all()
-            return render_template('admin/permission_index.html', records = permission)
+            permissions = DBSession.query(Permission).filter(Permission.active == 0).order_by(Permission.name).all()
+            return render_template('admin/permission_index.html', records = permissions)
         elif method == 'NEW':
             groups = Group.all()
             return render_template('admin/permission_new.html', groups = groups)
@@ -148,18 +175,30 @@ class AdminView(BasicView):
             if not id :
                 flash(MSG_NO_ID_SUPPLIED, MESSAGE_ERROR)
                 return redirect(url_for('.view', action = 'permission'))
-            permission = Permission.get(id)
-            if not permission :
+            obj = Permission.get(id)
+            if not obj :
                 flash(MSG_RECORD_NOT_EXIST, MESSAGE_ERROR)
                 return redirect(url_for('.view', action = 'permission'))
-            gids = map(lambda v:v.id, permission.groups)
+            gids = map(lambda v:v.id, obj.groups)
             all_groups = Group.all()
-            return render_template('admin/permission_update.html', v = permission.populate(), gids = gids, all_groups = all_groups)
+            return render_template('admin/permission_update.html', v = obj.populate(), gids = gids, all_groups = all_groups)
         elif method == 'DELETE':
-            pass
+            id = _g('id', None)
+            if not id :
+                flash(MSG_NO_ID_SUPPLIED, MESSAGE_ERROR)
+                return redirect(url_for('.view', action = 'permission'))
+            obj = Permission.get(id)
+            if not obj :
+                flash(MSG_RECORD_NOT_EXIST, MESSAGE_ERROR)
+                return redirect(url_for('.view', action = 'permission'))
+            obj.active = 1
+            obj.groups = []
+            obj.commit()
+            flash(MSG_DELETE_SUCC, MESSAGE_INFO)
+            return redirect(url_for('.view', action = 'permission'))
         elif method == 'SAVE_NEW':
-            permission = Permission.saveAsNew(request.values)
-            permission.groups = DBSession.query(Group).filter(Group.id.in_(_gl("gids"))).all()
+            obj = Permission.saveAsNew(request.values)
+            obj.groups = DBSession.query(Group).filter(Group.id.in_(_gl("gids"))).all()
             DBSession.commit()
             flash(MSG_SAVE_SUCC, MESSAGE_INFO)
             return redirect(url_for('.view', action = 'permission'))
@@ -168,16 +207,283 @@ class AdminView(BasicView):
             if not id :
                 flash(MSG_NO_ID_SUPPLIED, MESSAGE_ERROR)
                 return redirect(url_for('.view', action = 'permission'))
-            permission = Permission.get(id)
-            if not permission :
+            obj = Permission.get(id)
+            if not obj :
                 flash(MSG_RECORD_NOT_EXIST, MESSAGE_ERROR)
                 return redirect(url_for('.view', action = 'permission'))
-            permission.saveAsUpdate(request.values)
-            permission.groups = DBSession.query(Group).filter(Group.id.in_(_gl('gids'))).all()
-            DBSession.commit()
+            obj.saveAsUpdate(request.values)
+            obj.groups = DBSession.query(Group).filter(Group.id.in_(_gl('gids'))).all()
+            obj.commit()
             flash(MSG_UPDATE_SUCC, MESSAGE_INFO)
             return redirect(url_for('.view', action = 'permission'))
 
+
+    def customer(self):
+        method = _g('m', 'LIST')
+        if method not in ['LIST', 'NEW', 'UPDATE', 'DELETE', 'SAVE_NEW', 'SAVE_UPDATE']:
+            flash(MSG_NO_SUCH_ACTION, MESSAGE_ERROR);
+            return redirect(url_for('.view', action = 'index'))
+        if method == 'LIST':
+            customers = DBSession.query(Customer).filter(Customer.active == 0).order_by(Customer.name).all()
+            return render_template('admin/customer_index.html', records = customers)
+        elif method == 'NEW':
+            ps = getMasterAll(Province)
+            return render_template('admin/customer_new.html', provinces = ps)
+
+        elif method == 'UPDATE':
+            id = _g('id', None)
+            if not id :
+                flash(MSG_NO_ID_SUPPLIED, MESSAGE_ERROR)
+                return redirect(url_for('.view', action = 'customer'))
+            obj = DBSession.query(Customer).get(id)
+            if not obj :
+                flash(MSG_RECORD_NOT_EXIST, MESSAGE_ERROR)
+                return redirect(url_for('.view', action = 'customer'))
+            return render_template('admin/customer_update.html', obj = obj)
+        elif method == 'DELETE':
+            id = _g('id', None)
+            if not id :
+                flash(MSG_NO_ID_SUPPLIED, MESSAGE_ERROR)
+                return redirect(url_for('.view', action = 'customer'))
+            obj = DBSession.query(Customer).get(id)
+            if not obj :
+                flash(MSG_RECORD_NOT_EXIST, MESSAGE_ERROR)
+                return redirect(url_for('.view', action = 'customer'))
+            obj.active = 1
+            DBSession.commit()
+            flash(MSG_DELETE_SUCC, MESSAGE_INFO)
+            return redirect(url_for('.view', action = 'customer'))
+        elif method == 'SAVE_NEW':
+            obj = Customer(
+                                name = _g('name'),
+                                province_id = _g('province_id'),
+                                city_id = _g('city_id'),
+                                district_id = _g('district_id'),
+                                address = _g('address'),
+                                phone = _g('phone'),
+                                contact_person = _g('contact_person'),
+                                remark = _g('remark')
+                                )
+            DBSession.add(obj)
+            DBSession.commit()
+            flash(MSG_SAVE_SUCC, MESSAGE_INFO)
+            return redirect(url_for('.view', action = 'customer'))
+
+        elif method == 'SAVE_UPDATE':
+            id = _g('id', None)
+            if not id :
+                flash(MSG_NO_ID_SUPPLIED, MESSAGE_ERROR)
+                return redirect(url_for('.view', action = 'customer'))
+            obj = DBSession.query(Customer).get(id)
+            if not obj :
+                flash(MSG_RECORD_NOT_EXIST, MESSAGE_ERROR)
+                return redirect(url_for('.view', action = 'customer'))
+            for f in ['name', 'province_id', 'city_id', 'district_id', 'address', 'phone', 'contact_person', 'remark']:
+                setattr(obj, f, _g(f))
+            DBSession.commit()
+            flash(MSG_UPDATE_SUCC, MESSAGE_INFO)
+            return redirect(url_for('.view', action = 'customer'))
+
+
+
+    def cprofile(self):
+        method = _g('m', 'LIST')
+        if method not in ['LIST', 'NEW', 'UPDATE', 'DELETE', 'SAVE_NEW', 'SAVE_UPDATE']:
+            flash(MSG_NO_SUCH_ACTION, MESSAGE_ERROR);
+            return redirect(url_for('.view', action = 'cprofile'))
+        if method == 'LIST':
+            cps = DBSession.query(CustomerProfile).filter(CustomerProfile.active == 0).order_by(CustomerProfile.name).all()
+            return render_template('admin/customer_profile_index.html', records = cps)
+        elif method == 'NEW':
+            customers = DBSession.query(Customer).filter(Customer.active == 0).order_by(Customer.name).all()
+            groups = DBSession.query(Group).filter(Group.active == 0).order_by(Group.name).all()
+            return render_template('admin/customer_profile_new.html', customers = customers, groups = groups)
+        elif method == 'UPDATE':
+            id = _g('id', None)
+            if not id :
+                flash(MSG_NO_ID_SUPPLIED, MESSAGE_ERROR)
+                return redirect(url_for('.view', action = 'cprofile'))
+            obj = DBSession.query(CustomerProfile).get(id)
+            if not obj :
+                flash(MSG_RECORD_NOT_EXIST, MESSAGE_ERROR)
+                return redirect(url_for('.view', action = 'cprofile'))
+            return render_template('admin/customer_profile_update.html', obj = obj)
+        elif method == 'DELETE':
+            id = _g('id', None)
+            if not id :
+                flash(MSG_NO_ID_SUPPLIED, MESSAGE_ERROR)
+                return redirect(url_for('.view', action = 'cprofile'))
+            obj = DBSession.query(CustomerProfile).get(id)
+            if not obj :
+                flash(MSG_RECORD_NOT_EXIST, MESSAGE_ERROR)
+                return redirect(url_for('.view', action = 'cprofile'))
+            obj.active = 1
+            DBSession.commit()
+            flash(MSG_DELETE_SUCC, MESSAGE_INFO)
+            return redirect(url_for('.view', action = 'cprofile'))
+        elif method == 'SAVE_NEW':
+            obj = CustomerProfile(
+                                name = _g('name'),
+                                remark = _g('remark'),
+                                customer_id = _g('customer_id'),
+                                group_id = _g('group_id')
+                                )
+            DBSession.add(obj)
+            DBSession.commit()
+            flash(MSG_SAVE_SUCC, MESSAGE_INFO)
+            return redirect(url_for('.view', action = 'cprofile'))
+
+        elif method == 'SAVE_UPDATE':
+            id = _g('id', None)
+            if not id :
+                flash(MSG_NO_ID_SUPPLIED, MESSAGE_ERROR)
+                return redirect(url_for('.view', action = 'cprofile'))
+            obj = DBSession.query(CustomerProfile).get(id)
+            if not obj :
+                flash(MSG_RECORD_NOT_EXIST, MESSAGE_ERROR)
+                return redirect(url_for('.view', action = 'cprofile'))
+            for f in ['name', 'remark', 'customer_id', 'group_id']:
+                setattr(obj, f, _g(f))
+            DBSession.commit()
+            flash(MSG_UPDATE_SUCC, MESSAGE_INFO)
+            return redirect(url_for('.view', action = 'cprofile'))
+
+
+
+
+    def supplier(self):
+        method = _g('m', 'LIST')
+        if method not in ['LIST', 'NEW', 'UPDATE', 'DELETE', 'SAVE_NEW', 'SAVE_UPDATE']:
+            flash(MSG_NO_SUCH_ACTION, MESSAGE_ERROR);
+            return redirect(url_for('.view', action = 'index'))
+        if method == 'LIST':
+            suppliers = DBSession.query(Supplier).filter(Supplier.active == 0).order_by(Supplier.name).all()
+            return render_template('admin/supplier_index.html', records = suppliers)
+        elif method == 'NEW':
+            ps = getMasterAll(Province)
+            return render_template('admin/supplier_new.html', provices = ps)
+
+        elif method == 'UPDATE':
+            id = _g('id', None)
+            if not id :
+                flash(MSG_NO_ID_SUPPLIED, MESSAGE_ERROR)
+                return redirect(url_for('.view', action = 'supplier'))
+            obj = DBSession.query(Supplier).get(id)
+            if not obj :
+                flash(MSG_RECORD_NOT_EXIST, MESSAGE_ERROR)
+                return redirect(url_for('.view', action = 'supplier'))
+            return render_template('admin/supplier_update.html', obj = obj)
+        elif method == 'DELETE':
+            id = _g('id', None)
+            if not id :
+                flash(MSG_NO_ID_SUPPLIED, MESSAGE_ERROR)
+                return redirect(url_for('.view', action = 'supplier'))
+            obj = DBSession.query(Supplier).get(id)
+            if not obj :
+                flash(MSG_RECORD_NOT_EXIST, MESSAGE_ERROR)
+                return redirect(url_for('.view', action = 'supplier'))
+            obj.active = 1
+            DBSession.commit()
+            flash(MSG_DELETE_SUCC, MESSAGE_INFO)
+            return redirect(url_for('.view', action = 'supplier'))
+        elif method == 'SAVE_NEW':
+            obj = Supplier(
+                                name = _g('name'),
+                                province_id = _g('province_id'),
+                                city_id = _g('city_id'),
+                                district_id = _g('district_id'),
+                                address = _g('address'),
+                                phone = _g('phone'),
+                                contact_person = _g('contact_person'),
+                                remark = _g('remark')
+                                )
+            DBSession.add(obj)
+            DBSession.commit()
+            flash(MSG_SAVE_SUCC, MESSAGE_INFO)
+            return redirect(url_for('.view', action = 'supplier'))
+
+        elif method == 'SAVE_UPDATE':
+            id = _g('id', None)
+            if not id :
+                flash(MSG_NO_ID_SUPPLIED, MESSAGE_ERROR)
+                return redirect(url_for('.view', action = 'supplier'))
+            obj = DBSession.query(Customer).get(id)
+            if not obj :
+                flash(MSG_RECORD_NOT_EXIST, MESSAGE_ERROR)
+                return redirect(url_for('.view', action = 'supplier'))
+            for f in ['name', 'province_id', 'city_id', 'district_id', 'address', 'phone', 'contact_person', 'remark']:
+                setattr(obj, f, _g(f))
+            DBSession.commit()
+            flash(MSG_UPDATE_SUCC, MESSAGE_INFO)
+            return redirect(url_for('.view', action = 'supplier'))
+
+
+
+
+
+    def sprofile(self):
+        method = _g('m', 'LIST')
+        if method not in ['LIST', 'NEW', 'UPDATE', 'DELETE', 'SAVE_NEW', 'SAVE_UPDATE']:
+            flash(MSG_NO_SUCH_ACTION, MESSAGE_ERROR);
+            return redirect(url_for('.view', action = 'cprofile'))
+        if method == 'LIST':
+            cps = DBSession.query(SupplierProfile).filter(SupplierProfile.active == 0).order_by(SupplierProfile.name).all()
+            return render_template('admin/supplier_profile_index.html', records = cps)
+        elif method == 'NEW':
+            suppliers = DBSession.query(Supplier).filter(Supplier.active == 0).order_by(Supplier.name).all()
+            groups = DBSession.query(Group).filter(Group.active == 0).order_by(Group.name).all()
+            return render_template('admin/supplier_profile_new.html', suppliers = suppliers, groups = groups)
+        elif method == 'UPDATE':
+            id = _g('id', None)
+            if not id :
+                flash(MSG_NO_ID_SUPPLIED, MESSAGE_ERROR)
+                return redirect(url_for('.view', action = 'sprofile'))
+            obj = DBSession.query(SupplierProfile).get(id)
+            if not obj :
+                flash(MSG_RECORD_NOT_EXIST, MESSAGE_ERROR)
+                return redirect(url_for('.view', action = 'sprofile'))
+            suppliers = DBSession.query(Supplier).filter(Supplier.active == 0).order_by(Supplier.name).all()
+            groups = DBSession.query(Group).filter(Group.active == 0).order_by(Group.name).all()
+            return render_template('admin/supplier_profile_update.html', suppliers = suppliers, groups = groups, obj = obj)
+        elif method == 'DELETE':
+            id = _g('id', None)
+            if not id :
+                flash(MSG_NO_ID_SUPPLIED, MESSAGE_ERROR)
+                return redirect(url_for('.view', action = 'sprofile'))
+            obj = DBSession.query(SupplierProfile).get(id)
+            if not obj :
+                flash(MSG_RECORD_NOT_EXIST, MESSAGE_ERROR)
+                return redirect(url_for('.view', action = 'sprofile'))
+            obj.active = 1
+            DBSession.commit()
+            flash(MSG_DELETE_SUCC, MESSAGE_INFO)
+            return redirect(url_for('.view', action = 'sprofile'))
+        elif method == 'SAVE_NEW':
+            obj = SupplierProfile(
+                                name = _g('name'),
+                                remark = _g('remark'),
+                                customer_id = _g('customer_id'),
+                                group_id = _g('group_id')
+                                )
+            DBSession.add(obj)
+            DBSession.commit()
+            flash(MSG_SAVE_SUCC, MESSAGE_INFO)
+            return redirect(url_for('.view', action = 'sprofile'))
+
+        elif method == 'SAVE_UPDATE':
+            id = _g('id', None)
+            if not id :
+                flash(MSG_NO_ID_SUPPLIED, MESSAGE_ERROR)
+                return redirect(url_for('.view', action = 'sprofile'))
+            obj = DBSession.query(SupplierProfile).get(id)
+            if not obj :
+                flash(MSG_RECORD_NOT_EXIST, MESSAGE_ERROR)
+                return redirect(url_for('.view', action = 'sprofile'))
+            for f in ['name', 'remark', 'supplier_id', 'group_id']:
+                setattr(obj, f, _g(f))
+            DBSession.commit()
+            flash(MSG_UPDATE_SUCC, MESSAGE_INFO)
+            return redirect(url_for('.view', action = 'sprofile'))
 
 bpAdmin.add_url_rule('/', view_func = AdminView.as_view('view'), defaults = {'action':'index'})
 bpAdmin.add_url_rule('/<action>', view_func = AdminView.as_view('view'))

@@ -37,9 +37,17 @@ MSG_INVALID_FILE_TO_UPLOAD = T('Invalid file to upload!')
 MSG_USER_NOT_EXIST = T('This user does not exist!')
 MSG_WRONG_PASSWORD = T('The password is wrong!')
 
+LOG_CREATE_ORDER = T('Create Order.')
+LOG_SEND_PICKER = T('Already send picker to fetch the goods.')
+LOG_GOODS_IN_WAREHOUSE = T('Goods have been gotten into warehouse.')
+LOG_GOODS_SORTED = T('Goods have been sorted')
+LOG_GOODS_SENT_OUT = T('Goods have been sent out.')
+LOG_GOODS_ARRIVAL = T('Goods have arrived.')
+
 #order status
 ORDER_CANCELLED = (-1, T('Cancelled'))
 ORDER_NEW = (0, T('New'))
+ORDER_CONFIRMED = (1, T('Confirmed'))
 ASSIGN_PICKER = (10, T('Assign Picker'))
 IN_WAREHOUSE = (20, T('In Warehouse'))
 SORTING = (30, T('Sorting'))
@@ -50,7 +58,7 @@ GOODS_ARRIVED = (70, T('Goods Arrived'))
 GOODS_SIGNED = (90, T('Goods Signed'))
 
 STATUS_LIST = [
-               ORDER_CANCELLED, ORDER_NEW, ASSIGN_PICKER, IN_WAREHOUSE, SORTING, SEND_OUT, IN_TRAVEL,
+               ORDER_CANCELLED, ORDER_NEW, ORDER_CONFIRMED, ASSIGN_PICKER, IN_WAREHOUSE, SORTING, SEND_OUT, IN_TRAVEL,
                GOODS_ARRIVED, GOODS_SIGNED
                ]
 
@@ -65,8 +73,6 @@ BTN_SUBMIT = T('Submit')
 BTN_RESET = T('Reset')
 BTN_CANCEL = T('Cancel')
 BTN_RETURN = T('Return')
-
-
 
 
 

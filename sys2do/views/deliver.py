@@ -17,7 +17,8 @@ from werkzeug.utils import redirect
 from sys2do.constant import MESSAGE_ERROR, MSG_NO_SUCH_ACTION, MESSAGE_INFO, \
     MSG_SAVE_SUCC, IN_WAREHOUSE, MSG_UPDATE_SUCC, ORDER_NEW, \
     ORDER_CANCELLED, MSG_DELETE_SUCC, SORTING, MSG_RECORD_NOT_EXIST, SEND_OUT, \
-    GOODS_ARRIVED, IN_TRAVEL, GOODS_SIGNED, MSG_SERVER_ERROR
+    GOODS_ARRIVED, IN_TRAVEL, GOODS_SIGNED, MSG_SERVER_ERROR, LOG_GOODS_SORTED, \
+    LOG_GOODS_SENT_OUT, LOG_GOODS_ARRIVAL
 from sys2do.util.decorator import templated, login_required
 from sys2do.model import DBSession
 from sys2do.views import BasicView
@@ -26,7 +27,7 @@ from sys2do.model.logic import DeliverHeader, OrderHeader, OrderDetail, \
 from sys2do.util.common import _gl, _g, _gp, getOr404, getMasterAll, _debug, \
     _error
 #from sys2do.util.logic_helper import updateDeliverHeaderStatus
-from sys2do.model.master import WarehouseItem, Supplier
+from sys2do.model.master import WarehouseItem, Supplier, Province
 
 
 __all__ = ['bpDeliver']
@@ -36,7 +37,7 @@ bpDeliver = Blueprint('bpDeliver', __name__)
 
 class DeliverView(BasicView):
 
-    decorators = [login_required]
+#    decorators = [login_required]
 
     @templated('deliver/index.html')
     def index(self):
@@ -55,12 +56,14 @@ class DeliverView(BasicView):
         ids = _gl('order_detail_ids')
         order_details = DBSession.query(OrderDetail).filter(OrderDetail.id.in_(ids))
         suppliers = getMasterAll(Supplier)
-        return {'result' : order_details, 'suppliers' : suppliers}
+        return {'result' : order_details, 'suppliers' : suppliers, 'provinces' : getMasterAll(Province)}
 
 
     def deliver_save_new(self):
         try:
             header = DeliverHeader(no = _g('no'),
+                                   destination_province_id = _g('destination_province_id'),
+                                   destination_city_id = _g('destination_city_id'),
                                    destination_address = _g('destination_address'),
                                    supplier_id = _g('supplier_id'),
                                    supplier_contact = _g('supplier_contact'),
@@ -86,7 +89,7 @@ class DeliverView(BasicView):
                                       refer_id = header.id,
                                       transfer_date = dt.now().strftime("%Y-%m-%d"),
                                       type = 1,
-                                      remark = u"货物已分拣"
+                                      remark = unicode(LOG_GOODS_SORTED)
                                       ))
             DBSession.commit()
         except:
@@ -143,7 +146,7 @@ class DeliverView(BasicView):
                                       refer_id = header.id,
                                       transfer_date = dt.now().strftime("%Y-%m-%d"),
                                       type = 1,
-                                      remark = u"已发货"
+                                      remark = LOG_GOODS_SENT_OUT
                                       ))
 
             elif _g('sc') == 'GOODS_ARRIVED':
@@ -158,7 +161,7 @@ class DeliverView(BasicView):
                                       refer_id = header.id,
                                       transfer_date = dt.now().strftime("%Y-%m-%d"),
                                       type = 1,
-                                      remark = u"货物已到达"
+                                      remark = LOG_GOODS_ARRIVAL
                                       ))
             DBSession.commit()
         except:

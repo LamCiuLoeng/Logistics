@@ -18,10 +18,14 @@
 		<table border="1" cellpadding="3" cellspacing="3">
 			<tr><td>{{_('Order No')}}</td><td>{{values.get('no','')}}</td></tr>
 			<tr><td>{{_('Customer')}}</td><td>{{values.get('customer','')}}</td></tr>
-			<tr><td>{{_('Address')}}</td><td>{{values.get('source_address','')}}</td></tr>
-			<tr><td>{{_('Phone')}}</td><td>{{values.get('source_tel','')}}</td></tr>
-			<tr><td>{{_('Contact')}}</td><td>{{values.get('source_contact','')}}</td></tr>
-			<tr><td>{{_('Remark')}}</td><td>{{values.get('remark','')}}</td></tr>
+			<tr>
+				<td>{{_('Address')}}</td>
+				<td>{{values.get('source_provice','')}}{{values.get('source_city','')}}{{values.get('source_district','')}}{{values.get('source_address','')}}</td>
+			</tr>
+			<tr><td>{{_('Phone')}}</td><td>{{values.get('source_tel','')|ifFalse}}</td></tr>
+			<tr><td>{{_('Contact')}}</td><td>{{values.get('source_contact','')|ifFalse}}</td></tr>
+			<tr><td>{{_('Remark')}}</td><td>{{values.get('remark','')|ifFalse}}</td></tr>
+			<tr><td>{{_('Amount')}}</td><td>{{values.get('amount','')|ifFalse}}</td></tr>
 			<tr><td>{{_('Order Status')}}</td><td>{{values.get('status')|showStatus}}</td></tr>
 		</table>
 		<br />
@@ -36,6 +40,7 @@
 					<td>{{_('Destination Contact')}}</td>
 					<td>{{_('Destination Tel')}}</td>
 					<td>{{_('Expect Time')}}</td>
+					<td>{{_('Charge')}}</td>
 					<td>{{_('Remark')}}</td>
 				</tr>
 			</thead>
@@ -45,10 +50,11 @@
 					<td>{{d.order_qty}} {{d.unit}}</td>
 					<td>{{d.weight}} {{d.weight_unit}}</td>
 					<td>{{d.shipment_type}}</td>
-					<td>{{d.destination_address|ifFalse}}</td>
+					<td>{{d.destination_provice|ifFalse}}{{d.destination_city|ifFalse}}{{d.destination_district|ifFalse}}{{d.destination_address|ifFalse}}</td>
 					<td>{{d.destination_contact|ifFalse}}</td>
 					<td>{{d.destination_tel|ifFalse}}</td>
 					<td>{{d.expect_time|ifFalse}}</td>
+					<td>{{d.charge|ifFalse}}</td>
 					<td>{{d.status|showStatus}}</td>
 				</tr>
 			{% endfor %}
@@ -58,15 +64,15 @@
 		<br />
 		
 		{% if values.get('status',None) in [ORDER_NEW[0],] %}
-			<p>指派司机收货</p>
+			<p>指派收货人员收货</p>
 			<form action="{{url_for('.view', action = 'do_action',id=values.get('id',''),sc='ASSIGN_PICKER')}}" method="post">
 				<table>
 					<tr>
-						<td>{{_('Receiver')}}</td>
+						<td>{{_('Picker')}}</td>
 						<td><input type="text" name="receiver"/></td>
 					</tr>
 					<tr>
-						<td>{{_('Receiver Contact')}}</td>
+						<td>{{_('Picker Contact')}}</td>
 						<td><input type="text" name="receiver_contact"/></td>
 					</tr>
 					<tr>

@@ -1,0 +1,29 @@
+{% extends "master.html" %}
+
+{% block extJS %}
+
+{% endblock %}
+
+{% block content %}
+	<p><a href="{{url_for('.view', action = 'cprofile',m = 'NEW')}}">{{_('New Record')}}</a></p>
+	
+	<table border="1" cellpadding="3" cellspacing="3">
+		<thead>
+			<tr>
+				<td>{{_('Profile Name')}}</td>
+				<td>{{_('Customer')}}</td>
+				<td>{{_('Group')}}</td>
+				<td>{{_('Action')}}</td>
+			</tr>
+			{% for r in records %}
+			<tr>
+				<td>{{r}}</td>
+				<td>{{r.customer}}</td>
+				<td>{{r.group}}</td>
+				<td><a href="{{url_for('.view', action = 'cprofile',m = 'UPDATE',id=r.id)}}">{{_('Revise')}}</a>&nbsp|&nbsp;<a href="{{url_for('.view', action = 'cprofile',m = 'DELETE',id=r.id)}}">{{_('Delete')}}</a></td>
+			</tr>
+			{% endfor %}
+		</thead>
+	</table>
+	
+{% endblock %}

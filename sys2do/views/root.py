@@ -17,7 +17,7 @@ from sys2do.util.common import _g, _gp, _gl
 from sys2do.constant import MESSAGE_ERROR, MESSAGE_INFO, MSG_NO_SUCH_ACTION, \
     MSG_SAVE_SUCC
 from sys2do.views import BasicView
-from sys2do.model.master import CustomerProfile, Customer
+from sys2do.model.master import CustomerProfile, Customer, City, District
 from sys2do.model.logic import OrderHeader, OrderDetail
 from sys2do.util.logic_helper import genSystemNo
 
@@ -38,65 +38,20 @@ class RootView(BasicView):
         return {"content" : _("Hello,World!")}
 
 
-#    @templated('add.html')
-#    def add(self):
-#        cps = DBSession.query(CustomerProfile).all()
-#        companys = []
-#        vendors = []
-#        items = []
-#        units = []
-#        for cp in cps:
-#            companys.extend(cp.customers)
-#            vendors.extend(cp.vendors)
-#            items.extend(cp.items)
-#            units.extend(cp.itemunits)
-#        return {'companys' :companys , 'vendors' : vendors, 'items' : items, 'units' : units}
-
-
-#    def save(self):
-#        c = _g('company')
-#        v = _g('vendor')
-#
-#        no = genSystemNo()
-#        order = OrderHeader(no = no, customer_id = c, vendor_id = v)
-#        DBSession.add(order)
-#
-#        for (k, v), (uk, uv) in zip(_gp('item_'), _gp('unit_')):
-#            n, id = k.split("_")
-#            DBSession.add(OrderDetail(header = order, item_id = id, order_qty = v, item_unit_id = uv))
-#
-#        DBSession.commit()
-#        flash(MSG_SAVE_SUCC, MESSAGE_INFO)
-#        return redirect(url_for('bpRoot.view', action = 'index'))
-
-
-    @templated('track.html')
-    def track(self):
-        orders = DBSession.query(OrderHeader).filter(OrderHeader.active == 0).all()
-        return {'orders' : orders}
-
-
-#    @templated('search_orders.html')
-#    def search_orders(self):
-#        nos = _g('nos')
-#        logs = []
-#        for no in nos.split(','):
-#            log = DBSession.query(OrderLog).filter(and_(OrderHeader.id == OrderLog.order_id, OrderHeader.no == no, OrderLog.active == 0)).all()
-#            logs.append((no, log))
-#        return {'logs' : logs}
-
-
-    def test(self):
-        print _gp('aa_')
-        return redirect(url_for('bpRoot.view', action = 'index'))
-
-
     def ajax_master(self):
         master = _g('m')
-        if(master == 'customer'):
+        if master == 'customer':
             cs = DBSession.query(Customer).filter(Customer.active == 0).order_by(Customer.name).all()
             return jsonify({'status' : 0, 'msg' : '', 'data' : cs})
-        return
+        elif master == 'city':
+            pid = _g('pid')
+            cs = DBSession.query(City).filter(and_(City.active == 0, City.province_id == pid)).all()
+            return jsonify({'status' : 0, 'msg' : '', 'data' : [{'id' : c.id , 'name' : unicode(c)} for c in cs]})
+        elif master == 'district':
+            cid = _g('cid')
+            ds = DBSession.query(District).filter(and_(District.active == 0, District.city_id == cid)).all()
+            return jsonify({'status' : 0, 'msg' : '', 'data' : [{'id' : d.id , 'name' : unicode(d)} for d in ds]})
+        return jsonify({'status' : 1, 'msg' : 'Error', })
 
 
 bpRoot.add_url_rule('/', view_func = RootView.as_view('view'), defaults = {'action':'index'})

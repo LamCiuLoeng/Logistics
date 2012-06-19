@@ -12,6 +12,7 @@ from sqlalchemy.orm import relation, backref
 from sys2do.model import DeclarativeBase, metadata, DBSession
 from auth import SysMixin
 from sqlalchemy.sql.expression import and_
+from sys2do.model.auth import CRUDMixin, Group
 
 
 
@@ -25,10 +26,24 @@ class ShipmentType(DeclarativeBase, SysMixin):
     name = Column(Text)
 
     def __str__(self): return self.name
-
     def __repr__(self): return self.name
-
     def __unicode__(self): return self.name
+
+
+
+
+
+class ChargeType(DeclarativeBase, SysMixin):
+    __tablename__ = 'master_charge_type'
+
+    id = Column(Integer, autoincrement = True, primary_key = True)
+    name = Column(Text)
+
+    def __str__(self): return self.name
+    def __repr__(self): return self.name
+    def __unicode__(self): return self.name
+
+
 
 
 class Province(DeclarativeBase, SysMixin):
@@ -40,10 +55,10 @@ class Province(DeclarativeBase, SysMixin):
     remark = Column(Text)
 
     def __str__(self): return self.name
-
     def __repr__(self): return self.name
-
     def __unicode__(self): return self.name
+
+
 
 
 
@@ -57,10 +72,10 @@ class City(DeclarativeBase, SysMixin):
     province = relation(Province, backref = backref("cities", order_by = id), primaryjoin = "and_(Province.id == City.province_id, City.active == 0)")
 
     def __str__(self): return self.name
-
     def __repr__(self): return self.name
-
     def __unicode__(self): return self.name
+
+
 
 
 
@@ -81,6 +96,48 @@ class District(DeclarativeBase, SysMixin):
 
 
 
+
+
+class Customer(DeclarativeBase, SysMixin, CRUDMixin):
+    __tablename__ = 'master_customer'
+
+    id = Column(Integer, autoincrement = True, primary_key = True)
+
+    name = Column(Text)
+    province_id = Column(Integer, ForeignKey('master_province.id'))
+    provice = relation(Province)
+    city_id = Column(Integer, ForeignKey('master_city.id'))
+    city = relation(City)
+    district_id = Column(Integer, ForeignKey('master_district.id'))
+    district = relation(District)
+    address = Column(Text)
+    phone = Column(Text)
+    contact_person = Column(Text)
+    remark = Column(Text)
+
+
+    def __str__(self): return self.name
+    def __repr__(self): return self.name
+    def __unicode__(self): return self.name
+
+    def populate(self):
+        params = {}
+        for k in ['id', 'name', 'province_id', 'city_id', 'district_id',
+                  'address', 'phone', 'contact_person', 'remark']:
+            params[k] = getattr(self, k)
+        return k
+
+    @classmethod
+    def saveAsNew(clz, v):
+        return None
+
+    def saveAsUpdate(self, v):
+        return None
+
+
+
+
+
 class CustomerProfile(DeclarativeBase, SysMixin):
     __tablename__ = 'master_customer_profile'
 
@@ -88,55 +145,61 @@ class CustomerProfile(DeclarativeBase, SysMixin):
     name = Column(Text)
     remark = Column(Text)
 
+    customer_id = Column(Integer, ForeignKey('master_customer.id'))
+    customer = relation(Customer, backref = backref("customer_profile", order_by = id))
+    group_id = Column(Integer, ForeignKey('system_group.id'))
+    group = relation(Group, backref = backref("customer_profile", order_by = id))
+
     def __str__(self): return self.name
-
     def __repr__(self): return self.name
-
     def __unicode__(self): return self.name
 
 
 
-class Customer(DeclarativeBase, SysMixin):
-    __tablename__ = 'master_customer'
 
-    id = Column(Integer, autoincrement = True, primary_key = True)
-
-    name = Column(Text)
-    address = Column(Text)
-    phone = Column(Text)
-    mobile = Column(Text)
-    contact_person = Column(Text)
-    remark = Column(Text)
-
-    profile_id = Column(Integer, ForeignKey('master_customer_profile.id'))
-    profile = relation(CustomerProfile, backref = backref("customers", order_by = id))
-
-    def __str__(self): return self.name
-
-    def __repr__(self): return self.name
-
-    def __unicode__(self): return self.name
-
-
-
-class Supplier(DeclarativeBase, SysMixin):
+class Supplier(DeclarativeBase, SysMixin, CRUDMixin):
     __tablename__ = 'master_supplier'
 
     id = Column(Integer, autoincrement = True, primary_key = True)
 
     name = Column(Text)
+    province_id = Column(Integer, ForeignKey('master_province.id'))
+    provice = relation(Province)
+    city_id = Column(Integer, ForeignKey('master_city.id'))
+    city = relation(City)
+    district_id = Column(Integer, ForeignKey('master_district.id'))
+    district = relation(District)
     address = Column(Text)
     phone = Column(Text)
     contact_person = Column(Text)
     remark = Column(Text)
 
-    profile_id = Column(Integer, ForeignKey('master_customer_profile.id'))
-    prifile = relation(CustomerProfile, backref = backref("suppliers", order_by = id), primaryjoin = "and_(CustomerProfile.id == Supplier.profile_id, Supplier.active == 0)")
+    def __str__(self): return self.name
+    def __repr__(self): return self.name
+    def __unicode__(self): return self.name
+
+    def populate(self):
+        params = {}
+        for k in ['id', 'name', 'province_id', 'city_id', 'district_id',
+                  'address', 'phone', 'contact_person', 'remark']:
+            params[k] = getattr(self, k)
+        return k
+
+
+class SupplierProfile(DeclarativeBase, SysMixin):
+    __tablename__ = 'master_supplier_profile'
+
+    id = Column(Integer, autoincrement = True, primary_key = True)
+    name = Column(Text)
+    remark = Column(Text)
+
+    supplier_id = Column(Integer, ForeignKey('master_supplier.id'))
+    supplier = relation(Supplier, backref = backref("supplier_profile", order_by = id))
+    group_id = Column(Integer, ForeignKey('system_group.id'))
+    group = relation(Group, backref = backref("supplier_profile", order_by = id))
 
     def __str__(self): return self.name
-
     def __repr__(self): return self.name
-
     def __unicode__(self): return self.name
 
 
