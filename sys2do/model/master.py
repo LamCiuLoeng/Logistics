@@ -204,21 +204,21 @@ class SupplierProfile(DeclarativeBase, SysMixin):
 
 
 
-class Item(DeclarativeBase, SysMixin):
-    __tablename__ = 'master_item'
-
-    id = Column(Integer, autoincrement = True, primary_key = True)
-    name = Column(Text)
-    remark = Column(Text)
-
-    profile_id = Column(Integer, ForeignKey('master_customer_profile.id'))
-    prifile = relation(CustomerProfile, backref = backref("items", order_by = id), primaryjoin = "and_(CustomerProfile.id == Item.profile_id, Item.active == 0)")
-
-    def __str__(self): return self.name
-
-    def __repr__(self): return self.name
-
-    def __unicode__(self): return self.name
+#class Item(DeclarativeBase, SysMixin):
+#    __tablename__ = 'master_item'
+#
+#    id = Column(Integer, autoincrement = True, primary_key = True)
+#    name = Column(Text)
+#    remark = Column(Text)
+#
+#    profile_id = Column(Integer, ForeignKey('master_customer_profile.id'))
+#    prifile = relation(CustomerProfile, backref = backref("items", order_by = id), primaryjoin = "and_(CustomerProfile.id == Item.profile_id, Item.active == 0)")
+#
+#    def __str__(self): return self.name
+#
+#    def __repr__(self): return self.name
+#
+#    def __unicode__(self): return self.name
 
 
 
@@ -258,44 +258,46 @@ class WeightUnit(DeclarativeBase, SysMixin):
 
 
 
-class Warehouse(DeclarativeBase, SysMixin):
-    __tablename__ = 'master_warehouse'
+class InventoryLocation(DeclarativeBase, SysMixin):
+    __tablename__ = 'master_inventory_location'
 
     id = Column(Integer, autoincrement = True, primary_key = True)
     name = Column(Text)
     manager = Column(Text)
     address = Column(Text)
     remark = Column(Text)
+    full_path = Column(Text)
+    full_path_ids = Column(Text)
+    parent_id = Column(Integer, default = None)
 
     def __str__(self): return self.name
-
     def __repr__(self): return self.name
-
     def __unicode__(self): return self.name
 
+#
+#
+#    @property
+#    def items(self):
+#        return DBSession.query(WarehouseItem).filter(and_(WarehouseItem.active == 0, WarehouseItem.warehouse_id == self.id))
 
-    @property
-    def items(self):
-        return DBSession.query(WarehouseItem).filter(and_(WarehouseItem.active == 0, WarehouseItem.warehouse_id == self.id))
-
-
-class WarehouseItem(DeclarativeBase, SysMixin):
-    __tablename__ = 'master_warehouse_item'
+class InventoryItem(DeclarativeBase, SysMixin):
+    __tablename__ = 'master_Inventory_item'
 
     id = Column(Integer, autoincrement = True, primary_key = True)
-    item_id = Column(Integer, ForeignKey('master_item.id'))
-    item = relation(Item)
-    warehouse_id = Column(Integer, ForeignKey('master_warehouse.id'))
-    warehouse = relation(Warehouse)
+
+    item = Column(Text)
+    location_id = Column(Integer, ForeignKey('master_inventory_location.id'))
+    location = relation(InventoryLocation)
     qty = Column(Integer, default = 0)
-    order_detail_id = Column(Integer, ForeignKey('order_detail.id'))
+    refer_order_header = Column(Text)
+    refer_order_detail_id = Column(Integer, ForeignKey('order_detail.id'))
     remark = Column(Text)
 
 
     @property
     def order_detail(self):
         from sys2do.model.logic import OrderDetail
-        return DBSession.query(OrderDetail).get(self.order_detail_id)
+        return DBSession.query(OrderDetail).get(self.refer_order_detail_id)
 
 
 class Payment(DeclarativeBase, SysMixin):

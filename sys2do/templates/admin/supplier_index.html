@@ -5,27 +5,126 @@
 {% endblock %}
 
 {% block content %}
-	<p><a href="{{url_for('.view', action = 'supplier',m = 'NEW')}}">{{_('New Record')}}</a></p>
-	
-	<table border="1" cellpadding="3" cellspacing="3">
-		<thead>
-			<tr>
-				<td>{{_('Supplier Name')}}</td>
-				<td>{{_('Address')}}</td>
-				<td>{{_('Contact Person')}}</td>
-				<td>{{_('Phone')}}</td>
-				<td>{{_('Action')}}</td>
-			</tr>
-			{% for r in records %}
-			<tr>
-				<td>{{r}}</td>
-				<td>{{r.provice|ifFalse}}{{r.city|ifFalse}}{{r.district|ifFalse}}{{r.address|ifFalse}}</td>
-				<td>{{r.contact_person|ifFalse}}</td>
-				<td>{{r.phone|ifFalse}}</td>
-				<td><a href="{{url_for('.view', action = 'supplier',m = 'UPDATE',id=r.id)}}">{{_('Revise')}}</a>&nbsp|&nbsp;<a href="{{url_for('.view', action = 'supplier',m = 'DELETE',id=r.id)}}">{{_('Delete')}}</a></td>
-			</tr>
-			{% endfor %}
-		</thead>
-	</table>
-	
+	<table width="100%" border="0" cellspacing="0" cellpadding="0">
+      <tr>
+        <td><table width="100%" border="0" cellspacing="0" cellpadding="0">
+          <tr>
+            <td width="18"><img src="/static/images/system/group_manage_20.jpg" width="18" height="35" /></td>
+            <td width="2"><img src="/static/images/system/group_manage_21.jpg" width="2" height="35" /></td>
+            <td width="107"><a href="{{url_for('.view', action = 'supplier',m = 'NEW')}}"><img src="/static/images/system/group_manage_22.jpg" width="107" height="35" /></a></td>
+			<td width="2"><img src="/static/images/system/group_manage_21.jpg" width="2" height="35" /></td>
+            
+            
+            <!-- 
+            <td width="106"><img src="/static/images/system/group_manage_24.jpg" width="106" height="35" /></td>
+			<td width="2"><img src="/static/images/system/group_manage_21.jpg" width="2" height="35" /></td>
+            <td width="107"><img src="/static/images/system/group_manage_26.jpg" width="107" height="35" /></td>
+			<td width="2"><img src="/static/images/system/group_manage_21.jpg" width="2" height="35" /></td>
+            <td width="106"><img src="/static/images/system/group_manage_28.jpg" width="106" height="35" /></td>
+			<td width="2"><img src="/static/images/system/group_manage_21.jpg" width="2" height="35" /></td>
+            -->
+            <td background="/static/images/system/group_manage_30.jpg">&nbsp;</td>
+            <td width="16"><img src="/static/images/system/group_manage_33.jpg" width="16" height="35" /></td>
+          </tr>
+        </table></td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+      </tr>
+      <tr>
+        <td align="left">
+        
+        	<table width="99%" border="0" cellspacing="0" cellpadding="0" bgcolor="#FFFFFF">
+          <tr>
+            <td width="13"><img src="/static/images/system/group_manage_40.jpg" width="13" height="13" /></td>
+            <td></td>
+            <td width="13"><img src="/static/images/system/group_manage_46.jpg" width="13" height="13" /></td>
+          </tr>
+          <tr>
+            <td>&nbsp;</td>
+            <td><table width="100%" border="0" cellspacing="0" cellpadding="0">
+              <tr>
+                <td class="title_fonts_display">承运商管理</td>
+              </tr>
+              <tr>
+                <td>&nbsp;</td>
+              </tr>
+            </table>
+              <table width="99%" border="0" cellspacing="0" cellpadding="0">
+                <tr class="field_head">
+                  <td align="center"><table width="80%" border="0" cellspacing="0" cellpadding="0">
+                    <tr>
+                      <td width="20%" align="right"><img src="/static/images/system/group_manage_58.jpg" width="12" height="19" /></td>
+                      <td width="80%" align="left">{{_('Supplier Name')}}</td>
+                    </tr>
+                  </table></td>
+                  <td align="center"><table width="80%" border="0" cellspacing="0" cellpadding="0">
+                    <tr>
+                      <td width="20%" align="right"><img src="/static/images/system/group_manage_58.jpg" width="12" height="19" /></td>
+                      <td width="80%" align="left">{{_('Address')}}</td>
+                    </tr>
+                  </table></td>
+                  <td align="center"><table width="80%" border="0" cellspacing="0" cellpadding="0">
+                    <tr>
+                      <td width="20%" align="right"><img src="/static/images/system/group_manage_58.jpg" width="12" height="19" /></td>
+                      <td width="80%" align="left">{{_('Contact Person')}}</td>
+                    </tr>
+                  </table></td>
+                  <td align="center"><table width="80%" border="0" cellspacing="0" cellpadding="0">
+                    <tr>
+                      <td width="20%" align="right"><img src="/static/images/system/group_manage_58.jpg" width="12" height="19" /></td>
+                      <td width="80%" align="left">{{_('Phone')}}</td>
+                    </tr>
+                  </table></td>
+                  <td align="center"><table width="80%" border="0" cellspacing="0" cellpadding="0">
+                    <tr>
+                      <td width="20%" align="right"><img src="/static/images/system/group_manage_58.jpg" width="12" height="19" /></td>
+                      <td width="80%" align="left">{{_('Action')}}</td>
+                    </tr>
+                  </table></td>
+                </tr>
+				{% for r in records %}
+					<tr class="data_table_tr">
+						<td>{{r}}</td>
+						<td>{{r.provice|ifFalse}}{{r.city|ifFalse}}{{r.district|ifFalse}}{{r.address|ifFalse}}</td>
+						<td>{{r.contact_person|ifFalse}}</td>
+						<td>{{r.phone|ifFalse}}</td>
+						<td><a href="{{url_for('.view', action = 'supplier',m = 'UPDATE',id=r.id)}}">{{_('Revise')}}</a>&nbsp|&nbsp;<a href="{{url_for('.view', action = 'supplier',m = 'DELETE',id=r.id)}}">{{_('Delete')}}</a></td>
+					</tr>
+				{% endfor %}
+              </table></td>
+            <td>&nbsp;</td>
+          </tr>
+          
+          <!-- 
+          <tr>
+            <td>&nbsp;</td>
+            <td height="50"><table width="90%" border="0" cellspacing="0" cellpadding="0">
+              <tr>
+                <td>&nbsp;</td>
+                <td width="65">
+                  <select name="menu1" onchange="MM_jumpMenu('parent',this,0)">
+                    <option value="01">01</option>
+                    <option value="02">02</option>
+                    <option value="03">03</option>
+                  </select></td>
+                <td width="19"><img src="/static/images/system/group_manage_62.jpg" width="19" height="19" /></td>
+                <td width="10">&nbsp;</td>
+                <td width="19"><img src="/static/images/system/group_manage_64.jpg" width="19" height="19" /></td>
+              </tr>
+            </table></td>
+            <td>&nbsp;</td>
+          </tr>
+          -->
+          <tr>
+            <td><img src="/static/images/system/group_manage_47.jpg" width="13" height="13" /></td>
+            <td></td>
+            <td><img src="/static/images/system/group_manage_47-27.jpg" width="13" height="13" /></td>
+          </tr>
+        </table></td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+      </tr>
+    </table>
 {% endblock %}

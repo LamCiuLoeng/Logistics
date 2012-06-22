@@ -15,7 +15,7 @@
 	<table border="1" cellpadding="3" cellspacing="3">
 		<thead>
 			<tr>
-				<td>仓库名称</td>
+				<td>仓存地点名称</td>
 				<td>仓库管理人</td>
 				<td>仓库地址</td>
 				<td>查看库存</td>
@@ -23,9 +23,9 @@
 		</thead>
 		{% for r in result %}
 			<tr>
-				<td>{{r}}</td>
-				<td>{{r.manager}}</td>
-				<td>{{r.address}}</td>
+				<td>{{r.full_path|ifFalse}}</td>
+				<td>{{r.manager|ifFalse}}</td>
+				<td>{{r.address|ifFalse}}</td>
 				<td><a href="{{url_for('bpWarehouse.view',action='view_items',id=r.id)}}">查看</a></td>
 			</tr>
 		{% endfor %}

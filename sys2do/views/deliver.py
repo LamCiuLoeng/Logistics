@@ -8,6 +8,7 @@
 '''
 import traceback
 from datetime import datetime as dt
+from flask import session
 from flask.blueprints import Blueprint
 from flask.views import View
 from flask.helpers import url_for, flash
@@ -27,7 +28,7 @@ from sys2do.model.logic import DeliverHeader, OrderHeader, OrderDetail, \
 from sys2do.util.common import _gl, _g, _gp, getOr404, getMasterAll, _debug, \
     _error
 #from sys2do.util.logic_helper import updateDeliverHeaderStatus
-from sys2do.model.master import WarehouseItem, Supplier, Province
+from sys2do.model.master import Supplier, Province, InventoryItem
 
 
 __all__ = ['bpDeliver']
@@ -142,6 +143,11 @@ class DeliverView(BasicView):
                 for d in header.details :
                     d.order_detail.update_status(SEND_OUT[0])
 
+                    #delete the item form inventory
+                    for r in DBSession.quey(InventoryItem).filter(and_(InventoryItem.active == 0, InventoryItem.refer_order_detail_id == d.order_detail_id)):
+                        r.active = 1
+
+
                 DBSession.add(TransferLog(
                                       refer_id = header.id,
                                       transfer_date = dt.now().strftime("%Y-%m-%d"),
@@ -199,7 +205,14 @@ class DeliverView(BasicView):
 
     @templated('deliver/vendor_select.html')
     def vendor_select(self):
-        result = DBSession.query(DeliverHeader).filter(and_(DeliverHeader.active == 0, DeliverHeader.status.in_([SEND_OUT[0], IN_TRAVEL[0], GOODS_ARRIVED[0]]))).order_by(DeliverHeader.create_time)
+        if not session.get('supplier_profile', None) or session['supplier_profile'].get('id', None):
+            flash(MSG_NO_SUCH_ACTION, MESSAGE_ERROR)
+            return redirect(url_for('bpRoot.view', action = "index"))
+        result = DBSession.query(DeliverHeader).filter(and_(
+                                                            DeliverHeader.active == 0,
+                                                            DeliverHeader.status.in_([SEND_OUT[0], IN_TRAVEL[0], GOODS_ARRIVED[0]]),
+                                                            DeliverHeader.supplier_id == session['supplier_profile']['id'],
+                                                            )).order_by(DeliverHeader.create_time)
         return {'result' : result , 'values' : {
                                                 'no' : _g('no'),
                                                 'destination_address' : _g('destination_address'),
@@ -209,20 +222,34 @@ class DeliverView(BasicView):
 
     @templated('deliver/vendor_input.html')
     def vendor_input(self):
+        if not session.get('supplier_profile', None) or session['supplier_profile'].get('id', None):
+            flash(MSG_NO_SUCH_ACTION, MESSAGE_ERROR)
+            return redirect(url_for('bpRoot.view', action = "index"))
+
         header = DeliverHeader.get(_g('id'))
         if not header :
             flash(MSG_RECORD_NOT_EXIST, MESSAGE_ERROR)
             return redirect(url_for('.view', action = 'vendor_select'))
+        elif header.supplier_id != session['supplier_profile']['id']:
+            flash(MSG_NO_SUCH_ACTION, MESSAGE_ERROR)
+            return redirect(url_for('bpRoot.view', action = "index"))
 
         return {'values' : header.populate(), 'details' : header.details }
 
 
     def vendor_input_save(self):
+        if not session.get('supplier_profile', None) or session['supplier_profile'].get('id', None):
+            flash(MSG_NO_SUCH_ACTION, MESSAGE_ERROR)
+            return redirect(url_for('bpRoot.view', action = "index"))
+
+
         header = DeliverHeader.get(_g('id'))
         if not header :
             flash(MSG_RECORD_NOT_EXIST, MESSAGE_ERROR)
             return redirect(url_for('.view', action = 'vendor_select'))
-
+        elif header.supplier_id != session['supplier_profile']['id']:
+            flash(MSG_NO_SUCH_ACTION, MESSAGE_ERROR)
+            return redirect(url_for('bpRoot.view', action = "index"))
 
         if _g('type') == "IN_TRAVEL" :
             new_status = IN_TRAVEL[0]

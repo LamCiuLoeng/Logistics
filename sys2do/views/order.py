@@ -10,10 +10,10 @@ from datetime import datetime as dt
 from datetime import timedelta
 import traceback
 
-from flask import Blueprint, render_template, url_for, session
+from flask import Blueprint, render_template, url_for, session, Response
 from flask.views import View
 from werkzeug.utils import redirect
-from flask.helpers import flash
+from flask.helpers import flash, jsonify
 
 from sys2do.model.logic import OrderHeader, OrderDetail, TransferLog, \
     DeliverDetail
@@ -24,14 +24,16 @@ from sys2do.constant import MESSAGE_ERROR, MESSAGE_INFO, MSG_UPDATE_SUCC, \
     MSG_DELETE_SUCC, MSG_NO_ID_SUPPLIED, MSG_SERVER_ERROR, MSG_NO_SUCH_ACTION, \
     MSG_SAVE_SUCC, ORDER_CANCELLED, STATUS_LIST, IN_TRAVEL, \
     MSG_RECORD_NOT_EXIST, ASSIGN_PICKER, IN_WAREHOUSE, ASSIGN_PICKER, \
-    LOG_CREATE_ORDER, LOG_SEND_PICKER, LOG_GOODS_IN_WAREHOUSE
+    LOG_CREATE_ORDER, LOG_SEND_PICKER, LOG_GOODS_IN_WAREHOUSE, ORDER_NEW
 from sys2do.views import BasicView
-from sys2do.util.common import _g, getOr404, _gp, getMasterAll, _debug
-from sys2do.model.master import CustomerProfile, WarehouseItem, Warehouse, \
-    Customer, ItemUnit, WeightUnit, ShipmentType, Province, ChargeType
+from sys2do.util.common import _g, getOr404, _gp, getMasterAll, _debug, _info
+from sys2do.model.master import CustomerProfile, InventoryLocation, \
+    Customer, ItemUnit, WeightUnit, ShipmentType, Province, ChargeType, \
+    InventoryItem
 from sys2do.util.logic_helper import genSystemNo
 from sqlalchemy.sql.expression import and_
 from sys2do.util.barcode_helper import generate_barcode_file
+from flask.globals import request
 
 
 __all__ = ['bpOrder']
@@ -108,34 +110,41 @@ class OrderView(BasicView):
         _debug(qty)
         amount = 0
 
-        for rItem, rQty, rUnit, rWeight, rWunit, rShip, rPro, rCity, rDis, rDest, rCon, rTel, rExp, rCh, rRem \
-         in zip(item, qty, unit, weight, wunit, shipment_type, province, city, district, dest, contact, tel, expect_time, charge, remark):
-            line_no += 1
-            _debug(line_no)
-            if rCh[1] : amount += float(rCh[1])
-            DBSession.add(OrderDetail(header = order,
+
+        for (k, v) in _gp('item_'):
+            id = k.split("_")[1]
+            if v:
+                line_no += 1
+                DBSession.add(OrderDetail(header = order,
                                       line_no = line_no,
-                                      item = rItem[1],
-                                      order_qty = rQty[1],
+                                      item = v,
+                                      order_qty = _g('qty_%s' % id),
                                       delivered_qty = 0,
-                                      unit_id = rUnit[1],
-                                      weight = rWeight[1],
-                                      weight_unit_id = rWunit[1],
-                                      shipment_type_id = rShip[1],
-                                      destination_province_id = rPro[1],
-                                      destination_city_id = rCity[1],
-                                      destination_district_id = rDis[1],
-                                      destination_address = rDest[1],
-                                      destination_contact = rCon[1],
-                                      destination_tel = rTel[1],
-                                      expect_time = rExp[1],
-                                      charge = rCh[1],
-                                      remark = rRem[1]
+                                      unit_id = _g('unit_%s' % id),
+                                      weight = _g('weight_%s' % id),
+                                      weight_unit_id = _g('wunit_%s' % id),
+                                      shipment_type_id = _g('shipment_type_%s' % id),
+                                      destination_province_id = _g('destination_province_id_%s' % id),
+                                      destination_city_id = _g('destination_city_id_%s' % id),
+                                      destination_district_id = _g('destination_district_id_%s' % id),
+                                      destination_address = _g('dest_%s' % id),
+                                      destination_contact = _g('contact_%s' % id),
+                                      destination_tel = _g('tel_%s' % id),
+                                      expect_time = _g('expect_time_%s' % id),
+                                      charge = _g('charge_%s' % id),
+                                      remark = _g('remark_%s' % id)
                                       ))
+
+                if _g('charge_%s' % id) : amount += float(_g('charge_%s' % id))
         DBSession.flush()
         order.no = genSystemNo(order.id)
         order.barcode = generate_barcode_file(order.no)
         order.amount = amount
+
+        for d in order.details:
+            d.no = "%s%0.2d" % (order.no, d.line_no)
+            d.barcode = generate_barcode_file(d.no)
+
         DBSession.add(TransferLog(
                                   refer_id = order.id,
                                   transfer_date = dt.now().strftime("%Y-%m-%d"),
@@ -150,12 +159,14 @@ class OrderView(BasicView):
 
     @templated('order/review.html')
     def review(self):
-        app.logger.debug('go to review')
         header = getOr404(OrderHeader, _g('id'))
-        app.logger.debug('go to review')
         values = header.populate()
-        app.logger.debug('go to review')
-        return {'values' : values , 'details' : header.details}
+
+        if header.status in [ASSIGN_PICKER[0], ]:
+            locations = DBSession.query(InventoryLocation).filter(InventoryLocation.active == 0).order_by(InventoryLocation.full_path)
+        else:
+            locations = []
+        return {'values' : values , 'details' : header.details, 'locations' : locations}
 
 
     @templated('order/revise.html')
@@ -165,12 +176,12 @@ class OrderView(BasicView):
             flash(MSG_NO_ID_SUPPLIED, MESSAGE_ERROR)
             return redirect(self.default())
 
-        header = DBSession.query(OrderHeader).get(id)
-        values = header.populate()
-
-        ws = DBSession.query(Warehouse).filter(Warehouse.active == 0).order_by(Warehouse.name)
-
-        return {'values' : values , 'details' : header.details , 'warehouses' : ws}
+#        header = DBSession.query(OrderHeader).get(id)
+#        values = header.populate()
+#
+#        ws = DBSession.query(Warehouse).filter(Warehouse.active == 0).order_by(Warehouse.name)
+#
+#        return {'values' : values , 'details' : header.details , 'warehouses' : ws}
 
 
     def save_update(self):
@@ -228,7 +239,19 @@ class OrderView(BasicView):
         elif _g('sc') == 'IN_WAREHOUSE' :
             header.in_warehouse_remark = _g('in_warehouse_remark')
             header.status = IN_WAREHOUSE[0]
-            for d in header.details: d.status = IN_WAREHOUSE[0]
+            location_id = _g('location_id')
+            for d in header.details:
+                d.status = IN_WAREHOUSE[0]
+
+                if location_id:
+                    DBSession.add(InventoryItem(
+                                                item = d.item,
+                                                location_id = location_id,
+                                                qty = d.order_qty,
+                                                refer_order_header = unicode(header),
+                                                refer_order_detail_id = d.id,
+                                                ))
+
             DBSession.add(TransferLog(
                                       refer_id = header.id,
                                       transfer_date = dt.now().strftime("%Y-%m-%d"),
@@ -279,7 +302,11 @@ class OrderView(BasicView):
         if not session.get('customer_profile', None) or session['customer_profile'].get('id', None):
             flash(MSG_NO_SUCH_ACTION, MESSAGE_ERROR)
             return redirect(url_for('bpRoot.view', action = "index"))
-        conditions = [OrderHeader.active == 0, OrderDetail.active == 0, OrderHeader.id == OrderDetail.header_id]
+        conditions = [OrderHeader.active == 0,
+                      OrderDetail.active == 0,
+                      OrderHeader.id == OrderDetail.header_id,
+                      OrderHeader.customer_id == session['customer_profile']['id'],
+                      ]
         if _g('no'):
             conditions.append(OrderHeader.no.like('%%%s%%' % _g('no')))
         if _g('destination_address'):
@@ -314,6 +341,68 @@ class OrderView(BasicView):
             detail_log[d.id] = logs
 
         return {'order_log' : order_log, 'detail_log' : detail_log}
+
+
+    def ajax_todo_list(self):
+        new_orders = DBSession.query(OrderHeader).filer(and_(OrderHeader.active == 0 , OrderHeader.status == ORDER_NEW[0])).order_by(OrderHeader.create_time).all()
+        return jsonify(result = 0, data = [{'id' : order.id, 'no' : unicode(order)} for order in new_orders])
+
+
+    @templated('order/barcode.html')
+    def barcode(self):
+        header = OrderHeader.get(_g('id'))
+
+        if not header :
+            flash(MSG_RECORD_NOT_EXIST)
+            return redirect(self.default())
+
+        return {'header' : header}
+
+
+    def hh(self):
+        print request.values
+        type = _g('type')
+        barcode = _g('barcode')
+
+        if type == 'search':
+            try:
+                d = DBSession.query(OrderDetail).filter(OrderDetail.no == barcode).one()
+                h = d.header
+                params = {
+                          'NO' : h.no,
+                          'CUSTOMER' : unicode(h.customer),
+                          'TEL' : h.source_tel,
+                          'DESTINATION' : d.destination_full_address,
+                          }
+            except:
+                params = {
+                          'NO' : 'NO SUCH NO#',
+                          'CUSTOMER' : '',
+                          'TEL' : '',
+                          'DESTINATION' : '',
+                          }
+
+            xml = []
+            xml.append('<?xml version="1.0" encoding="UTF-8" ?>')
+            xml.append('<ORDER>')
+            xml.append('<NO>%s</NO>' % params['NO'])
+            xml.append('<CUSTOMER>%s</CUSTOMER>' % params['CUSTOMER'])
+            xml.append('<TEL>%s</TEL>' % params['TEL'])
+            xml.append('<DESTINATION>%s</DESTINATION>' % params['DESTINATION'])
+            xml.append('</ORDER>')
+            rv = app.make_response("".join(xml))
+            rv.mimetype = 'text/xml'
+            return rv
+        elif type == 'submit':
+            try:
+                d = DBSession.query(OrderDetail).filter(OrderDetail.no == barcode).one()
+                d.update_status(_g('id'))
+                DBSession.commit()
+                return unicode(MSG_UPDATE_SUCC)
+            except:
+                return unicode(MSG_RECORD_NOT_EXIST)
+        else:
+            return unicode(MSG_NO_SUCH_ACTION)
 
 
 

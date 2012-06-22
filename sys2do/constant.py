@@ -22,7 +22,6 @@ class T(object):
     def __repr__(self): return _(self.msg)
 
 
-
 #alert messages
 MSG_NO_SUCH_ACTION = T('No such action!')
 MSG_SAVE_SUCC = T('Save the record successfully!')
@@ -49,6 +48,7 @@ ORDER_CANCELLED = (-1, T('Cancelled'))
 ORDER_NEW = (0, T('New'))
 ORDER_CONFIRMED = (1, T('Confirmed'))
 ASSIGN_PICKER = (10, T('Assign Picker'))
+FETCH_GOODS = (11, T('Fetch Goods'))
 IN_WAREHOUSE = (20, T('In Warehouse'))
 SORTING = (30, T('Sorting'))
 #OUT_WAREHOUSE = (40, _('Out Warehouse'))

@@ -10,8 +10,8 @@ import traceback
 from sys2do.model import metadata, engine, DBSession, Permission, Group, User
 #import sys2do.model.logic as logic
 import sys
-from sys2do.model.master import CustomerProfile, Customer, Item, \
-    ItemUnit, Warehouse, WeightUnit, ShipmentType, Payment, Province, Supplier, \
+from sys2do.model.master import CustomerProfile, Customer, \
+    ItemUnit, InventoryLocation, WeightUnit, ShipmentType, Payment, Province, Supplier, \
     ChargeType
 reload(sys)
 sys.setdefaultencoding('utf8')
@@ -110,8 +110,15 @@ def init():
         for n, en, tn in [(u'吨', u'ton', u'噸'), (u'千克', u'kg', u'千克'), (u'克', u'g', u'克'), ]:
             DBSession.add(WeightUnit(name = n, english_name = en, tradition_name = tn))
 
-        DBSession.add(Warehouse(name = u"仓库 1", address = u"仓库地址 1", manager = "MANAGER 1"))
-        DBSession.add(Warehouse(name = u"仓库 2", address = u"仓库地址 2", manager = "MANAGER 2"))
+        location1 = InventoryLocation(name = u"深圳仓库", address = u"仓库地址 1", manager = "MANAGER 1", full_path = u"深圳仓库")
+        location2 = InventoryLocation(name = u"东莞仓库", address = u"仓库地址 2", manager = "MANAGER 2", full_path = u"东莞仓库")
+        DBSession.add(location1)
+        DBSession.add(location2)
+
+        DBSession.flush()
+        location1.full_path_ids = location1.id
+        location2.full_path_ids = location2.id
+
         DBSession.add(ShipmentType(name = u"陆运"))
         DBSession.add(ShipmentType(name = u"水运"))
         DBSession.add(ShipmentType(name = u"空运"))

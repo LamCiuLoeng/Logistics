@@ -1,0 +1,36 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+  
+</head>
+
+<body>
+	{% for d in header.details %}
+	<table cellpadding="3" cellspacing="3" border="1">
+		<tr>
+			<td width="100">客户</td>
+			<td width="250">{{header.customer}}</td>
+			<td width="5">&nbsp;</td>
+			<td colspan="2" rowspan="3" align="center" valign="middle"><img width="222" height="91" src="{{d.barcode.url}}"/></td>
+		</tr>
+		<tr>
+			<td>订单号</td>
+			<td>{{header.no}}</td>
+			<td>&nbsp;</td>
+		</tr>
+		<tr>
+			<td>货物</td>
+			<td>{{d.item}}</td>
+			<td>&nbsp;</td>
+		</tr>
+		<tr>
+			<td>地区</td>
+			<td>{{d.destination_provice}}{{d.destination_city}}</td>
+			<td>&nbsp;</td>
+			<td width="100">数量</td>
+			<td width="250">{{d.order_qty}}</td>		
+		</tr>
+	</table> 
+	{% endfor %}
+</body>
+</html>

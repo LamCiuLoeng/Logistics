@@ -91,7 +91,9 @@ def check():
 def logout():
     session.pop('login', None)
     session.pop('user_profile', None)
-    return redirect(index_url())
+    if 'customer_profile' in session : session.pop('customer_profile', None)
+    if 'supplier_profile' in session : session.pop('supplier_profile', None)
+    return redirect(url_for('bpAuth.login'))
 
 
 @bpAuth.route('/register')

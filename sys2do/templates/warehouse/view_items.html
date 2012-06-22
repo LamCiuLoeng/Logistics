@@ -13,15 +13,21 @@
 		<thead>
 			<tr>
 				<td>货物名称</td>
-				<td>仓库数量</td>
+				<td>数量</td>
 				<td>货物来源</td>
+				<td>货物地点</td>
+				<td>入仓时间</td>
+				<td>经手人</td>
 			</tr>
 		</thead>
-		{% for r in result %}
+		{% for (item,location) in result %}
 			<tr>
-				<td>{{r.item}}</td>
-				<td>{{r.qty}} {{r.order_detail.item_unit}}</td>
-				<td>{{r.order_detail.header}}</td>
+				<td>{{item.item}}</td>
+				<td>{{item.qty}}</td>
+				<td>{{item.refer_order_header}}</td>
+				<td>{{location.full_path}}</td>
+				<td>{{item.create_time|ft}}</td>
+				<td>{{item.create_by}}</td>
 			</tr>
 		{% endfor %}
 	</table>

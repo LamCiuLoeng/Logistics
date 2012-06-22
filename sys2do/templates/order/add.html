@@ -5,6 +5,11 @@
 	.template{
 		display:none;
 	}
+	
+	.field{
+		background-color : #FFFFCC;
+		height : 20px;
+	}
 </style>
 {% endblock %}
 
@@ -19,7 +24,7 @@
 	function addline(){
 		var index = ++index_count;
 		var tr = $(".template").clone().removeClass("template");
-		$("input[type='text'],textarea,select",tr).each(function(){
+		$("input[type='text'],input[type='hidden'],textarea,select",tr).each(function(){
 			var old_name = $(this).attr('name');
 			var new_name = old_name.replace('_x','_'+index);
 			$(this).attr('name',new_name);
@@ -59,9 +64,48 @@
 		<input type="reset" value="{{BTN_RESET}}"/>
 		<input type="button" value="{{BTN_CANCEL}}" onclick="location.href='{{url_for('.view', action = 'index')}}'"/>
 		<input type="button" value="{{BTN_RETURN}}" onclick="location.href='{{url_for('.view', action = 'index')}}'"/>
-		<table border="1" cellpadding="3" cellspacing="3">
+
+		<table width="100%" border="0" cellspacing="0" cellpadding="0">
+      <tr>
+        <td><table width="100%" border="0" cellspacing="0" cellpadding="0">
+          <tr>
+            <td width="18"><img src="/static/images/system/group_manage_20.jpg" width="18" height="35" /></td>
+            <td width="2"><img src="/static/images/system/group_manage_21.jpg" width="2" height="35" /></td>
+            <td width="107"><a href="{{url_for('.view', action = 'add')}}"><img src="/static/images/system/group_manage_22.jpg" width="107" height="35" /></a></td>
+			<td width="2"><img src="/static/images/system/group_manage_21.jpg" width="2" height="35" /></td>
+            
+            
+            <!-- 
+            <td width="106"><img src="/static/images/system/group_manage_24.jpg" width="106" height="35" /></td>
+			<td width="2"><img src="/static/images/system/group_manage_21.jpg" width="2" height="35" /></td>
+            <td width="107"><img src="/static/images/system/group_manage_26.jpg" width="107" height="35" /></td>
+			<td width="2"><img src="/static/images/system/group_manage_21.jpg" width="2" height="35" /></td>
+            <td width="106"><img src="/static/images/system/group_manage_28.jpg" width="106" height="35" /></td>
+			<td width="2"><img src="/static/images/system/group_manage_21.jpg" width="2" height="35" /></td>
+            -->
+            <td background="/static/images/system/group_manage_30.jpg">&nbsp;</td>
+            <td width="16"><img src="/static/images/system/group_manage_33.jpg" width="16" height="35" /></td>
+          </tr>
+        </table></td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+      </tr>
+      <tr>
+        <td align="left">
+        
+        	<table width="99%" border="0" cellspacing="0" cellpadding="0" bgcolor="#FFFFFF">
+          <tr>
+            <td width="13"><img src="/static/images/system/group_manage_40.jpg" width="13" height="13" /></td>
+            <td></td>
+            <td width="13"><img src="/static/images/system/group_manage_46.jpg" width="13" height="13" /></td>
+          </tr>
+          <tr>
+            <td>&nbsp;</td>
+            <td>
+            	<table border="0" cellpadding="3" cellspacing="3">
 			<tr>
-				<td>{{_('Customer')}}</td>
+				<td width="100">{{_('Customer')}}</td>
 				<td>
 					<select name="customer_id" id="customer_id" onchange="changecustomer(this)">
 						<option>{{_('Please Select One')}}</option>
@@ -99,85 +143,85 @@
 			</tr>
 		</table>
 		<br />
-		<br />
-		
 		<p><input type="button" value="{{_('Add Line')}}" onclick="addline();"/></p>
-		
-		<table border="1" cellpadding="3" cellspacing="3" id="item_table">
-			<thead>
-				<tr>
-					<td>{{_('Action')}}</td>
-					<td>{{_('Item')}}</td>
-					<td>{{_('Qty')}}</td>
-					<td>{{_('Unit')}}</td>
-					<td>{{_('Weight')}}</td>
-					<td>{{_('Weight Unit')}}</td>
-					<td>{{_('Shipment Type')}}</td>
-					<td>{{_('Charge Type')}}</td>
-					<td>{{_('Destination')}}</td>
-					<td>{{_('Destination Contact')}}</td>
-					<td>{{_('Destination Tel')}}</td>
-					<td>{{_('Expect Time')}}</td>
-					<td>{{_('Charge')}}</td>
-					<td>{{_('Remark')}}</td>
-				</tr>
-			</thead>
-			<tbody>
-				<tr class="template">
-					<td><input type="button" value="{{_('Del Line')}}" onclick="deleteline(this)"/></td>
-					<td><input type="text" name="item_x" id="item_x" value=""/></td>
-					<td><input type="text" name="qty_x" id="qty_x" value=""/></td>
+		<br />
+              <table width="99%" border="0" cellspacing="0" cellpadding="0" id="item_table">
+              	<thead>
+                <tr class="field_head">
+                	<td>{{_('Action')}}</td>
+                	<td>{{_('Item')}}</td>
+                	<td>{{_('Qty')}}</td>
+                	<td>{{_('Unit')}}</td>
+                	<td>{{_('Weight')}}</td>
+                	<td>{{_('Weight Unit')}}</td>
+                	<td>{{_('Destination')}}</td>
+                	<td>{{_('Contact')}}</td>
+                	<td>{{_('Tel')}}</td>
+                	<td>{{_('Expect Time')}}</td>
+                	<td>{{_('Charge')}}</td>
+                	<td>{{_('Remark')}}</td>
+                </tr>
+                </thead>
+                <tbody>
+				<tr class="template data_table_tr">
 					<td>
-						<select name="unit_x">
+						<input type="button" value="{{_('Del Line')}}" onclick="deleteline(this)" />
+						<input type="hidden" name="shipment_type_x" value=""/>
+					</td>
+					<td><input type="text" name="item_x" id="item_x" value="" class="field" style="width:80px"/></td>
+					<td><input type="text" name="qty_x" id="qty_x" value="" class="field" style="width:30px"/></td>
+					<td>
+						<select name="unit_x" class="field">
 							{% for unit in units %}
 								<option value="{{unit.id}}">{{unit}}</option>
 							{% endfor %}
 						</select>
 					</td>
-					<td><input type="text" name="weight_x" id="weight_x" value=""/></td>
+					<td><input type="text" name="weight_x" id="weight_x" value="" class="field" style="width:30px"/></td>
 					
 					<td>
-						<select name="wunit_x">
+						<select name="wunit_x" class="field">
 							{% for wunit in wunits %}
 								<option value="{{wunit.id}}">{{wunit}}</option>
 							{% endfor %}
 						</select>	
 					</td>
-					
 					<td>
-						<select name="shipment_type_x">
-							{% for st in shiptype %}
-								<option value="{{st.id}}">{{st}}</option>
-							{% endfor %}
-						</select>
-					</td>
-					<td>
-						<select name="charge_type_x">
-							{% for ct in  chargetype%}
-								<option value="{{ct.id}}">{{ct}}</option>
-							{% endfor %}
-						</select>
-					</td>
-					<td>
-						<select name="destination_province_id_x" id="destination_province_id_x">
+						<select name="destination_province_id_x" id="destination_province_id_x" class="field">
 							<option>{{_('Please Select One')}}</option>
 							{% for p in provinces %}
 								<option value="{{p.id}}">{{p}}</option>
 							{% endfor %}
 						</select>
 						<br />
-						<select name="destination_city_id_x" id="destination_city_id_x"></select><br />
-						<select name="destination_district_id_x" id="destination_district_id_x"></select><br />
-						<input type="text" name="dest_x" id="dest_x" value=""/>
+						<select name="destination_city_id_x" id="destination_city_id_x" class="field"></select><br />
+						<select name="destination_district_id_x" id="destination_district_id_x" class="field"></select><br />
+						<input type="text" name="dest_x" id="dest_x" value="" class="field"/>
 					</td>
-					<td><input type="text" name="contact_x" id="contact_x" value=""/></td>
-					<td><input type="text" name="tel_x" id="tel_x" value=""/></td>
-					<td><input type="text" name="expect_time_x" id="expect_time_x" value=""/></td>
-					<td><input type="text" name="charge_x" id="charge_x" value=""/></td>
-					<td><textarea name="remark_x" id="remark_x"></textarea></td>
-					
+					<td><input type="text" name="contact_x" id="contact_x" value="" class="field" style="width:50px"/></td>
+					<td><input type="text" name="tel_x" id="tel_x" value="" class="field" style="width:50px"/></td>
+					<td><input type="text" name="expect_time_x" id="expect_time_x" value="" class="field" style="width:50px"/></td>
+					<td><input type="text" name="charge_x" id="charge_x" value="" class="field" style="width:50px"/></td>
+					<td><textarea name="remark_x" id="remark_x" class="field"></textarea></td>
 				</tr>
-			</tbody>
-		</table>
+				</tbody>
+              </table></td>
+            <td>&nbsp;</td>
+          </tr>
+
+          <tr>
+            <td><img src="/static/images/system/group_manage_47.jpg" width="13" height="13" /></td>
+            <td></td>
+            <td><img src="/static/images/system/group_manage_47-27.jpg" width="13" height="13" /></td>
+          </tr>
+        </table></td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+      </tr>
+    </table>
+		
+		
+		
 	</form>
 {% endblock %}

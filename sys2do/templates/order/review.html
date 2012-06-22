@@ -8,7 +8,8 @@
 		<ul>
 			<li><a href="{{url_for('.view', action = 'add')}}">新建订单</a></li>
 			<li><a href="{{url_for('.view', action = 'revise',id=values.get('id',''))}}">修改订单</a></li>
-			<li><a href="{{url_for('.view', action = 'cancel',id=values.get('id',''))}}">删除订单</a></li>		
+			<li><a href="{{url_for('.view', action = 'cancel',id=values.get('id',''))}}">删除订单</a></li>
+			<li><a href="{{url_for('.view', action = 'barcode',id=values.get('id',''))}}">打印条码</a></li>		
 		</ul>
 
 		<p>{{_('Order Information')}}</p>
@@ -20,7 +21,7 @@
 			<tr><td>{{_('Customer')}}</td><td>{{values.get('customer','')}}</td></tr>
 			<tr>
 				<td>{{_('Address')}}</td>
-				<td>{{values.get('source_provice','')}}{{values.get('source_city','')}}{{values.get('source_district','')}}{{values.get('source_address','')}}</td>
+				<td>{{values.get('destination_full_address','')|ifFalse}}</td>
 			</tr>
 			<tr><td>{{_('Phone')}}</td><td>{{values.get('source_tel','')|ifFalse}}</td></tr>
 			<tr><td>{{_('Contact')}}</td><td>{{values.get('source_contact','')|ifFalse}}</td></tr>
@@ -107,6 +108,16 @@
 			<form action="{{url_for('.view', action = 'do_action',id=values.get('id',''),sc='IN_WAREHOUSE')}}" method="post">
 				<table>
 					<tr>
+						<td>{{_('Warehouse')}}</td>
+						<td>
+							<select name="location_id" id="location_id">
+								{% for l in locations %}
+									<option value="{{l.id}}">{{l.full_path}}</option>
+								{% endfor %}
+							</select>
+						</td>
+					</tr>				
+					<tr>
 						<td>{{_('Remark')}}</td>
 						<td><textarea name="in_warehouse_remark"></textarea></td>
 					</tr>
@@ -116,4 +127,30 @@
 				</table>
 			</form>	
 		{% endif %}
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
 {% endblock %}

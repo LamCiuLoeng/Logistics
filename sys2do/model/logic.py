@@ -12,8 +12,8 @@ from sqlalchemy.types import Unicode, Integer, DateTime, Float, Date, Text
 from sqlalchemy.orm import relation, backref
 from sys2do.model import DeclarativeBase, metadata, DBSession
 from auth import SysMixin
-from sys2do.model.master import Customer, Supplier, Item, ItemUnit, ShipmentType, \
-    WeightUnit, Province, City, District
+from sys2do.model.master import Customer, Supplier, ItemUnit, ShipmentType, \
+    WeightUnit, Province, City, District, InventoryLocation
 from sys2do.model.auth import CRUDMixin
 from sys2do.model.system import UploadFile
 from sqlalchemy.sql.expression import and_
@@ -87,6 +87,7 @@ class OrderHeader(DeclarativeBase, SysMixin, CRUDMixin):
                 'status' : self.status,
                 'barcode' : self.barcode,
                 'amount' : self.amount,
+                'destination_full_address' : self.destination_full_address,
                 }
 
     def update_status(self, status):
@@ -102,6 +103,11 @@ class OrderHeader(DeclarativeBase, SysMixin, CRUDMixin):
                                                 )).order_by(TransferLog.id)
 
 
+    @property
+    def destination_full_address(self):
+        return "".join(filter(lambda v:v, [self.source_provice, self.source_city, self.source_address]))
+
+
 class OrderDetail(DeclarativeBase, SysMixin):
     __tablename__ = 'order_detail'
 
@@ -114,6 +120,7 @@ class OrderDetail(DeclarativeBase, SysMixin):
 
 
     line_no = Column(Integer, default = 1)
+    no = Column(Text)
     item = Column(Text)
     order_qty = Column(Float, default = 0) #client order qty
     delivered_qty = Column(Integer)
@@ -141,15 +148,26 @@ class OrderDetail(DeclarativeBase, SysMixin):
 
     expect_time = Column(Date, default = None)
     actual_time = Column(Date, default = None)
-    remark = Column(Text)
+
 #    charge_type = 
+    barcode_id = Column(Integer, ForeignKey('system_upload_file.id'))
+    barcode = relation(UploadFile)
     charge = Column(Float, default = 0)
+    inventory_location_id = Column(Integer, ForeignKey('master_inventory_location.id'))
+    inventory_location = relation(InventoryLocation, backref = backref("items", order_by = id))
+    remark = Column(Text)
     status = Column(Integer, default = 0)
 
 
     def update_status(self, status):
         self.status = status
         self.header.status = min([d.status for d in self.header.details])
+
+    @property
+    def destination_full_address(self):
+        return "".join(filter(lambda v:v, [self.destination_provice, self.destination_city, self.destination_address]))
+
+
 
 
 class DeliverHeader(DeclarativeBase, SysMixin, CRUDMixin):
@@ -220,6 +238,10 @@ class DeliverHeader(DeclarativeBase, SysMixin, CRUDMixin):
                                                 TransferLog.type == 1,
                                                 TransferLog.refer_id == self.id
                                                 )).order_by(TransferLog.id)
+
+    @property
+    def destination_full_address(self):
+        return "".join(filter(lambda v:v, [self.destination_provice, self.destination_city, self.destination_address]))
 
 
 class DeliverDetail(DeclarativeBase, SysMixin):

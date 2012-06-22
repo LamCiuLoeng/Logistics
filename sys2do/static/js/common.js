@@ -1,3 +1,15 @@
+function menu_hover(menu_bt){
+$(menu_bt).attr("class","menu_hover_highlight"); 
+}
+function menu_hover_highlight(menu_bt){
+$(menu_bt).attr("class","menu_hover"); 
+}
+
+function MM_jumpMenu(targ,selObj,restore){ //v3.0
+  eval(targ+".location='"+selObj.options[selObj.selectedIndex].value+"'");
+  if (restore) selObj.selectedIndex=0;
+}
+
 function redirect(url) {
     window.location = url;
 }

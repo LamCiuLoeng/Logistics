@@ -1,38 +1,102 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml">
  <head>
   <title>{{_('Login')}}</title>
-  <meta name="Author" content="">
-  <meta name="Keywords" content="">
-  <meta name="Description" content="">
-  <link rel="stylesheet" type="text/css" href="" />
-  <style type="text/css">
-
-  </style>
-
-  <script type="text/javascript" src=""></script>
-  <script language="JavaScript" type="text/javascript">
-    //<![CDATA[
-          
-    //]]>
-   </script>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
  </head>
 
- <body>
- 		<div>
- 			{% for category,message in get_flashed_messages(with_categories=true) %}
-				<p>{{message}}</p>
-			{% endfor %}
- 		</div>
-		<form action="{{url_for('bpAuth.check')}}" method="post">
-			<input type="hidden" name="action" value="check"/>
-			{% if request.values.get("next", None) %}
-				<input type="hidden" name="next" value="{{request.values['next']}}"/>
-			{% endif %}
-			<div class="row"><label class="label">{{_('User Name')}}</label><input type="text" name="name" class="field" id="name"/></div>
-			<div class="row"><label class="label">{{_('Password')}}</label><input type="password" name="password" class="field"/></div>
-			<div class="row" style="text-align:center"><input class="btn" type="submit" value="{{_('Login')}}"/>&nbsp;
-			<input type="button" value="{{_('Register')}}" class="btn" onclick="register()"/></div>
-		</form>
- </body>
+<body>
+<form action="{{url_for('bpAuth.check')}}" method="post">
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td width="460"><img src="/static/images/system/group_manage_01.jpg" width="460" height="86" /></td>
+    <td background="/static/images/system/group_manage_02.jpg">&nbsp;</td>
+  </tr>
+</table>
+
+<table width="100%" height="100%" border="0" cellpadding="0" cellspacing="0">
+  <tr>
+    <td align="center" valign="middle"><table width="538" height="370" border="0" cellpadding="0" cellspacing="0">
+      <tr>
+        <td width="538" height="315" background="/static/images/system/index_03.jpg" style="border:#000000 5px solid"><table width="100%" border="0" cellspacing="0" cellpadding="0">
+          <tr>
+            <td height="80">&nbsp;</td>
+            <td align="right">&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+          </tr>
+          
+          {% for category,message in get_flashed_messages(with_categories=true) %}
+	          <tr>
+	            <td height="80">&nbsp;</td>
+	            <td align="right">&nbsp;</td>
+	            <td colspan="3">{{message}}</td>
+	          </tr>
+          {% endfor %}
+          
+          <tr>
+            <td width="120">&nbsp;</td>
+            <td width="80" align="right">{{_('User Name')}}</td>
+            <td width="15">&nbsp;</td>
+            <td><input type="text" name="name" class="field" id="name"/></td>
+            <td>&nbsp;</td>
+          </tr>
+          <tr>
+            <td>&nbsp;</td>
+            <td align="right">&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+          </tr>
+          <tr>
+            <td>&nbsp;</td>
+            <td align="right">{{_('Password')}}</td>
+            <td>&nbsp;</td>
+            <td><input type="password" name="password" class="field"/></td>
+            <td>&nbsp;</td>
+          </tr>
+          <tr>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+          </tr>
+          <tr>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td><input type="image" src="/static/images/system/index_07.jpg" width="50" height="22">
+            	<!-- 
+            	&nbsp;&nbsp;<img src="/static/images/system/index_09.jpg" width="50" height="22">
+            	 -->
+            </td>
+            <td>&nbsp;</td>
+          </tr>
+        </table></td>
+      </tr>
+      <tr>
+        <td bgcolor="#000000" style="border:#000000 5px solid"><table width="100%" border="0" cellspacing="0" cellpadding="0">
+          <tr>
+            <td width="15">&nbsp;</td>
+            <!--  
+            <td width="30"><input type="checkbox" name="checkbox" value="checkbox"></td>
+            <td width="350" style="color:#FFFFFF;">记住密码</td>
+            -->
+            <td><a href="{{url_for('bpAuth.register')}}"><img src="/static/images/system/index_14.jpg" width="95" height="22"></a></td>
+            </tr>
+        </table></td>
+      </tr>
+    </table>
+      <table width="538" border="0" align="center" cellpadding="0" cellspacing="0">
+        <tr>
+          <td height="200" align="left" valign="top"><img src="/static/images/system/index_18.gif" width="217" height="31" /></td>
+        </tr>
+      </table></td>
+  </tr>
+</table>
+</form>
+
+
+</body>
 </html>
