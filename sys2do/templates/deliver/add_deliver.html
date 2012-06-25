@@ -11,6 +11,8 @@
 {% endblock %}
 
 {% block content %}
+	<div style="background-color: #fff;padding: 10px;">
+		
 	<form method="post" action="{{url_for('.view',action='deliver_save_new')}}">
 	<p>
 		<input type="submit" value="保存"/>
@@ -20,9 +22,9 @@
 		<table border="1" cellpadding="3" cellspacing="3">
 			<tbody>
 				<tr>
-					<td>{{_('3rd Party Supplier')}}</td>
-					<td>
-						<select name="supplier_id" id="supplier_id">
+					<td width="200">{{_('3rd Party Supplier')}}</td>
+					<td width="300">
+						<select name="supplier_id" id="supplier_id" class="field" style="width: 200px">
 							{% for s in suppliers %}
 								<option value="{{s.id}}">{{s}}</option>
 							{% endfor %}
@@ -31,41 +33,32 @@
 					</td>
 					<tr>
 						<td>{{_('Deliver Number')}}</td>
-						<td><input type="text" name="no" id="no"/></td>
+						<td><input type="text" name="no" id="no" class="field" style="width: 200px"/></td>
 					</tr>
 				</tr>
 				<tr>
 					<td>{{_('Destination')}}</td>
-					<td>
-						<select name="destination_province_id" id="destination_province_id">
-							<option>{{_('Please Select One')}}</option>
-							{% for p in provinces %}
-								<option value="{{p.id}}">{{p}}</option>
-							{% endfor %}
-						</select>
-						<select name="destination_city_id" id="destination_city_id"></select>
-						<input type="text" name="destination_address" id="destination_address" />
-					</td>
+					<td><input type="text" name="destination_address" id="destination_address" class="field" style="width: 200px"/></td>
 				</tr>
 				<tr>
 					<td>{{_('Supplier Contact')}}</td>
-					<td><input type="text" name="supplier_contact" id="supplier_contact" /></td>
+					<td><input type="text" name="supplier_contact" id="supplier_contact" class="field" style="width: 200px"/></td>
 				</tr>
 				<tr>
 					<td>{{_('Supplier Tel')}}</td>
-					<td><input type="text" name="supplier_tel" id="supplier_tel" /></td>
+					<td><input type="text" name="supplier_tel" id="supplier_tel" class="field" style="width: 200px"/></td>
 				</tr>
 				<tr>
 					<td>{{_('Expect Time')}}</td>
-					<td><input type="text" name="expect_time" id="expect_time" /></td>
+					<td><input type="text" name="expect_time" id="expect_time" class="field" style="width: 200px"/></td>
 				</tr>
 				<tr>
 					<td>{{_('Charge')}}</td>
-					<td><input type="text" name="amount" id="amount" /></td>
+					<td><input type="text" name="amount" id="amount" class="field" style="width: 200px"/></td>
 				</tr>
 				<tr>
 					<td>{{_('Remark')}}</td>
-					<td><textarea name="remark" id="remark"></textarea></td>
+					<td><textarea name="remark" id="remark" class="field" style="width: 200px"></textarea></td>
 				</tr>
 			</tbody>
 		</table>
@@ -85,8 +78,6 @@
 					<td>{{_('Destination Contact')}}</td>
 					<td>{{_('Destination Tel')}}</td>
 					<td>{{_('Remark')}}</td>
-					<td>{{_('Create Time')}}</td>
-					<td>{{_('Creator')}}</td>
 					<td>{{_('Update Time')}}</td>
 					<td>{{_('Last Updator')}}</td>
 				</tr>
@@ -95,7 +86,7 @@
 				<tr>
 					<td>{{d.header.customer}}<input type="hidden" name="detail_{{d.id}}" value="{{d.id}}"/></td>
 					<td>{{d.header.no}}</td>
-					<td>{{d.destination_provice|ifFalse}}{{d.destination_city|ifFalse}}{{d.destination_district|ifFalse}}{{d.destination_address|ifFalse}}</td>
+					<td>{{d.destination_address|ifFalse}}</td>
 					<td>{{d.item}}</td>
 					<td>{{d.order_qty}}&nbsp;{{d.unit}}</td>
 					<td>{{d.weight}}&nbsp;{{d.weight_unit}}</td>
@@ -104,13 +95,12 @@
 					<td>{{d.destination_tel|ifFalse}}</td>
 					<td>{{d.remark|ifFalse}}</td>
 					<td>{{d.update_time|ft}}</td>
-					<td>{{d.create_by|ifFalse}}</td>
-					<td>{{d.update_time|ft}}</td>
 					<td>{{d.update_by|ifFalse}}</td>
 				</tr>
 			{% endfor %}
 		</table>
 		<br />	
 	</form>
+	</div>
 	
 {% endblock %}

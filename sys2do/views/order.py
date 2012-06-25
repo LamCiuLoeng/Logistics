@@ -28,7 +28,7 @@ from sys2do.constant import MESSAGE_ERROR, MESSAGE_INFO, MSG_UPDATE_SUCC, \
 from sys2do.views import BasicView
 from sys2do.util.common import _g, getOr404, _gp, getMasterAll, _debug, _info
 from sys2do.model.master import CustomerProfile, InventoryLocation, \
-    Customer, ItemUnit, WeightUnit, ShipmentType, Province, ChargeType, \
+    Customer, ItemUnit, WeightUnit, ShipmentType, ChargeType, \
     InventoryItem
 from sys2do.util.logic_helper import genSystemNo
 from sqlalchemy.sql.expression import and_
@@ -42,7 +42,7 @@ bpOrder = Blueprint('bpOrder', __name__)
 
 class OrderView(BasicView):
 
-#    decorators = [login_required]
+    decorators = [login_required]
 
     @templated('order/index.html')
 #    @login_required
@@ -57,7 +57,6 @@ class OrderView(BasicView):
                 'units' : getMasterAll(ItemUnit),
                 'wunits' : getMasterAll(WeightUnit),
                 'shiptype' : getMasterAll(ShipmentType),
-                'provinces' : getMasterAll(Province, 'id'),
                 'chargetype' : getMasterAll(ChargeType),
                 }
 
@@ -74,15 +73,15 @@ class OrderView(BasicView):
 
     def _save_new_process(self):
         customer_id = _g('customer_id')
-        source_province_id = _g('source_province_id')
-        source_city_id = _g('source_city_id')
-        source_district_id = _g('source_district_id')
+#        source_province_id = _g('source_province_id')
+#        source_city_id = _g('source_city_id')
+#        source_district_id = _g('source_district_id')
         source_address = _g('source_address')
         source_tel = _g('source_tel')
         source_contact = _g('source_contact')
         remark = _g('remark')
         order = OrderHeader(no = None, customer_id = customer_id,
-                            source_province_id = source_province_id, source_city_id = source_city_id, source_district_id = source_district_id,
+#                            source_province_id = source_province_id, source_city_id = source_city_id, source_district_id = source_district_id,
                             source_address = source_address,
                             source_tel = source_tel, source_contact = source_contact, remark = remark)
         DBSession.add(order)
@@ -93,9 +92,9 @@ class OrderView(BasicView):
         weight = _gp('weight_')
         wunit = _gp('wunit_')
         shipment_type = _gp('shipment_type_')
-        province = _gp('destination_province_id_')
-        city = _gp('destination_city_id_')
-        district = _gp('destination_district_id_')
+#        province = _gp('destination_province_id_')
+#        city = _gp('destination_city_id_')
+#        district = _gp('destination_district_id_')
         dest = _gp('dest_')
         contact = _gp('contact_')
         tel = _gp('tel_')
@@ -124,9 +123,9 @@ class OrderView(BasicView):
                                       weight = _g('weight_%s' % id),
                                       weight_unit_id = _g('wunit_%s' % id),
                                       shipment_type_id = _g('shipment_type_%s' % id),
-                                      destination_province_id = _g('destination_province_id_%s' % id),
-                                      destination_city_id = _g('destination_city_id_%s' % id),
-                                      destination_district_id = _g('destination_district_id_%s' % id),
+#                                      destination_province_id = _g('destination_province_id_%s' % id),
+#                                      destination_city_id = _g('destination_city_id_%s' % id),
+#                                      destination_district_id = _g('destination_district_id_%s' % id),
                                       destination_address = _g('dest_%s' % id),
                                       destination_contact = _g('contact_%s' % id),
                                       destination_tel = _g('tel_%s' % id),
@@ -277,14 +276,14 @@ class OrderView(BasicView):
 
     @templated('order/add_by_customer.html')
     def add_by_customer(self):
-        if not session.get('customer_profile', None) or session['customer_profile'].get('id', None):
+        
+        if not session.get('customer_profile', None) or not session['customer_profile'].get('id', None):
             flash(MSG_NO_SUCH_ACTION, MESSAGE_ERROR)
             return redirect(url_for('bpRoot.view', action = "index"))
         return {
                 'units' : getMasterAll(ItemUnit),
                 'wunits' : getMasterAll(WeightUnit),
                 'shiptype' : getMasterAll(ShipmentType),
-                'provinces' : getMasterAll(Province, 'id'),
                 }
 
 
@@ -299,7 +298,7 @@ class OrderView(BasicView):
 
     @templated('order/search_by_customer.html')
     def search_by_customer(self):
-        if not session.get('customer_profile', None) or session['customer_profile'].get('id', None):
+        if not session.get('customer_profile', None) or not session['customer_profile'].get('id', None):
             flash(MSG_NO_SUCH_ACTION, MESSAGE_ERROR)
             return redirect(url_for('bpRoot.view', action = "index"))
         conditions = [OrderHeader.active == 0,
@@ -310,7 +309,7 @@ class OrderView(BasicView):
         if _g('no'):
             conditions.append(OrderHeader.no.like('%%%s%%' % _g('no')))
         if _g('destination_address'):
-            conditions.append(OrderDetail.destination_address == _g('destination_address'))
+            conditions.append(OrderDetail.destination_address.like(_g('destination_address')))
         if _g('create_time_from'):
             conditions.append(OrderHeader.create_time > _g('create_time_from'))
         if _g('create_time_to'):

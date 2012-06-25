@@ -28,7 +28,7 @@ from sys2do.model.logic import DeliverHeader, OrderHeader, OrderDetail, \
 from sys2do.util.common import _gl, _g, _gp, getOr404, getMasterAll, _debug, \
     _error
 #from sys2do.util.logic_helper import updateDeliverHeaderStatus
-from sys2do.model.master import Supplier, Province, InventoryItem
+from sys2do.model.master import Supplier, InventoryItem
 
 
 __all__ = ['bpDeliver']
@@ -38,7 +38,7 @@ bpDeliver = Blueprint('bpDeliver', __name__)
 
 class DeliverView(BasicView):
 
-#    decorators = [login_required]
+    decorators = [login_required]
 
     @templated('deliver/index.html')
     def index(self):
@@ -57,14 +57,12 @@ class DeliverView(BasicView):
         ids = _gl('order_detail_ids')
         order_details = DBSession.query(OrderDetail).filter(OrderDetail.id.in_(ids))
         suppliers = getMasterAll(Supplier)
-        return {'result' : order_details, 'suppliers' : suppliers, 'provinces' : getMasterAll(Province)}
+        return {'result' : order_details, 'suppliers' : suppliers}
 
 
     def deliver_save_new(self):
         try:
             header = DeliverHeader(no = _g('no'),
-                                   destination_province_id = _g('destination_province_id'),
-                                   destination_city_id = _g('destination_city_id'),
                                    destination_address = _g('destination_address'),
                                    supplier_id = _g('supplier_id'),
                                    supplier_contact = _g('supplier_contact'),
@@ -144,7 +142,7 @@ class DeliverView(BasicView):
                     d.order_detail.update_status(SEND_OUT[0])
 
                     #delete the item form inventory
-                    for r in DBSession.quey(InventoryItem).filter(and_(InventoryItem.active == 0, InventoryItem.refer_order_detail_id == d.order_detail_id)):
+                    for r in DBSession.query(InventoryItem).filter(and_(InventoryItem.active == 0, InventoryItem.refer_order_detail_id == d.order_detail_id)):
                         r.active = 1
 
 
@@ -152,7 +150,7 @@ class DeliverView(BasicView):
                                       refer_id = header.id,
                                       transfer_date = dt.now().strftime("%Y-%m-%d"),
                                       type = 1,
-                                      remark = LOG_GOODS_SENT_OUT
+                                      remark = unicode(LOG_GOODS_SENT_OUT)
                                       ))
 
             elif _g('sc') == 'GOODS_ARRIVED':
@@ -205,7 +203,7 @@ class DeliverView(BasicView):
 
     @templated('deliver/vendor_select.html')
     def vendor_select(self):
-        if not session.get('supplier_profile', None) or session['supplier_profile'].get('id', None):
+        if not session.get('supplier_profile', None) or not session['supplier_profile'].get('id', None):
             flash(MSG_NO_SUCH_ACTION, MESSAGE_ERROR)
             return redirect(url_for('bpRoot.view', action = "index"))
         result = DBSession.query(DeliverHeader).filter(and_(
@@ -222,7 +220,7 @@ class DeliverView(BasicView):
 
     @templated('deliver/vendor_input.html')
     def vendor_input(self):
-        if not session.get('supplier_profile', None) or session['supplier_profile'].get('id', None):
+        if not session.get('supplier_profile', None) or not session['supplier_profile'].get('id', None):
             flash(MSG_NO_SUCH_ACTION, MESSAGE_ERROR)
             return redirect(url_for('bpRoot.view', action = "index"))
 
@@ -238,7 +236,7 @@ class DeliverView(BasicView):
 
 
     def vendor_input_save(self):
-        if not session.get('supplier_profile', None) or session['supplier_profile'].get('id', None):
+        if not session.get('supplier_profile', None) or not session['supplier_profile'].get('id', None):
             flash(MSG_NO_SUCH_ACTION, MESSAGE_ERROR)
             return redirect(url_for('bpRoot.view', action = "index"))
 

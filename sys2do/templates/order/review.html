@@ -4,7 +4,9 @@
 
 {% endblock %}
 
-{% block content %}	
+{% block content %}
+	<div style="background-color: #fff;padding: 10px;">
+		
 		<ul>
 			<li><a href="{{url_for('.view', action = 'add')}}">新建订单</a></li>
 			<li><a href="{{url_for('.view', action = 'revise',id=values.get('id',''))}}">修改订单</a></li>
@@ -12,16 +14,17 @@
 			<li><a href="{{url_for('.view', action = 'barcode',id=values.get('id',''))}}">打印条码</a></li>		
 		</ul>
 
+
 		<p>{{_('Order Information')}}</p>
 		{% if values.get('barcode',None) %}
 			<p><img src="{{values.get('barcode','').url}}"/></p>
 		{% endif %}
-		<table border="1" cellpadding="3" cellspacing="3">
+		<table border="1" cellpadding="5" cellspacing="5">
 			<tr><td>{{_('Order No')}}</td><td>{{values.get('no','')}}</td></tr>
 			<tr><td>{{_('Customer')}}</td><td>{{values.get('customer','')}}</td></tr>
 			<tr>
 				<td>{{_('Address')}}</td>
-				<td>{{values.get('destination_full_address','')|ifFalse}}</td>
+				<td>{{values.get('source_address','')|ifFalse}}</td>
 			</tr>
 			<tr><td>{{_('Phone')}}</td><td>{{values.get('source_tel','')|ifFalse}}</td></tr>
 			<tr><td>{{_('Contact')}}</td><td>{{values.get('source_contact','')|ifFalse}}</td></tr>
@@ -30,7 +33,7 @@
 			<tr><td>{{_('Order Status')}}</td><td>{{values.get('status')|showStatus}}</td></tr>
 		</table>
 		<br />
-		<table border="1" cellpadding="3" cellspacing="3">
+		<table border="1" cellpadding="5" cellspacing="5">
 			<thead>
 				<tr>
 					<td>{{_('Item')}}</td>
@@ -51,7 +54,7 @@
 					<td>{{d.order_qty}} {{d.unit}}</td>
 					<td>{{d.weight}} {{d.weight_unit}}</td>
 					<td>{{d.shipment_type}}</td>
-					<td>{{d.destination_provice|ifFalse}}{{d.destination_city|ifFalse}}{{d.destination_district|ifFalse}}{{d.destination_address|ifFalse}}</td>
+					<td>{{d.destination_address|ifFalse}}</td>
 					<td>{{d.destination_contact|ifFalse}}</td>
 					<td>{{d.destination_tel|ifFalse}}</td>
 					<td>{{d.expect_time|ifFalse}}</td>
@@ -129,28 +132,7 @@
 		{% endif %}
 		
 		
+
 		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
+	</div>
 {% endblock %}

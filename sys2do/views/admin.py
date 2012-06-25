@@ -19,7 +19,7 @@ from sys2do.constant import MESSAGE_ERROR, MSG_NO_SUCH_ACTION, \
     MSG_NO_ID_SUPPLIED, MSG_RECORD_NOT_EXIST, MESSAGE_INFO, MSG_SAVE_SUCC, \
     MSG_UPDATE_SUCC, MSG_DELETE_SUCC
 from sys2do.util.common import _g, _gl, getMasterAll
-from sys2do.model.master import Customer, Province, CustomerProfile, \
+from sys2do.model.master import Customer, CustomerProfile, \
     SupplierProfile, Supplier
 
 __all__ = ['bpAdmin']
@@ -28,7 +28,7 @@ bpAdmin = Blueprint('bpAdmin', __name__)
 
 class AdminView(BasicView):
 
-#    decorators = [login_required, ]
+    decorators = [login_required, ]
 
     @templated('admin/index.html')
     def index(self):

@@ -5,19 +5,21 @@
 {% endblock %}
 
 {% block content %}
+	<div style="background-color: #fff;padding: 10px">
+		
 	<form method="post">
 		<table>
 			<tr>
-				<td>{{_('Deliver Number')}}</td><td><input type="text" name="no" value="{{values.get('no','')|ifFalse}}"/></td>
+				<td width="200">{{_('Deliver Number')}}</td><td width="200"><input type="text" name="no" value="{{values.get('no','')|ifFalse}}" class="field"/></td>
 			</tr>
 			<tr>
-				<td>{{_('Destination')}}</td><td><input type="text" name="destination_address" value="{{values.get('destination_address','')|ifFalse}}"/></td>
+				<td>{{_('Destination')}}</td><td><input type="text" name="destination_address" value="{{values.get('destination_address','')|ifFalse}}" class="field"//></td>
 			</tr>
 			<tr>
-				<td>{{_('Create Time(From)')}}</td><td><input type="text" name="create_time_from" value="{{values.get('create_time_from','')|ifFalse}}"/></td>
+				<td>{{_('Create Time(From)')}}</td><td><input type="text" name="create_time_from" value="{{values.get('create_time_from','')|ifFalse}}" class="field"//></td>
 			</tr>
 			<tr>
-				<td>{{_('Create Time(To)')}}</td><td><input type="text" name="create_time_to" value="{{values.get('create_time_to','')|ifFalse}}"/></td>
+				<td>{{_('Create Time(To)')}}</td><td><input type="text" name="create_time_to" value="{{values.get('create_time_to','')|ifFalse}}" class="field"//></td>
 			</tr>
 			<tr>
 				<td colspan="2"><input type="submit" value="{{_('Submit')}}"/></td>			
@@ -53,4 +55,5 @@
 		</thead>
 	</table>
 
+	</div>
 {% endblock %}

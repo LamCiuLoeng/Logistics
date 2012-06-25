@@ -46,53 +46,53 @@ class ChargeType(DeclarativeBase, SysMixin):
 
 
 
-class Province(DeclarativeBase, SysMixin):
-    __tablename__ = 'master_province'
-
-    id = Column(Integer, autoincrement = True, primary_key = True)
-    name = Column(Text)
-    is_direct = Column(Integer, default = 0)
-    remark = Column(Text)
-
-    def __str__(self): return self.name
-    def __repr__(self): return self.name
-    def __unicode__(self): return self.name
-
-
-
-
-
-
-class City(DeclarativeBase, SysMixin):
-    __tablename__ = 'master_city'
-
-    id = Column(Integer, autoincrement = True, primary_key = True)
-    name = Column(Text)
-    province_id = Column(Integer, ForeignKey('master_province.id'))
-    province = relation(Province, backref = backref("cities", order_by = id), primaryjoin = "and_(Province.id == City.province_id, City.active == 0)")
-
-    def __str__(self): return self.name
-    def __repr__(self): return self.name
-    def __unicode__(self): return self.name
-
-
-
-
-
-
-class District(DeclarativeBase, SysMixin):
-    __tablename__ = 'master_district'
-
-    id = Column(Integer, autoincrement = True, primary_key = True)
-    name = Column(Text)
-    city_id = Column(Integer, ForeignKey('master_city.id'))
-    city = relation(City, backref = backref("districts", order_by = id), primaryjoin = "and_(City.id == District.city_id, District.active == 0)")
-
-    def __str__(self): return self.name
-
-    def __repr__(self): return self.name
-
-    def __unicode__(self): return self.name
+#class Province(DeclarativeBase, SysMixin):
+#    __tablename__ = 'master_province'
+#
+#    id = Column(Integer, autoincrement = True, primary_key = True)
+#    name = Column(Text)
+#    is_direct = Column(Integer, default = 0)
+#    remark = Column(Text)
+#
+#    def __str__(self): return self.name
+#    def __repr__(self): return self.name
+#    def __unicode__(self): return self.name
+#
+#
+#
+#
+#
+#
+#class City(DeclarativeBase, SysMixin):
+#    __tablename__ = 'master_city'
+#
+#    id = Column(Integer, autoincrement = True, primary_key = True)
+#    name = Column(Text)
+#    province_id = Column(Integer, ForeignKey('master_province.id'))
+#    province = relation(Province, backref = backref("cities", order_by = id), primaryjoin = "and_(Province.id == City.province_id, City.active == 0)")
+#
+#    def __str__(self): return self.name
+#    def __repr__(self): return self.name
+#    def __unicode__(self): return self.name
+#
+#
+#
+#
+#
+#
+#class District(DeclarativeBase, SysMixin):
+#    __tablename__ = 'master_district'
+#
+#    id = Column(Integer, autoincrement = True, primary_key = True)
+#    name = Column(Text)
+#    city_id = Column(Integer, ForeignKey('master_city.id'))
+#    city = relation(City, backref = backref("districts", order_by = id), primaryjoin = "and_(City.id == District.city_id, District.active == 0)")
+#
+#    def __str__(self): return self.name
+#
+#    def __repr__(self): return self.name
+#
+#    def __unicode__(self): return self.name
 
 
 
@@ -104,12 +104,12 @@ class Customer(DeclarativeBase, SysMixin, CRUDMixin):
     id = Column(Integer, autoincrement = True, primary_key = True)
 
     name = Column(Text)
-    province_id = Column(Integer, ForeignKey('master_province.id'))
-    provice = relation(Province)
-    city_id = Column(Integer, ForeignKey('master_city.id'))
-    city = relation(City)
-    district_id = Column(Integer, ForeignKey('master_district.id'))
-    district = relation(District)
+#    province_id = Column(Integer, ForeignKey('master_province.id'))
+#    provice = relation(Province)
+#    city_id = Column(Integer, ForeignKey('master_city.id'))
+#    city = relation(City)
+#    district_id = Column(Integer, ForeignKey('master_district.id'))
+#    district = relation(District)
     address = Column(Text)
     phone = Column(Text)
     contact_person = Column(Text)
@@ -122,10 +122,11 @@ class Customer(DeclarativeBase, SysMixin, CRUDMixin):
 
     def populate(self):
         params = {}
-        for k in ['id', 'name', 'province_id', 'city_id', 'district_id',
+        for k in ['id', 'name', 
+#                  'province_id', 'city_id', 'district_id',
                   'address', 'phone', 'contact_person', 'remark']:
             params[k] = getattr(self, k)
-        return k
+        return params
 
     @classmethod
     def saveAsNew(clz, v):
@@ -163,12 +164,12 @@ class Supplier(DeclarativeBase, SysMixin, CRUDMixin):
     id = Column(Integer, autoincrement = True, primary_key = True)
 
     name = Column(Text)
-    province_id = Column(Integer, ForeignKey('master_province.id'))
-    provice = relation(Province)
-    city_id = Column(Integer, ForeignKey('master_city.id'))
-    city = relation(City)
-    district_id = Column(Integer, ForeignKey('master_district.id'))
-    district = relation(District)
+#    province_id = Column(Integer, ForeignKey('master_province.id'))
+#    provice = relation(Province)
+#    city_id = Column(Integer, ForeignKey('master_city.id'))
+#    city = relation(City)
+#    district_id = Column(Integer, ForeignKey('master_district.id'))
+#    district = relation(District)
     address = Column(Text)
     phone = Column(Text)
     contact_person = Column(Text)
@@ -180,10 +181,11 @@ class Supplier(DeclarativeBase, SysMixin, CRUDMixin):
 
     def populate(self):
         params = {}
-        for k in ['id', 'name', 'province_id', 'city_id', 'district_id',
+        for k in ['id', 'name', 
+#                  'province_id', 'city_id', 'district_id',
                   'address', 'phone', 'contact_person', 'remark']:
             params[k] = getattr(self, k)
-        return k
+        return params
 
 
 class SupplierProfile(DeclarativeBase, SysMixin):

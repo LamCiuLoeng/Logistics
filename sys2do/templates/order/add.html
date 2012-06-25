@@ -5,11 +5,7 @@
 	.template{
 		display:none;
 	}
-	
-	.field{
-		background-color : #FFFFCC;
-		height : 20px;
-	}
+
 </style>
 {% endblock %}
 
@@ -66,28 +62,7 @@
 		<input type="button" value="{{BTN_RETURN}}" onclick="location.href='{{url_for('.view', action = 'index')}}'"/>
 
 		<table width="100%" border="0" cellspacing="0" cellpadding="0">
-      <tr>
-        <td><table width="100%" border="0" cellspacing="0" cellpadding="0">
-          <tr>
-            <td width="18"><img src="/static/images/system/group_manage_20.jpg" width="18" height="35" /></td>
-            <td width="2"><img src="/static/images/system/group_manage_21.jpg" width="2" height="35" /></td>
-            <td width="107"><a href="{{url_for('.view', action = 'add')}}"><img src="/static/images/system/group_manage_22.jpg" width="107" height="35" /></a></td>
-			<td width="2"><img src="/static/images/system/group_manage_21.jpg" width="2" height="35" /></td>
-            
-            
-            <!-- 
-            <td width="106"><img src="/static/images/system/group_manage_24.jpg" width="106" height="35" /></td>
-			<td width="2"><img src="/static/images/system/group_manage_21.jpg" width="2" height="35" /></td>
-            <td width="107"><img src="/static/images/system/group_manage_26.jpg" width="107" height="35" /></td>
-			<td width="2"><img src="/static/images/system/group_manage_21.jpg" width="2" height="35" /></td>
-            <td width="106"><img src="/static/images/system/group_manage_28.jpg" width="106" height="35" /></td>
-			<td width="2"><img src="/static/images/system/group_manage_21.jpg" width="2" height="35" /></td>
-            -->
-            <td background="/static/images/system/group_manage_30.jpg">&nbsp;</td>
-            <td width="16"><img src="/static/images/system/group_manage_33.jpg" width="16" height="35" /></td>
-          </tr>
-        </table></td>
-      </tr>
+      
       <tr>
         <td>&nbsp;</td>
       </tr>
@@ -107,39 +82,29 @@
 			<tr>
 				<td width="100">{{_('Customer')}}</td>
 				<td>
-					<select name="customer_id" id="customer_id" onchange="changecustomer(this)">
+					<select name="customer_id" id="customer_id" onchange="changecustomer(this)" class="field" style="width: 300px">
 						<option>{{_('Please Select One')}}</option>
 						{% for c in customers%}
 							<option value="{{c.id}}">{{c.name}}</option>
 						{% endfor %}
-						<option value="OTHER">---- {{_('Other')}} ----</option>
 					</select>
 				</td>
 			</tr>
 			<tr>
 				<td>{{_('Address')}}</td>
-				<td>
-					<select name="source_province_id" id="source_province_id">
-						<option>{{_('Please Select One')}}</option>
-						{% for p in provinces %}
-							<option value="{{p.id}}">{{p}}</option>
-						{% endfor %}
-					</select>
-					<select name="source_city_id" id="source_city_id"></select>
-					<select name="source_district_id" id="source_district_id"></select>
-					<input type="text" name="source_address" id="source_address" value=""/></td>
+				<td><input type="text" name="source_address" id="source_address" value="" class="field" style="width: 300px"/></td>
 			</tr>
 			<tr>
 				<td>{{_('Phone')}}</td>
-				<td><input type="text" name="source_tel" id="source_tel" value=""/></td>
+				<td><input type="text" name="source_tel" id="source_tel" value="" class="field" style="width: 300px"/></td>
 			</tr>
 			<tr>
 				<td>{{_('Contact')}}</td>
-				<td><input type="text" name="source_contact" id="source_contact" value=""/></td>
+				<td><input type="text" name="source_contact" id="source_contact" value="" class="field" style="width: 300px"/></td>
 			</tr>
 			<tr>
 				<td>{{_('Remark')}}</td>
-				<td><textarea name="remark" id="remark"></textarea></td>
+				<td><textarea name="remark" id="remark" class="field" style="width: 300px"></textarea></td>
 			</tr>
 		</table>
 		<br />
@@ -165,7 +130,7 @@
                 <tbody>
 				<tr class="template data_table_tr">
 					<td>
-						<input type="button" value="{{_('Del Line')}}" onclick="deleteline(this)" />
+						<input type="button" value="{{_('Del')}}" onclick="deleteline(this)" />
 						<input type="hidden" name="shipment_type_x" value=""/>
 					</td>
 					<td><input type="text" name="item_x" id="item_x" value="" class="field" style="width:80px"/></td>
@@ -186,18 +151,7 @@
 							{% endfor %}
 						</select>	
 					</td>
-					<td>
-						<select name="destination_province_id_x" id="destination_province_id_x" class="field">
-							<option>{{_('Please Select One')}}</option>
-							{% for p in provinces %}
-								<option value="{{p.id}}">{{p}}</option>
-							{% endfor %}
-						</select>
-						<br />
-						<select name="destination_city_id_x" id="destination_city_id_x" class="field"></select><br />
-						<select name="destination_district_id_x" id="destination_district_id_x" class="field"></select><br />
-						<input type="text" name="dest_x" id="dest_x" value="" class="field"/>
-					</td>
+					<td><input type="text" name="dest_x" id="dest_x" value="" class="field"/></td>
 					<td><input type="text" name="contact_x" id="contact_x" value="" class="field" style="width:50px"/></td>
 					<td><input type="text" name="tel_x" id="tel_x" value="" class="field" style="width:50px"/></td>
 					<td><input type="text" name="expect_time_x" id="expect_time_x" value="" class="field" style="width:50px"/></td>

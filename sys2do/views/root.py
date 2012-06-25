@@ -12,12 +12,12 @@ from sqlalchemy import and_
 from sys2do import app
 from sys2do.model import DBSession, User
 from flask.helpers import jsonify
-from sys2do.util.decorator import templated
+from sys2do.util.decorator import templated, login_required
 from sys2do.util.common import _g, _gp, _gl
 from sys2do.constant import MESSAGE_ERROR, MESSAGE_INFO, MSG_NO_SUCH_ACTION, \
     MSG_SAVE_SUCC
 from sys2do.views import BasicView
-from sys2do.model.master import CustomerProfile, Customer, City, District
+from sys2do.model.master import CustomerProfile, Customer
 from sys2do.model.logic import OrderHeader, OrderDetail
 from sys2do.util.logic_helper import genSystemNo
 
@@ -29,6 +29,7 @@ bpRoot = Blueprint('bpRoot', __name__)
 
 class RootView(BasicView):
 
+    @login_required
     @templated("index.html")
     def index(self):
     #    flash('hello!', MESSAGE_INFO)

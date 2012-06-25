@@ -54,43 +54,40 @@
 {% endblock %}
 
 {% block content %}
+	<div style="background-color: #fff;padding: 10px;">
 	<form action="{{url_for('.view', action = 'save_new_by_customer')}}" method="post">
+		<p>
+			
 		<input type="button" value="{{BTN_SAVE}}" onclick="tosave()"/> 
 		<input type="reset" value="{{BTN_RESET}}"/>
 		<input type="button" value="{{BTN_CANCEL}}" onclick="location.href='{{url_for('.view', action = 'index')}}'"/>
+		
 		<input type="button" value="{{BTN_RETURN}}" onclick="location.href='{{url_for('.view', action = 'index')}}'"/>
-		<table border="1" cellpadding="3" cellspacing="3">
+		</p>
+		<table border="0" cellpadding="5" cellspacing="5">
+			
 			<tr>
 				<td>{{_('Customer')}}</td>
 				<td>
 					{{session.get('customer_profile',{}).get('name','')}}
-					<input type="hidden" name="customer_id" value="{{session.get('customer_profile',{}).get('id','')}}"/>
+					<input type="hidden" name="customer_id" value="{{session.get('customer_profile',{}).get('id','')}}" class="field"/>
 				</td>
 			</tr>
 			<tr>
 				<td>{{_('Address')}}</td>
-				<td>
-					<select name="source_province_id" id="source_province_id">
-						<option>{{_('Please Select One')}}</option>
-						{% for p in provinces %}
-							<option value="{{p.id}}">{{p}}</option>
-						{% endfor %}
-					</select>
-					<select name="source_city_id" id="source_city_id"></select>
-					<select name="source_district_id" id="source_district_id"></select>
-					<input type="text" name="source_address" id="source_address" value=""/></td>
+				<td><input type="text" style="width:300px" name="source_address" id="source_address" value="{{session.get('customer_profile',{}).get('address','')|ifFalse}}" class="field"/></td>
 			</tr>
 			<tr>
 				<td>{{_('Phone')}}</td>
-				<td><input type="text" name="source_tel" id="source_tel" value="{{session.get('customer_profile',{}).get('phone','')}}"/></td>
+				<td><input type="text" style="width:300px" name="source_tel" id="source_tel" value="{{session.get('customer_profile',{}).get('phone','')|ifFalse}}" class="field"/></td>
 			</tr>
 			<tr>
 				<td>{{_('Contact')}}</td>
-				<td><input type="text" name="source_contact" id="source_contact" value="{{session.get('customer_profile',{}).get('contact_person','')}}"/></td>
+				<td><input type="text" style="width:300px" name="source_contact" id="source_contact" value="{{session.get('customer_profile',{}).get('contact_person','')|ifFalse}}" class="field"/></td>
 			</tr>
 			<tr>
 				<td>{{_('Remark')}}</td>
-				<td><textarea name="remark" id="remark"></textarea></td>
+				<td><textarea name="remark" id="remark" class="field" style="width:300px"></textarea></td>
 			</tr>
 		</table>
 		<br />
@@ -98,7 +95,7 @@
 		
 		<p><input type="button" value="{{_('Add Line')}}" onclick="addline();"/></p>
 		
-		<table border="1" cellpadding="3" cellspacing="3" id="item_table">
+		<table border="0" cellpadding="3" cellspacing="3" id="item_table">
 			<thead>
 				<tr>
 					<td>{{_('Action')}}</td>
@@ -108,30 +105,29 @@
 					<td>{{_('Weight')}}</td>
 					<td>{{_('Weight Unit')}}</td>
 					<td>{{_('Shipment Type')}}</td>
-					<td>{{_('Charge Type')}}</td>
 					<td>{{_('Destination')}}</td>
-					<td>{{_('Destination Contact')}}</td>
-					<td>{{_('Destination Tel')}}</td>
+					<td>{{_('Contact')}}</td>
+					<td>{{_('Tel')}}</td>
 					<td>{{_('Expect Time')}}</td>
 					<td>{{_('Remark')}}</td>
 				</tr>
 			</thead>
 			<tbody>
 				<tr class="template">
-					<td><input type="button" value="{{_('Del Line')}}" onclick="deleteline(this)"/></td>
-					<td><input type="text" name="item_x" id="item_x" value=""/></td>
-					<td><input type="text" name="qty_x" id="qty_x" value=""/></td>
+					<td><input type="button" value="{{_('Del')}}" onclick="deleteline(this)" class="field" /></td>
+					<td><input type="text" name="item_x" id="item_x" value="" class="field" style="width:80px"/></td>
+					<td><input type="text" name="qty_x" id="qty_x" value="" class="field" style="width:30px"/></td>
 					<td>
-						<select name="unit_x">
+						<select name="unit_x" class="field">
 							{% for unit in units %}
 								<option value="{{unit.id}}">{{unit}}</option>
 							{% endfor %}
 						</select>
 					</td>
-					<td><input type="text" name="weight_x" id="weight_x" value=""/></td>
+					<td><input type="text" name="weight_x" id="weight_x" value="" class="field" style="width:30px"/></td>
 					
 					<td>
-						<select name="wunit_x">
+						<select name="wunit_x" class="field">
 							{% for wunit in wunits %}
 								<option value="{{wunit.id}}">{{wunit}}</option>
 							{% endfor %}
@@ -139,38 +135,21 @@
 					</td>
 					
 					<td>
-						<select name="shipment_type_x">
+						<select name="shipment_type_x" class="field">
 							{% for st in shiptype %}
 								<option value="{{st.id}}">{{st}}</option>
 							{% endfor %}
 						</select>
 					</td>
-					<td>
-						<select name="charge_type_x">
-							{% for ct in  chargetype%}
-								<option value="{{ct.id}}">{{ct}}</option>
-							{% endfor %}
-						</select>
-					</td>
-					<td>
-						<select name="destination_province_id_x" id="destination_province_id_x">
-							<option>{{_('Please Select One')}}</option>
-							{% for p in provinces %}
-								<option value="{{p.id}}">{{p}}</option>
-							{% endfor %}
-						</select>
-						<br />
-						<select name="destination_city_id_x" id="destination_city_id_x"></select><br />
-						<select name="destination_district_id_x" id="destination_district_id_x"></select><br />
-						<input type="text" name="dest_x" id="dest_x" value=""/>
-					</td>
-					<td><input type="text" name="contact_x" id="contact_x" value=""/></td>
-					<td><input type="text" name="tel_x" id="tel_x" value=""/></td>
-					<td><input type="text" name="expect_time_x" id="expect_time_x" value=""/></td>
-					<td><textarea name="remark_x" id="remark_x"></textarea></td>
+					<td><input type="text" name="dest_x" id="dest_x" value="" class="field" style="width:80px"/></td>
+					<td><input type="text" name="contact_x" id="contact_x" value="" class="field" style="width:50px"/></td>
+					<td><input type="text" name="tel_x" id="tel_x" value="" class="field" style="width:100px"/></td>
+					<td><input type="text" name="expect_time_x" id="expect_time_x" value="" class="field" style="width:80px"/></td>
+					<td><textarea name="remark_x" id="remark_x" class="field"></textarea></td>
 					
 				</tr>
 			</tbody>
 		</table>
 	</form>
+	</div>
 {% endblock %}

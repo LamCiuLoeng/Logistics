@@ -9,6 +9,7 @@
 	<title>{% block title %}{{_("Logistics Management")}}{% block subtitle %}{% endblock %}{% endblock %}</title>
 	
 	<link href="{{url_for('static', filename='css/screen.css')}}" rel="stylesheet" type="text/css" />
+	<link href="{{url_for('static', filename='css/extra.css')}}" rel="stylesheet" type="text/css" />
 	<link href="{{url_for('static', filename='css/modaldialog/jquery.modaldialog.css')}}" rel="stylesheet" type="text/css" />
 	{% block extCSS %}{% endblock %}
 
@@ -56,7 +57,7 @@
 			      <table width="100%" border="0" cellspacing="0" cellpadding="0">
 			        <tr>
 			          <td width="24"><img src="/static/images/system/group_manage_10.jpg" width="24" height="50" /></td>
-			          <td class="user_display">管理员用户 / administrator</td>
+			          <td class="user_display">{{session['user_profile']['name']}}</td>
 			        </tr>
 			      </table>
 			    </td>
@@ -78,7 +79,7 @@
 			    	  <tr><td class="menu_hover" onmouseover="menu_hover(this)" onmouseout="menu_hover_highlight(this)"><a href="{{url_for('bpDeliver.view', action = 'vendor_select')}}" class="menu_left">订单信息录入</a></td></tr>
 					  <tr><td>&nbsp;</td></tr>
 			    	{% endif %}
-			    	{% if 'ADMIN' is in_group %}
+			    	{% if 'OFFICER' is in_group %}
 			    	  <tr><td class="menu_hover" onmouseover="menu_hover(this)" onmouseout="menu_hover_highlight(this)"><a href="{{url_for('bpOrder.view', action = 'index')}}" class="menu_left">订单管理</a></td></tr>
 					  <tr><td>&nbsp;</td></tr>
 					  <tr><td class="menu_hover" onmouseover="menu_hover(this)" onmouseout="menu_hover_highlight(this)"><a href="{{url_for('bpDeliver.view', action = 'select_orders')}}" class="menu_left">分拣</a></td></tr>

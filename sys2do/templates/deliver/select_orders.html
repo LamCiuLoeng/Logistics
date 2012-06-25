@@ -5,6 +5,8 @@
 {% endblock %}
 
 {% block content %}
+	<div style="background-color: #fff;padding: 10px;">
+		
 	<form method="post" action="{{url_for('.view',action='add_deliver')}}">
 	<p>
 		<input type="submit" value="{{_('New Delivery')}}"/>
@@ -42,5 +44,6 @@
 		</thead>
 	</table>
 	</form>
+	</div>
 	
 {% endblock %}

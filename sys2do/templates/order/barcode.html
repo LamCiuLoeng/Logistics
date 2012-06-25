@@ -1,7 +1,9 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html>
 <head>
-  
+ 
+    <link href="/static/css/screen.css" rel="stylesheet" type="text/css" media="print"/>
+	<link href="/static/css/extra.css" rel="stylesheet" type="text/css" media="print"/>
 </head>
 
 <body>
@@ -20,17 +22,19 @@
 		</tr>
 		<tr>
 			<td>货物</td>
-			<td>{{d.item}}</td>
+			<td>&nbsp;{{d.item}}</td>
 			<td>&nbsp;</td>
 		</tr>
 		<tr>
 			<td>地区</td>
-			<td>{{d.destination_provice}}{{d.destination_city}}</td>
+			<td>&nbsp;{{d.destination_address}}</td>
 			<td>&nbsp;</td>
 			<td width="100">数量</td>
-			<td width="250">{{d.order_qty}}</td>		
+			<td width="250">&nbsp;{{d.order_qty}}</td>		
 		</tr>
-	</table> 
+	</table>
+	<br />
+	<br />
 	{% endfor %}
 </body>
 </html>

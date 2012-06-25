@@ -36,13 +36,13 @@ LOGGING_LEVEL = logging.INFO
 
 
 #config for i18n
-BABEL_DEFAULT_LOCALE = 'en'
+BABEL_DEFAULT_LOCALE = 'zh_CN'
 BABEL_DEFAULT_TIMEZONE = 'UTC'
 
 #database setting
 #sqlite
-SQLALCHEMY_DATABASE_URI = 'sqlite:///%s' % (os.path.join(os.path.dirname(__file__), ".." , "logistics.db"))
+#SQLALCHEMY_DATABASE_URI = 'sqlite:///%s' % (os.path.join(os.path.dirname(__file__), ".." , "logistics.db"))
 #mysql
 #SQLALCHEMY_DATABASE_URI = sqlalchemy.url=mysql://username:password@hostname:port/databasename
 #postgresql
-#SQLALCHEMY_DATABASE_URI = sqlalchemy.url=postgresql://postgres:admin@hostname:port/databasename
+SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:admin@localhost:5432/Logistics'

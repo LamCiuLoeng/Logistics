@@ -5,16 +5,18 @@
 {% endblock %}
 
 {% block content %}
+	<div style="background-color: #fff;padding: 10px;">
+		
 	<ul>
 		<li><a href="{{url_for('.view', action = 'revise')}}">{{_('Revise')}}</a></li>
 		<li><a href="{{url_for('.view', action = 'cancel')}}">{{_('Cancel')}}</a></li>
 		<li><a href="{{url_for('.view')}}">{{_('Return')}}</a></li>
 	</ul>	
 	
-	<table border="1" cellpadding="3" cellspacing="3">
+	<table border="1" cellpadding="5" cellspacing="5">
 		<tr>
-			<td>{{_('3rd Party Supplier')}}</td>
-			<td>{{values.get('supplier','')|ifFalse}}</td>
+			<td width="200">{{_('3rd Party Supplier')}}</td>
+			<td width="200">{{values.get('supplier','')|ifFalse}}</td>
 		</tr>
 		<tr>
 			<td>{{_('Deliver Number')}}</td>
@@ -62,7 +64,7 @@
 		</tr>
 	</table>
 	<br />
-	<table border="1" cellpadding="3" cellspacing="3">
+	<table border="1" cellpadding="5" cellspacing="5">
 		<thead>
 			<tr>
 				<td>{{_('Customer')}}</td>
@@ -75,8 +77,6 @@
 				<td>{{_('Destination Contact')}}</td>
 				<td>{{_('Destination Tel')}}</td>
 				<td>{{_('Remark')}}</td>
-				<td>{{_('Create Time')}}</td>
-				<td>{{_('Creator')}}</td>
 				<td>{{_('Update Time')}}</td>
 				<td>{{_('Last Updator')}}</td>
 			</tr>
@@ -93,8 +93,6 @@
 				<td>{{d.order_detail.destination_contact}}</td>
 				<td>{{d.order_detail.destination_tel}}</td>
 				<td>{{d.order_detail.remark|ifFalse}}</td>
-				<td>{{d.order_detail.create_time|ft}}</td>
-				<td>{{d.order_detail.create_by|ifFalse}}</td>
 				<td>{{d.order_detail.update_time|ft}}</td>
 				<td>{{d.order_detail.update_by|ifFalse}}</td>
 			</tr>
@@ -136,5 +134,6 @@
 			</table>
 		</form>
 	{% endif %}
+	</div>
 	
 {% endblock %}

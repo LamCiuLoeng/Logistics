@@ -13,7 +13,7 @@ from sqlalchemy.orm import relation, backref
 from sys2do.model import DeclarativeBase, metadata, DBSession
 from auth import SysMixin
 from sys2do.model.master import Customer, Supplier, ItemUnit, ShipmentType, \
-    WeightUnit, Province, City, District, InventoryLocation
+    WeightUnit, InventoryLocation
 from sys2do.model.auth import CRUDMixin
 from sys2do.model.system import UploadFile
 from sqlalchemy.sql.expression import and_
@@ -35,12 +35,12 @@ class OrderHeader(DeclarativeBase, SysMixin, CRUDMixin):
     customer = relation(Customer, backref = backref("orders", order_by = id), primaryjoin = "and_(Customer.id == OrderHeader.customer_id, OrderHeader.active == 0)")
 
 
-    source_province_id = Column(Integer, ForeignKey('master_province.id'))
-    source_provice = relation(Province)
-    source_city_id = Column(Integer, ForeignKey('master_city.id'))
-    source_city = relation(City)
-    source_district_id = Column(Integer, ForeignKey('master_district.id'))
-    source_district = relation(District)
+#    source_province_id = Column(Integer, ForeignKey('master_province.id'))
+#    source_provice = relation(Province)
+#    source_city_id = Column(Integer, ForeignKey('master_city.id'))
+#    source_city = relation(City)
+#    source_district_id = Column(Integer, ForeignKey('master_district.id'))
+#    source_district = relation(District)
 
     source_address = Column(Text)
     source_contact = Column(Text)
@@ -73,9 +73,9 @@ class OrderHeader(DeclarativeBase, SysMixin, CRUDMixin):
                 'id' : self.id,
                 'no' : self.no,
                 'customer' : self.customer,
-                'source_provice' : self.source_provice,
-                'source_city' : self.source_city,
-                'source_district' : self.source_district,
+#                'source_provice' : self.source_provice,
+#                'source_city' : self.source_city,
+#                'source_district' : self.source_district,
                 'source_address' : self.source_address,
                 'source_contact' : self.source_contact,
                 'source_tel' : self.source_tel,
@@ -87,7 +87,7 @@ class OrderHeader(DeclarativeBase, SysMixin, CRUDMixin):
                 'status' : self.status,
                 'barcode' : self.barcode,
                 'amount' : self.amount,
-                'destination_full_address' : self.destination_full_address,
+#                'destination_full_address' : self.destination_full_address,
                 }
 
     def update_status(self, status):
@@ -103,9 +103,9 @@ class OrderHeader(DeclarativeBase, SysMixin, CRUDMixin):
                                                 )).order_by(TransferLog.id)
 
 
-    @property
-    def destination_full_address(self):
-        return "".join(filter(lambda v:v, [self.source_provice, self.source_city, self.source_address]))
+#    @property
+#    def destination_full_address(self):
+#        return "".join(filter(lambda v:v, [self.source_provice, self.source_city, self.source_address]))
 
 
 class OrderDetail(DeclarativeBase, SysMixin):
@@ -135,12 +135,12 @@ class OrderDetail(DeclarativeBase, SysMixin):
     shipment_type = relation(ShipmentType)
 #    shipment_instruction = Column(Unicode(5000))
 
-    destination_province_id = Column(Integer, ForeignKey('master_province.id'))
-    destination_provice = relation(Province)
-    destination_city_id = Column(Integer, ForeignKey('master_city.id'))
-    destination_city = relation(City)
-    destination_district_id = Column(Integer, ForeignKey('master_district.id'))
-    destination_district = relation(District)
+#    destination_province_id = Column(Integer, ForeignKey('master_province.id'))
+#    destination_provice = relation(Province)
+#    destination_city_id = Column(Integer, ForeignKey('master_city.id'))
+#    destination_city = relation(City)
+#    destination_district_id = Column(Integer, ForeignKey('master_district.id'))
+#    destination_district = relation(District)
     destination_address = Column(Text)
     destination_contact = Column(Text)
     destination_tel = Column(Text)
@@ -163,9 +163,9 @@ class OrderDetail(DeclarativeBase, SysMixin):
         self.status = status
         self.header.status = min([d.status for d in self.header.details])
 
-    @property
-    def destination_full_address(self):
-        return "".join(filter(lambda v:v, [self.destination_provice, self.destination_city, self.destination_address]))
+#    @property
+#    def destination_full_address(self):
+#        return "".join(filter(lambda v:v, [self.destination_provice, self.destination_city, self.destination_address]))
 
 
 
@@ -176,10 +176,10 @@ class DeliverHeader(DeclarativeBase, SysMixin, CRUDMixin):
     id = Column(Integer, autoincrement = True, primary_key = True)
     no = Column(Text)
 
-    destination_province_id = Column(Integer, ForeignKey('master_province.id'))
-    destination_provice = relation(Province)
-    destination_city_id = Column(Integer, ForeignKey('master_city.id'))
-    destination_city = relation(City)
+#    destination_province_id = Column(Integer, ForeignKey('master_province.id'))
+#    destination_provice = relation(Province)
+#    destination_city_id = Column(Integer, ForeignKey('master_city.id'))
+#    destination_city = relation(City)
     destination_address = Column(Text)
     supplier_id = Column(Integer, ForeignKey('master_supplier.id'))
     supplier = relation(Supplier)
@@ -239,9 +239,9 @@ class DeliverHeader(DeclarativeBase, SysMixin, CRUDMixin):
                                                 TransferLog.refer_id == self.id
                                                 )).order_by(TransferLog.id)
 
-    @property
-    def destination_full_address(self):
-        return "".join(filter(lambda v:v, [self.destination_provice, self.destination_city, self.destination_address]))
+#    @property
+#    def destination_full_address(self):
+#        return "".join(filter(lambda v:v, [self.destination_provice, self.destination_city, self.destination_address]))
 
 
 class DeliverDetail(DeclarativeBase, SysMixin):

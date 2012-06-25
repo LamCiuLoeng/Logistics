@@ -1,54 +1,133 @@
 {% extends "master.html" %}
 
 {% block extJS %}
+<script language="JavaScript" type="text/javascript">
+//<![CDATA[
+	function tosave(){
+		$("form").submit();
+	}
 
+//]]>
+</script>
 {% endblock %}
 
-{% block content %}
-	<form method="post">
-		<table>
-			<tr>
-				<tr><td>{{_('Order No')}}</td>
-				<td><input type="text" name="no" value="{{values.get('no','')|ifFalse}}"/></td>
-			</tr>
-			<tr>
-				<td>{{_('Create Time(From)')}}</td>
-				<td><input type="text" name="create_time_from" value="{{values.get('create_time_from','')|ifFalse}}"/></td>
-			</tr>
-			<tr>
-				<td>{{_('Create Time(To)')}}</td>
-				<td><input type="text" name="create_time_to" value="{{values.get('create_time_to','')|ifFalse}}"/></td>
-			</tr>
-			<tr>
-				<td>{{_('Destination')}}</td>
-				<td><input type="text" name="destination_address" value="{{values.get('destination_address','')|ifFalse}}"/></td>
-			</tr>
-			<tr>
-				<td colspan="2"><input type="submit" value="{{_('Submit')}}"/></td>
-			</tr>
-		</table>
-	</form>
-	
-	
-	<table border="1" cellpadding="3" cellspacing="3">
-		<thead>
-			<tr>
-				<td>{{_('Order Number')}}</td>
-				<td>{{_('Customer')}}</td>
-				<td>{{_('Destination')}}</td>
-				<td>{{_('create_time')}}</td>
-				<td>{{_('Status')}}</td>
-			</tr>
-			{% for (h,d) in result%}
-			<tr>
-				<td><a href="{{url_for('.view', action = 'search_transfer_log',id=h.id)}}">{{h.no}}</a></td>
-				<td>{{h.customer}}</td>
-				<td>{{d.destination_address}}</td>
-				<td>{{h.create_time|ft}}</td>
-				<td>{{d.status|showStatus}}</td>
-			</tr>
-			{% endfor %}
-		</thead>
-	</table>
-	
+{% block content %}	
+	<table width="100%" border="0" cellspacing="0" cellpadding="0">
+      <tr>
+        <td><table width="100%" border="0" cellspacing="0" cellpadding="0">
+          <tr>
+            <td width="18"><img src="/static/images/system/group_manage_20.jpg" width="18" height="35" /></td>
+            <td width="2"><img src="/static/images/system/group_manage_21.jpg" width="2" height="35" /></td>
+             <td width="106"><a href="#" onclick="return tosave();"><img width="106" height="35" src="/static/images/system/group_manage_24.jpg"></a></td>
+			<td width="2"><img src="/static/images/system/group_manage_21.jpg" width="2" height="35" /></td>
+            
+            
+            <!-- 
+            <td width="106"><img src="/static/images/system/group_manage_24.jpg" width="106" height="35" /></td>
+			<td width="2"><img src="/static/images/system/group_manage_21.jpg" width="2" height="35" /></td>
+            <td width="107"><img src="/static/images/system/group_manage_26.jpg" width="107" height="35" /></td>
+			<td width="2"><img src="/static/images/system/group_manage_21.jpg" width="2" height="35" /></td>
+            <td width="106"><img src="/static/images/system/group_manage_28.jpg" width="106" height="35" /></td>
+			<td width="2"><img src="/static/images/system/group_manage_21.jpg" width="2" height="35" /></td>
+            -->
+            <td background="/static/images/system/group_manage_30.jpg">&nbsp;</td>
+            <td width="16"><img src="/static/images/system/group_manage_33.jpg" width="16" height="35" /></td>
+          </tr>
+        </table></td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+      </tr>
+      <tr>
+        <td align="left">
+        
+        	<table width="99%" border="0" cellspacing="0" cellpadding="0" bgcolor="#FFFFFF">
+          <tr>
+            <td width="13"><img src="/static/images/system/group_manage_40.jpg" width="13" height="13" /></td>
+            <td></td>
+            <td width="13"><img src="/static/images/system/group_manage_46.jpg" width="13" height="13" /></td>
+          </tr>
+          <tr>
+            <td>&nbsp;</td>
+            <td><table width="100%" border="0" cellspacing="0" cellpadding="0">
+              <tr>
+                <td class="title_fonts_display">订单查询</td>
+              </tr>
+              <tr>
+                <td>&nbsp;</td>
+              </tr>
+            </table>
+            
+            <form method="post">
+              <table width="80%" cellspacing="0" cellpadding="0" border="0">
+                <tbody><tr>
+                  <td width="100" height="30" align="center">{{_('Order No')}}&nbsp;</td>
+                  <td width="300"><input type="text" class="search_input" name="no" value="{{values.get('no','')|ifFalse}}"/></td>
+                  <td width="100" align="center">{{_('Destination')}}&nbsp;</td>
+                  <td><input type="text" class="search_input" name="destination_address"/></td>
+                </tr>
+                <tr>
+                  <td width="100" height="30" align="center">{{_('Create Time(From)')}}&nbsp;</td>
+                  <td><input type="text" class="search_input" name="create_time_from" value="{{values.get('create_time_from','')|ifFalse}}"/></td>
+                  <td width="100" align="center">{{_('Create Time(To)')}}&nbsp;</td>
+                  <td><input type="text" class="search_input" name="create_time_to" value="{{values.get('create_time_to','')|ifFalse}}"/></td>
+                </tr>
+              </tbody></table>
+              
+              </form>
+			
+			  <br /><br />            
+            
+              <table width="99%" border="0" cellspacing="0" cellpadding="0">
+                <tr class="field_head">
+                  <td align="center"><table width="80%" border="0" cellspacing="0" cellpadding="0">
+                    <tr>
+                       <td width="80%" align="left">{{_('Order Number')}}</td>
+                    </tr>
+                  </table></td>
+                  <td align="center"><table width="80%" border="0" cellspacing="0" cellpadding="0">
+                    <tr>
+                      <td width="80%" align="left">{{_('Customer')}}</td>
+                    </tr>
+                  </table></td>
+                  <td align="center"><table width="80%" border="0" cellspacing="0" cellpadding="0">
+                    <tr>
+                       <td width="80%" align="left">{{_('Destination')}}</td>
+                    </tr>
+                  </table></td>
+                  <td align="center"><table width="80%" border="0" cellspacing="0" cellpadding="0">
+                    <tr>
+                      <td width="80%" align="left">{{_('Create Time(To)')}}</td>
+                    </tr>
+                  </table></td>
+                  <td align="center"><table width="80%" border="0" cellspacing="0" cellpadding="0">
+                    <tr>
+                      <td width="80%" align="left">{{_('Status')}}</td>
+                    </tr>
+                  </table></td>
+                  
+                </tr>
+				{% for (h,d) in result%}
+                <tr class="data_table_tr">
+                    <td><a href="{{url_for('.view', action = 'search_transfer_log',id=h.id)}}">{{h.no}}</a></td>
+					<td>{{h.customer}}</td>
+					<td>{{d.destination_address}}</td>
+					<td>{{h.create_time|ft}}</td>
+					<td>{{d.status|showStatus}}</td>
+                </tr>
+                {% endfor %}
+              </table></td>
+            <td>&nbsp;</td>
+          </tr>
+          <tr>
+            <td><img src="/static/images/system/group_manage_47.jpg" width="13" height="13" /></td>
+            <td></td>
+            <td><img src="/static/images/system/group_manage_47-27.jpg" width="13" height="13" /></td>
+          </tr>
+        </table></td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+      </tr>
+    </table>
 {% endblock %}
