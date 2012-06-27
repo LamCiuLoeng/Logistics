@@ -31,19 +31,17 @@ class ShipmentType(DeclarativeBase, SysMixin):
 
 
 
-
-
-class ChargeType(DeclarativeBase, SysMixin):
-    __tablename__ = 'master_charge_type'
+class Ratio(DeclarativeBase, SysMixin):
+    __tablename__ = 'master_ratio'
 
     id = Column(Integer, autoincrement = True, primary_key = True)
-    name = Column(Text)
+
+    type = Column(Text)
+    value = Column(Float, default = 0)
 
     def __str__(self): return self.name
     def __repr__(self): return self.name
     def __unicode__(self): return self.name
-
-
 
 
 #class Province(DeclarativeBase, SysMixin):
@@ -122,7 +120,7 @@ class Customer(DeclarativeBase, SysMixin, CRUDMixin):
 
     def populate(self):
         params = {}
-        for k in ['id', 'name', 
+        for k in ['id', 'name',
 #                  'province_id', 'city_id', 'district_id',
                   'address', 'phone', 'contact_person', 'remark']:
             params[k] = getattr(self, k)
@@ -181,7 +179,7 @@ class Supplier(DeclarativeBase, SysMixin, CRUDMixin):
 
     def populate(self):
         params = {}
-        for k in ['id', 'name', 
+        for k in ['id', 'name',
 #                  'province_id', 'city_id', 'district_id',
                   'address', 'phone', 'contact_person', 'remark']:
             params[k] = getattr(self, k)
@@ -309,6 +307,10 @@ class Payment(DeclarativeBase, SysMixin):
     name = Column(Text)
     remark = Column(Text)
 
+
+    def __str__(self): return self.name
+    def __unicode__(self): return self.name
+    def __repr__(self): return self.name
 
 
 

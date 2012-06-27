@@ -12,15 +12,15 @@ from sys2do.model import metadata, engine, DBSession, Permission, Group, User
 import sys
 from sys2do.model.master import CustomerProfile, Customer, \
     ItemUnit, InventoryLocation, WeightUnit, ShipmentType, Payment, Supplier, \
-    ChargeType, SupplierProfile
+    SupplierProfile, Ratio
 reload(sys)
 sys.setdefaultencoding('utf8')
 
 def init():
     try:
         print "create tables"
-        metadata.drop_all(engine,checkfirst=True)
-        
+        metadata.drop_all(engine, checkfirst = True)
+
         metadata.create_all(engine)
 
         print "insert default value"
@@ -33,8 +33,8 @@ def init():
         uKefu2 = User(name = u'kefu2', email = 'kefu2@sfhlwl.com', password = '123', first_name = u'客服2', last_name = '')
         uSupplier = User(name = 'supplier', email = 'supplier@test.com', password = '123', first_name = 'Supplier', last_name = 'Test')
         uWarehouse = User(name = 'warehouse', email = 'warehouse@sfhlwl.com', password = '123', first_name = 'Warehouse', last_name = 'Test')
-        
-        
+
+
 
         pCreateUser = Permission(name = 'CREATE_USER')
         pUpdateUser = Permission(name = 'UPDATE_USER')
@@ -80,20 +80,20 @@ def init():
         gAdmin.users = [uAdmin, ]
         gCustomer = Group(name = 'CUSTOMER', display_name = 'Customer', type = 0)
         gCustomer.permissions = [pCreateOrder, pUpdateOrder, pDeleteOrder, pSearchOrder, ]
-        gCustomer.users = [uKinlong,uWeiqian ]
+        gCustomer.users = [uKinlong, uWeiqian ]
         gKinlongGroup = Group(name = 'KINLONG_GROUP', display_name = 'KINLONG GROUP', type = 1)
-        gKinlongGroup.users = [uKinlong,]
+        gKinlongGroup.users = [uKinlong, ]
         gWeiqianGroup = Group(name = 'WEIQIAN_GROUP', display_name = 'WEIQIAN GROUP', type = 1)
         gWeiqianGroup.users = [uWeiqian]
         gOfficer = Group(name = 'OFFICER', display_name = 'Officer', type = 0)
         gOfficer.permissions = [pCreateOrder, pUpdateOrder, pDeleteOrder, pSearchOrder, pSearchAllOrder,
                                 pCreateDeliver, pUpdateDeliver, pDeleteDeliver, pSearchDeliver, pManageDeliver, pSearchAllDeliver,
                                 ]
-        gOfficer.users = [uKefu1,uKefu2]
+        gOfficer.users = [uKefu1, uKefu2]
         gSupplier = Group(name = 'SUPPLIER', display_name = 'Supplier', type = 0)
         gSupplier.permissions = [pUpdateDeliver, pSearchDeliver ]
         gSupplier.users = [uSupplier]
-        
+
         gSupplier1 = Group(name = 'SUPPLIER_1', display_name = 'Supplier1', type = 1)
         gSupplier1.users = [uSupplier]
         gWarehouse = Group(name = 'WAREHOUSE', display_name = 'Warehouse', type = 0)
@@ -103,7 +103,7 @@ def init():
 
 
         DBSession.add_all([
-                            uAdmin, uKefu1,uKefu2, uSupplier, uWarehouse,
+                            uAdmin, uKefu1, uKefu2, uSupplier, uWarehouse,
                             pCreateUser, pUpdateUser, pDeleteUser, pSearchUser,
                             pCreateOrder, pUpdateOrder, pDeleteOrder, pSearchOrder, pSearchAllOrder, pManageOrder,
                             pCreateDeliver, pUpdateDeliver, pDeleteDeliver, pSearchDeliver, pSearchAllDeliver, pManageDeliver,
@@ -112,7 +112,7 @@ def init():
                             pCreateWarehouse, pUpdateWarehouse, pDeleteWarehouse, pSearchWarehouse,
                             pCreateDriver, pUpdateDriver, pDeleteDriver, pSearchDriver,
                             gAdmin, gCustomer, gOfficer, gSupplier, gWarehouse,
-                            gKinlongGroup,gWeiqianGroup,
+                            gKinlongGroup, gWeiqianGroup,
                             ])
 
         for n, en, tn in [(u'米', u'meter', u'米'), (u'分米', u'dm', u'分米'), (u'厘米', u'cm', u'釐米'), (u'吨', u'ton', u'噸'), (u'千克', u'kg', u'千克'), (u'克', u'g', u'克'),
@@ -135,26 +135,27 @@ def init():
         DBSession.add(ShipmentType(name = u"陆运"))
 #        DBSession.add(ShipmentType(name = u"水运"))
 #        DBSession.add(ShipmentType(name = u"空运"))
-        DBSession.add(Payment(name = u"月结"))
-        
-        
-        DBSession.add(ChargeType(name = u"按件",))
-        DBSession.add(ChargeType(name = u"按体积",))
-        DBSession.add(ChargeType(name = u"按重量",))
 
+        DBSession.add(Payment(name = u"月付"))
+        DBSession.add(Payment(name = u"到付"))
+        DBSession.add(Payment(name = u"现付"))
+
+        DBSession.add(Ratio(type = "QTY", value = 10))
+        DBSession.add(Ratio(type = "VOL", value = 0.33))
+        DBSession.add(Ratio(type = "WEIGHT", value = 0.5))
 
         kinlong = Customer(name = u"广东坚朗五金制品股份有限公司", address = u"广东省东莞市塘厦镇大坪村工业区卢地坑路3号", phone = "0769-82166666", contact_person = None)
-        kinlong_profile = CustomerProfile(name="KINLONG_PROFILE",customer = kinlong, group = gKinlongGroup)
-        
+        kinlong_profile = CustomerProfile(name = "KINLONG_PROFILE", customer = kinlong, group = gKinlongGroup)
+
         weiqian = Customer(name = u"味千（中国）控股有限公司", address = u"广东省深圳市福田区金田路3037号金中环商务大厦主楼23号", phone = "0755-8280 5333", contact_person = None)
-        weiqian_profile = CustomerProfile(name="WEIQIAN_PROFILE",customer = weiqian, group = gWeiqianGroup)
+        weiqian_profile = CustomerProfile(name = "WEIQIAN_PROFILE", customer = weiqian, group = gWeiqianGroup)
 
-        
+
         supplier1 = Supplier(name = u"承运商一", address = u"广东省珠海市斗门区", phone = "0756-25361422", contact_person = u"林先生")
-        supplier1_profile = SupplierProfile(name="SUPPLIER1_PROFILE",supplier=supplier1,group=gSupplier1)
+        supplier1_profile = SupplierProfile(name = "SUPPLIER1_PROFILE", supplier = supplier1, group = gSupplier1)
 
 
-        DBSession.add_all([kinlong,kinlong_profile,weiqian,weiqian_profile,supplier1,supplier1_profile])
+        DBSession.add_all([kinlong, kinlong_profile, weiqian, weiqian_profile, supplier1, supplier1_profile])
 
         DBSession.commit()
         print "finish init!"

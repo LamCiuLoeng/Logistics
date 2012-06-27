@@ -18,7 +18,7 @@ from sys2do.constant import MESSAGE_ERROR, MESSAGE_INFO, MSG_NO_SUCH_ACTION, \
     MSG_SAVE_SUCC
 from sys2do.views import BasicView
 from sys2do.model.master import CustomerProfile, Customer
-from sys2do.model.logic import OrderHeader, OrderDetail
+from sys2do.model.logic import OrderHeader
 from sys2do.util.logic_helper import genSystemNo
 
 

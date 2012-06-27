@@ -70,9 +70,10 @@
 				<tr>
 					<td>{{_('Customer')}}</td>
 					<td>{{_('Order Number')}}</td>
-					<td>{{_('Destination')}}</td>
+					<td>{{_('Destination Station')}}</td>
 					<td>{{_('Item')}}</td>
 					<td>{{_('Qty')}}</td>
+					<td>{{_('Vol')}}</td>
 					<td>{{_('Weight')}}</td>
 					<td>{{_('Expect Time')}}</td>
 					<td>{{_('Destination Contact')}}</td>
@@ -84,11 +85,12 @@
 			</thead>
 			{% for d in result %}		
 				<tr>
-					<td>{{d.header.customer}}<input type="hidden" name="detail_{{d.id}}" value="{{d.id}}"/></td>
-					<td>{{d.header.no}}</td>
-					<td>{{d.destination_address|ifFalse}}</td>
+					<td>{{d.customer}}<input type="hidden" name="detail_{{d.id}}" value="{{d.id}}"/></td>
+					<td>{{d.no}}</td>
+					<td>{{d.destination_station|ifFalse}}</td>
 					<td>{{d.item}}</td>
-					<td>{{d.order_qty}}&nbsp;{{d.unit}}</td>
+					<td>{{d.qty}}</td>
+					<td>{{d.vol}}</td>
 					<td>{{d.weight}}&nbsp;{{d.weight_unit}}</td>
 					<td>{{d.expect_time|ifFalse}}</td>
 					<td>{{d.destination_contact|ifFalse}}</td>

@@ -15,7 +15,7 @@ from flask.views import View
 from werkzeug.utils import redirect
 from flask.helpers import flash, jsonify
 
-from sys2do.model.logic import OrderHeader, OrderDetail, TransferLog, \
+from sys2do.model.logic import OrderHeader, TransferLog, \
     DeliverDetail
 from sys2do.model import DBSession
 from sys2do.util.decorator import templated, login_required
@@ -28,8 +28,8 @@ from sys2do.constant import MESSAGE_ERROR, MESSAGE_INFO, MSG_UPDATE_SUCC, \
 from sys2do.views import BasicView
 from sys2do.util.common import _g, getOr404, _gp, getMasterAll, _debug, _info
 from sys2do.model.master import CustomerProfile, InventoryLocation, \
-    Customer, ItemUnit, WeightUnit, ShipmentType, ChargeType, \
-    InventoryItem
+    Customer, ItemUnit, WeightUnit, ShipmentType, \
+    InventoryItem, Payment, Ratio
 from sys2do.util.logic_helper import genSystemNo
 from sqlalchemy.sql.expression import and_
 from sys2do.util.barcode_helper import generate_barcode_file
@@ -42,7 +42,7 @@ bpOrder = Blueprint('bpOrder', __name__)
 
 class OrderView(BasicView):
 
-    decorators = [login_required]
+#    decorators = [login_required]
 
     @templated('order/index.html')
 #    @login_required
@@ -53,11 +53,15 @@ class OrderView(BasicView):
 
     @templated('order/add.html')
     def add(self):
+        ratios = {}
+        for r in DBSession.query(Ratio).filter(Ratio.active == 0):
+            ratios[r.type] = r.value
         return {'customers' :getMasterAll(Customer),
-                'units' : getMasterAll(ItemUnit),
-                'wunits' : getMasterAll(WeightUnit),
-                'shiptype' : getMasterAll(ShipmentType),
-                'chargetype' : getMasterAll(ChargeType),
+#                'units' : getMasterAll(ItemUnit),
+#                'wunits' : getMasterAll(WeightUnit),
+#                'shiptype' : getMasterAll(ShipmentType),
+                'payment' : getMasterAll(Payment),
+                'ratios' : ratios,
                 }
 
 
@@ -72,100 +76,37 @@ class OrderView(BasicView):
 
 
     def _save_new_process(self):
-        customer_id = _g('customer_id')
-#        source_province_id = _g('source_province_id')
-#        source_city_id = _g('source_city_id')
-#        source_district_id = _g('source_district_id')
-        source_address = _g('source_address')
-        source_tel = _g('source_tel')
-        source_contact = _g('source_contact')
-        remark = _g('remark')
-        order = OrderHeader(no = None, customer_id = customer_id,
-#                            source_province_id = source_province_id, source_city_id = source_city_id, source_district_id = source_district_id,
-                            source_address = source_address,
-                            source_tel = source_tel, source_contact = source_contact, remark = remark)
+        params = {}
+        for k in ['source_station', 'source_company', 'source_address', 'source_contact', 'source_tel', 'source_mobile',
+                  'destination_station', 'destination_company', 'destination_address', 'destination_contact', 'destination_tel', 'destination_mobile',
+                  'no', 'order_time', 'item', 'expect_time', 'remark',
+                 'payment_id', 'qty', 'qty_ratio', 'vol', 'vol_ratio',
+                  'weight', 'weight_ratio', 'weight_ratio', 'amount',
+                  ]:
+            params[k] = _g(k)
+        order = OrderHeader(**params)
         DBSession.add(order)
-
-        item = _gp('item_')
-        qty = _gp('qty_')
-        unit = _gp('unit_')
-        weight = _gp('weight_')
-        wunit = _gp('wunit_')
-        shipment_type = _gp('shipment_type_')
-#        province = _gp('destination_province_id_')
-#        city = _gp('destination_city_id_')
-#        district = _gp('destination_district_id_')
-        dest = _gp('dest_')
-        contact = _gp('contact_')
-        tel = _gp('tel_')
-        expect_time = _gp('expect_time_')
-        charge = _gp('charge_')
-        remark = _gp('remark_')
-
-
-        line_no = 0
-
-        _debug(item)
-        _debug(qty)
-        amount = 0
-
-
-        for (k, v) in _gp('item_'):
-            id = k.split("_")[1]
-            if v:
-                line_no += 1
-                DBSession.add(OrderDetail(header = order,
-                                      line_no = line_no,
-                                      item = v,
-                                      order_qty = _g('qty_%s' % id),
-                                      delivered_qty = 0,
-                                      unit_id = _g('unit_%s' % id),
-                                      weight = _g('weight_%s' % id),
-                                      weight_unit_id = _g('wunit_%s' % id),
-                                      shipment_type_id = _g('shipment_type_%s' % id),
-#                                      destination_province_id = _g('destination_province_id_%s' % id),
-#                                      destination_city_id = _g('destination_city_id_%s' % id),
-#                                      destination_district_id = _g('destination_district_id_%s' % id),
-                                      destination_address = _g('dest_%s' % id),
-                                      destination_contact = _g('contact_%s' % id),
-                                      destination_tel = _g('tel_%s' % id),
-                                      expect_time = _g('expect_time_%s' % id),
-                                      charge = _g('charge_%s' % id),
-                                      remark = _g('remark_%s' % id)
-                                      ))
-
-                if _g('charge_%s' % id) : amount += float(_g('charge_%s' % id))
-        DBSession.flush()
-        order.no = genSystemNo(order.id)
         order.barcode = generate_barcode_file(order.no)
-        order.amount = amount
-
-        for d in order.details:
-            d.no = "%s%0.2d" % (order.no, d.line_no)
-            d.barcode = generate_barcode_file(d.no)
-
         DBSession.add(TransferLog(
                                   refer_id = order.id,
                                   transfer_date = dt.now().strftime("%Y-%m-%d"),
                                   type = 0,
                                   remark = unicode(LOG_CREATE_ORDER),
                                   ))
-
         DBSession.commit()
         return 0
+
 
 
 
     @templated('order/review.html')
     def review(self):
         header = getOr404(OrderHeader, _g('id'))
-        values = header.populate()
-
         if header.status in [ASSIGN_PICKER[0], ]:
             locations = DBSession.query(InventoryLocation).filter(InventoryLocation.active == 0).order_by(InventoryLocation.full_path)
         else:
             locations = []
-        return {'values' : values , 'details' : header.details, 'locations' : locations}
+        return {'header' : header , 'details' : header.details, 'locations' : locations}
 
 
     @templated('order/revise.html')
@@ -175,12 +116,11 @@ class OrderView(BasicView):
             flash(MSG_NO_ID_SUPPLIED, MESSAGE_ERROR)
             return redirect(self.default())
 
-#        header = DBSession.query(OrderHeader).get(id)
-#        values = header.populate()
-#
-#        ws = DBSession.query(Warehouse).filter(Warehouse.active == 0).order_by(Warehouse.name)
-#
-#        return {'values' : values , 'details' : header.details , 'warehouses' : ws}
+        header = DBSession.query(OrderHeader).get(id)
+        return {
+                'header' : header ,
+                'payment' : getMasterAll(Payment),
+                }
 
 
     def save_update(self):
@@ -190,11 +130,14 @@ class OrderView(BasicView):
             return redirect(self.default())
 
         header = DBSession.query(OrderHeader).get(id)
-
-        fields = ['no', 'customer', ]
         try:
-            for f in fields:
-                setattr(header, f, _g(f) or None)
+            for k in ['source_station', 'source_company', 'source_address', 'source_contact', 'source_tel', 'source_mobile',
+                  'destination_station', 'destination_company', 'destination_address', 'destination_contact', 'destination_tel', 'destination_mobile',
+                  'no', 'order_time', 'item', 'expect_time', 'remark',
+                 'payment_id', 'qty', 'qty_ratio', 'vol', 'vol_ratio',
+                  'weight', 'weight_ratio', 'weight_ratio', 'amount',
+                  ]:
+                setattr(header, k, _g(k) or None)
 
             DBSession.commit()
         except:
@@ -274,9 +217,20 @@ class OrderView(BasicView):
         return {'result' : result, 't' : t}
 
 
+
+
+
+
+
+
+
+
+    #===========================================================================
+    # not very important
+    #===========================================================================
     @templated('order/add_by_customer.html')
     def add_by_customer(self):
-        
+
         if not session.get('customer_profile', None) or not session['customer_profile'].get('id', None):
             flash(MSG_NO_SUCH_ACTION, MESSAGE_ERROR)
             return redirect(url_for('bpRoot.view', action = "index"))
@@ -287,6 +241,9 @@ class OrderView(BasicView):
                 }
 
 
+    #===========================================================================
+    # not very important
+    #===========================================================================
     def save_new_by_customer(self):
         code = self._save_new_process()
         if code == 0:
@@ -335,7 +292,7 @@ class OrderView(BasicView):
         detail_log = {}
         for d in header.details:
             logs = []
-            for dd in DBSession.query(DeliverDetail).filter(and_(DeliverDetail.active == 0, DeliverDetail.order_detail_id == d.id)).order_by(DeliverDetail.id):
+            for dd in DBSession.query(DeliverDetail).filter(and_(DeliverDetail.active == 0, DeliverDetail.order_header_id == d.id)).order_by(DeliverDetail.id):
                 logs.extend(dd.header.get_logs())
             detail_log[d.id] = logs
 

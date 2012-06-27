@@ -97,7 +97,7 @@
                 </tr>
 				{% for r in result %}
 					<tr class="data_table_tr">
-						<td><a href="{{url_for('.view', action = 'review',id=r.id)}}">{{r.no}}</a></td>
+						<td><a href="{{url_for('.view', action = 'revise',id=r.id)}}">{{r.no}}</a></td>
 						<td>{{r.customer}}</td>
 						<td>{{r.create_time|ft}}</td>
 						<td>{{r.create_by}}</td>

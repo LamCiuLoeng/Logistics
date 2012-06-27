@@ -17,28 +17,30 @@
 				<td><input type="checkbox" onclick=""/></td>
 				<td>{{_('Order Number')}}</td>
 				<td>{{_('Customer')}}</td>
-				<td>{{_('Destination')}}</td>
+				<td>{{_('Source Station')}}</td>
+				<td>{{_('Destination Station')}}</td>
 				<td>{{_('Item')}}</td>
 				<td>{{_('Qty')}}</td>
+				<td>{{_('Vol')}}</td>
 				<td>{{_('Weight')}}</td>
 				<td>{{_('Expect Time')}}</td>
 				<td>{{_('Destination Contact')}}</td>
 				<td>{{_('Destination Tel')}}</td>
-				<td>{{_('Remark')}}</td>
 			</tr>
 			{% for r in result%}
 			<tr>
 				<td><input type="checkbox" name="order_detail_ids" value="{{r.id}}"/></td>
-				<td>{{r.header.no}}</td>
-				<td>{{r.header.customer}}</td>
-				<td>{{r.destination_provice|ifFalse}}{{r.destination_city|ifFalse}}{{r.destination_district|ifFalse}}{{r.destination_address|ifFalse}}</td>
+				<td>{{r.no}}</td>
+				<td>{{r.customer}}</td>
+				<td>{{r.dsource_station|ifFalse}}</td>
+				<td>{{r.destination_station|ifFalse}}</td>
 				<td>{{r.item|ifFalse}}</td>
-				<td>{{r.order_qty}}&nbsp;{{r.unit}}</td>
+				<td>{{r.qty}}</td>
+				<td>{{r.vol}}</td>
 				<td>{{r.weight}}&nbsp;{{r.weight_unit}}</td>
 				<td>{{r.expect_time|ifFalse}}</td>
 				<td>{{r.destination_contact|ifFalse}}</td>
 				<td>{{r.destination_tel|ifFalse}}</td>
-				<td>{{r.remark|ifFalse}}</td>
 			</tr>
 			{% endfor %}
 		</thead>

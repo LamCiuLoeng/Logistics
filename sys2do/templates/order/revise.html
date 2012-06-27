@@ -5,51 +5,95 @@
 {% endblock %}
 
 {% block content %}
-	<form action="{{url_for('.view', action = 'save_update')}}" method="post">
-		<input type="hidden" name="id" value="{{values['id']}}"/>
-		<input type="submit" value="{{_('Save')}}"/> 
-		<input type="reset" value="{{_('Reset')}}"/>
-		<input type="button" value="{{_('Cancel')}}" onclick="location.href='{{url_for('.view', action = 'index')}}'"/>
-		<input type="button" value="{{_('Delete')}}" onclick="location.href='{{url_for('.view', action = 'cancel',id=values['id'])}}'">
-		
-		
-		<p>{{_('Order Information')}}</p>
-		{% if values.get('barcode',None) %}
-			<p><img src="{{values.get('barcode','').url}}"/></p>
-		{% endif %}
-		<table border="1" cellpadding="3" cellspacing="3">
-			<tr><td>{{_('Order No')}}</td><td>{{values.get('no','')}}</td></tr>
-			<tr><td>{{_('Customer')}}</td><td>{{values.get('customer','')}}</td></tr>
-			<tr><td>{{_('Address')}}</td><td>{{values.get('source_address','')}}</td></tr>
-			<tr><td>{{_('Phone')}}</td><td>{{values.get('source_tel','')}}</td></tr>
-			<tr><td>{{_('Contact')}}</td><td>{{values.get('source_contact','')}}</td></tr>
-			<tr><td>{{_('Remark')}}</td><td>{{values.get('remark','')}}</td></tr>
-			<tr><td>{{_('Order Status')}}</td><td>{{values.get('status')|showStatus}}</td></tr>
-		</table>
-		<br />
-		<table border="1" cellpadding="3" cellspacing="3">
-			<thead>
+	<div style="background-color: #fff;padding: 10px;">
+		<form action="{{url_for('.view', action = 'save_update')}}" method="post">
+		<input type="hidden" name="id" value="{{header.id}}"/>
+		<p><input type="submit" value="{{BTN_SAVE}}"/></p>
+			<table>
 				<tr>
-					<td>{{_('Item')}}</td>
-					<td>{{_('Qty')}}</td>
-					<td>{{_('Weight')}}</td>
-					<td>{{_('Shipment Type')}}</td>
-					<td>{{_('Destination')}}</td>
-					<td>{{_('Destination Contact')}}</td>
-					<td>{{_('Destination Tel')}}</td>
-					<td>{{_('Expect Time')}}</td>
-					<td>{{_('Remark')}}</td>
+					<td>{{_('Source Station')}}</td>
+					<td><input type="text" name="source_station" id="source_station" value="{{header.source_station|ifFalse}}" class="field"/></td>
+					<td>&nbsp;</td>
+					<td>{{_('No#')}}</td>
+					<td><input type="text" name="no" id="no" value="{{header.no|ifFalse}}" class="field"/></td>
+					<td>&nbsp;</td>
+					<td>{{_('Creator')}}</td>
+					<td>&nbsp;</td>
 				</tr>
-			</thead>
-			{% for d in details %}
 				<tr>
-					<td>{{d.item}}</td>
-					<td>{{d.order_qty}} {{d.item_unit}}</td>
-					<td>{{d.status|showStatus}}</td>
-					<td>{{d.warehouse_qty}} {{d.item_unit}}</td>
+					<td>{{_('Destination Station')}}</td>
+					<td><input type="text" name="destination_station" id="destination_station" value="{{header.destination_station|ifFalse}}" class="field"/></td>
+					<td>&nbsp;</td>
+					<td>{{Date}}</td>
+					<td><input type="text" name="order_time" id="order_time" value="{{header.order_time|ifFalse}}" class="field"/></td>
+					<td>&nbsp;</td>
+					<td></td>
+					<td>&nbsp;</td>
 				</tr>
-			{% endfor %}
-		</table>
-	</form>
-		
+			</table>
+			<table>
+				<tr>
+					<td valign="top">
+						<table>
+						    <tr><td>{{_('Source Company')}}</td><td><input type="text" name="source_company" id="source_company" value="{{header.source_company|ifFalse}}" class="field" style="width: 300px"/></td></tr>
+							<tr><td>{{_('Source Contact')}}</td><td><input type="text" name="source_contact" id="source_contact" value="{{header.source_contact|ifFalse}}" class="field" style="width: 300px"/></td></tr>
+							<tr><td>{{_('Source Address')}}</td><td><input type="text" name="source_address" id="source_address" value="{{header.source_address|ifFalse}}" class="field" style="width: 300px"/></td></tr>
+							<tr><td>{{_('Source Phone')}}</td><td><input type="text" name="source_tel" id="source_tel" value="{{header.source_tel|ifFalse}}" class="field" style="width: 300px"/></td></tr>
+							<tr><td>{{_('Source Mobile')}}</td><td><input type="text" name="source_mobile" id="source_mobile" value="{{header.source_mobile|ifFalse}}" class="field" style="width: 300px"/></td></tr>
+							<tr><td>{{_('Item')}}</td><td><input type="text" name="item" id="item" value="{{header.item|ifFalse}}" class="field" style="width: 300px"/></td></tr>
+							<tr><td>{{_('Expect Time')}}</td><td><input type="text" name="expect_time" id="expect_time" value="{{header.expect_time|ifFalse}}" class="field" style="width: 300px"/></td></tr>
+							<tr><td>{{_('Remark')}}</td><td><textarea name="remark" id="remark" class="field" style="width: 300px">{{header.remark|ifFalse}}</textarea></td></tr>
+						</table>
+					</td>
+					<td>&nbsp;</td>
+					<td valign="top">
+						<table>
+						    <tr><td>{{_('Destination Company')}}</td><td><input type="text" name="destination_company" id="destination_company" value="{{header.destination_company|ifFalse}}" class="field" style="width: 300px"/></td></tr>
+							<tr><td>{{_('Destination Contact')}}</td><td><input type="text" name="destination_contact" id="destination_contact" value="{{header.destination_contact|ifFalse}}" class="field" style="width: 300px"/></td></tr>
+							<tr><td>{{_('Destination Address')}}</td><td><input type="text" name="destination_address" id="destination_address" value="{{header.destination_address|ifFalse}}" class="field" style="width: 300px"/></td></tr>
+							<tr><td>{{_('Destination Phone')}}</td><td><input type="text" name="destination_tel" id="destination_tel" value="{{header.destination_tel|ifFalse}}" class="field" style="width: 300px"/></td></tr>
+							<tr><td>{{_('Destination Mobile')}}</td><td><input type="text" name="destination_mobile" id="destination_mobile" value="{{header.destination_mobile|ifFalse}}" class="field" style="width: 300px"/></td></tr>
+							<tr><td>{{_('Payment')}}</td>
+								<td>
+									<select name="payment_id" id="payment_id">
+										{% for p in payment %}
+											{% if p.id == header.payment_id %}
+												<option value="{{p.id}}" selected="selected">{{p}}</optino>
+											{% else %}
+												<option value="{{p.id}}">{{p}}</optino>
+											{% endif %}
+										{% endfor %}
+									</select>
+								</td>
+							</tr>
+						</table>
+			
+					</td>
+				</tr>
+			</table>
+			<table>
+				<tr>
+					<td>件数</td>
+					<td>件数费率</td>
+					<td>体积</td>
+					<td>体积费率</td>
+					<td>重量</td>
+					<td>重量费率</td>
+					<td>费用</td>
+				</tr>
+				<tr>
+					<td><input type="text" name="qty" id="qty" value="{{header.qty|ifFalse}}"/></td>
+					<td><input type="text" name="qty_ratio" id="qty_ratio" value="{{header.qty_ratio|ifFalse}}"/></td>
+					<td><input type="text" name="vol" id="vol" value="{{header.vol|ifFalse}}"/></td>
+					<td><input type="text" name="vol_ratio" id="vol_ratio" value="{{header.vol_ratio|ifFalse}}"/></td>
+					<td><input type="text" name="weight" id="weight" value="{{header.weight|ifFalse}}"/></td>
+					<td><input type="text" name="weight_ratio" id="weight_ratio" value="{{header.weight_ratio|ifFalse}}"/></td>
+					<td><input type="text" name="amount" id="amount" value="{{header.amount|ifFalse}}"/></td>
+				</tr>
+			</table>
+			
+			
+			
+		</form>
+	</div>
 {% endblock %}

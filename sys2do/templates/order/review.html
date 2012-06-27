@@ -6,133 +6,81 @@
 
 {% block content %}
 	<div style="background-color: #fff;padding: 10px;">
-		
-		<ul>
-			<li><a href="{{url_for('.view', action = 'add')}}">新建订单</a></li>
-			<li><a href="{{url_for('.view', action = 'revise',id=values.get('id',''))}}">修改订单</a></li>
-			<li><a href="{{url_for('.view', action = 'cancel',id=values.get('id',''))}}">删除订单</a></li>
-			<li><a href="{{url_for('.view', action = 'barcode',id=values.get('id',''))}}">打印条码</a></li>		
-		</ul>
-
-
-		<p>{{_('Order Information')}}</p>
-		{% if values.get('barcode',None) %}
-			<p><img src="{{values.get('barcode','').url}}"/></p>
-		{% endif %}
-		<table border="1" cellpadding="5" cellspacing="5">
-			<tr><td>{{_('Order No')}}</td><td>{{values.get('no','')}}</td></tr>
-			<tr><td>{{_('Customer')}}</td><td>{{values.get('customer','')}}</td></tr>
-			<tr>
-				<td>{{_('Address')}}</td>
-				<td>{{values.get('source_address','')|ifFalse}}</td>
-			</tr>
-			<tr><td>{{_('Phone')}}</td><td>{{values.get('source_tel','')|ifFalse}}</td></tr>
-			<tr><td>{{_('Contact')}}</td><td>{{values.get('source_contact','')|ifFalse}}</td></tr>
-			<tr><td>{{_('Remark')}}</td><td>{{values.get('remark','')|ifFalse}}</td></tr>
-			<tr><td>{{_('Amount')}}</td><td>{{values.get('amount','')|ifFalse}}</td></tr>
-			<tr><td>{{_('Order Status')}}</td><td>{{values.get('status')|showStatus}}</td></tr>
-		</table>
-		<br />
-		<table border="1" cellpadding="5" cellspacing="5">
-			<thead>
-				<tr>
-					<td>{{_('Item')}}</td>
-					<td>{{_('Qty')}}</td>
-					<td>{{_('Weight')}}</td>
-					<td>{{_('Shipment Type')}}</td>
-					<td>{{_('Destination')}}</td>
-					<td>{{_('Destination Contact')}}</td>
-					<td>{{_('Destination Tel')}}</td>
-					<td>{{_('Expect Time')}}</td>
-					<td>{{_('Charge')}}</td>
-					<td>{{_('Remark')}}</td>
-				</tr>
-			</thead>
-			{% for d in details %}
-				<tr>
-					<td>{{d.item}}</td>
-					<td>{{d.order_qty}} {{d.unit}}</td>
-					<td>{{d.weight}} {{d.weight_unit}}</td>
-					<td>{{d.shipment_type}}</td>
-					<td>{{d.destination_address|ifFalse}}</td>
-					<td>{{d.destination_contact|ifFalse}}</td>
-					<td>{{d.destination_tel|ifFalse}}</td>
-					<td>{{d.expect_time|ifFalse}}</td>
-					<td>{{d.charge|ifFalse}}</td>
-					<td>{{d.status|showStatus}}</td>
-				</tr>
-			{% endfor %}
-		</table>
-	</form>
-		
-		<br />
-		
-		{% if values.get('status',None) in [ORDER_NEW[0],] %}
-			<p>指派收货人员收货</p>
-			<form action="{{url_for('.view', action = 'do_action',id=values.get('id',''),sc='ASSIGN_PICKER')}}" method="post">
-				<table>
-					<tr>
-						<td>{{_('Picker')}}</td>
-						<td><input type="text" name="receiver"/></td>
-					</tr>
-					<tr>
-						<td>{{_('Picker Contact')}}</td>
-						<td><input type="text" name="receiver_contact"/></td>
-					</tr>
-					<tr>
-						<td>{{_('Remark')}}</td>
-						<td><textarea name="receiver_remark"></textarea></td>
-					</tr>
-					<tr>
-						<td colspan="2"><input type="submit" value="{{_('Submit')}}"/></td>
-					</tr>
-				</table>
-			</form>
-		{% endif %}
-		
-		
-		{% if values.get('status',None) in [ASSIGN_PICKER[0],] %}
 			<table>
-					<tr>
-						<td>{{_('Picker')}}</td>
-						<td>{{values.get('picker','')|ifFalse}}</td>
-					</tr>
-					<tr>
-						<td>{{_('Picker Contact')}}</td>
-						<td>{{values.get('picker_contact','')|ifFalse}}</td>
-					</tr>
-					<tr>
-						<td>{{_('Remark')}}</td>
-						<td>{{values.get('picker_remark','')|ifFalse}}</td>
-					</tr>
-				</table>
-				<br />
-			<p>入仓</p>
-			<form action="{{url_for('.view', action = 'do_action',id=values.get('id',''),sc='IN_WAREHOUSE')}}" method="post">
-				<table>
-					<tr>
-						<td>{{_('Warehouse')}}</td>
-						<td>
-							<select name="location_id" id="location_id">
-								{% for l in locations %}
-									<option value="{{l.id}}">{{l.full_path}}</option>
-								{% endfor %}
-							</select>
-						</td>
-					</tr>				
-					<tr>
-						<td>{{_('Remark')}}</td>
-						<td><textarea name="in_warehouse_remark"></textarea></td>
-					</tr>
-					<tr>
-						<td colspan="2"><input type="submit" value="{{_('Submit')}}"/></td>
-					</tr>
-				</table>
-			</form>	
-		{% endif %}
-		
-		
-
-		
+				<tr>
+					<td>{{_('Source Station')}}</td>
+					<td><input type="text" name="source_station" id="source_station" value="" class="field"/></td>
+					<td>&nbsp;</td>
+					<td>{{_('No#')}}</td>
+					<td><input type="text" name="no" id="no" value="" class="field"/></td>
+					<td>&nbsp;</td>
+					<td>{{_('Creator')}}</td>
+					<td>&nbsp;</td>
+				</tr>
+				<tr>
+					<td>{{_('Destination Station')}}</td>
+					<td><input type="text" name="destination_station" id="destination_station" value="" class="field"/></td>
+					<td>&nbsp;</td>
+					<td>{{Date}}</td>
+					<td><input type="text" name="order_time" id="order_time" value="" class="field"/></td>
+					<td>&nbsp;</td>
+					<td></td>
+					<td>&nbsp;</td>
+				</tr>
+			</table>
+			<table>
+				<tr>
+					<td valign="top">
+						<table>
+							<tr><td>{{_('Source Contact')}}</td><td><input type="text" name="source_contact" id="source_contact" value="" class="field" style="width: 300px"/></td></tr>
+							<tr><td>{{_('Source Address')}}</td><td><input type="text" name="source_address" id="source_address" value="" class="field" style="width: 300px"/></td></tr>
+							<tr><td>{{_('Source Phone')}}</td><td><input type="text" name="source_tel" id="source_tel" value="" class="field" style="width: 300px"/></td></tr>
+							<tr><td>{{_('Source Mobile')}}</td><td><input type="text" name="source_mobile" id="source_mobile" value="" class="field" style="width: 300px"/></td></tr>
+							<tr><td>{{_('Item')}}</td><td><input type="text" name="item" id="item" value="" class="field" style="width: 300px"/></td></tr>
+							<tr><td>{{_('Expect Time')}}</td><td><input type="text" name="expect_time" id="expect_time" value="" class="field" style="width: 300px"/></td></tr>
+							<tr><td>{{_('Remark')}}</td><td><textarea name="remark" id="remark" value="" class="field" style="width: 300px"></textarea></td></tr>
+						</table>
+					</td>
+					<td>&nbsp;</td>
+					<td valign="top">
+						<table>
+							<tr><td>{{_('Destination Contact')}}</td><td><input type="text" name="destination_contact" id="destination_contact" value="" class="field" style="width: 300px"/></td></tr>
+							<tr><td>{{_('Destination Address')}}</td><td><input type="text" name="destination_address" id="destination_address" value="" class="field" style="width: 300px"/></td></tr>
+							<tr><td>{{_('Destination Phone')}}</td><td><input type="text" name="destination_tel" id="destination_tel" value="" class="field" style="width: 300px"/></td></tr>
+							<tr><td>{{_('Destination Mobile')}}</td><td><input type="text" name="destination_mobile" id="destination_mobile" value="" class="field" style="width: 300px"/></td></tr>
+							<tr><td>{{_('Payment')}}</td>
+								<td>
+									<select name="payment_id" id="payment_id">
+										{% for p in payment %}
+											<option value="{{plid}}">{{p}}</optino>
+										{% endfor %}
+									</select>
+								</td>
+							</tr>
+						</table>
+			
+					</td>
+				</tr>
+			</table>
+			<table>
+				<tr>
+					<td>件数</td>
+					<td>件数费率</td>
+					<td>体积</td>
+					<td>体积费率</td>
+					<td>重量</td>
+					<td>重量费率</td>
+					<td>费用</td>
+				</tr>
+				<tr>
+					<td><input type="text" name="qty" id="qty" value=""/></td>
+					<td><input type="text" name="qty_ratio" id="qty_ratio" value="{{ratios.get('QTY',0)}}"/></td>
+					<td><input type="text" name="vol" id="vol" value=""/></td>
+					<td><input type="text" name="vol_ratio" id="vol_ratio" value="{{ratios.get('VOL',0)}}"/></td>
+					<td><input type="text" name="weight" id="weight" value=""/></td>
+					<td><input type="text" name="weight_ratio" id="weight_ratio" value="{{ratios.get('WEIGHT',0)}}"/></td>
+					<td><input type="text" name="amount" id="amount" value=""/></td>
+				</tr>
+			</table>
 	</div>
 {% endblock %}

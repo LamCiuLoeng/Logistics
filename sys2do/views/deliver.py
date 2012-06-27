@@ -23,7 +23,7 @@ from sys2do.constant import MESSAGE_ERROR, MSG_NO_SUCH_ACTION, MESSAGE_INFO, \
 from sys2do.util.decorator import templated, login_required
 from sys2do.model import DBSession
 from sys2do.views import BasicView
-from sys2do.model.logic import DeliverHeader, OrderHeader, OrderDetail, \
+from sys2do.model.logic import DeliverHeader, OrderHeader, \
     DeliverDetail, TransferLog
 from sys2do.util.common import _gl, _g, _gp, getOr404, getMasterAll, _debug, \
     _error
@@ -38,7 +38,7 @@ bpDeliver = Blueprint('bpDeliver', __name__)
 
 class DeliverView(BasicView):
 
-    decorators = [login_required]
+#    decorators = [login_required]
 
     @templated('deliver/index.html')
     def index(self):
@@ -47,7 +47,7 @@ class DeliverView(BasicView):
 
     @templated('deliver/select_orders.html')
     def select_orders(self):
-        result = DBSession.query(OrderDetail).filter(and_(OrderDetail.active == 0, OrderDetail.status < SORTING[0])).all()
+        result = DBSession.query(OrderHeader).filter(and_(OrderHeader.active == 0, OrderHeader.status < SORTING[0])).all()
         return {'result' : result}
 
 
@@ -55,9 +55,9 @@ class DeliverView(BasicView):
     @templated('deliver/add_deliver.html')
     def add_deliver(self):
         ids = _gl('order_detail_ids')
-        order_details = DBSession.query(OrderDetail).filter(OrderDetail.id.in_(ids))
+        order_headers = DBSession.query(OrderHeader).filter(OrderHeader.id.in_(ids))
         suppliers = getMasterAll(Supplier)
-        return {'result' : order_details, 'suppliers' : suppliers}
+        return {'result' : order_headers, 'suppliers' : suppliers}
 
 
     def deliver_save_new(self):
@@ -73,12 +73,10 @@ class DeliverView(BasicView):
 
             line_no = 1
             for k, id in _gp('detail_'):
-                order_detail = DBSession.query(OrderDetail).get(id)
+                order_header = DBSession.query(OrderHeader).get(id)
                 DBSession.add(DeliverDetail(header = header,
-                                            order_detail = order_detail,
-                                            order_detail_line_no = order_detail.line_no,
+                                            order_header = order_header,
                                             line_no = line_no))
-                order_detail.status = SORTING[0]
                 line_no += 1
                 _debug('------- save detail')
 
@@ -137,10 +135,8 @@ class DeliverView(BasicView):
         try:
             if _g('sc') == 'SEND_OUT' :
                 header.send_out_remark = _g('send_out_remark')
-                header.update_status(SEND_OUT[0])
+                header.status = SEND_OUT[0]
                 for d in header.details :
-                    d.order_detail.update_status(SEND_OUT[0])
-
                     #delete the item form inventory
                     for r in DBSession.query(InventoryItem).filter(and_(InventoryItem.active == 0, InventoryItem.refer_order_detail_id == d.order_detail_id)):
                         r.active = 1

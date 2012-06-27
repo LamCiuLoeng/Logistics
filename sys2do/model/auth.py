@@ -158,7 +158,7 @@ class User(DeclarativeBase, SysMixin, CRUDMixin):
     id = Column(Integer, autoincrement = True, primary_key = True)
     name = Column(Text, unique = True, nullable = False)
     email = Column(Text)
-    _password = Column(Text)
+    _password = Column('password', Text)
     first_name = Column(Text)
     last_name = Column(Text)
     phone = Column(Text)

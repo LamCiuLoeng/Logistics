@@ -83,18 +83,18 @@
 		</thead>
 		{% for d in details %}
 			<tr>
-				<td>{{d.order_detail.header.customer}}</td>
-				<td>{{d.order_detail.header.no}}</td>
-				<td>{{d.order_detail.destination_address}}</td>
-				<td>{{d.order_detail.item}}</td>
-				<td>{{d.order_detail.order_qty}}&nbsp;{{d.order_detail.unit}}</td>
-				<td>{{d.order_detail.weight}}&nbsp;{{d.order_detail.weight_unit}}</td>
-				<td>{{d.order_detail.expect_time|ifFalse}}</td>
-				<td>{{d.order_detail.destination_contact}}</td>
-				<td>{{d.order_detail.destination_tel}}</td>
-				<td>{{d.order_detail.remark|ifFalse}}</td>
-				<td>{{d.order_detail.update_time|ft}}</td>
-				<td>{{d.order_detail.update_by|ifFalse}}</td>
+				<td>{{d.order_header.customer}}</td>
+				<td>{{d.order_header.no}}</td>
+				<td>{{d.order_header.destination_address}}</td>
+				<td>{{d.order_header.item}}</td>
+				<td>{{d.order_header.qty}}</td>
+				<td>{{d.order_header.weight}}</td>
+				<td>{{d.order_header.expect_time|ifFalse}}</td>
+				<td>{{d.order_header.destination_contact}}</td>
+				<td>{{d.order_header.destination_tel}}</td>
+				<td>{{d.order_header.remark|ifFalse}}</td>
+				<td>{{d.order_header.update_time|ft}}</td>
+				<td>{{d.order_header.update_by|ifFalse}}</td>
 			</tr>
 		{% endfor %}
 	</table>

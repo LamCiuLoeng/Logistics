@@ -55,127 +55,91 @@
 {% endblock %}
 
 {% block content %}
-	<form action="{{url_for('.view', action = 'save_new')}}" method="post">
-		<input type="button" value="{{BTN_SAVE}}" onclick="tosave()"/> 
-		<input type="reset" value="{{BTN_RESET}}"/>
-		<input type="button" value="{{BTN_CANCEL}}" onclick="location.href='{{url_for('.view', action = 'index')}}'"/>
-		<input type="button" value="{{BTN_RETURN}}" onclick="location.href='{{url_for('.view', action = 'index')}}'"/>
-
-		<table width="100%" border="0" cellspacing="0" cellpadding="0">
-      
-      <tr>
-        <td>&nbsp;</td>
-      </tr>
-      <tr>
-        <td align="left">
-        
-        	<table width="99%" border="0" cellspacing="0" cellpadding="0" bgcolor="#FFFFFF">
-          <tr>
-            <td width="13"><img src="/static/images/system/group_manage_40.jpg" width="13" height="13" /></td>
-            <td></td>
-            <td width="13"><img src="/static/images/system/group_manage_46.jpg" width="13" height="13" /></td>
-          </tr>
-          <tr>
-            <td>&nbsp;</td>
-            <td>
-            	<table border="0" cellpadding="3" cellspacing="3">
-			<tr>
-				<td width="100">{{_('Customer')}}</td>
-				<td>
-					<select name="customer_id" id="customer_id" onchange="changecustomer(this)" class="field" style="width: 300px">
-						<option>{{_('Please Select One')}}</option>
-						{% for c in customers%}
-							<option value="{{c.id}}">{{c.name}}</option>
-						{% endfor %}
-					</select>
-				</td>
-			</tr>
-			<tr>
-				<td>{{_('Address')}}</td>
-				<td><input type="text" name="source_address" id="source_address" value="" class="field" style="width: 300px"/></td>
-			</tr>
-			<tr>
-				<td>{{_('Phone')}}</td>
-				<td><input type="text" name="source_tel" id="source_tel" value="" class="field" style="width: 300px"/></td>
-			</tr>
-			<tr>
-				<td>{{_('Contact')}}</td>
-				<td><input type="text" name="source_contact" id="source_contact" value="" class="field" style="width: 300px"/></td>
-			</tr>
-			<tr>
-				<td>{{_('Remark')}}</td>
-				<td><textarea name="remark" id="remark" class="field" style="width: 300px"></textarea></td>
-			</tr>
-		</table>
-		<br />
-		<p><input type="button" value="{{_('Add Line')}}" onclick="addline();"/></p>
-		<br />
-              <table width="99%" border="0" cellspacing="0" cellpadding="0" id="item_table">
-              	<thead>
-                <tr class="field_head">
-                	<td>{{_('Action')}}</td>
-                	<td>{{_('Item')}}</td>
-                	<td>{{_('Qty')}}</td>
-                	<td>{{_('Unit')}}</td>
-                	<td>{{_('Weight')}}</td>
-                	<td>{{_('Weight Unit')}}</td>
-                	<td>{{_('Destination')}}</td>
-                	<td>{{_('Contact')}}</td>
-                	<td>{{_('Tel')}}</td>
-                	<td>{{_('Expect Time')}}</td>
-                	<td>{{_('Charge')}}</td>
-                	<td>{{_('Remark')}}</td>
-                </tr>
-                </thead>
-                <tbody>
-				<tr class="template data_table_tr">
-					<td>
-						<input type="button" value="{{_('Del')}}" onclick="deleteline(this)" />
-						<input type="hidden" name="shipment_type_x" value=""/>
-					</td>
-					<td><input type="text" name="item_x" id="item_x" value="" class="field" style="width:80px"/></td>
-					<td><input type="text" name="qty_x" id="qty_x" value="" class="field" style="width:30px"/></td>
-					<td>
-						<select name="unit_x" class="field">
-							{% for unit in units %}
-								<option value="{{unit.id}}">{{unit}}</option>
-							{% endfor %}
-						</select>
-					</td>
-					<td><input type="text" name="weight_x" id="weight_x" value="" class="field" style="width:30px"/></td>
-					
-					<td>
-						<select name="wunit_x" class="field">
-							{% for wunit in wunits %}
-								<option value="{{wunit.id}}">{{wunit}}</option>
-							{% endfor %}
-						</select>	
-					</td>
-					<td><input type="text" name="dest_x" id="dest_x" value="" class="field"/></td>
-					<td><input type="text" name="contact_x" id="contact_x" value="" class="field" style="width:50px"/></td>
-					<td><input type="text" name="tel_x" id="tel_x" value="" class="field" style="width:50px"/></td>
-					<td><input type="text" name="expect_time_x" id="expect_time_x" value="" class="field" style="width:50px"/></td>
-					<td><input type="text" name="charge_x" id="charge_x" value="" class="field" style="width:50px"/></td>
-					<td><textarea name="remark_x" id="remark_x" class="field"></textarea></td>
+	<div style="background-color: #fff;padding: 10px;">
+		<form action="{{url_for('.view', action = 'save_new')}}" method="post">
+		<p><input type="submit" value="{{BTN_SAVE}}"/></p>
+			<table>
+				<tr>
+					<td>{{_('Source Station')}}</td>
+					<td><input type="text" name="source_station" id="source_station" value="" class="field"/></td>
+					<td>&nbsp;</td>
+					<td>{{_('No#')}}</td>
+					<td><input type="text" name="no" id="no" value="" class="field"/></td>
+					<td>&nbsp;</td>
+					<td>{{_('Creator')}}</td>
+					<td>&nbsp;</td>
 				</tr>
-				</tbody>
-              </table></td>
-            <td>&nbsp;</td>
-          </tr>
+				<tr>
+					<td>{{_('Destination Station')}}</td>
+					<td><input type="text" name="destination_station" id="destination_station" value="" class="field"/></td>
+					<td>&nbsp;</td>
+					<td>{{Date}}</td>
+					<td><input type="text" name="order_time" id="order_time" value="" class="field"/></td>
+					<td>&nbsp;</td>
+					<td></td>
+					<td>&nbsp;</td>
+				</tr>
+			</table>
+			<table>
+				<tr>
+					<td valign="top">
+						<table>
+							<tr><td>{{_('Source Company')}}</td><td><input type="text" name="source_company" id="source_company" value="" class="field" style="width: 300px"/></td></tr>
+							<tr><td>{{_('Source Contact')}}</td><td><input type="text" name="source_contact" id="source_contact" value="" class="field" style="width: 300px"/></td></tr>
+							<tr><td>{{_('Source Address')}}</td><td><input type="text" name="source_address" id="source_address" value="" class="field" style="width: 300px"/></td></tr>
+							<tr><td>{{_('Source Phone')}}</td><td><input type="text" name="source_tel" id="source_tel" value="" class="field" style="width: 300px"/></td></tr>
+							<tr><td>{{_('Source Mobile')}}</td><td><input type="text" name="source_mobile" id="source_mobile" value="" class="field" style="width: 300px"/></td></tr>
+							<tr><td>{{_('Item')}}</td><td><input type="text" name="item" id="item" value="" class="field" style="width: 300px"/></td></tr>
+							<tr><td>{{_('Expect Time')}}</td><td><input type="text" name="expect_time" id="expect_time" value="" class="field" style="width: 300px"/></td></tr>
+							<tr><td>{{_('Remark')}}</td><td><textarea name="remark" id="remark"class="field" style="width: 300px"></textarea></td></tr>
+						</table>
+					</td>
+					<td>&nbsp;</td>
+					<td valign="top">
+						<table>
+						    <tr><td>{{_('Destination Company')}}</td><td><input type="text" name="destination_company" id="destination_company" value="" class="field" style="width: 300px"/></td></tr>
+							<tr><td>{{_('Destination Contact')}}</td><td><input type="text" name="destination_contact" id="destination_contact" value="" class="field" style="width: 300px"/></td></tr>
+							<tr><td>{{_('Destination Address')}}</td><td><input type="text" name="destination_address" id="destination_address" value="" class="field" style="width: 300px"/></td></tr>
+							<tr><td>{{_('Destination Phone')}}</td><td><input type="text" name="destination_tel" id="destination_tel" value="" class="field" style="width: 300px"/></td></tr>
+							<tr><td>{{_('Destination Mobile')}}</td><td><input type="text" name="destination_mobile" id="destination_mobile" value="" class="field" style="width: 300px"/></td></tr>
+							<tr><td>{{_('Payment')}}</td>
+								<td>
+									<select name="payment_id" id="payment_id">
+										{% for p in payment %}
+											<option value="{{plid}}">{{p}}</optino>
+										{% endfor %}
+									</select>
+								</td>
+							</tr>
+						</table>
+			
+					</td>
+				</tr>
+			</table>
+			<table>
+				<tr>
+					<td>件数</td>
+					<td>件数费率</td>
+					<td>体积</td>
+					<td>体积费率</td>
+					<td>重量</td>
+					<td>重量费率</td>
+					<td>费用</td>
+				</tr>
+				<tr>
+					<td><input type="text" name="qty" id="qty" value=""/></td>
+					<td><input type="text" name="qty_ratio" id="qty_ratio" value="{{ratios.get('QTY',0)}}"/></td>
+					<td><input type="text" name="vol" id="vol" value=""/></td>
+					<td><input type="text" name="vol_ratio" id="vol_ratio" value="{{ratios.get('VOL',0)}}"/></td>
+					<td><input type="text" name="weight" id="weight" value=""/></td>
+					<td><input type="text" name="weight_ratio" id="weight_ratio" value="{{ratios.get('WEIGHT',0)}}"/></td>
+					<td><input type="text" name="amount" id="amount" value=""/></td>
+				</tr>
+			</table>
+			
+			
+			
+		</form>
+	</div>
 
-          <tr>
-            <td><img src="/static/images/system/group_manage_47.jpg" width="13" height="13" /></td>
-            <td></td>
-            <td><img src="/static/images/system/group_manage_47-27.jpg" width="13" height="13" /></td>
-          </tr>
-        </table></td>
-      </tr>
-      <tr>
-        <td>&nbsp;</td>
-      </tr>
-    </table>
-		
-		
-		
-	</form>
 {% endblock %}

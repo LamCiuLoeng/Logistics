@@ -9,11 +9,11 @@
 from datetime import datetime as dt
 from sqlalchemy import Table, Column, ForeignKey
 from sqlalchemy.types import Unicode, Integer, DateTime, Float, Date, Text
-from sqlalchemy.orm import relation, backref
+from sqlalchemy.orm import relation, backref, synonym
 from sys2do.model import DeclarativeBase, metadata, DBSession
 from auth import SysMixin
 from sys2do.model.master import Customer, Supplier, ItemUnit, ShipmentType, \
-    WeightUnit, InventoryLocation
+    WeightUnit, InventoryLocation, Payment
 from sys2do.model.auth import CRUDMixin
 from sys2do.model.system import UploadFile
 from sqlalchemy.sql.expression import and_
@@ -34,35 +34,65 @@ class OrderHeader(DeclarativeBase, SysMixin, CRUDMixin):
     customer_id = Column(Integer, ForeignKey('master_customer.id'))
     customer = relation(Customer, backref = backref("orders", order_by = id), primaryjoin = "and_(Customer.id == OrderHeader.customer_id, OrderHeader.active == 0)")
 
-
-#    source_province_id = Column(Integer, ForeignKey('master_province.id'))
-#    source_provice = relation(Province)
-#    source_city_id = Column(Integer, ForeignKey('master_city.id'))
-#    source_city = relation(City)
-#    source_district_id = Column(Integer, ForeignKey('master_district.id'))
-#    source_district = relation(District)
-
+    source_station = Column(Text)
+    source_company = Column(Text)
     source_address = Column(Text)
     source_contact = Column(Text)
     source_tel = Column(Text)
     source_mobile = Column(Text)
 
+    payment_id = Column(Integer, ForeignKey('master_payment.id'))
+    payment = relation(Payment)
+
+    item = Column(Text)
+    qty = Column(Float, default = 0) #client order qty
+    unit_id = Column(Integer, ForeignKey('master_item_unit.id'))
+    unit = relation(ItemUnit)
+
+    weight = Column(Float, default = 0)
+    weight_unit_id = Column(Integer, ForeignKey('master_weight_unit.id'))
+    weight_unit = relation(WeightUnit)
+
+    vol = Column(Float, default = 0)
+
+    shipment_type_id = Column(Integer, ForeignKey('master_shipment_type.id'))
+    shipment_type = relation(ShipmentType)
+
+    destination_station = Column(Text)
+    destination_company = Column(Text)
+    destination_address = Column(Text)
+    destination_contact = Column(Text)
+    destination_tel = Column(Text)
+    destination_mobile = Column(Text)
+
+    order_time = Column(Date, default = None)
+    expect_time = Column(Date, default = None)
+    actual_time = Column(Date, default = None)
+
+    qty_ratio = Column(Float, default = 0)
+    weight_ratio = Column(Float, default = 0)
+    vol_ratio = Column(Float, default = 0)
+    amount = Column(Float, default = 0)
+    cost = Column(Float, default = 0)
+
+
     picker = Column(Text)
     picker_contact = Column(Text)
     picker_remark = Column(Text)
-
     in_warehouse_remark = Column(Text)
 
-    remark = Column(Text)
     barcode_id = Column(Integer, ForeignKey('system_upload_file.id'))
     barcode = relation(UploadFile)
-    amount = Column(Float, default = 0)
+
+    inventory_location_id = Column(Integer, ForeignKey('master_inventory_location.id'))
+    inventory_location = relation(InventoryLocation, backref = backref("items", order_by = id))
+
+    remark = Column(Text)
     status = Column(Integer, default = 0)
 
+
     def __str__(self): return self.no
-
     def __repr__(self): return self.no
-
     def __unicode__(self): return self.no
 
     def populate(self):
@@ -92,8 +122,8 @@ class OrderHeader(DeclarativeBase, SysMixin, CRUDMixin):
 
     def update_status(self, status):
         self.status = status
-        for d in self.details :
-            if d.status < self.status : d.status = status
+#        for d in self.details :
+#            if d.status < self.status : d.status = status
 
     def get_logs(self):
         return DBSession.query(TransferLog).filter(and_(
@@ -103,10 +133,6 @@ class OrderHeader(DeclarativeBase, SysMixin, CRUDMixin):
                                                 )).order_by(TransferLog.id)
 
 
-#    @property
-#    def destination_full_address(self):
-#        return "".join(filter(lambda v:v, [self.source_provice, self.source_city, self.source_address]))
-
 
 class OrderDetail(DeclarativeBase, SysMixin):
     __tablename__ = 'order_detail'
@@ -114,59 +140,58 @@ class OrderDetail(DeclarativeBase, SysMixin):
     id = Column(Integer, autoincrement = True, primary_key = True)
     header_id = Column(Integer, ForeignKey('order_header.id'))
     header = relation(OrderHeader, backref = backref("details", order_by = id), primaryjoin = "and_(OrderHeader.id == OrderDetail.header_id, OrderDetail.active == 0)")
-
-#    item_id = Column(Integer, ForeignKey('master_item.id'))
-#    item = relation(Item, backref = backref("details", order_by = id), primaryjoin = "and_(Item.id == OrderDetail.item_id, OrderDetail.active == 0)")
-
-
-    line_no = Column(Integer, default = 1)
-    no = Column(Text)
+#
+##    item_id = Column(Integer, ForeignKey('master_item.id'))
+##    item = relation(Item, backref = backref("details", order_by = id), primaryjoin = "and_(Item.id == OrderDetail.item_id, OrderDetail.active == 0)")
+#
+#
+#    line_no = Column(Integer, default = 1)
+#    no = Column(Text)
     item = Column(Text)
-    order_qty = Column(Float, default = 0) #client order qty
-    delivered_qty = Column(Integer)
-    unit_id = Column(Integer, ForeignKey('master_item_unit.id'))
-    unit = relation(ItemUnit)
-
-    weight = Column(Float, default = 0)
-    weight_unit_id = Column(Integer, ForeignKey('master_weight_unit.id'))
-    weight_unit = relation(WeightUnit)
-
-    shipment_type_id = Column(Integer, ForeignKey('master_shipment_type.id'))
-    shipment_type = relation(ShipmentType)
-#    shipment_instruction = Column(Unicode(5000))
-
-#    destination_province_id = Column(Integer, ForeignKey('master_province.id'))
-#    destination_provice = relation(Province)
-#    destination_city_id = Column(Integer, ForeignKey('master_city.id'))
-#    destination_city = relation(City)
-#    destination_district_id = Column(Integer, ForeignKey('master_district.id'))
-#    destination_district = relation(District)
-    destination_address = Column(Text)
-    destination_contact = Column(Text)
-    destination_tel = Column(Text)
-    destination_mobile = Column(Text)
-
-    expect_time = Column(Date, default = None)
-    actual_time = Column(Date, default = None)
-
-#    charge_type = 
-    barcode_id = Column(Integer, ForeignKey('system_upload_file.id'))
-    barcode = relation(UploadFile)
-    charge = Column(Float, default = 0)
-    inventory_location_id = Column(Integer, ForeignKey('master_inventory_location.id'))
-    inventory_location = relation(InventoryLocation, backref = backref("items", order_by = id))
-    remark = Column(Text)
-    status = Column(Integer, default = 0)
-
-
-    def update_status(self, status):
-        self.status = status
-        self.header.status = min([d.status for d in self.header.details])
-
-#    @property
-#    def destination_full_address(self):
-#        return "".join(filter(lambda v:v, [self.destination_provice, self.destination_city, self.destination_address]))
-
+    qty = Column(Float, default = 0) #client order qty
+#    delivered_qty = Column(Integer)
+#    unit_id = Column(Integer, ForeignKey('master_item_unit.id'))
+#    unit = relation(ItemUnit)
+#
+#    weight = Column(Float, default = 0)
+#    weight_unit_id = Column(Integer, ForeignKey('master_weight_unit.id'))
+#    weight_unit = relation(WeightUnit)
+#
+#    shipment_type_id = Column(Integer, ForeignKey('master_shipment_type.id'))
+#    shipment_type = relation(ShipmentType)
+##    shipment_instruction = Column(Unicode(5000))
+#
+##    destination_province_id = Column(Integer, ForeignKey('master_province.id'))
+##    destination_provice = relation(Province)
+##    destination_city_id = Column(Integer, ForeignKey('master_city.id'))
+##    destination_city = relation(City)
+##    destination_district_id = Column(Integer, ForeignKey('master_district.id'))
+##    destination_district = relation(District)
+#    destination_address = Column(Text)
+#    destination_contact = Column(Text)
+#    destination_tel = Column(Text)
+#    destination_mobile = Column(Text)
+#
+#    expect_time = Column(Date, default = None)
+#    actual_time = Column(Date, default = None)
+#
+##    charge_type = 
+#    barcode_id = Column(Integer, ForeignKey('system_upload_file.id'))
+#    barcode = relation(UploadFile)
+#    charge = Column(Float, default = 0)
+#    inventory_location_id = Column(Integer, ForeignKey('master_inventory_location.id'))
+#    inventory_location = relation(InventoryLocation, backref = backref("items", order_by = id))
+#    remark = Column(Text)
+#    status = Column(Integer, default = 0)
+#
+#
+#    def update_status(self, status):
+#        self.status = status
+#        self.header.status = min([d.status for d in self.header.details])
+#
+##    @property
+##    def destination_full_address(self):
+##        return "".join(filter(lambda v:v, [self.destination_provice, self.destination_city, self.destination_address]))
 
 
 
@@ -198,7 +223,7 @@ class DeliverHeader(DeclarativeBase, SysMixin, CRUDMixin):
     amount = Column(Float, default = 0)
 
     remark = Column(Text)
-    status = Column(Integer, default = 0)
+    _status = Column('status', Integer, default = 0)
 
 
 
@@ -226,10 +251,15 @@ class DeliverHeader(DeclarativeBase, SysMixin, CRUDMixin):
                 'update_by' : self.update_by,
                 }
 
-    def update_status(self, status):
-        self.status = status
+
+    def _get_status(self): return self._status
+
+    def _set_status(self, status):
+        self._status = status
         for d in self.details :
             if d.status < self.status : d.status = status
+
+    status = synonym('_status', descriptor = property(_get_status, _set_status))
 
 
     def get_logs(self):
@@ -253,20 +283,25 @@ class DeliverDetail(DeclarativeBase, SysMixin):
     header = relation(DeliverHeader, backref = backref("details", order_by = id), primaryjoin = "and_(DeliverHeader.id == DeliverDetail.header_id, DeliverDetail.active == 0)")
     line_no = Column(Integer, default = 1)
 
-    order_detail_id = Column(Integer, ForeignKey('order_detail.id'))
-    order_detail = relation(OrderDetail, backref = backref("deliver_details", order_by = id), primaryjoin = "and_(OrderDetail.id == DeliverDetail.order_detail_id, DeliverDetail.active == 0)")
-    order_detail_line_no = Column(Integer)
+    order_header_id = Column(Integer, ForeignKey('order_header.id'))
+    order_header = relation(OrderHeader)
+#    order_detail_line_no = Column(Integer)
 
-    deliver_qty = Column(Integer)
+#    deliver_qty = Column(Integer)
 
     remark = Column(Text)
     cost = Column(Float, default = 0)
-    status = Column(Integer, default = 0)
+    _status = Column('status', Integer, default = 0)
 
 
-    def update_status(self, status):
-        self.status = status
-        self.header.status = min([d.status for d in self.header.details])
+    def _get_status(self): return self._status
+
+    def _set_status(self, status):
+        self._status = status
+        self.order_header.status = status
+
+
+    status = synonym('_status', descriptor = property(_get_status, _set_status))
 
 
 #class OrderLog(DeclarativeBase, SysMixin):
