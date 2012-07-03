@@ -9,7 +9,7 @@
 from datetime import datetime as dt
 import random
 from sys2do.model import DBSession
-from sys2do.model.logic import DeliverDetail, OrderDetail, DeliverHeader
+from sys2do.model.logic import DeliverDetail, DeliverHeader
 from sqlalchemy.sql.functions import sum
 from sqlalchemy.sql.expression import and_
 

@@ -167,7 +167,7 @@ class User(DeclarativeBase, SysMixin, CRUDMixin):
     image_url = Column(Text)
     last_login = Column(DateTime, default = dt.now)
 
-    customer_profile_id = Column(Integer, ForeignKey('order_detail.id'))
+#    customer_profile_id = Column(Integer, ForeignKey('order_detail.id'))
 #    customer_profile = relation(CustomerProfile, backref = backref("users", order_by = id), primaryjoin = "and_(CustomerProfile.id == User.customer_profile_id, User.active == 0)")
 
     def __repr__(self): return "%s %s" % (self.first_name, self.last_name)

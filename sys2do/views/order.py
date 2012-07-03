@@ -96,17 +96,17 @@ class OrderView(BasicView):
         DBSession.commit()
         return 0
 
-
-
-
-    @templated('order/review.html')
-    def review(self):
-        header = getOr404(OrderHeader, _g('id'))
-        if header.status in [ASSIGN_PICKER[0], ]:
-            locations = DBSession.query(InventoryLocation).filter(InventoryLocation.active == 0).order_by(InventoryLocation.full_path)
-        else:
-            locations = []
-        return {'header' : header , 'details' : header.details, 'locations' : locations}
+#
+#
+#
+#    @templated('order/review.html')
+#    def review(self):
+#        header = getOr404(OrderHeader, _g('id'))
+#        if header.status in [ASSIGN_PICKER[0], ]:
+#            locations = DBSession.query(InventoryLocation).filter(InventoryLocation.active == 0).order_by(InventoryLocation.full_path)
+#        else:
+#            locations = []
+#        return {'header' : header , 'details' : header.details, 'locations' : locations}
 
 
     @templated('order/revise.html')
@@ -206,18 +206,17 @@ class OrderView(BasicView):
         return redirect(self.default())
 
 
-
-    @templated('order/warning.html')
-    def warning(self):
-        t = _g('t') or None
-        if not t : return {'result' : [] , 't' : t}
-
-        n = dt.now() + timedelta(int(t))
-        result = DBSession.query(OrderHeader).filter(and_(OrderHeader.status == IN_TRAVEL[0], OrderHeader.expect_time > n)).order_by(OrderHeader.expect_time)
-        return {'result' : result, 't' : t}
-
-
-
+#
+#    @templated('order/warning.html')
+#    def warning(self):
+#        t = _g('t') or None
+#        if not t : return {'result' : [] , 't' : t}
+#
+#        n = dt.now() + timedelta(int(t))
+#        result = DBSession.query(OrderHeader).filter(and_(OrderHeader.status == IN_TRAVEL[0], OrderHeader.expect_time > n)).order_by(OrderHeader.expect_time)
+#        return {'result' : result, 't' : t}
+#
+#
 
 
 
@@ -361,6 +360,17 @@ class OrderView(BasicView):
             return unicode(MSG_NO_SUCH_ACTION)
 
 
+
+    def ajax_save(self):
+        type = _g('')
+
+        if type not in ['', ]:
+            return jsonify({'code' :-1, 'msg' : unicode(MSG_NO_SUCH_ACTION)})
+
+        if type == '':
+            pass
+        elif type == '':
+            pass
 
 bpOrder.add_url_rule('/', view_func = OrderView.as_view('view'), defaults = {'action':'index'})
 bpOrder.add_url_rule('/<action>', view_func = OrderView.as_view('view'))

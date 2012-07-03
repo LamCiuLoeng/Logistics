@@ -1,4 +1,4 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"> 
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -8,9 +8,8 @@
 	
 	<title>{% block title %}{{_("Logistics Management")}}{% block subtitle %}{% endblock %}{% endblock %}</title>
 	
-	<link href="{{url_for('static', filename='css/screen.css')}}" rel="stylesheet" type="text/css" />
-	<link href="{{url_for('static', filename='css/extra.css')}}" rel="stylesheet" type="text/css" />
 	<link href="{{url_for('static', filename='css/modaldialog/jquery.modaldialog.css')}}" rel="stylesheet" type="text/css" />
+	<link href="{{url_for('static', filename='css/screen.css')}}" rel="stylesheet" type="text/css" />
 	{% block extCSS %}{% endblock %}
 
 	<script src="{{url_for('static', filename='js/jquery-1.7.1.min.js')}}" type="text/javascript"></script>
@@ -36,114 +35,37 @@
 </head>
 
 <body>
+	<div id="container">
 		{% block header %}
+			<div id="header">
 				<!-- header Here -->
-				<table width="100%" border="0" cellspacing="0" cellpadding="0" id="header">
-				  <tr>
-				    <td width="460"><img src="/static/images/system/group_manage_01.jpg" width="460" height="86" /></td>
-				    <td background="/static/images/system/group_manage_02.jpg">&nbsp;</td>
-				    <td width="92"><img src="/static/images/system/group_manage_04.jpg" width="92" height="86" /></td>
-				    <td width="60" align="left" valign="top" background="/static/images/system/group_manage_06.jpg"><a href="{{url_for('bpAuth.logout')}}"><img src="/static/images/system/group_manage_05.jpg" width="60" height="38" /></a></td>
-				    <td width="70"><img src="/static/images/system/group_manage_06.jpg" width="70" height="86" /></td>
-				  </tr>
-				</table>
+				<ul>
+					<li><a href="/index">首页</a></li>
+					{% if not session.get('login',None)%}
+						<li><a href="{{url_for('bpAuth.login')}}">{{_('Login')}}</a></li>
+						<li><a href="{{url_for('bpAuth.register')}}">{{_('Register')}}</a></li>
+					{% else %}
+						<li><a href="{{url_for('bpAuth.logout')}}">{{_('Logout')}}</a></li>
+					{% endif %}
+				</ul>
+			</div>
 		{% endblock %}
+		
 		{% block main %}
-			<table width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="#F4D421">
-			  <tr>
-			    <td width="40">&nbsp;</td>
-			    <td width="263" valign="top"><img src="/static/images/system/group_manage_09.jpg" width="263" height="50" /></td>
-			    <td align="left" valign="top" background="/static/images/system/group_manage_12.jpg">
-			      <table width="100%" border="0" cellspacing="0" cellpadding="0">
-			        <tr>
-			          <td width="24"><img src="/static/images/system/group_manage_10.jpg" width="24" height="50" /></td>
-			          <td class="user_display"></td>
-			        </tr>
-			      </table>
-			    </td>
-			    <td width="10"><img src="/static/images/system/group_manage_16.jpg" width="10" height="49" /></td>
-			    <td width="50">&nbsp;</td>
-			  </tr>
-			  <tr>
-			    <td>&nbsp;</td>
-			    <td align="center" bgcolor="#4B4B4B" style="padding:25px 0px 10px 0px" valign="top">
-			    
-			    <table width="204" border="0" cellspacing="0" cellpadding="0">
-			    	{% if 'CUSTOMER' is in_group %}
-			    	  <tr><td class="menu_hover" onmouseover="menu_hover(this)" onmouseout="menu_hover_highlight(this)"><a href="{{url_for('bpOrder.view', action = 'add_by_customer')}}" class="menu_left">订单录入</a></td></tr>
-					  <tr><td>&nbsp;</td></tr>
-					  <tr><td class="menu_hover" onmouseover="menu_hover(this)" onmouseout="menu_hover_highlight(this)"><a href="{{url_for('bpOrder.view', action = 'search_by_customer')}}" class="menu_left">订单查询</a></td></tr>
-					  <tr><td>&nbsp;</td></tr>
-			    	{% endif %}
-			    	{% if 'SUPPLIER' is in_group %}
-			    	  <tr><td class="menu_hover" onmouseover="menu_hover(this)" onmouseout="menu_hover_highlight(this)"><a href="{{url_for('bpDeliver.view', action = 'vendor_select')}}" class="menu_left">订单信息录入</a></td></tr>
-					  <tr><td>&nbsp;</td></tr>
-			    	{% endif %}
-			    	{% if 'OFFICER' is in_group %}
-			    	  <tr><td class="menu_hover" onmouseover="menu_hover(this)" onmouseout="menu_hover_highlight(this)"><a href="{{url_for('bpOrder.view', action = 'index')}}" class="menu_left">订单管理</a></td></tr>
-					  <tr><td>&nbsp;</td></tr>
-					  <tr><td class="menu_hover" onmouseover="menu_hover(this)" onmouseout="menu_hover_highlight(this)"><a href="{{url_for('bpDeliver.view', action = 'select_orders')}}" class="menu_left">分拣</a></td></tr>
-					  <tr><td>&nbsp;</td></tr>
-					  <tr><td class="menu_hover" onmouseover="menu_hover(this)" onmouseout="menu_hover_highlight(this)"><a href="{{url_for('bpDeliver.view', action = 'index')}}" class="menu_left">送货单管理</a></td></tr>
-					  <tr><td>&nbsp;</td></tr>
-			    	{% endif %}
-			    	{% if 'WAREHOUSE' is in_group %}
-			    	  <tr><td class="menu_hover" onmouseover="menu_hover(this)" onmouseout="menu_hover_highlight(this)"><a href="{{url_for('bpWarehouse.view', action = 'index')}}" class="menu_left">仓存管理</a></td></tr>
-					  <tr><td>&nbsp;</td></tr>
-			    	{% endif %}
-			    	{% if 'ADMIN' is in_group %}
-				      <tr><td class="menu_hover" onmouseover="menu_hover(this)" onmouseout="menu_hover_highlight(this)"><a href="{{url_for('bpAdmin.view', action = 'user')}}" class="menu_left">用户管理</a></td></tr>
-					  <tr><td>&nbsp;</td></tr>
-				      <tr><td class="menu_hover" onmouseover="menu_hover(this)" onmouseout="menu_hover_highlight(this)"><a href="{{url_for('bpAdmin.view', action = 'group')}}" class="menu_left">组管理</a></td></tr>
-					  <tr><td>&nbsp;</td></tr>
-				      <tr><td class="menu_hover" onmouseover="menu_hover(this)" onmouseout="menu_hover_highlight(this)"><a href="{{url_for('bpAdmin.view', action = 'permission')}}" class="menu_left">权限管理</a></td></tr>
-					  <tr><td>&nbsp;</td></tr>
-				      <tr><td class="menu_hover" onmouseover="menu_hover(this)" onmouseout="menu_hover_highlight(this)"><a href="{{url_for('bpAdmin.view', action = 'customer')}}" class="menu_left">客户管理</a></td></tr>
-					  <tr><td>&nbsp;</td></tr>
-				      <tr><td class="menu_hover" onmouseover="menu_hover(this)" onmouseout="menu_hover_highlight(this)"><a href="{{url_for('bpAdmin.view', action = 'cprofile')}}" class="menu_left">客户与用户关系管理</a></td></tr>
-					  <tr><td>&nbsp;</td></tr>
-				      <tr><td class="menu_hover" onmouseover="menu_hover(this)" onmouseout="menu_hover_highlight(this)"><a href="{{url_for('bpAdmin.view', action = 'supplier')}}" class="menu_left">承运商管理</a></td></tr>
-					  <tr><td>&nbsp;</td></tr>
-				      <tr><td class="menu_hover" onmouseover="menu_hover(this)" onmouseout="menu_hover_highlight(this)"><a href="{{url_for('bpAdmin.view', action = 'sprofile')}}" class="menu_left">承运商与用户关系管理</a></td></tr>
-					  <!-- 
-					  <tr><td>&nbsp;</td></tr>
-				      <tr><td class="menu_hover" onmouseover="menu_hover(this)" onmouseout="menu_hover_highlight(this)"><a href="{{url_for('bpAdmin.view', action = 'location')}}" class="menu_left">省份/城市/地区管理</a></td></tr>
-					  <tr><td>&nbsp;</td></tr>
-				      <tr><td class="menu_hover" onmouseover="menu_hover(this)" onmouseout="menu_hover_highlight(this)"><a href="{{url_for('bpAdmin.view', action = 'charge')}}" class="menu_left">计费方式管理</a></td></tr>
-					  <tr><td>&nbsp;</td></tr>
-				      <tr><td class="menu_hover" onmouseover="menu_hover(this)" onmouseout="menu_hover_highlight(this)"><a href="{{url_for('bpAdmin.view', action = 'unit')}}" class="menu_left">计量单位管理</a></td></tr>
-					  <tr><td>&nbsp;</td></tr>
-				      <tr><td class="menu_hover" onmouseover="menu_hover(this)" onmouseout="menu_hover_highlight(this)"><a href="{{url_for('bpAdmin.view', action = 'system')}}" class="menu_left">系统设置管理</a></td></tr>
-					  -->
-				  {% endif %}
-			      
-			    </table></td>
-			    <td valign="top" bgcolor="#4B4B4B">
-			    	{% block content %}
-			    		<!-- Main Content Here -->
-			    	{% endblock %}
-			    </td>
-			    <td bgcolor="#4B4B4B">&nbsp;</td>
-			    <td>&nbsp;</td>
-			  </tr>
-			</table>
+			<div id="main">
+				<div id="main_content">
+					{% block content %}
+					<!-- Main Content Here -->
+					{% endblock %}
+				</div>
+			</div>
 		{% endblock %}
 		
 		{% block footer %}
-			<!-- footer Here -->
-			<table width="100%" border="0" cellspacing="0" cellpadding="0" id="footer">
-			  <tr>
-			    <td width="40" height="37" background="/static/images/system/group_manage_70.jpg">&nbsp;</td>
-			    <td background="/static/images/system/group_manage_71.jpg">&nbsp;</td>
-			    <td width="50" background="/static/images/system/group_manage_70.jpg">&nbsp;</td>
-			  </tr>
-			</table>
-			<table width="100%" border="0" cellspacing="0" cellpadding="0">
-			  <tr>
-			    <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="/static/images/system/group_manage_76.jpg" width="232" height="25" /></td>
-			  </tr>
-			</table>
+			<div id="footer">
+				<!-- footer Here -->
+			</div>
 		{% endblock %}
-
+	</div>
 </body>
 </html>

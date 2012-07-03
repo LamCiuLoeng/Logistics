@@ -76,10 +76,10 @@ class OrderHeader(DeclarativeBase, SysMixin, CRUDMixin):
     cost = Column(Float, default = 0)
 
 
-    picker = Column(Text)
-    picker_contact = Column(Text)
-    picker_remark = Column(Text)
-    in_warehouse_remark = Column(Text)
+#    picker = Column(Text)
+#    picker_contact = Column(Text)
+#    picker_remark = Column(Text)
+#    in_warehouse_remark = Column(Text)
 
     barcode_id = Column(Integer, ForeignKey('system_upload_file.id'))
     barcode = relation(UploadFile)
@@ -109,10 +109,10 @@ class OrderHeader(DeclarativeBase, SysMixin, CRUDMixin):
                 'source_address' : self.source_address,
                 'source_contact' : self.source_contact,
                 'source_tel' : self.source_tel,
-                'picker' : self.picker,
-                'picker_contact' : self.picker_contact,
-                'picker_remark' : self.picker_remark,
-                'in_warehouse_remark' : self.in_warehouse_remark,
+#                'picker' : self.picker,
+#                'picker_contact' : self.picker_contact,
+#                'picker_remark' : self.picker_remark,
+#                'in_warehouse_remark' : self.in_warehouse_remark,
                 'remark' : self.remark,
                 'status' : self.status,
                 'barcode' : self.barcode,
@@ -134,64 +134,65 @@ class OrderHeader(DeclarativeBase, SysMixin, CRUDMixin):
 
 
 
-class OrderDetail(DeclarativeBase, SysMixin):
-    __tablename__ = 'order_detail'
+class ItemDetail(DeclarativeBase, SysMixin):
+    __tablename__ = 'order_item_detail'
 
     id = Column(Integer, autoincrement = True, primary_key = True)
     header_id = Column(Integer, ForeignKey('order_header.id'))
-    header = relation(OrderHeader, backref = backref("details", order_by = id), primaryjoin = "and_(OrderHeader.id == OrderDetail.header_id, OrderDetail.active == 0)")
-#
-##    item_id = Column(Integer, ForeignKey('master_item.id'))
-##    item = relation(Item, backref = backref("details", order_by = id), primaryjoin = "and_(Item.id == OrderDetail.item_id, OrderDetail.active == 0)")
-#
-#
-#    line_no = Column(Integer, default = 1)
-#    no = Column(Text)
+    header = relation(OrderHeader, backref = backref("item_details", order_by = id), primaryjoin = "and_(OrderHeader.id == ItemDetail.header_id, ItemDetail.active == 0)")
     item = Column(Text)
     qty = Column(Float, default = 0) #client order qty
-#    delivered_qty = Column(Integer)
-#    unit_id = Column(Integer, ForeignKey('master_item_unit.id'))
-#    unit = relation(ItemUnit)
-#
-#    weight = Column(Float, default = 0)
-#    weight_unit_id = Column(Integer, ForeignKey('master_weight_unit.id'))
-#    weight_unit = relation(WeightUnit)
-#
-#    shipment_type_id = Column(Integer, ForeignKey('master_shipment_type.id'))
-#    shipment_type = relation(ShipmentType)
-##    shipment_instruction = Column(Unicode(5000))
-#
-##    destination_province_id = Column(Integer, ForeignKey('master_province.id'))
-##    destination_provice = relation(Province)
-##    destination_city_id = Column(Integer, ForeignKey('master_city.id'))
-##    destination_city = relation(City)
-##    destination_district_id = Column(Integer, ForeignKey('master_district.id'))
-##    destination_district = relation(District)
-#    destination_address = Column(Text)
-#    destination_contact = Column(Text)
-#    destination_tel = Column(Text)
-#    destination_mobile = Column(Text)
-#
-#    expect_time = Column(Date, default = None)
-#    actual_time = Column(Date, default = None)
-#
-##    charge_type = 
-#    barcode_id = Column(Integer, ForeignKey('system_upload_file.id'))
-#    barcode = relation(UploadFile)
-#    charge = Column(Float, default = 0)
-#    inventory_location_id = Column(Integer, ForeignKey('master_inventory_location.id'))
-#    inventory_location = relation(InventoryLocation, backref = backref("items", order_by = id))
-#    remark = Column(Text)
-#    status = Column(Integer, default = 0)
-#
-#
-#    def update_status(self, status):
-#        self.status = status
-#        self.header.status = min([d.status for d in self.header.details])
-#
-##    @property
-##    def destination_full_address(self):
-##        return "".join(filter(lambda v:v, [self.destination_provice, self.destination_city, self.destination_address]))
+    vol = Column(Float, default = 0)
+    weight = Column(Float, default = 0)
+    remark = Column(Text)
+
+
+
+class WarehouseDetail(DeclarativeBase, SysMixin):
+    __tablename__ = 'order_warehouse_detail'
+
+    id = Column(Integer, autoincrement = True, primary_key = True)
+    header_id = Column(Integer, ForeignKey('order_header.id'))
+    header = relation(OrderHeader, backref = backref("warehouse_details", order_by = id), primaryjoin = "and_(OrderHeader.id == WarehouseDetail.header_id, WarehouseDetail.active == 0)")
+
+    action_type = Column(Text)
+    action_time = Column(Text)
+#    location_id = Column(Integer, ForeignKey('master_inventory_location.id'))
+#    location = relation(InventoryLocation)
+    remark = Column(Text)
+
+
+
+
+class TransitDetail(DeclarativeBase, SysMixin):
+    __tablename__ = 'order_transit_detail'
+
+    id = Column(Integer, autoincrement = True, primary_key = True)
+    header_id = Column(Integer, ForeignKey('order_header.id'))
+    header = relation(OrderHeader, backref = backref("transit_details", order_by = id), primaryjoin = "and_(OrderHeader.id == TransitDetail.header_id, TransitDetail.active == 0)")
+
+    action_time = Column(Text)
+    action_location = Column(Text)
+    remark = Column(Text)
+
+
+
+
+
+class PickupDetail(DeclarativeBase, SysMixin):
+    __tablename__ = 'order_pickup_detail'
+
+    id = Column(Integer, autoincrement = True, primary_key = True)
+    header_id = Column(Integer, ForeignKey('order_header.id'))
+    header = relation(OrderHeader, backref = backref("pickup_details", order_by = id), primaryjoin = "and_(OrderHeader.id == PickupDetail.header_id, PickupDetail.active == 0)")
+
+    action_time = Column(Text)
+    contact = Column(Text)
+    tel = Column(Text)
+    qty = Column(Float, default = 0)
+    remark = Column(Text)
+
+
 
 
 

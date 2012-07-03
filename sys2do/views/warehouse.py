@@ -15,7 +15,7 @@ from sys2do.util.common import _g
 from flask.helpers import flash
 from sys2do.constant import MESSAGE_INFO, MSG_SAVE_SUCC
 from werkzeug.utils import redirect
-from sys2do.model.logic import OrderDetail
+
 from sqlalchemy.sql.expression import and_
 
 

@@ -290,14 +290,14 @@ class InventoryItem(DeclarativeBase, SysMixin):
     location = relation(InventoryLocation)
     qty = Column(Integer, default = 0)
     refer_order_header = Column(Text)
-    refer_order_detail_id = Column(Integer, ForeignKey('order_detail.id'))
+#    refer_order_detail_id = Column(Integer, ForeignKey('order_detail.id'))
     remark = Column(Text)
 
 
-    @property
-    def order_detail(self):
-        from sys2do.model.logic import OrderDetail
-        return DBSession.query(OrderDetail).get(self.refer_order_detail_id)
+#    @property
+#    def order_detail(self):
+#        from sys2do.model.logic import OrderDetail
+#        return DBSession.query(OrderDetail).get(self.refer_order_detail_id)
 
 
 class Payment(DeclarativeBase, SysMixin):
