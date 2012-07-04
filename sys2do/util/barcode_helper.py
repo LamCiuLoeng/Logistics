@@ -14,7 +14,9 @@ from sys2do.model import UploadFile
 
 
 def generate_barcode_file(string, ext = '.jpg'):
+    if not string : return None
     try:
+        if len(string) % 2 != 0 :    string = '0' + string
         codestring = '^105%s' % string  #code 128 C format
         c = code128.Code128()
         f = c.render(codestring, options = dict(includetext = True, height = 0.4, textxalign = 'center'), scale = 2, margin = 5)
@@ -23,7 +25,7 @@ def generate_barcode_file(string, ext = '.jpg'):
         if not os.path.exists(file_dir): os.makedirs(file_dir)
         full_path = os.path.join(file_dir, file_name)
         f.save(full_path)
-    
+
         return UploadFile(name = file_name,
                    path = os.path.join(UPLOAD_FOLDER, file_name),
                    url = "/".join([UPLOAD_FOLDER_URL, file_name]),
@@ -32,10 +34,10 @@ def generate_barcode_file(string, ext = '.jpg'):
                    )
     except:
         return None
-    
-    
-    
-    
+
+
+
+
 
 if __name__ == "__main__":
 

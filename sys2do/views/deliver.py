@@ -11,7 +11,7 @@ from datetime import datetime as dt
 from flask import session
 from flask.blueprints import Blueprint
 from flask.views import View
-from flask.helpers import url_for, flash
+from flask.helpers import url_for, flash, jsonify
 from sqlalchemy.sql.expression import and_
 from werkzeug.utils import redirect
 
@@ -19,7 +19,7 @@ from sys2do.constant import MESSAGE_ERROR, MSG_NO_SUCH_ACTION, MESSAGE_INFO, \
     MSG_SAVE_SUCC, IN_WAREHOUSE, MSG_UPDATE_SUCC, ORDER_NEW, \
     ORDER_CANCELLED, MSG_DELETE_SUCC, SORTING, MSG_RECORD_NOT_EXIST, SEND_OUT, \
     GOODS_ARRIVED, IN_TRAVEL, GOODS_SIGNED, MSG_SERVER_ERROR, LOG_GOODS_SORTED, \
-    LOG_GOODS_SENT_OUT, LOG_GOODS_ARRIVAL
+    LOG_GOODS_SENT_OUT, LOG_GOODS_ARRIVAL, MSG_NO_ID_SUPPLIED
 from sys2do.util.decorator import templated, login_required
 from sys2do.model import DBSession
 from sys2do.views import BasicView
@@ -50,6 +50,26 @@ class DeliverView(BasicView):
         result = DBSession.query(OrderHeader).filter(and_(OrderHeader.active == 0, OrderHeader.status < SORTING[0])).all()
         return {'result' : result}
 
+
+
+    def ajax_check_ids(self):
+        action = _g('action')
+        id = _g('id')
+        if action not in ['ADD', 'DEL'] : return jsonify({'code' :-1 , 'msg' : unicode(MSG_NO_SUCH_ACTION)})
+        if not id : return jsonify({'code' :-1 , 'msg' : unicode(MSG_NO_ID_SUPPLIED)})
+
+        if action == 'ADD':
+            if 'deliver_order_ids' in session: session['deliver_order_ids'].append(id)
+            else: session['deliver_order_ids'] = [id, ]
+            return jsonify({'code' : 0 , 'msg' : unicode(MSG_SAVE_SUCC)})
+        else:
+            if 'deliver_order_ids' not in session: pass
+            else:
+                try:
+                    session['deliver_order_ids'].pop(session['deliver_order_ids'].index(id))
+                except:
+                    pass
+                return jsonify({'code' : 0 , 'msg' : unicode(MSG_SAVE_SUCC)})
 
 
     @templated('deliver/add_deliver.html')

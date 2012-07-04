@@ -12,7 +12,7 @@ from sys2do.constant import STATUS_LIST
 #from flask import current_app as app
 #from sys2do import app
 
-__all__ = ['ft', 'fd', 'ifFalse', 'showStatus']
+__all__ = ['ft', 'fd', 'ifFalse', 'f', 'showStatus']
 
 
 def ft(t, f = "%Y-%m-%d %H:%M"):
@@ -32,6 +32,8 @@ def fd(d, f = "%Y-%m-%d"):
 def ifFalse(v, default = u""):
     return do_default(v, default) or default
 
+
+f = ifFalse
 
 def showStatus(s):
     for code, msg in STATUS_LIST:

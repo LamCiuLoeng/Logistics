@@ -10,44 +10,17 @@
 {% endblock %}
 
 {% block extJS %}
+<script src="{{url_for('static', filename='js/customer/order_add.js')}}" type="text/javascript"></script>
+
 <script language="JavaScript" type="text/javascript">
 //<![CDATA[
-	function changecustomer(obj){
-		
-	}
-
-	var index_count = 0;
-	function addline(){
-		var index = ++index_count;
-		var tr = $(".template").clone().removeClass("template");
-		$("input[type='text'],input[type='hidden'],textarea,select",tr).each(function(){
-			var old_name = $(this).attr('name');
-			var new_name = old_name.replace('_x','_'+index);
-			$(this).attr('name',new_name);
-			$(this).attr('id',new_name);
-		});
-		
-		var pid = $("select[name^='destination_province_id_']",tr).attr("id");
-		var cid = $("select[name^='destination_city_id_']",tr).attr("id");
-		var did = $("select[name^='destination_district_id_']",tr).attr("id");
-		
-		$("#item_table tbody").append(tr);
-		bind_province_city_district("#"+pid,"#"+cid,"#"+did);
-	}
-		
-	function deleteline(obj){
-		$($(obj).parents('tr')[0]).remove(); 
-	}        
+   
 	
 	function tosave(){
 		$(".template").remove();
 		$("form").submit();
 	}
-	
-	
-	$(document).ready(function(){
-		bind_province_city_district("#source_province_id","#source_city_id","#source_district_id");		
-	});
+
 	
 //]]>
 </script>
@@ -55,8 +28,9 @@
 {% endblock %}
 
 {% block content %}
+	<form action="{{url_for('.view', action = 'save_new')}}" method="post">
+		
 	<div style="background-color: #fff;padding: 10px;">
-		<form action="{{url_for('.view', action = 'save_new')}}" method="post">
 		<p><input type="submit" value="{{BTN_SAVE}}"/></p>
 			<table>
 				<tr>
@@ -139,7 +113,33 @@
 			
 			
 			
-		</form>
+		
 	</div>
-
+	
+	
+	
+	<!-- item info -->
+	<div>
+		<div id="item_details">
+			<table>
+				<tr><td>货物名称</td><td><input type="text" name="item_name" id="item_name" value=""></td></tr>
+				<tr><td>件数</td><td><input type="text" name="item_qty" id="item_qty" value=""></td></tr>
+				<tr><td>体积</td><td><input type="text" name="item_vol" id="item_vol" value=""></td></tr>
+				<tr><td>重量</td><td><input type="text" name="item_weight" id="item_weight" value=""></td></tr>
+				<tr><td>备注</td><td><textarea name="item_remark" id="item_remark"></textarea></td></tr>
+			</table>
+			<p><input type="button" value="添加" onclick="add_item()"/></p>
+		</div>
+		<table>
+			<thead>
+				<tr>
+					<td>货物名称</td><td>件数</td><td>体积</td><td>重量</td><td>备注</td><td>&nbsp;</td>
+				</tr>
+			</thead>
+			<tbody id="item_list">
+			</tbody>
+		</table>
+	</div>
+	
+	</form>
 {% endblock %}

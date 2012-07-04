@@ -97,11 +97,11 @@
                 </tr>
 				{% for r in result %}
 					<tr class="data_table_tr">
-						<td><a href="{{url_for('.view', action = 'revise',id=r.id)}}">{{r.no}}</a></td>
-						<td>{{r.customer}}</td>
+						<td><a href="{{url_for('.view', action = 'revise',id=r.id)}}">{{r.no|f}}</a></td>
+						<td>{{r.customer|f}}</td>
 						<td>{{r.create_time|ft}}</td>
-						<td>{{r.create_by}}</td>
-						<td>{{r.update_by}}</td>
+						<td>{{r.create_by|f}}</td>
+						<td>{{r.update_by|f}}</td>
 						<td>{{r.status|showStatus}}</td>
 						<td>
 							<a href="{{url_for('.view', action = 'revise',id=r.id)}}">{{_('Revise')}}</a>

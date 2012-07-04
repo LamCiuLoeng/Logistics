@@ -1,31 +1,37 @@
 {% extends "master.html" %}
 
 {% block extJS %}
+<script src="{{url_for('static', filename='js/customer/order_revise.js')}}" type="text/javascript"></script>
+
+
 
 {% endblock %}
 
 {% block content %}
-	<div style="background-color: #fff;padding: 10px;">
-		<form action="{{url_for('.view', action = 'save_update')}}" method="post">
-		<input type="hidden" name="id" value="{{header.id}}"/>
-		<p><input type="submit" value="{{BTN_SAVE}}"/></p>
+	<input type="hidden" name="id" id="id" value="{{header.id}}">
+	{% if header.barcode_id %}
+		<p><img src="{{header.barcode.url}}"/></p>
+	{% endif %}
+	
+	<div style="background-color: #fff;padding: 10px;" id="order_header">
+		<input type="hidden" name="form_type" value="order_header"/>
 			<table>
 				<tr>
 					<td>{{_('Source Station')}}</td>
-					<td><input type="text" name="source_station" id="source_station" value="{{header.source_station|ifFalse}}" class="field"/></td>
+					<td><input type="text" name="source_station" id="source_station" value="{{header.source_station|f}}" class="field"/></td>
 					<td>&nbsp;</td>
 					<td>{{_('No#')}}</td>
-					<td><input type="text" name="no" id="no" value="{{header.no|ifFalse}}" class="field"/></td>
+					<td><input type="text" name="no" id="no" value="{{header.no|f}}" class="field"/></td>
 					<td>&nbsp;</td>
 					<td>{{_('Creator')}}</td>
-					<td>&nbsp;</td>
+					<td>{{header.create_by|f}}</td>
 				</tr>
 				<tr>
 					<td>{{_('Destination Station')}}</td>
-					<td><input type="text" name="destination_station" id="destination_station" value="{{header.destination_station|ifFalse}}" class="field"/></td>
+					<td><input type="text" name="destination_station" id="destination_station" value="{{header.destination_station|f}}" class="field"/></td>
 					<td>&nbsp;</td>
 					<td>{{Date}}</td>
-					<td><input type="text" name="order_time" id="order_time" value="{{header.order_time|ifFalse}}" class="field"/></td>
+					<td><input type="text" name="order_time" id="order_time" value="{{header.order_time|f}}" class="field"/></td>
 					<td>&nbsp;</td>
 					<td></td>
 					<td>&nbsp;</td>
@@ -35,32 +41,32 @@
 				<tr>
 					<td valign="top">
 						<table>
-						    <tr><td>{{_('Source Company')}}</td><td><input type="text" name="source_company" id="source_company" value="{{header.source_company|ifFalse}}" class="field" style="width: 300px"/></td></tr>
-							<tr><td>{{_('Source Contact')}}</td><td><input type="text" name="source_contact" id="source_contact" value="{{header.source_contact|ifFalse}}" class="field" style="width: 300px"/></td></tr>
-							<tr><td>{{_('Source Address')}}</td><td><input type="text" name="source_address" id="source_address" value="{{header.source_address|ifFalse}}" class="field" style="width: 300px"/></td></tr>
-							<tr><td>{{_('Source Phone')}}</td><td><input type="text" name="source_tel" id="source_tel" value="{{header.source_tel|ifFalse}}" class="field" style="width: 300px"/></td></tr>
-							<tr><td>{{_('Source Mobile')}}</td><td><input type="text" name="source_mobile" id="source_mobile" value="{{header.source_mobile|ifFalse}}" class="field" style="width: 300px"/></td></tr>
-							<tr><td>{{_('Item')}}</td><td><input type="text" name="item" id="item" value="{{header.item|ifFalse}}" class="field" style="width: 300px"/></td></tr>
-							<tr><td>{{_('Expect Time')}}</td><td><input type="text" name="expect_time" id="expect_time" value="{{header.expect_time|ifFalse}}" class="field" style="width: 300px"/></td></tr>
-							<tr><td>{{_('Remark')}}</td><td><textarea name="remark" id="remark" class="field" style="width: 300px">{{header.remark|ifFalse}}</textarea></td></tr>
+							<tr><td>{{_('Source Company')}}</td><td><input type="text" name="source_company" id="source_company" value="{{header.source_company|f}}" class="field" style="width: 300px"/></td></tr>
+							<tr><td>{{_('Source Contact')}}</td><td><input type="text" name="source_contact" id="source_contact" value="{{header.source_contact|f}}" class="field" style="width: 300px"/></td></tr>
+							<tr><td>{{_('Source Address')}}</td><td><input type="text" name="source_address" id="source_address" value="{{header.source_address|f}}" class="field" style="width: 300px"/></td></tr>
+							<tr><td>{{_('Source Phone')}}</td><td><input type="text" name="source_tel" id="source_tel" value="{{header.source_tel|f}}" class="field" style="width: 300px"/></td></tr>
+							<tr><td>{{_('Source Mobile')}}</td><td><input type="text" name="source_mobile" id="source_mobile" value="{{header.source_mobile|f}}" class="field" style="width: 300px"/></td></tr>
+							<tr><td>{{_('Item')}}</td><td><input type="text" name="item" id="item" value="{{header.item|f}}" class="field" style="width: 300px"/></td></tr>
+							<tr><td>{{_('Expect Time')}}</td><td><input type="text" name="expect_time" id="expect_time" value="{{header.expect_time|f}}" class="field" style="width: 300px"/></td></tr>
+							<tr><td>{{_('Remark')}}</td><td><textarea name="remark" id="remark"class="field" style="width: 300px">{{header.remark|f}}</textarea></td></tr>
 						</table>
 					</td>
 					<td>&nbsp;</td>
 					<td valign="top">
 						<table>
-						    <tr><td>{{_('Destination Company')}}</td><td><input type="text" name="destination_company" id="destination_company" value="{{header.destination_company|ifFalse}}" class="field" style="width: 300px"/></td></tr>
-							<tr><td>{{_('Destination Contact')}}</td><td><input type="text" name="destination_contact" id="destination_contact" value="{{header.destination_contact|ifFalse}}" class="field" style="width: 300px"/></td></tr>
-							<tr><td>{{_('Destination Address')}}</td><td><input type="text" name="destination_address" id="destination_address" value="{{header.destination_address|ifFalse}}" class="field" style="width: 300px"/></td></tr>
-							<tr><td>{{_('Destination Phone')}}</td><td><input type="text" name="destination_tel" id="destination_tel" value="{{header.destination_tel|ifFalse}}" class="field" style="width: 300px"/></td></tr>
-							<tr><td>{{_('Destination Mobile')}}</td><td><input type="text" name="destination_mobile" id="destination_mobile" value="{{header.destination_mobile|ifFalse}}" class="field" style="width: 300px"/></td></tr>
+						    <tr><td>{{_('Destination Company')}}</td><td><input type="text" name="destination_company" id="destination_company" value="{{header.destination_company|f}}" class="field" style="width: 300px"/></td></tr>
+							<tr><td>{{_('Destination Contact')}}</td><td><input type="text" name="destination_contact" id="destination_contact" value="{{header.destination_contact|f}}" class="field" style="width: 300px"/></td></tr>
+							<tr><td>{{_('Destination Address')}}</td><td><input type="text" name="destination_address" id="destination_address" value="{{header.destination_address|f}}" class="field" style="width: 300px"/></td></tr>
+							<tr><td>{{_('Destination Phone')}}</td><td><input type="text" name="destination_tel" id="destination_tel" value="{{header.destination_tel|f}}" class="field" style="width: 300px"/></td></tr>
+							<tr><td>{{_('Destination Mobile')}}</td><td><input type="text" name="destination_mobile" id="destination_mobile" value="{{header.destination_mobile|f}}" class="field" style="width: 300px"/></td></tr>
 							<tr><td>{{_('Payment')}}</td>
 								<td>
 									<select name="payment_id" id="payment_id">
 										{% for p in payment %}
 											{% if p.id == header.payment_id %}
-												<option value="{{p.id}}" selected="selected">{{p}}</optino>
+												<option value="{{plid}}" selected="selected">{{p}}</optino>
 											{% else %}
-												<option value="{{p.id}}">{{p}}</optino>
+												<option value="{{plid}}">{{p}}</optino>
 											{% endif %}
 										{% endfor %}
 									</select>
@@ -82,18 +88,142 @@
 					<td>费用</td>
 				</tr>
 				<tr>
-					<td><input type="text" name="qty" id="qty" value="{{header.qty|ifFalse}}"/></td>
-					<td><input type="text" name="qty_ratio" id="qty_ratio" value="{{header.qty_ratio|ifFalse}}"/></td>
-					<td><input type="text" name="vol" id="vol" value="{{header.vol|ifFalse}}"/></td>
-					<td><input type="text" name="vol_ratio" id="vol_ratio" value="{{header.vol_ratio|ifFalse}}"/></td>
-					<td><input type="text" name="weight" id="weight" value="{{header.weight|ifFalse}}"/></td>
-					<td><input type="text" name="weight_ratio" id="weight_ratio" value="{{header.weight_ratio|ifFalse}}"/></td>
-					<td><input type="text" name="amount" id="amount" value="{{header.amount|ifFalse}}"/></td>
+					<td><input type="text" name="qty" id="qty" value="{{header.qty|f}}"/></td>
+					<td><input type="text" name="qty_ratio" id="qty_ratio" value="{{header.qty_ratio|f}}"/></td>
+					<td><input type="text" name="vol" id="vol" value="{{header.vol|f}}"/></td>
+					<td><input type="text" name="vol_ratio" id="vol_ratio" value="{{header.vol_ratio|f}}"/></td>
+					<td><input type="text" name="weight" id="weight" value="{{header.weight|f}}"/></td>
+					<td><input type="text" name="weight_ratio" id="weight_ratio" value="{{header.weight_ratio|f}}"/></td>
+					<td><input type="text" name="amount" id="amount" value="{{header.amount|f}}"/></td>
 				</tr>
 			</table>
-			
-			
-			
-		</form>
+			<p><input type="button" value="保存" onclick="save_header()"/></p>
+	</div>
+	
+	
+	
+	<!-- item info -->
+	<div>
+		<div>
+			<table>
+				<tr><td>货物名称</td><td><input type="text" name="item_name" id="item_name" value=""></td></tr>
+				<tr><td>件数</td><td><input type="text" name="item_qty" id="item_qty" value=""></td></tr>
+				<tr><td>体积</td><td><input type="text" name="item_vol" id="item_vol" value=""></td></tr>
+				<tr><td>重量</td><td><input type="text" name="item_weight" id="item_weight" value=""></td></tr>
+				<tr><td>备注</td><td><textarea name="item_remark" id="item_remark"></textarea></td></tr>
+			</table>
+			<p><input type="button" value="保存" onclick="save_item()"/></p>
+		</div>
+		<table>
+			<thead>
+				<tr>
+					<td>货物名称</td><td>件数</td><td>体积</td><td>重量</td><td>备注</td><td>&nbsp;</td>
+				</tr>
+			</thead>
+			<tbody id="item_list">
+				{% for l in header.item_details %}
+					<tr>
+						<td>{{l.item|f}}</td>
+						<td>{{l.qty|f}}</td>
+						<td>{{l.vol|f}}</td>
+						<td>{{l.weight|f}}</td>
+						<td>{{l.remark|f}}</td>
+						<td><input type="button" value="删除" onclick="del_item({{l.id}},this)"/></td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
+	
+	<!-- receiver info -->
+	<div>
+		<div>
+			<table>
+				<tr>
+					<td>收货联系人</td><td><input type="text" name="receiver_contact" id="receiver_contact" value="{{header.receiver_contact|f}}"/></td>
+					<td>联系人电话</td><td><input type="text" name="receiver_tel" id="receiver_tel" value="{{header.receiver_tel|f}}"/></td>
+					<td>联系手机</td><td><input type="text" name="receiver_mobile" id="receiver_mobile" value="{{header.receiver_mobile|f}}"/></td>
+					<td>备注</td><td><textarea name="receiver_remark" id="receiver_remark">{{header.receiver_remark|f}}</textarea></td>
+				</tr>
+			</table>
+			<p><input type="button" value="保存" onclick="save_receiver()"/></p>
+		</div>
+	</div>
+	
+	<!-- warehouse info -->
+	<div>
+	
+	</div>
+	
+	<!-- transit info -->
+	<div>
+		<div>
+			<table>
+				<tr>
+					<td>时间</td><td><input type="text" name="transit_action_time" value=""/></td>
+					<td>地点</td><td><input type="text" name="transit_action_location" value=""/></td>
+					<td>备注</td><td><textarea name="transit_remark"></textarea></td>
+				</tr>
+			</table>
+			<p><input type="button" value="保存" onclick="save_transit()"/></p>
+		</div>
+		<table>
+			<thead>
+				<tr>
+					<td>时间</td><td>地点</td><td>备注</td>
+				</tr>
+			<thead>
+			<tbody id="transit_list">
+				{% for t in header.transit_details %}
+					<tr>
+						<td>{{t.action_time}}</td>
+						<td>{{t.action_location}}</td>
+						<td>{{t.remark}}</td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
+	
+	<!-- pickup info -->
+	<div>
+		<div>
+			<table>
+				<tr>
+					<td>时间</td><td><input type="text" name="action_time" value=""/></td>
+					<td>提货联系人</td><td><input type="text" name="contact" value=""/></td>
+					<td>联系人电话</td><td><input type="text" name="tel" value=""/></td>
+					<td>提货数量</td><td><input type="text" name="qty" value=""/></td>
+					<td>备注</td><td><textarea name="remark"></textarea></td>
+				</tr>
+			</table>
+			<p><input type="button" value="保存" onclick="save_pickup()"/></p>
+		</div>
+		<table>
+			<thead>
+				<tr>
+					<td>时间</td><td>提货联系人</td><td>联系人电话</td><td>提货数量</td><td>备注</td>
+				</tr>
+				{% for t in header.pickup_details %}
+					<tr>
+						<td>{{t.action_time}}</td>
+						<td>{{t.contact}}</td>
+						<td>{{t.tel}}</td>
+						<td>{{t.qty}}</td>
+						<td>{{t.remark}}</td>
+					</tr>
+				{% endfor %}
+			<thead>
+		</table>
+	</div>
+	
+	<!-- fin info -->
+	<div>
+	
+	</div>
+	
+	<!-- history info -->
+	<div>
+	
 	</div>
 {% endblock %}

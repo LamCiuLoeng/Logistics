@@ -1,7 +1,7 @@
 {% extends "master.html" %}
 
 {% block extJS %}
-
+<script src="{{url_for('static', filename='js/customer/deliver_select_orders.js')}}" type="text/javascript"></script>
 {% endblock %}
 
 {% block content %}
@@ -29,18 +29,24 @@
 			</tr>
 			{% for r in result%}
 			<tr>
-				<td><input type="checkbox" name="order_detail_ids" value="{{r.id}}"/></td>
-				<td>{{r.no}}</td>
-				<td>{{r.customer}}</td>
-				<td>{{r.dsource_station|ifFalse}}</td>
-				<td>{{r.destination_station|ifFalse}}</td>
-				<td>{{r.item|ifFalse}}</td>
-				<td>{{r.qty}}</td>
-				<td>{{r.vol}}</td>
-				<td>{{r.weight}}&nbsp;{{r.weight_unit}}</td>
-				<td>{{r.expect_time|ifFalse}}</td>
-				<td>{{r.destination_contact|ifFalse}}</td>
-				<td>{{r.destination_tel|ifFalse}}</td>
+				<td>
+					{% if r.id in session.get('deliver_order_ids',{})%}
+						<input type="checkbox" name="order_ids" value="{{r.id}}" checked="checked" onclick="check_ids({{r.id}},this)"/>
+					{% else %}
+						<input type="checkbox" name="order_ids" value="{{r.id}}" onclick="check_ids({{r.id}},this)"/>
+					{% endif %}
+				</td>
+				<td>{{r.no|f}}</td>
+				<td>{{r.customer|f}}</td>
+				<td>{{r.dsource_station|f}}</td>
+				<td>{{r.destination_station|f}}</td>
+				<td>{{r.item|f}}</td>
+				<td>{{r.qty|f}}</td>
+				<td>{{r.vol|f}}</td>
+				<td>{{r.weight|f}}</td>
+				<td>{{r.expect_time|f}}</td>
+				<td>{{r.destination_contact|f}}</td>
+				<td>{{r.destination_tel|f}}</td>
 			</tr>
 			{% endfor %}
 		</thead>

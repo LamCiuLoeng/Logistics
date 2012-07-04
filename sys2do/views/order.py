@@ -16,17 +16,19 @@ from werkzeug.utils import redirect
 from flask.helpers import flash, jsonify
 
 from sys2do.model.logic import OrderHeader, TransferLog, \
-    DeliverDetail
+    DeliverDetail, ItemDetail
 from sys2do.model import DBSession
 from sys2do.util.decorator import templated, login_required
 from sys2do import app
 from sys2do.constant import MESSAGE_ERROR, MESSAGE_INFO, MSG_UPDATE_SUCC, \
     MSG_DELETE_SUCC, MSG_NO_ID_SUPPLIED, MSG_SERVER_ERROR, MSG_NO_SUCH_ACTION, \
     MSG_SAVE_SUCC, ORDER_CANCELLED, STATUS_LIST, IN_TRAVEL, \
-    MSG_RECORD_NOT_EXIST, ASSIGN_PICKER, IN_WAREHOUSE, ASSIGN_PICKER, \
-    LOG_CREATE_ORDER, LOG_SEND_PICKER, LOG_GOODS_IN_WAREHOUSE, ORDER_NEW
+    MSG_RECORD_NOT_EXIST, IN_WAREHOUSE, \
+    LOG_CREATE_ORDER, LOG_GOODS_IN_WAREHOUSE, ORDER_NEW, \
+    ASSIGN_RECEIVER, LOG_SEND_RECEIVER
 from sys2do.views import BasicView
-from sys2do.util.common import _g, getOr404, _gp, getMasterAll, _debug, _info
+from sys2do.util.common import _g, getOr404, _gp, getMasterAll, _debug, _info, \
+    _gl
 from sys2do.model.master import CustomerProfile, InventoryLocation, \
     Customer, ItemUnit, WeightUnit, ShipmentType, \
     InventoryItem, Payment, Ratio
@@ -66,12 +68,25 @@ class OrderView(BasicView):
 
 
     def save_new(self):
-        code = self._save_new_process()
-        if code == 0:
-            flash(MSG_SAVE_SUCC, MESSAGE_INFO)
-        else:
-            flash(MSG_SERVER_ERROR, MESSAGE_ERROR)
+        try:
+            code, header = self._save_new_process()
+            if code == 0:
+                flash(MSG_SAVE_SUCC, MESSAGE_INFO)
+            else:
+                flash(MSG_SERVER_ERROR, MESSAGE_ERROR)
+
+            for nk, nv in _gp('item_name_'):
+                id = nk.split("_")[2]
+                DBSession.add(ItemDetail(
+                                         header = header, item = nv , qty = _g("item_qty_%s" % id) ,
+                                         vol = _g("item_vol_%s" % id), weight = _g("item_weight_%s" % id)
+                                         ))
+            DBSession.commit()
+        except:
+            DBSession.rollback()
+
         return redirect(url_for('.view', action = 'index'))
+
 
 
 
@@ -87,14 +102,14 @@ class OrderView(BasicView):
         order = OrderHeader(**params)
         DBSession.add(order)
         order.barcode = generate_barcode_file(order.no)
+        DBSession.flush()
         DBSession.add(TransferLog(
                                   refer_id = order.id,
                                   transfer_date = dt.now().strftime("%Y-%m-%d"),
                                   type = 0,
                                   remark = unicode(LOG_CREATE_ORDER),
                                   ))
-        DBSession.commit()
-        return 0
+        return (0, order)
 
 #
 #
@@ -362,15 +377,64 @@ class OrderView(BasicView):
 
 
     def ajax_save(self):
-        type = _g('')
-
-        if type not in ['', ]:
+        type = _g('form_type')
+        id = _g("id")
+        if type not in ['order_header', 'item_detail', 'receiver' , 'transit']:
             return jsonify({'code' :-1, 'msg' : unicode(MSG_NO_SUCH_ACTION)})
 
-        if type == '':
-            pass
-        elif type == '':
-            pass
+        header = DBSession.query(OrderHeader).get(id)
+
+        if type == 'order_header':
+            fields = ['no', 'source_station', 'source_company', 'source_address', 'source_contact', 'source_tel', 'source_mobile',
+                      'payment_id', 'item', 'qty', 'weight', 'vol', 'shipment_type_id',
+                      'destination_station', 'destination_company', 'destination_address', 'destination_contact', 'destination_tel', 'destination_mobile',
+                      'order_time', 'expect_time', 'actual_time', 'qty_ratio', 'weight_ratio', 'vol_ratio', 'amount', 'cost', 'remark',
+                      ]
+            for f in fields:
+                setattr(header, f, _g(f))
+            DBSession.commit()
+            return jsonify({'code' : 0 , 'msg' : unicode(MSG_SAVE_SUCC)})
+
+        elif type == 'item_detail':
+            action_type = _g('action_type')
+            if action_type not in ['ADD', 'DELETE']: return jsonify({'code' :-1, 'msg' : unicode(MSG_NO_SUCH_ACTION)})
+            if action_type == 'ADD' :
+                params = {'header' : header}
+                for f in ['item', 'qty', 'vol', 'weight', 'remark', ]:
+                    params[f] = _g(f)
+                obj = ItemDetail(**params)
+                DBSession.add(obj)
+                DBSession.commit()
+                return jsonify({'code' : 0 , 'msg' : unicode(MSG_SAVE_SUCC) , 'id' : obj.id})
+            else:
+                line = DBSession.query(ItemDetail).get(_g('item_id'))
+                line.active = 1
+                DBSession.commit()
+                return jsonify({'code' : 0 , 'msg' : unicode(MSG_SAVE_SUCC)})
+
+        elif type == 'receiver' :
+            for f in ['receiver_contact', 'receiver_tel', 'receiver_mobile', 'receiver_remark', ]:
+                setattr(header, f, _g(f))
+
+            if header.status < ASSIGN_RECEIVER[0]:
+                header.update_status(ASSIGN_RECEIVER[0])
+                DBSession.add(TransferLog(
+                                  refer_id = header.id,
+                                  transfer_date = dt.now().strftime("%Y-%m-%d"),
+                                  type = 0,
+                                  remark = unicode(LOG_SEND_RECEIVER),
+                                  ))
+
+            DBSession.commit()
+            return jsonify({'code' : 0 , 'msg' : unicode(MSG_SAVE_SUCC)})
+
+        elif type == 'transit':
+            action_type = _g('')
+            if action_type not in ['ADD', 'DELETE'] : return jsonify({'code' :-1, 'msg' : unicode(MSG_NO_SUCH_ACTION)})
+            if action_type == 'ADD':
+                pass
+            else:
+                pass
 
 bpOrder.add_url_rule('/', view_func = OrderView.as_view('view'), defaults = {'action':'index'})
 bpOrder.add_url_rule('/<action>', view_func = OrderView.as_view('view'))

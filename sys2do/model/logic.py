@@ -45,15 +45,15 @@ class OrderHeader(DeclarativeBase, SysMixin, CRUDMixin):
     payment = relation(Payment)
 
     item = Column(Text)
-    qty = Column(Float, default = 0) #client order qty
+    qty = Column(Float, default = None) #client order qty
     unit_id = Column(Integer, ForeignKey('master_item_unit.id'))
     unit = relation(ItemUnit)
 
-    weight = Column(Float, default = 0)
+    weight = Column(Float, default = None)
     weight_unit_id = Column(Integer, ForeignKey('master_weight_unit.id'))
     weight_unit = relation(WeightUnit)
 
-    vol = Column(Float, default = 0)
+    vol = Column(Float, default = None)
 
     shipment_type_id = Column(Integer, ForeignKey('master_shipment_type.id'))
     shipment_type = relation(ShipmentType)
@@ -69,17 +69,18 @@ class OrderHeader(DeclarativeBase, SysMixin, CRUDMixin):
     expect_time = Column(Date, default = None)
     actual_time = Column(Date, default = None)
 
-    qty_ratio = Column(Float, default = 0)
-    weight_ratio = Column(Float, default = 0)
-    vol_ratio = Column(Float, default = 0)
+    qty_ratio = Column(Float, default = None)
+    weight_ratio = Column(Float, default = None)
+    vol_ratio = Column(Float, default = None)
     amount = Column(Float, default = 0)
     cost = Column(Float, default = 0)
 
 
-#    picker = Column(Text)
-#    picker_contact = Column(Text)
-#    picker_remark = Column(Text)
-#    in_warehouse_remark = Column(Text)
+    receiver_contact = Column(Text)
+    receiver_tel = Column(Text)
+    receiver_mobile = Column(Text)
+    receiver_remark = Column(Text)
+
 
     barcode_id = Column(Integer, ForeignKey('system_upload_file.id'))
     barcode = relation(UploadFile)
@@ -141,9 +142,9 @@ class ItemDetail(DeclarativeBase, SysMixin):
     header_id = Column(Integer, ForeignKey('order_header.id'))
     header = relation(OrderHeader, backref = backref("item_details", order_by = id), primaryjoin = "and_(OrderHeader.id == ItemDetail.header_id, ItemDetail.active == 0)")
     item = Column(Text)
-    qty = Column(Float, default = 0) #client order qty
-    vol = Column(Float, default = 0)
-    weight = Column(Float, default = 0)
+    qty = Column(Float, default = None) #client order qty
+    vol = Column(Float, default = None)
+    weight = Column(Float, default = None)
     remark = Column(Text)
 
 
