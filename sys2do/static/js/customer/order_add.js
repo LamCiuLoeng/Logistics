@@ -6,8 +6,8 @@ function add_item() {
     var item_vol = $("#item_vol").val();
     var item_weight = $("#item_weight").val();
     var item_remark = $("#item_remark").val();
-    var html = '<tr>';
-    html += '<td><input type="hidden" name="item_name_'+index+'" value="'+item_name+'"/>'+item_name+'</td>';
+    var html = '<tr class="data_table_tr">';
+    html += '<th><input type="hidden" name="item_name_'+index+'" value="'+item_name+'"/>'+item_name+'</th>';
     html += '<td><input type="hidden" name="item_qty_'+index+'" value="'+item_qty+'"/>'+item_qty+'</td>';
     html += '<td><input type="hidden" name="item_vol_'+index+'" value="'+item_vol+'"/>'+item_vol+'</td>';
     html += '<td><input type="hidden" name="item_weight_'+index+'" value="'+item_weight+'"/>'+item_weight+'</td>';

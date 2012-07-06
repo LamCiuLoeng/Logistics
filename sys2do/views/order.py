@@ -16,7 +16,7 @@ from werkzeug.utils import redirect
 from flask.helpers import flash, jsonify
 
 from sys2do.model.logic import OrderHeader, TransferLog, \
-    DeliverDetail, ItemDetail
+    DeliverDetail, ItemDetail, PickupDetail
 from sys2do.model import DBSession
 from sys2do.util.decorator import templated, login_required
 from sys2do import app
@@ -31,7 +31,7 @@ from sys2do.util.common import _g, getOr404, _gp, getMasterAll, _debug, _info, \
     _gl
 from sys2do.model.master import CustomerProfile, InventoryLocation, \
     Customer, ItemUnit, WeightUnit, ShipmentType, \
-    InventoryItem, Payment, Ratio
+    InventoryItem, Payment, Ratio, PickupType, PackType
 from sys2do.util.logic_helper import genSystemNo
 from sqlalchemy.sql.expression import and_
 from sys2do.util.barcode_helper import generate_barcode_file
@@ -49,8 +49,28 @@ class OrderView(BasicView):
     @templated('order/index.html')
 #    @login_required
     def index(self):
-        result = DBSession.query(OrderHeader).filter(OrderHeader.active == 0)
-        return {'result' : result }
+        values = {}
+        for f in ['create_time_from', 'create_time_to', 'no', 'source_station', 'source_company', 'destination_station', 'destination_company'] :
+            values[f] = _g(f)
+
+        conditions = [OrderHeader.active == 0]
+        if values['create_time_from']:
+            conditions.append(OrderHeader.create_time > values['create_time_from'])
+        if values['create_time_to']:
+            conditions.append(OrderHeader.create_time < values['create_time_to'])
+        if values['no']:
+            conditions.append(OrderHeader.no.op('like')('%%%s%%' % values['no']))
+        if values['source_station']:
+            conditions.append(OrderHeader.source_station.op('like')('%%%s%%' % values['source_station']))
+        if values['source_company']:
+            conditions.append(OrderHeader.source_company.op('like')('%%%s%%' % values['source_company']))
+        if values['destination_station']:
+            conditions.append(OrderHeader.destination_station.op('like')('%%%s%%' % values['destination_station']))
+        if values['destination_company']:
+            conditions.append(OrderHeader.destination_company.op('like')('%%%s%%' % values['destination_company']))
+
+        result = DBSession.query(OrderHeader).filter(and_(*conditions))
+        return {'result' : result , 'values' : values}
 
 
     @templated('order/add.html')
@@ -62,8 +82,11 @@ class OrderView(BasicView):
 #                'units' : getMasterAll(ItemUnit),
 #                'wunits' : getMasterAll(WeightUnit),
 #                'shiptype' : getMasterAll(ShipmentType),
-                'payment' : getMasterAll(Payment),
+                'payment' : getMasterAll(Payment, 'id'),
+                'pickup_type' : getMasterAll(PickupType, 'id'),
+                'pack_type' : getMasterAll(PackType, 'id'),
                 'ratios' : ratios,
+                'current' : dt.now().strftime("%Y-%m-%d %H:%M")
                 }
 
 
@@ -94,14 +117,17 @@ class OrderView(BasicView):
         params = {}
         for k in ['source_station', 'source_company', 'source_address', 'source_contact', 'source_tel', 'source_mobile',
                   'destination_station', 'destination_company', 'destination_address', 'destination_contact', 'destination_tel', 'destination_mobile',
-                  'no', 'order_time', 'item', 'expect_time', 'remark',
-                 'payment_id', 'qty', 'qty_ratio', 'vol', 'vol_ratio',
+                  'no', 'order_time', 'item', 'item_remark', 'expect_time', 'remark',
+                 'payment_id', 'pickup_type_id', 'pack_type_id', 'qty', 'qty_ratio', 'vol', 'vol_ratio',
                   'weight', 'weight_ratio', 'weight_ratio', 'amount',
                   ]:
             params[k] = _g(k)
         order = OrderHeader(**params)
         DBSession.add(order)
         order.barcode = generate_barcode_file(order.no)
+
+        _info(type(order.no))
+
         DBSession.flush()
         DBSession.add(TransferLog(
                                   refer_id = order.id,
@@ -135,6 +161,8 @@ class OrderView(BasicView):
         return {
                 'header' : header ,
                 'payment' : getMasterAll(Payment),
+                'pickup_type' : getMasterAll(PickupType, 'id'),
+                'pack_type' : getMasterAll(PackType, 'id'),
                 }
 
 
@@ -379,7 +407,7 @@ class OrderView(BasicView):
     def ajax_save(self):
         type = _g('form_type')
         id = _g("id")
-        if type not in ['order_header', 'item_detail', 'receiver' , 'transit']:
+        if type not in ['order_header', 'item_detail', 'receiver' , 'transit', 'pickup']:
             return jsonify({'code' :-1, 'msg' : unicode(MSG_NO_SUCH_ACTION)})
 
         header = DBSession.query(OrderHeader).get(id)
@@ -389,6 +417,7 @@ class OrderView(BasicView):
                       'payment_id', 'item', 'qty', 'weight', 'vol', 'shipment_type_id',
                       'destination_station', 'destination_company', 'destination_address', 'destination_contact', 'destination_tel', 'destination_mobile',
                       'order_time', 'expect_time', 'actual_time', 'qty_ratio', 'weight_ratio', 'vol_ratio', 'amount', 'cost', 'remark',
+                      'pickup_type_id', 'pack_type_id',
                       ]
             for f in fields:
                 setattr(header, f, _g(f))
@@ -410,7 +439,7 @@ class OrderView(BasicView):
                 line = DBSession.query(ItemDetail).get(_g('item_id'))
                 line.active = 1
                 DBSession.commit()
-                return jsonify({'code' : 0 , 'msg' : unicode(MSG_SAVE_SUCC)})
+                return jsonify({'code' : 0 , 'msg' : unicode(MSG_DELETE_SUCC)})
 
         elif type == 'receiver' :
             for f in ['receiver_contact', 'receiver_tel', 'receiver_mobile', 'receiver_remark', ]:
@@ -429,12 +458,42 @@ class OrderView(BasicView):
             return jsonify({'code' : 0 , 'msg' : unicode(MSG_SAVE_SUCC)})
 
         elif type == 'transit':
-            action_type = _g('')
+            action_type = _g('action_type')
             if action_type not in ['ADD', 'DELETE'] : return jsonify({'code' :-1, 'msg' : unicode(MSG_NO_SUCH_ACTION)})
             if action_type == 'ADD':
-                pass
+                obj = TransferLog(
+                                  refer_id = header.id,
+                                  transfer_date = _g('action_time'),
+                                  type = 0,
+                                  remark = _g('remark'),
+                                  )
+                DBSession.add(obj)
+                DBSession.commit()
+                return jsonify({'code' : 0 , 'msg' : unicode(MSG_SAVE_SUCC) , 'transit_id' : obj.id})
             else:
-                pass
+                transit_id = _g('transit_id')
+                obj = DBSession.query(TransferLog).get(transit_id)
+                obj.active = 1
+                DBSession.commit()
+                return jsonify({'code' : 0 , 'msg' : unicode(MSG_DELETE_SUCC)})
+
+        elif type == 'pickup':
+            action_type = _g('action_type')
+            if action_type not in ['ADD', 'DELETE'] : return jsonify({'code' :-1, 'msg' : unicode(MSG_NO_SUCH_ACTION)})
+            if action_type == 'ADD' :
+                params = {}
+                for f in ['action_time', 'contact', 'tel', 'qty', 'remark']: params[f] = _g(f)
+                obj = PickupDetail(header = header, **params)
+                DBSession.add(obj)
+                DBSession.commit()
+                return jsonify({'code' : 0 , 'msg' : unicode(MSG_SAVE_SUCC) , 'pickup_id' : obj.id})
+            else:
+                pickup_id = _g('pickup_id')
+                obj = DBSession.query(PickupDetail).get(pickup_id)
+                obj.active = 1
+                DBSession.commit()
+                return jsonify({'code' : 0 , 'msg' : unicode(MSG_DELETE_SUCC)})
+
 
 bpOrder.add_url_rule('/', view_func = OrderView.as_view('view'), defaults = {'action':'index'})
 bpOrder.add_url_rule('/<action>', view_func = OrderView.as_view('view'))

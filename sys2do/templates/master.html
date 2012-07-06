@@ -1,4 +1,4 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"> 
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -9,10 +9,15 @@
 	<title>{% block title %}{{_("Logistics Management")}}{% block subtitle %}{% endblock %}{% endblock %}</title>
 	
 	<link href="{{url_for('static', filename='css/modaldialog/jquery.modaldialog.css')}}" rel="stylesheet" type="text/css" />
-	<link href="{{url_for('static', filename='css/screen.css')}}" rel="stylesheet" type="text/css" />
+	<link href="{{url_for('static', filename='css/jquery-ui-1.8.21.custom.css')}}" rel="stylesheet" type="text/css" />
+	<link href="{{url_for('static', filename='css/common_style.css')}}" rel="stylesheet" type="text/css" />
+	<link href="{{url_for('static', filename='css/system_style.css')}}" rel="stylesheet" type="text/css" />
+
 	{% block extCSS %}{% endblock %}
 
 	<script src="{{url_for('static', filename='js/jquery-1.7.1.min.js')}}" type="text/javascript"></script>
+	<script src="{{url_for('static', filename='js/jquery-ui-1.8.21.custom.min.js')}}" type="text/javascript"></script>
+	<script src="{{url_for('static', filename='js/numeric.js')}}" type="text/javascript"></script>
 	<script src="{{url_for('static', filename='js/modaldialog/jquery.modaldialog.js')}}" type="text/javascript"></script>
 	<script src="{{url_for('static', filename='js/common.js')}}" type="text/javascript"></script>
 	
@@ -26,7 +31,16 @@
 				{% elif category == 'ERROR' %}
 					$.modaldialog.error('{{message}}');
 				{% endif %}
-			{% endfor %}	
+			{% endfor %}
+			
+			
+			//init the datepicker
+			$('.datepicker').datepicker({
+					inline: true,
+					dateFormat: "yy-mm-dd" 
+			});
+			//init the numeric
+			$(".numeric").numeric();
 		});
     //]]>
    </script>
@@ -37,17 +51,48 @@
 <body>
 	<div id="container">
 		{% block header %}
-			<div id="header">
-				<!-- header Here -->
-				<ul>
-					<li><a href="/index">首页</a></li>
-					{% if not session.get('login',None)%}
-						<li><a href="{{url_for('bpAuth.login')}}">{{_('Login')}}</a></li>
-						<li><a href="{{url_for('bpAuth.register')}}">{{_('Register')}}</a></li>
-					{% else %}
-						<li><a href="{{url_for('bpAuth.logout')}}">{{_('Logout')}}</a></li>
-					{% endif %}
-				</ul>
+			<!-- header Here -->
+			<div id="header" class="top_header_div">
+			  <div class="top_logo"></div>
+			  <div class="top_system_right"></div>
+			  <div style="clear:both"></div>
+			</div>
+		{% endblock %}
+			
+		
+		{% block menu %}
+			<div class="main_menu">
+			  <table width="100%" border="0" cellpadding="0" cellspacing="0">
+			    <tr>
+			      <td width="50" height="27" background="/static/images/system/order_manage_06.jpg"><img src="/static/images/system/order_manage_06.jpg" width="30" height="27" /></td>
+			      <td class="gap1"></td>
+			      <td class="bt_normal" onmouseover="menu_move_over(this)" onmouseout="menu_move_out(this)" onclick="redirect('{{url_for('bpOrder.view')}}')">订单管理</td>
+			      <td class="gap2"></td>
+			      <td class="bt_normal" onmouseover="menu_move_over(this)" onmouseout="menu_move_out(this)" onclick="redirect('{{url_for('bpAdmin.view',action='user')}}')">用户管理</td>
+			      <td class="gap2"></td>
+			      <td class="bt_normal" onmouseover="menu_move_over(this)" onmouseout="menu_move_out(this)" onclick="redirect('{{url_for('bpAdmin.view',action='group')}}')">组管理</td>
+			      <td class="gap2"></td>
+			      <td class="bt_normal" onmouseover="menu_move_over(this)" onmouseout="menu_move_out(this)" onclick="redirect('{{url_for('bpAdmin.view',action='permission')}}')">权限管理</td>
+			      <td class="gap2"></td>
+			      <!-- 
+			      <td class="bt_normal" onmouseover="menu_move_over(this)" onmouseout="menu_move_out(this)"><a href="{{url_for('bpOrder.view')}}">客户关系管理</a></td>
+			      <td class="gap2"></td>
+			      -->
+			      <td><table width="100%" border="0" cellpadding="0" cellspacing="0">
+			        <tr>
+			          <td style="padding:0px; margin:0px">&nbsp;</td>
+			          <td width="30" style="padding:0px; margin:0px"><img src="/static/images/system/order_manage_14.jpg" width="20" height="27" /></td>
+			          <td width="230" class="user_display">{{'TEST'}}</td>
+			        </tr>
+			      </table></td>
+			    </tr>
+			  </table>
+			</div>
+		{% endblock %}
+		
+		{% block inner_menu %}
+			<div class="inner_menu">
+				<ul><li style="padding:0px; margin:0px 55px 0px 0px; float:right"><a href="{{url_for('bpAuth.logout')}}"><img src="/static/images/system/order_manage_22.jpg" width="56" height="29" /></a></li></ul>
 			</div>
 		{% endblock %}
 		
@@ -64,6 +109,7 @@
 		{% block footer %}
 			<div id="footer">
 				<!-- footer Here -->
+				<table width="100%" border="0" cellspacing="0" cellpadding="0"><tr><td>&nbsp;</td></tr><tr><td bgcolor="#39565e" style="color:#FFF; font-family:Arial, Helvetica, sans-serif; padding:5px;">Copyright SFHL. All Rights Reserved. </td></tr></table>
 			</div>
 		{% endblock %}
 	</div>

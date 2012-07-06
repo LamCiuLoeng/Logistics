@@ -30,6 +30,27 @@ class ShipmentType(DeclarativeBase, SysMixin):
     def __unicode__(self): return self.name
 
 
+class PickupType(DeclarativeBase, SysMixin):
+    __tablename__ = 'master_pickup_type'
+
+    id = Column(Integer, autoincrement = True, primary_key = True)
+    name = Column(Text)
+
+    def __str__(self): return self.name
+    def __repr__(self): return self.name
+    def __unicode__(self): return self.name
+
+
+class PackType(DeclarativeBase, SysMixin):
+    __tablename__ = 'master_pack_type'
+
+    id = Column(Integer, autoincrement = True, primary_key = True)
+    name = Column(Text)
+
+    def __str__(self): return self.name
+    def __repr__(self): return self.name
+    def __unicode__(self): return self.name
+
 
 class Ratio(DeclarativeBase, SysMixin):
     __tablename__ = 'master_ratio'

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2012-06-26 00:29+0800\n"
+"POT-Creation-Date: 2012-07-06 19:24+0800\n"
 "PO-Revision-Date: 2011-12-06 18:39+0800\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: en <LL@li.org>\n"
@@ -26,22 +26,6 @@ msgstr ""
 msgid "Internal Server Error!"
 msgstr ""
 
-#: templates/login.html:3
-msgid "Login"
-msgstr ""
-
-#: templates/login.html:39 templates/register.html:52
-#: templates/admin/group_new.html:27 templates/admin/group_update.html:34
-#: templates/admin/user_index.html:58 templates/admin/user_new.html:11
-#: templates/admin/user_update.html:12
-msgid "User Name"
-msgstr ""
-
-#: templates/login.html:53 templates/register.html:60
-#: templates/admin/user_new.html:15 templates/admin/user_update.html:16
-msgid "Password"
-msgstr ""
-
 #: templates/master.html:9
 msgid "Logistics Management"
 msgstr ""
@@ -57,9 +41,8 @@ msgstr ""
 #: templates/deliver/add_deliver.html:71
 #: templates/deliver/revise_deliver.html:66
 #: templates/deliver/select_orders.html:19 templates/deliver/view.html:70
-#: templates/order/add.html:83 templates/order/add_by_customer.html:70
-#: templates/order/index.html:64 templates/order/review.html:24
-#: templates/order/revise.html:22 templates/order/search_by_customer.html:90
+#: templates/order/add_by_customer.html:70
+#: templates/order/search_by_customer.html:90
 msgid "Customer"
 msgstr ""
 
@@ -76,15 +59,25 @@ msgstr ""
 #: templates/register.html:45 templates/admin/customer_index.html:64
 #: templates/admin/customer_new.html:15 templates/admin/customer_update.html:15
 #: templates/admin/supplier_index.html:64 templates/admin/supplier_new.html:15
-#: templates/admin/supplier_update.html:15 templates/order/add.html:94
-#: templates/order/add_by_customer.html:77 templates/order/review.html:26
-#: templates/order/revise.html:23
+#: templates/admin/supplier_update.html:15
+#: templates/order/add_by_customer.html:77
 msgid "Address"
+msgstr ""
+
+#: templates/register.html:52 templates/admin/group_new.html:27
+#: templates/admin/group_update.html:34 templates/admin/user_index.html:58
+#: templates/admin/user_new.html:11 templates/admin/user_update.html:12
+msgid "User Name"
 msgstr ""
 
 #: templates/register.html:56 templates/admin/user_new.html:23
 #: templates/admin/user_update.html:24
 msgid "E-mail"
+msgstr ""
+
+#: templates/register.html:60 templates/admin/user_new.html:15
+#: templates/admin/user_update.html:16
+msgid "Password"
 msgstr ""
 
 #: templates/register.html:63
@@ -105,9 +98,7 @@ msgstr ""
 #: templates/admin/customer_new.html:29 templates/admin/customer_update.html:29
 #: templates/admin/supplier_index.html:76 templates/admin/supplier_new.html:29
 #: templates/admin/supplier_update.html:29 templates/admin/user_new.html:35
-#: templates/admin/user_update.html:36 templates/order/add.html:98
-#: templates/order/add_by_customer.html:81 templates/order/review.html:29
-#: templates/order/revise.html:24
+#: templates/admin/user_update.html:36 templates/order/add_by_customer.html:81
 msgid "Phone"
 msgstr ""
 
@@ -115,11 +106,14 @@ msgstr ""
 msgid "Mobile"
 msgstr ""
 
-#: templates/register.html:82 templates/order/revise.html:10
+#: templates/register.html:82 templates/order/revise.html:239
+#: templates/order/revise.html:260 templates/order/revise.html:292
 msgid "Save"
 msgstr ""
 
-#: templates/search_orders.html:14
+#: templates/search_orders.html:14 templates/order/revise.html:256
+#: templates/order/revise.html:265 templates/order/revise.html:285
+#: templates/order/revise.html:297
 msgid "Time"
 msgstr ""
 
@@ -136,7 +130,7 @@ msgid "Order Time"
 msgstr ""
 
 #: templates/track.html:12 templates/deliver/vendor_input.html:58
-#: templates/deliver/view.html:62 templates/order/index.html:88
+#: templates/deliver/view.html:62 templates/order/index.html:82
 #: templates/order/search_by_customer.html:105
 msgid "Status"
 msgstr ""
@@ -154,8 +148,8 @@ msgstr ""
 #: templates/admin/supplier_index.html:82
 #: templates/admin/supplier_profile_index.html:76
 #: templates/admin/user_index.html:70 templates/deliver/index.html:25
-#: templates/deliver/vendor_select.html:41 templates/order/add.html:116
-#: templates/order/add_by_customer.html:101 templates/order/index.html:94
+#: templates/deliver/vendor_select.html:41
+#: templates/order/add_by_customer.html:101
 msgid "Action"
 msgstr ""
 
@@ -165,7 +159,7 @@ msgstr ""
 #: templates/admin/supplier_index.html:92
 #: templates/admin/supplier_profile_index.html:85
 #: templates/admin/user_index.html:78 templates/deliver/index.html:39
-#: templates/deliver/view.html:11 templates/order/index.html:107
+#: templates/deliver/view.html:11
 msgid "Revise"
 msgstr ""
 
@@ -175,8 +169,7 @@ msgstr ""
 #: templates/admin/supplier_index.html:92
 #: templates/admin/supplier_profile_index.html:85
 #: templates/admin/user_index.html:78 templates/common/search.html:11
-#: templates/deliver/index.html:39 templates/order/index.html:109
-#: templates/order/revise.html:13
+#: templates/deliver/index.html:39
 msgid "Delete"
 msgstr ""
 
@@ -190,7 +183,7 @@ msgstr ""
 #: templates/admin/supplier_profile_new.html:29
 #: templates/admin/supplier_profile_update.html:18
 #: templates/admin/supplier_profile_update.html:29
-#: templates/admin/supplier_update.html:18 templates/order/add.html:86
+#: templates/admin/supplier_update.html:18
 msgid "Please Select One"
 msgstr ""
 
@@ -201,20 +194,21 @@ msgstr ""
 #: templates/admin/supplier_profile_new.html:37
 #: templates/admin/supplier_profile_update.html:37
 #: templates/admin/supplier_update.html:37
-#: templates/deliver/add_deliver.html:60 templates/deliver/add_deliver.html:80
+#: templates/deliver/add_deliver.html:60 templates/deliver/add_deliver.html:81
 #: templates/deliver/revise_deliver.html:55
 #: templates/deliver/revise_deliver.html:75
-#: templates/deliver/select_orders.html:27
 #: templates/deliver/vendor_input.html:38
 #: templates/deliver/vendor_input.html:73
 #: templates/deliver/vendor_input.html:117 templates/deliver/view.html:42
 #: templates/deliver/view.html:79 templates/deliver/view.html:109
-#: templates/deliver/view.html:128 templates/order/add.html:106
-#: templates/order/add.html:127 templates/order/add_by_customer.html:89
-#: templates/order/add_by_customer.html:112 templates/order/review.html:31
-#: templates/order/review.html:48 templates/order/review.html:83
-#: templates/order/review.html:105 templates/order/review.html:124
-#: templates/order/revise.html:26 templates/order/revise.html:41
+#: templates/deliver/view.html:128 templates/order/add.html:156
+#: templates/order/add.html:221 templates/order/add.html:228
+#: templates/order/add_by_customer.html:89
+#: templates/order/add_by_customer.html:112 templates/order/received.html:48
+#: templates/order/review.html:41 templates/order/revise.html:122
+#: templates/order/revise.html:198 templates/order/revise.html:206
+#: templates/order/revise.html:257 templates/order/revise.html:265
+#: templates/order/revise.html:289 templates/order/revise.html:297
 msgid "Remark"
 msgstr ""
 
@@ -230,8 +224,7 @@ msgstr ""
 #: templates/admin/supplier_update.html:41 templates/admin/user_new.html:60
 #: templates/admin/user_update.html:67 templates/deliver/vendor_input.html:120
 #: templates/deliver/vendor_select.html:25 templates/deliver/view.html:113
-#: templates/deliver/view.html:132 templates/order/review.html:87
-#: templates/order/review.html:128
+#: templates/deliver/view.html:132
 msgid "Submit"
 msgstr ""
 
@@ -246,7 +239,6 @@ msgstr ""
 #: templates/admin/supplier_profile_update.html:41
 #: templates/admin/supplier_update.html:41 templates/admin/user_new.html:60
 #: templates/admin/user_update.html:67 templates/deliver/view.html:12
-#: templates/order/revise.html:12
 msgid "Cancel"
 msgstr ""
 
@@ -284,7 +276,8 @@ msgstr ""
 #: templates/deliver/vendor_input.html:42
 #: templates/deliver/vendor_input.html:74
 #: templates/deliver/vendor_select.html:36 templates/deliver/view.html:46
-#: templates/order/index.html:70
+#: templates/order/add.html:105 templates/order/index.html:79
+#: templates/order/revise.html:63
 msgid "Create Time"
 msgstr ""
 
@@ -362,17 +355,15 @@ msgstr ""
 msgid "Deliver Number"
 msgstr ""
 
-#: templates/deliver/add_deliver.html:40 templates/deliver/add_deliver.html:73
-#: templates/deliver/index.html:16 templates/deliver/revise_deliver.html:39
+#: templates/deliver/add_deliver.html:40 templates/deliver/index.html:16
+#: templates/deliver/revise_deliver.html:39
 #: templates/deliver/revise_deliver.html:68
-#: templates/deliver/select_orders.html:20
 #: templates/deliver/vendor_input.html:22
 #: templates/deliver/vendor_input.html:66
 #: templates/deliver/vendor_select.html:16
 #: templates/deliver/vendor_select.html:35 templates/deliver/view.html:26
-#: templates/deliver/view.html:72 templates/order/add.html:122
-#: templates/order/add_by_customer.html:108 templates/order/review.html:43
-#: templates/order/revise.html:37 templates/order/search_by_customer.html:66
+#: templates/deliver/view.html:72 templates/order/add_by_customer.html:108
+#: templates/order/search_by_customer.html:66
 #: templates/order/search_by_customer.html:95
 msgid "Destination"
 msgstr ""
@@ -389,74 +380,94 @@ msgstr ""
 msgid "Supplier Tel"
 msgstr ""
 
-#: templates/deliver/add_deliver.html:52 templates/deliver/add_deliver.html:77
+#: templates/deliver/add_deliver.html:52 templates/deliver/add_deliver.html:78
 #: templates/deliver/revise_deliver.html:51
 #: templates/deliver/revise_deliver.html:72
-#: templates/deliver/select_orders.html:24
+#: templates/deliver/select_orders.html:26
 #: templates/deliver/vendor_input.html:34
 #: templates/deliver/vendor_input.html:70 templates/deliver/view.html:38
-#: templates/deliver/view.html:76 templates/order/add.html:125
-#: templates/order/add_by_customer.html:111 templates/order/review.html:46
-#: templates/order/revise.html:40
+#: templates/deliver/view.html:76 templates/order/add_by_customer.html:111
+#: templates/order/received.html:47 templates/order/review.html:40
 msgid "Expect Time"
 msgstr ""
 
-#: templates/deliver/add_deliver.html:56 templates/order/add.html:126
-#: templates/order/review.html:47
+#: templates/deliver/add_deliver.html:56
 msgid "Charge"
 msgstr ""
 
 #: templates/deliver/add_deliver.html:72
 #: templates/deliver/revise_deliver.html:67
 #: templates/deliver/select_orders.html:18 templates/deliver/view.html:71
-#: templates/order/index.html:58 templates/order/search_by_customer.html:85
+#: templates/order/index.html:51 templates/order/index.html:71
+#: templates/order/search_by_customer.html:85
 msgid "Order Number"
+msgstr ""
+
+#: templates/deliver/add_deliver.html:73
+#: templates/deliver/select_orders.html:21 templates/order/add.html:93
+#: templates/order/index.html:54 templates/order/index.html:74
+#: templates/order/received.html:27 templates/order/review.html:21
+#: templates/order/revise.html:57
+msgid "Destination Station"
 msgstr ""
 
 #: templates/deliver/add_deliver.html:74
 #: templates/deliver/revise_deliver.html:69
-#: templates/deliver/select_orders.html:21
+#: templates/deliver/select_orders.html:22
 #: templates/deliver/vendor_input.html:67 templates/deliver/view.html:73
-#: templates/order/add.html:117 templates/order/add_by_customer.html:102
-#: templates/order/review.html:39 templates/order/revise.html:33
+#: templates/order/add.html:150 templates/order/add_by_customer.html:102
+#: templates/order/received.html:46 templates/order/review.html:39
+#: templates/order/revise.html:116
 msgid "Item"
 msgstr ""
 
 #: templates/deliver/add_deliver.html:75
 #: templates/deliver/revise_deliver.html:70
-#: templates/deliver/select_orders.html:22
+#: templates/deliver/select_orders.html:23
 #: templates/deliver/vendor_input.html:68 templates/deliver/view.html:74
-#: templates/order/add.html:118 templates/order/add_by_customer.html:103
-#: templates/order/review.html:40 templates/order/revise.html:34
+#: templates/order/add.html:162 templates/order/add.html:218
+#: templates/order/add.html:228 templates/order/add_by_customer.html:103
+#: templates/order/index.html:76 templates/order/revise.html:127
+#: templates/order/revise.html:195 templates/order/revise.html:206
 msgid "Qty"
 msgstr ""
 
 #: templates/deliver/add_deliver.html:76
+#: templates/deliver/select_orders.html:24 templates/order/add.html:166
+#: templates/order/add.html:219 templates/order/add.html:228
+#: templates/order/revise.html:131 templates/order/revise.html:196
+#: templates/order/revise.html:206
+msgid "Vol"
+msgstr ""
+
+#: templates/deliver/add_deliver.html:77
 #: templates/deliver/revise_deliver.html:71
-#: templates/deliver/select_orders.html:23
+#: templates/deliver/select_orders.html:25
 #: templates/deliver/vendor_input.html:69 templates/deliver/view.html:75
-#: templates/order/add.html:120 templates/order/add_by_customer.html:105
-#: templates/order/review.html:41 templates/order/revise.html:35
+#: templates/order/add.html:164 templates/order/add.html:220
+#: templates/order/add.html:228 templates/order/add_by_customer.html:105
+#: templates/order/index.html:77 templates/order/revise.html:129
+#: templates/order/revise.html:197 templates/order/revise.html:206
 msgid "Weight"
 msgstr ""
 
-#: templates/deliver/add_deliver.html:78
+#: templates/deliver/add_deliver.html:79
 #: templates/deliver/revise_deliver.html:73
-#: templates/deliver/select_orders.html:25
+#: templates/deliver/select_orders.html:27
 #: templates/deliver/vendor_input.html:71 templates/deliver/view.html:77
-#: templates/order/review.html:44 templates/order/revise.html:38
+#: templates/order/add.html:115 templates/order/received.html:55
+#: templates/order/review.html:47 templates/order/revise.html:73
 msgid "Destination Contact"
 msgstr ""
 
-#: templates/deliver/add_deliver.html:79
+#: templates/deliver/add_deliver.html:80
 #: templates/deliver/revise_deliver.html:74
-#: templates/deliver/select_orders.html:26
+#: templates/deliver/select_orders.html:28
 #: templates/deliver/vendor_input.html:72 templates/deliver/view.html:78
-#: templates/order/review.html:45 templates/order/revise.html:39
 msgid "Destination Tel"
 msgstr ""
 
-#: templates/deliver/add_deliver.html:81 templates/deliver/index.html:22
+#: templates/deliver/add_deliver.html:82 templates/deliver/index.html:22
 #: templates/deliver/revise_deliver.html:78
 #: templates/deliver/vendor_input.html:50
 #: templates/deliver/vendor_input.html:76
@@ -465,12 +476,12 @@ msgstr ""
 msgid "Update Time"
 msgstr ""
 
-#: templates/deliver/add_deliver.html:82 templates/deliver/index.html:23
+#: templates/deliver/add_deliver.html:83 templates/deliver/index.html:23
 #: templates/deliver/revise_deliver.html:79
 #: templates/deliver/vendor_input.html:54
 #: templates/deliver/vendor_input.html:77
 #: templates/deliver/vendor_select.html:39 templates/deliver/view.html:58
-#: templates/deliver/view.html:81 templates/order/index.html:82
+#: templates/deliver/view.html:81 templates/order/index.html:81
 msgid "Last Updator"
 msgstr ""
 
@@ -478,12 +489,12 @@ msgstr ""
 #: templates/deliver/vendor_input.html:46
 #: templates/deliver/vendor_input.html:75
 #: templates/deliver/vendor_select.html:37 templates/deliver/view.html:50
-#: templates/order/index.html:76
+#: templates/order/index.html:80 templates/order/received.html:23
+#: templates/order/review.html:17
 msgid "Creator"
 msgstr ""
 
 #: templates/deliver/index.html:24 templates/deliver/vendor_select.html:40
-#: templates/order/review.html:33 templates/order/revise.html:27
 msgid "Order Status"
 msgstr ""
 
@@ -493,6 +504,13 @@ msgstr ""
 
 #: templates/deliver/select_orders.html:12
 msgid "New Delivery"
+msgstr ""
+
+#: templates/deliver/select_orders.html:20 templates/order/add.html:71
+#: templates/order/index.html:52 templates/order/index.html:72
+#: templates/order/received.html:17 templates/order/review.html:11
+#: templates/order/revise.html:54
+msgid "Source Station"
 msgstr ""
 
 #: templates/deliver/vendor_input.html:104
@@ -534,65 +552,164 @@ msgstr ""
 msgid "Arrival Time"
 msgstr ""
 
-#: templates/order/add.html:102 templates/order/add.html:123
-#: templates/order/add_by_customer.html:85
-#: templates/order/add_by_customer.html:109 templates/order/review.html:30
-#: templates/order/revise.html:25
-msgid "Contact"
+#: templates/order/add.html:68
+msgid "Now Order"
 msgstr ""
 
-#: templates/order/add.html:111 templates/order/add_by_customer.html:96
-msgid "Add Line"
+#: templates/order/add.html:106 templates/order/index.html:53
+#: templates/order/index.html:73 templates/order/received.html:41
+#: templates/order/revise.html:64
+msgid "Source Company"
 msgstr ""
 
-#: templates/order/add.html:119 templates/order/add_by_customer.html:104
-msgid "Unit"
+#: templates/order/add.html:109 templates/order/index.html:55
+#: templates/order/index.html:75 templates/order/received.html:54
+#: templates/order/revise.html:67
+msgid "Destination Company"
 msgstr ""
 
-#: templates/order/add.html:121 templates/order/add_by_customer.html:106
-msgid "Weight Unit"
+#: templates/order/add.html:112 templates/order/received.html:42
+#: templates/order/review.html:35 templates/order/revise.html:70
+msgid "Source Contact"
 msgstr ""
 
-#: templates/order/add.html:124 templates/order/add_by_customer.html:110
-msgid "Tel"
+#: templates/order/add.html:118 templates/order/received.html:43
+#: templates/order/review.html:36 templates/order/revise.html:76
+msgid "Source Address"
 msgstr ""
 
-#: templates/order/add.html:133 templates/order/add_by_customer.html:117
-msgid "Del"
+#: templates/order/add.html:121 templates/order/received.html:56
+#: templates/order/review.html:48 templates/order/revise.html:79
+msgid "Destination Address"
 msgstr ""
 
-#: templates/order/add_by_customer.html:107 templates/order/review.html:42
-#: templates/order/revise.html:36
-msgid "Shipment Type"
+#: templates/order/add.html:124 templates/order/received.html:44
+#: templates/order/review.html:37 templates/order/revise.html:82
+msgid "Source Phone"
 msgstr ""
 
-#: templates/order/review.html:18 templates/order/revise.html:16
-msgid "Order Information"
+#: templates/order/add.html:127 templates/order/received.html:45
+#: templates/order/review.html:38 templates/order/revise.html:85
+msgid "Source Mobile"
 msgstr ""
 
-#: templates/order/review.html:23 templates/order/revise.html:21
-#: templates/order/search_by_customer.html:64
-msgid "Order No"
+#: templates/order/add.html:130 templates/order/received.html:57
+#: templates/order/review.html:49 templates/order/revise.html:88
+msgid "Destination Phone"
 msgstr ""
 
-#: templates/order/review.html:32
+#: templates/order/add.html:133 templates/order/received.html:58
+#: templates/order/review.html:50 templates/order/revise.html:91
+msgid "Destination Mobile"
+msgstr ""
+
+#: templates/order/add.html:136 templates/order/revise.html:94
+msgid "Pickup Type"
+msgstr ""
+
+#: templates/order/add.html:143 templates/order/revise.html:105
+msgid "Package Type"
+msgstr ""
+
+#: templates/order/add.html:153 templates/order/revise.html:119
+msgid "Item Remark"
+msgstr ""
+
+#: templates/order/add.html:163 templates/order/revise.html:128
+msgid "Qty Ratio"
+msgstr ""
+
+#: templates/order/add.html:165 templates/order/revise.html:130
+msgid "Weight Ratio"
+msgstr ""
+
+#: templates/order/add.html:167 templates/order/revise.html:132
+msgid "Vol Ratio"
+msgstr ""
+
+#: templates/order/add.html:168 templates/order/index.html:78
+#: templates/order/revise.html:133
 msgid "Amount"
 msgstr ""
 
-#: templates/order/review.html:75 templates/order/review.html:97
-msgid "Picker"
+#: templates/order/add.html:169 templates/order/received.html:59
+#: templates/order/review.html:51 templates/order/revise.html:134
+msgid "Payment"
 msgstr ""
 
-#: templates/order/review.html:79 templates/order/review.html:101
-msgid "Picker Contact"
+#: templates/order/add.html:211
+msgid "Item Details"
 msgstr ""
 
-#: templates/order/review.html:114
-msgid "Warehouse"
+#: templates/order/add.html:217 templates/order/add.html:228
+#: templates/order/revise.html:194 templates/order/revise.html:206
+msgid "Item Name"
 msgstr ""
 
-#: templates/order/revise.html:11
-msgid "Reset"
+#: templates/order/add.html:223 templates/order/revise.html:201
+msgid "Add"
+msgstr ""
+
+#: templates/order/add_by_customer.html:85
+#: templates/order/add_by_customer.html:109
+msgid "Contact"
+msgstr ""
+
+#: templates/order/add_by_customer.html:96
+msgid "Add Line"
+msgstr ""
+
+#: templates/order/add_by_customer.html:104
+msgid "Unit"
+msgstr ""
+
+#: templates/order/add_by_customer.html:106
+msgid "Weight Unit"
+msgstr ""
+
+#: templates/order/add_by_customer.html:107
+msgid "Shipment Type"
+msgstr ""
+
+#: templates/order/add_by_customer.html:110
+msgid "Tel"
+msgstr ""
+
+#: templates/order/add_by_customer.html:117 templates/order/revise.html:217
+#: templates/order/revise.html:273
+msgid "Del"
+msgstr ""
+
+#: templates/order/index.html:57
+msgid "Search"
+msgstr ""
+
+#: templates/order/index.html:63
+msgid "Input the conditions and search."
+msgstr ""
+
+#: templates/order/received.html:20 templates/order/review.html:14
+msgid "No#"
+msgstr ""
+
+#: templates/order/revise.html:51
+msgid "Order Detail"
+msgstr ""
+
+#: templates/order/revise.html:286 templates/order/revise.html:297
+msgid "Pickup Contact"
+msgstr ""
+
+#: templates/order/revise.html:287 templates/order/revise.html:297
+msgid "Contact Tel"
+msgstr ""
+
+#: templates/order/revise.html:288 templates/order/revise.html:297
+msgid "Pickup Qty"
+msgstr ""
+
+#: templates/order/search_by_customer.html:64
+msgid "Order No"
 msgstr ""
 
 #: util/decorator.py:50 util/decorator.py:65 util/decorator.py:80

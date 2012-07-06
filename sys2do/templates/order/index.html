@@ -1,148 +1,114 @@
 {% extends "master.html" %}
 
-{% block extJS %}
+{% block extCSS %}
 
 {% endblock %}
 
-{% block content %}	
-	<table width="100%" border="0" cellspacing="0" cellpadding="0">
-      <tr>
-        <td><table width="100%" border="0" cellspacing="0" cellpadding="0">
-          <tr>
-            <td width="18"><img src="/static/images/system/group_manage_20.jpg" width="18" height="35" /></td>
-            <td width="2"><img src="/static/images/system/group_manage_21.jpg" width="2" height="35" /></td>
-            <td width="107"><a href="{{url_for('.view', action = 'add')}}"><img src="/static/images/system/group_manage_22.jpg" width="107" height="35" /></a></td>
-			<td width="2"><img src="/static/images/system/group_manage_21.jpg" width="2" height="35" /></td>
-            
-            
-            <!-- 
-            <td width="106"><img src="/static/images/system/group_manage_24.jpg" width="106" height="35" /></td>
-			<td width="2"><img src="/static/images/system/group_manage_21.jpg" width="2" height="35" /></td>
-            <td width="107"><img src="/static/images/system/group_manage_26.jpg" width="107" height="35" /></td>
-			<td width="2"><img src="/static/images/system/group_manage_21.jpg" width="2" height="35" /></td>
-            <td width="106"><img src="/static/images/system/group_manage_28.jpg" width="106" height="35" /></td>
-			<td width="2"><img src="/static/images/system/group_manage_21.jpg" width="2" height="35" /></td>
-            -->
-            <td background="/static/images/system/group_manage_30.jpg">&nbsp;</td>
-            <td width="16"><img src="/static/images/system/group_manage_33.jpg" width="16" height="35" /></td>
-          </tr>
-        </table></td>
+
+{% block extJS %}
+
+<script language="JavaScript" type="text/javascript">
+//<![CDATA[
+	$(document).ready(function(){
+
+	});
+//]]>
+</script>
+
+{% endblock %}
+
+
+{% block inner_menu %}
+<div class="inner_menu">
+	<ul>
+        <li><a href="{{url_for('.view',action='add')}}"><img src="/static/images/system/order_manage_31.jpg" width="77" height="21" id="Image2" onmouseover="MM_swapImage('Image2','','/static/images/system/order_manage_h_31.jpg',1)" onmouseout="MM_swapImgRestore()" /></a></li>
+        <!-- 
+    	<li><img src="/static/images/system/order_manage_25.jpg" width="71" height="21" id="Image1" onmouseover="MM_swapImage('Image1','','/static/images/system/order_manage_h_25.jpg',1)" onmouseout="MM_swapImgRestore()" /></li>
+        <li><img src="/static/images/system/order_manage_33.jpg" width="77" height="21" id="Image3" onmouseover="MM_swapImage('Image3','','/static/images/system/order_manage_h_33.jpg',1)" onmouseout="MM_swapImgRestore()" /></li>
+        <li><img src="/static/images/system/order_manage_35.jpg" width="94" height="21" id="Image4" onmouseover="MM_swapImage('Image4','','/static/images/system/order_manage_h_35.jpg',1)" onmouseout="MM_swapImgRestore()" /></li>
+        <li><img src="/static/images/system/order_manage_37.jpg" width="77" height="21" id="Image5" onmouseover="MM_swapImage('Image5','','/static/images/system/order_manage_h_37.jpg',1)" onmouseout="MM_swapImgRestore()" /></li>
+        <li><img src="/static/images/system/order_manage_39.jpg" width="101" height="21" id="Image6" onmouseover="MM_swapImage('Image6','','/static/images/system/order_manage_h_39.jpg',1)" onmouseout="MM_swapImgRestore()" /></li>
+        <li><img src="/static/images/system/order_manage_41.jpg" width="101" height="21" id="Image7" onmouseover="MM_swapImage('Image7','','/static/images/system/order_manage_h_41.jpg',1)" onmouseout="MM_swapImgRestore()" /></li>
+        -->
+        <li style="padding:0px; margin:0px 55px 0px 0px; float:right"><a href="{{url_for('bpAuth.logout')}}"><img src="/static/images/system/order_manage_22.jpg" width="56" height="29" /></a></li>
+    </ul>
+</div>
+{% endblock %}
+
+
+{% block content %}
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+	<tr><td class="title_fonts_display">&middot; 订单管理</td></tr>
+</table>
+<div class="search_div">
+	<div class="search_div_header">订单搜索</div>
+    <div class="search_div_body">
+    	<form action="{{url_for('.view')}}" method="post">
+    	<ul>
+          <li style="width:100%; border-right:#E2FEFE 1px solid;"><span>起始日期</span>
+        	  <input type="text" class="datepicker" name="create_time_from" value="{{values.get('create_time_from','')|f}}"/>&nbsp;&nbsp;-&nbsp;&nbsp;<input type="text" class="datepicker" name="create_time_to" value="{{values.get('create_time_to','')|f}}"/>
+          </li>
+          <li><span>{{_('Order Number')}}</span><input type="text" name="no" value="{{values.get('no','')|f}}"/></li>
+          <li><span>{{_('Source Station')}}</span><input type="text" name="source_station" value="{{values.get('source_station','')|f}}"/></li>
+          <li><span>{{_('Source Company')}}</span><input type="text" name="source_company" value="{{values.get('source_company','')|f}}"/></li>
+          <li><span>{{_('Destination Station')}}</span><input type="text" name="destination_station" value="{{values.get('destination_station','')|f}}"/></li>
+          <li><span>{{_('Destination Company')}}</span><input type="text" name="destination_company" value="{{values.get('destination_company','')|f}}"/></li>
+        </ul>
+        <div class="button_div"><input type="submit" value="{{_('Search')}}"/></div>
+    	</form>
+        <div style="clear:both"></div>
+    </div>
+</div>
+
+<div class="point_div"><img src="images/order_manage_54.jpg" width="22" height="28" /><span>{{_('Input the conditions and search.')}}</span></div>
+
+
+
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
+  <tr class="field_head">
+    <th width="20" align="center"><input type="checkbox"/></th>
+    <td align="center"><img src="images/group_manage_58.gif" width="12" height="19" align="absmiddle" />{{_('Order Number')}}</td>
+    <td align="center"><img src="images/group_manage_58down.gif" width="12" height="19" align="absmiddle" />{{_('Source Station')}}</td>
+    <td align="center"><img src="images/group_manage_58down.gif" width="12" height="19" align="absmiddle" />{{_('Source Company')}}</td>
+    <td align="center"><img src="images/group_manage_58down.gif" width="12" height="19" align="absmiddle" />{{_('Destination Station')}}</td>
+    <td align="center"><img src="images/group_manage_58down.gif" width="12" height="19" align="absmiddle" />{{_('Destination Company')}}</td>
+    <td align="center"><img src="images/group_manage_58down.gif" width="12" height="19" align="absmiddle" />{{_('Qty')}}</td>
+    <td align="center"><img src="images/group_manage_58down.gif" width="12" height="19" align="absmiddle" />{{_('Weight')}}</td>
+    <td align="center"><img src="images/group_manage_58down.gif" width="12" height="19" align="absmiddle" />{{_('Amount')}}</td>
+    <td align="center"><img src="images/group_manage_58up.gif" width="12" height="19" align="absmiddle" />{{_('Create Time')}}</td>
+    <td align="center"><img src="images/group_manage_58.gif" width="12" height="19" align="absmiddle" />{{_('Creator')}}</td>
+    <td align="center"><img src="images/group_manage_58.gif" width="12" height="19" align="absmiddle" />{{_('Last Updator')}}</td>
+    <td align="center"><img src="images/group_manage_58.gif" width="12" height="19" align="absmiddle" />{{_('Status')}}</td>
+  </tr>
+  
+  {% for r in result %}
+	  <tr class="data_table_tr {{ loop.cycle('data_table_tr_odd', 'data_table_tr_even') }}">
+	    <th><input type="checkbox" name="orders" value="{{r.id}}" /></th>
+	    <td><a href="{{url_for('.view', action = 'revise',id=r.id)}}">{{r.no|f}}</a></td>
+		<td>{{r.source_station|f}}</td>
+		<td>{{r.source_company|f}}</td>
+		<td>{{r.destination_station|f}}</td>
+		<td>{{r.destination_company|f}}</td>
+		<td>{{r.qty|f}}</td>
+		<td>{{r.weight|f}}</td>
+		<td>{{r.weight|f}}</td>
+		<td>{{r.amount|ft}}</td>
+		<td>{{r.create_by|f}}</td>
+		<td>{{r.update_by|f}}</td>
+		<td>{{r.status|showStatus}}</td>
+	  </tr>
+  {% endfor %}
+      <tr class="data_table_tr">
+      	<th></th>
+      	<td colspan="5">&nbsp;</td>
+      	<td>0.0</td>
+      	<td>0.1</td>
+      	<td>0.2</td>
+      	<td colspan="100">&nbsp;</td>
       </tr>
-      <tr>
-        <td>&nbsp;</td>
-      </tr>
-      <tr>
-        <td align="left">
-        
-        	<table width="99%" border="0" cellspacing="0" cellpadding="0" bgcolor="#FFFFFF">
-          <tr>
-            <td width="13"><img src="/static/images/system/group_manage_40.jpg" width="13" height="13" /></td>
-            <td></td>
-            <td width="13"><img src="/static/images/system/group_manage_46.jpg" width="13" height="13" /></td>
-          </tr>
-          <tr>
-            <td>&nbsp;</td>
-            <td><table width="100%" border="0" cellspacing="0" cellpadding="0">
-              <tr>
-                <td class="title_fonts_display">订单管理</td>
-              </tr>
-              <tr>
-                <td>&nbsp;</td>
-              </tr>
-            </table>
-              <table width="99%" border="0" cellspacing="0" cellpadding="0">
-                <tr class="field_head">
-                  <td align="center"><table width="80%" border="0" cellspacing="0" cellpadding="0">
-                    <tr>
-                      <td width="20%" align="right"><img src="/static/images/system/group_manage_58.jpg" width="12" height="19" /></td>
-                      <td width="80%" align="left">{{_('Order Number')}}</td>
-                    </tr>
-                  </table></td>
-                  <td align="center"><table width="80%" border="0" cellspacing="0" cellpadding="0">
-                    <tr>
-                      <td width="20%" align="right"><img src="/static/images/system/group_manage_58.jpg" width="12" height="19" /></td>
-                      <td width="80%" align="left">{{_('Customer')}}</td>
-                    </tr>
-                  </table></td>
-                  <td align="center"><table width="80%" border="0" cellspacing="0" cellpadding="0">
-                    <tr>
-                      <td width="20%" align="right"><img src="/static/images/system/group_manage_58.jpg" width="12" height="19" /></td>
-                      <td width="80%" align="left">{{_('Create Time')}}</td>
-                    </tr>
-                  </table></td>
-                  <td align="center"><table width="80%" border="0" cellspacing="0" cellpadding="0">
-                    <tr>
-                      <td width="20%" align="right"><img src="/static/images/system/group_manage_58.jpg" width="12" height="19" /></td>
-                      <td width="80%" align="left">{{_('Creator')}}</td>
-                    </tr>
-                  </table></td>
-                  <td align="center"><table width="80%" border="0" cellspacing="0" cellpadding="0">
-                    <tr>
-                      <td width="20%" align="right"><img src="/static/images/system/group_manage_58.jpg" width="12" height="19" /></td>
-                      <td width="80%" align="left">{{_('Last Updator')}}</td>
-                    </tr>
-                  </table></td>
-                  <td align="center"><table width="80%" border="0" cellspacing="0" cellpadding="0">
-                    <tr>
-                      <td width="20%" align="right"><img src="/static/images/system/group_manage_58.jpg" width="12" height="19" /></td>
-                      <td width="80%" align="left">{{_('Status')}}</td>
-                    </tr>
-                  </table></td>
-                  <td align="center"><table width="80%" border="0" cellspacing="0" cellpadding="0">
-                    <tr>
-                      <td width="20%" align="right"><img src="/static/images/system/group_manage_58.jpg" width="12" height="19" /></td>
-                      <td width="80%" align="left">{{_('Action')}}</td>
-                    </tr>
-                  </table></td>
-                </tr>
-				{% for r in result %}
-					<tr class="data_table_tr">
-						<td><a href="{{url_for('.view', action = 'revise',id=r.id)}}">{{r.no|f}}</a></td>
-						<td>{{r.customer|f}}</td>
-						<td>{{r.create_time|ft}}</td>
-						<td>{{r.create_by|f}}</td>
-						<td>{{r.update_by|f}}</td>
-						<td>{{r.status|showStatus}}</td>
-						<td>
-							<a href="{{url_for('.view', action = 'revise',id=r.id)}}">{{_('Revise')}}</a>
-							&nbsp;&nbsp;
-							<a href="{{url_for('.view', action = 'delete',id=r.id)}}">{{_('Delete')}}</a>
-						</td>
-					</tr>
-				{% endfor %}
-              </table></td>
-            <td>&nbsp;</td>
-          </tr>
-          
-          <!-- 
-          <tr>
-            <td>&nbsp;</td>
-            <td height="50"><table width="90%" border="0" cellspacing="0" cellpadding="0">
-              <tr>
-                <td>&nbsp;</td>
-                <td width="65">
-                  <select name="menu1" onchange="MM_jumpMenu('parent',this,0)">
-                    <option value="01">01</option>
-                    <option value="02">02</option>
-                    <option value="03">03</option>
-                  </select></td>
-                <td width="19"><img src="/static/images/system/group_manage_62.jpg" width="19" height="19" /></td>
-                <td width="10">&nbsp;</td>
-                <td width="19"><img src="/static/images/system/group_manage_64.jpg" width="19" height="19" /></td>
-              </tr>
-            </table></td>
-            <td>&nbsp;</td>
-          </tr>
-          -->
-          <tr>
-            <td><img src="/static/images/system/group_manage_47.jpg" width="13" height="13" /></td>
-            <td></td>
-            <td><img src="/static/images/system/group_manage_47-27.jpg" width="13" height="13" /></td>
-          </tr>
-        </table></td>
-      </tr>
-      <tr>
-        <td>&nbsp;</td>
-      </tr>
-    </table>
+</table>
+
+
+
 {% endblock %}

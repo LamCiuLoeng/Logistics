@@ -1,209 +1,324 @@
 {% extends "master.html" %}
 
+
+{% block extCSS %}
+
+<style type="text/css">
+
+</style>
+{% endblock %}
+
 {% block extJS %}
 <script src="{{url_for('static', filename='js/customer/order_revise.js')}}" type="text/javascript"></script>
-
-
+<script language="JavaScript" type="text/javascript">
+//<![CDATA[
+	$(document).ready(function(){
+		$(".order_add_info_tab_div").tabs();
+		
+		$(".compute").each(function(){
+			var t = $(this);
+			t.change(compute);
+		});
+		
+		function compute(){
+		var qty = $("#qty").val();
+		var qty_ratio = $("#qty_ratio").val();
+		var vol = $("#vol").val();
+		var vol_ratio = $("#vol_ratio").val();
+		var weight = $("#weight").val();
+		var weight_ratio = $("#weight_ratio").val();
+		var amount = qty * qty_ratio + vol * vol_ratio + weight * weight_ratio;
+		$("#amount").val(amount);
+	}
+	});
+		
+//]]>
+</script>
 
 {% endblock %}
 
+{% block inner_menu %}
+<div class="inner_menu">
+	<ul>
+    	<li><img src="/static/images/system/order_manage_25.jpg" width="71" height="21" id="Image1" onmouseover="MM_swapImage('Image1','','/static/images/system/order_manage_h_25.jpg',1)" onmouseout="MM_swapImgRestore()" /></li>
+        
+        <li><img src="/static/images/system/order_manage_37.jpg" width="77" height="21" id="Image5" onmouseover="MM_swapImage('Image5','','/static/images/system/order_manage_h_37.jpg',1)" onmouseout="MM_swapImgRestore()" /></li>
+        <!-- 
+        <li><img src="/static/images/system/order_manage_35.jpg" width="94" height="21" id="Image4" onmouseover="MM_swapImage('Image4','','/static/images/system/order_manage_h_35.jpg',1)" onmouseout="MM_swapImgRestore()" /></li>
+        <li><img src="/static/images/system/order_manage_39.jpg" width="101" height="21" id="Image6" onmouseover="MM_swapImage('Image6','','/static/images/system/order_manage_h_39.jpg',1)" onmouseout="MM_swapImgRestore()" /></li>
+        <li><img src="/static/images/system/order_manage_41.jpg" width="101" height="21" id="Image7" onmouseover="MM_swapImage('Image7','','/static/images/system/order_manage_h_41.jpg',1)" onmouseout="MM_swapImgRestore()" /></li>
+        -->
+        <li style="padding:0px; margin:0px 55px 0px 0px; float:right"><a href="{{url_for('bpAuth.logout')}}"><img src="/static/images/system/order_manage_22.jpg" width="56" height="29" /></a></li>
+    </ul>
+</div>
+{% endblock %}
+
 {% block content %}
-	<input type="hidden" name="id" id="id" value="{{header.id}}">
-	{% if header.barcode_id %}
-		<p><img src="{{header.barcode.url}}"/></p>
-	{% endif %}
-	
-	<div style="background-color: #fff;padding: 10px;" id="order_header">
-		<input type="hidden" name="form_type" value="order_header"/>
-			<table>
-				<tr>
-					<td>{{_('Source Station')}}</td>
-					<td><input type="text" name="source_station" id="source_station" value="{{header.source_station|f}}" class="field"/></td>
-					<td>&nbsp;</td>
-					<td>{{_('No#')}}</td>
-					<td><input type="text" name="no" id="no" value="{{header.no|f}}" class="field"/></td>
-					<td>&nbsp;</td>
-					<td>{{_('Creator')}}</td>
-					<td>{{header.create_by|f}}</td>
-				</tr>
-				<tr>
-					<td>{{_('Destination Station')}}</td>
-					<td><input type="text" name="destination_station" id="destination_station" value="{{header.destination_station|f}}" class="field"/></td>
-					<td>&nbsp;</td>
-					<td>{{Date}}</td>
-					<td><input type="text" name="order_time" id="order_time" value="{{header.order_time|f}}" class="field"/></td>
-					<td>&nbsp;</td>
-					<td></td>
-					<td>&nbsp;</td>
-				</tr>
-			</table>
-			<table>
-				<tr>
-					<td valign="top">
-						<table>
-							<tr><td>{{_('Source Company')}}</td><td><input type="text" name="source_company" id="source_company" value="{{header.source_company|f}}" class="field" style="width: 300px"/></td></tr>
-							<tr><td>{{_('Source Contact')}}</td><td><input type="text" name="source_contact" id="source_contact" value="{{header.source_contact|f}}" class="field" style="width: 300px"/></td></tr>
-							<tr><td>{{_('Source Address')}}</td><td><input type="text" name="source_address" id="source_address" value="{{header.source_address|f}}" class="field" style="width: 300px"/></td></tr>
-							<tr><td>{{_('Source Phone')}}</td><td><input type="text" name="source_tel" id="source_tel" value="{{header.source_tel|f}}" class="field" style="width: 300px"/></td></tr>
-							<tr><td>{{_('Source Mobile')}}</td><td><input type="text" name="source_mobile" id="source_mobile" value="{{header.source_mobile|f}}" class="field" style="width: 300px"/></td></tr>
-							<tr><td>{{_('Item')}}</td><td><input type="text" name="item" id="item" value="{{header.item|f}}" class="field" style="width: 300px"/></td></tr>
-							<tr><td>{{_('Expect Time')}}</td><td><input type="text" name="expect_time" id="expect_time" value="{{header.expect_time|f}}" class="field" style="width: 300px"/></td></tr>
-							<tr><td>{{_('Remark')}}</td><td><textarea name="remark" id="remark"class="field" style="width: 300px">{{header.remark|f}}</textarea></td></tr>
-						</table>
-					</td>
-					<td>&nbsp;</td>
-					<td valign="top">
-						<table>
-						    <tr><td>{{_('Destination Company')}}</td><td><input type="text" name="destination_company" id="destination_company" value="{{header.destination_company|f}}" class="field" style="width: 300px"/></td></tr>
-							<tr><td>{{_('Destination Contact')}}</td><td><input type="text" name="destination_contact" id="destination_contact" value="{{header.destination_contact|f}}" class="field" style="width: 300px"/></td></tr>
-							<tr><td>{{_('Destination Address')}}</td><td><input type="text" name="destination_address" id="destination_address" value="{{header.destination_address|f}}" class="field" style="width: 300px"/></td></tr>
-							<tr><td>{{_('Destination Phone')}}</td><td><input type="text" name="destination_tel" id="destination_tel" value="{{header.destination_tel|f}}" class="field" style="width: 300px"/></td></tr>
-							<tr><td>{{_('Destination Mobile')}}</td><td><input type="text" name="destination_mobile" id="destination_mobile" value="{{header.destination_mobile|f}}" class="field" style="width: 300px"/></td></tr>
-							<tr><td>{{_('Payment')}}</td>
-								<td>
-									<select name="payment_id" id="payment_id">
-										{% for p in payment %}
-											{% if p.id == header.payment_id %}
-												<option value="{{plid}}" selected="selected">{{p}}</optino>
-											{% else %}
-												<option value="{{plid}}">{{p}}</optino>
-											{% endif %}
-										{% endfor %}
-									</select>
-								</td>
-							</tr>
-						</table>
-			
-					</td>
-				</tr>
-			</table>
-			<table>
-				<tr>
-					<td>件数</td>
-					<td>件数费率</td>
-					<td>体积</td>
-					<td>体积费率</td>
-					<td>重量</td>
-					<td>重量费率</td>
-					<td>费用</td>
-				</tr>
-				<tr>
-					<td><input type="text" name="qty" id="qty" value="{{header.qty|f}}"/></td>
-					<td><input type="text" name="qty_ratio" id="qty_ratio" value="{{header.qty_ratio|f}}"/></td>
-					<td><input type="text" name="vol" id="vol" value="{{header.vol|f}}"/></td>
-					<td><input type="text" name="vol_ratio" id="vol_ratio" value="{{header.vol_ratio|f}}"/></td>
-					<td><input type="text" name="weight" id="weight" value="{{header.weight|f}}"/></td>
-					<td><input type="text" name="weight_ratio" id="weight_ratio" value="{{header.weight_ratio|f}}"/></td>
-					<td><input type="text" name="amount" id="amount" value="{{header.amount|f}}"/></td>
-				</tr>
-			</table>
-			<p><input type="button" value="保存" onclick="save_header()"/></p>
+<input type="hidden" name="id" id="id" value="{{header.id}}">
+
+
+<div class="order_add_div">
+  <div class="order_add_div_header">{{_('Order Detail')}}</div>
+    <div class="order_add_div_body">
+    
+    <div id="order_header">
+  <ul>
+    	<li style="width:180px;"><span>{{_('Source Station')}}</span>
+    	  <input name="source_station" id="source_station" type="text" style="width:100px" value="{{header.source_station|f}}"/>
+    	</li>    	
+    	  <li style="width:366px;"><span>{{_('Destination Station')}}</span>
+    	    <input name="destination_station" id="destination_station" type="text" style="width:160px" value="{{header.destination_station|f}}"/>
+   	      </li>
+    	  <li style="width:180px;"><span>单据条码</span>
+    	    <input name="no" id="no" type="text" class="numeric" style="width:100px" value="{{header.no|f}}"/>
+  	    </li>
+    	  <li style="width:180px;"><span>{{_('Create Time')}}</span>{{header.create_time|ft}}</li>
+    	  <li style="width:459px;"><span>{{_('Source Company')}}</span>
+    	    <input name="source_company" id="source_company" type="text" style="width:360px" value="{{header.source_company|f}}"/>
+    	  </li>
+    	  <li style="width:459px;"><span>{{_('Destination Company')}}</span>
+    	    <input name="destination_company" id="destination_company" type="text" style="width:360px" value="{{header.destination_company|f}}"/>
+    	  </li>
+    	  <li style="width:459px;"><span>{{_('Source Contact')}}</span>
+    	    <input name="source_contact" id="source_contact" type="text" style="width:360px" value="{{header.source_contact|f}}"/>
+    	  </li>
+    	  <li style="width:459px;"><span>{{_('Destination Contact')}}</span>
+    	    <input name="destination_contact" id="destination_contact" type="text" style="width:360px" value="{{header.destination_contact|f}}"/>
+    	  </li>
+    	  <li style="width:459px;"><span>{{_('Source Address')}}</span>
+    	    <input name="source_address" id="source_address" type="text" style="width:360px" value="{{header.source_address|f}}"/>
+    	  </li>
+    	  <li style="width:459px;"><span>{{_('Destination Address')}}</span>
+    	    <input name="destination_address" id="destination_address" type="text" style="width:360px" value="{{header.destination_address|f}}"/>
+    	  </li>
+    	  <li style="width:227px;"><span>{{_('Source Phone')}}</span>
+    	    <input name="source_tel" id="source_tel" type="text" style="width:140px" value="{{header.source_tel|f}}"/>
+  	    </li>
+    	  <li style="width:226px;"><span>{{_('Source Mobile')}}</span>
+    	    <input name="source_mobile" id="source_mobile" type="text" style="width:140px" value="{{header.source_mobile|f}}"/>
+  	    </li>
+        <li style="width:227px;"><span>{{_('Destination Phone')}}</span>
+    	    <input name="destination_tel" id="destination_tel" type="text" style="width:140px" value="{{header.destination_tel|f}}"/>
+  	    </li>
+    	  <li style="width:226px;"><span>{{_('Destination Mobile')}}</span>
+    	    <input name="destination_mobile" id="destination_mobile" type="text" style="width:140px" value="{{header.destination_mobile|f}}"/>
+  	    </li>
+    	  <li style="width:459px;"><span>{{_('Pickup Type')}}</span>
+    	  	<select name="pickup_type_id" id="pickup_type_id">
+    	  		{% for p in pickup_type %}
+    	  			{% if p.id == header.pickup_type_id %}
+    	  				<option value="{{p.id}}" checked="checked">{{p}}</option>
+    	  			{% else %}
+    	  				<option value="{{p.id}}">{{p}}</option>
+    	  			{% endif %}
+    	  		{% endfor %}
+    	    </select>
+  	    </li>
+    	  <li style="width:227px;"><span>{{_('Package Type')}}</span>
+    	    <select name="pack_type_id" id="pack_type_id">
+    	  		{% for p in pack_type%}
+    	  			{% if p.id == header.pack_type_id %}
+    	  				<option value="{{p.id}}" checked="checked">{{p}}</option>
+    	  			{% else %}
+    	  				<option value="{{p.id}}">{{p}}</option>
+    	  			{% endif %}
+    	  		{% endfor %}
+    	    </select>
+  	    </li>
+    	  <li style="width:459px;"><span>{{_('Item')}}</span>
+    	    <input name="item" id="item" type="text" style="width:360px" value="{{header.item|f}}"/>
+  	    </li>
+    	  <li style="width:925px;"><span>{{_('Item Remark')}}</span>
+    	    <input name="item_remark" id="item_remark" type="text" style="width:840px" value="{{header.item_remark|f}}"/>
+  	    </li>
+    	  <li style="width:925px;"><span>{{_('Remark')}}</span>
+    	    <textarea name="remark" id="remark" style="width:840px">{{header.remark|f}}</textarea>
+  	    </li>
+      </ul>
+      
+      
+  <table width="100%" border="0" cellspacing="0" cellpadding="0" style="float:left;">
+  <tr>
+    <td width="9%" align="center">{{_('Qty')}}</td>
+    <td width="9%" align="center">{{_('Qty Ratio')}}</td>
+    <td width="9%" align="center">{{_('Weight')}}</td>
+    <td width="9%" align="center">{{_('Weight Ratio')}}</td>
+    <td width="9%" align="center">{{_('Vol')}}</td>
+    <td width="9%" align="center">{{_('Vol Ratio')}}</td>
+    <td width="9%" align="center">{{_('Amount')}}</td>
+    <td width="9%" align="center">{{_('Payment')}}</td>
+    </tr>
+  <tr>
+    <td height="30" align="center"><span style="width:180px;">
+      <input name="qty" id="qty" type="text" class="order_add_div_body_input numeric compute" style="width:70px"  value="{{header.qty|f}}"/>
+    </span></td>
+    <td align="center"><span style="width:180px;">
+      <input name="qty_ratio" id="qty_ratio" type="text" class="order_add_div_body_input numeric compute" style="width:70px" value="{{header.qty_ratio|f}}"/>
+    </span></td>
+    <td align="center"><span style="width:180px;">
+      <input name="weight" id="weight" type="text" class="order_add_div_body_input numeric compute" style="width:70px" value="{{header.weight|f}}"/>
+    </span></td>
+    <td align="center"><span style="width:180px;">
+      <input name="weight_ratio" id="weight_ratio" type="text" class="order_add_div_body_input numeric compute" style="width:70px" value="{{header.weight_ratio|f}}"/>
+    </span></td>
+    <td align="center"><span style="width:180px;">
+      <input name="vol" id="vol" type="text" class="order_add_div_body_input numeric compute" style="width:70px" value="{{header.vol|f}}"/>
+    </span></td>
+    <td align="center"><span style="width:180px;">
+      <input name="vol_ratio" id="vol_ratio" type="text" class="order_add_div_body_input numeric compute" style="width:70px" value="{{header.vol_ratio|f}}"/>
+    </span></td>
+    <td align="center"><span style="width:180px;">
+      <input name="amount" id="amount" type="text" class="order_add_div_body_input numeric" style="width:70px" value="{{header.amount|f}}"/>
+    </span></td>
+    <td align="center">
+    	<span style="width:180px;">
+	      <select name="payment_id" id="payment_id" class="order_add_div_body_input" style="width:70px">
+				{% for p in payment %}
+					{% if p.id == header.payment_id %}
+						<option value="{{p.id}}" selected="selected">{{p}}</optino>
+					{% else %}
+						<option value="{{p.id}}">{{p}}</optino>
+					{% endif %}
+				{% endfor %}
+			</select>
+    	</span>
+    </td>
+    </tr>
+</table>
+	</div>
+
+      <div style="clear:both"></div>
+
+
+<p><input type="image" src="/static/images/system/order_manage_33.jpg" width="77" height="21" onclick="save_header()"/></p>
+
+<div class="order_add_info_tab_div">
+	<div class="order_add_info_tab_header">
+		<ul>
+			<li><a href="#tabs-1">货物详情</a></li>
+			<li><a href="#tabs-2">配载信息</a></li>
+			<li><a href="#tabs-3">仓存信息</a></li>
+			<li><a href="#tabs-4">运输信息</a></li>
+			<li><a href="#tabs-5">提货信息</a></li>
+			<li><a href="#tabs-6">财务信息</a></li>
+			<li><a href="#tabs-7">历史记录</a></li>
+		</ul>
 	</div>
 	
 	
-	
 	<!-- item info -->
-	<div>
-		<div>
-			<table>
-				<tr><td>货物名称</td><td><input type="text" name="item_name" id="item_name" value=""></td></tr>
-				<tr><td>件数</td><td><input type="text" name="item_qty" id="item_qty" value=""></td></tr>
-				<tr><td>体积</td><td><input type="text" name="item_vol" id="item_vol" value=""></td></tr>
-				<tr><td>重量</td><td><input type="text" name="item_weight" id="item_weight" value=""></td></tr>
-				<tr><td>备注</td><td><textarea name="item_remark" id="item_remark"></textarea></td></tr>
-			</table>
-			<p><input type="button" value="保存" onclick="save_item()"/></p>
-		</div>
-		<table>
-			<thead>
+    <div class="order_add_info_tab_body" id="tabs-1">
+			<div id="item_details">
+				<table>
 				<tr>
-					<td>货物名称</td><td>件数</td><td>体积</td><td>重量</td><td>备注</td><td>&nbsp;</td>
+					<td>{{_('Item Name')}}</td><td><input type="text" name="item_name" id="item_name" value=""></td>
+					<td>{{_('Qty')}}</td><td><input type="text" name="item_qty" id="item_qty" value=""></td>
+					<td>{{_('Vol')}}</td><td><input type="text" name="item_vol" id="item_vol" value=""></td>
+					<td>{{_('Weight')}}</td><td><input type="text" name="item_weight" id="item_weight" value=""></td>
 				</tr>
-			</thead>
-			<tbody id="item_list">
+				<tr><td>{{_('Remark')}}</td><td><textarea name="item_remark" id="item_remark"></textarea></td></tr>
+			</table>
+				</table>
+				<p><input type="button" value="{{_('Add')}}" onclick="save_item()"/></p>
+			</div>
+			<table>
+				<thead>
+					<tr class="field_head">
+						<td>{{_('Item Name')}}</td><td>{{_('Qty')}}</td><td>{{_('Vol')}}</td><td>{{_('Weight')}}</td><td>{{_('Remark')}}</td><td>&nbsp;</td>
+					</tr>
+				</thead>
+				<tbody id="item_list">
 				{% for l in header.item_details %}
-					<tr>
-						<td>{{l.item|f}}</td>
+					<tr class="data_table_tr">
+						<th>{{l.item|f}}</td>
 						<td>{{l.qty|f}}</td>
 						<td>{{l.vol|f}}</td>
 						<td>{{l.weight|f}}</td>
 						<td>{{l.remark|f}}</td>
-						<td><input type="button" value="删除" onclick="del_item({{l.id}},this)"/></td>
+						<td><input type="button" value="{{_('Del')}}" onclick="del_item({{l.id}},this)"/></td>
 					</tr>
 				{% endfor %}
 			</tbody>
-		</table>
+			</table>
+          <div style="clear:both"><br /></div>
 	</div>
-	
-	<!-- receiver info -->
-	<div>
+       
+       
+ 
+  
+  <!-- receiver info -->
+  <div class="order_add_info_tab_body" id="tabs-2">
 		<div>
 			<table>
 				<tr>
-					<td>收货联系人</td><td><input type="text" name="receiver_contact" id="receiver_contact" value="{{header.receiver_contact|f}}"/></td>
+					<td>收件联系人</td><td><input type="text" name="receiver_contact" id="receiver_contact" value="{{header.receiver_contact|f}}"/></td>
 					<td>联系人电话</td><td><input type="text" name="receiver_tel" id="receiver_tel" value="{{header.receiver_tel|f}}"/></td>
 					<td>联系手机</td><td><input type="text" name="receiver_mobile" id="receiver_mobile" value="{{header.receiver_mobile|f}}"/></td>
 					<td>备注</td><td><textarea name="receiver_remark" id="receiver_remark">{{header.receiver_remark|f}}</textarea></td>
 				</tr>
 			</table>
-			<p><input type="button" value="保存" onclick="save_receiver()"/></p>
+			<p><input type="button" value="{{_('Save')}}" onclick="save_receiver()"/></p>
 		</div>
 	</div>
-	
+
+
+
 	<!-- warehouse info -->
-	<div>
+	<div class="order_add_info_tab_body" id="tabs-3">
 	
 	</div>
-	
+
+
 	<!-- transit info -->
-	<div>
+	<div class="order_add_info_tab_body" id="tabs-4">
 		<div>
 			<table>
 				<tr>
-					<td>时间</td><td><input type="text" name="transit_action_time" value=""/></td>
-					<td>地点</td><td><input type="text" name="transit_action_location" value=""/></td>
-					<td>备注</td><td><textarea name="transit_remark"></textarea></td>
+					<td>{{_('Time')}}</td><td><input type="text" name="transit_action_time" id="transit_action_time" value=""/></td>
+					<td>{{_('Remark')}}</td><td><textarea name="transit_remark" id="transit_remark"></textarea></td>
 				</tr>
 			</table>
-			<p><input type="button" value="保存" onclick="save_transit()"/></p>
+			<p><input type="button" value="{{_('Save')}}" onclick="save_transit()"/></p>
 		</div>
 		<table>
 			<thead>
 				<tr>
-					<td>时间</td><td>地点</td><td>备注</td>
+					<td>{{_('Time')}}</td><td>{{_('Remark')}}</td><td>&nbsp;</td>
 				</tr>
 			<thead>
 			<tbody id="transit_list">
-				{% for t in header.transit_details %}
+				{% for t in header.get_logs() %}
 					<tr>
-						<td>{{t.action_time}}</td>
-						<td>{{t.action_location}}</td>
+						<td>{{t.transfer_date|ft}}</td>
 						<td>{{t.remark}}</td>
+						<td><input type="button" value="{{_('Del')}}" onclick="del_transit({{t.id}},this)"/></td>
 					</tr>
 				{% endfor %}
 			</tbody>
 		</table>
 	</div>
-	
+
 	<!-- pickup info -->
-	<div>
+	<div class="order_add_info_tab_body" id="tabs-5">
 		<div>
 			<table>
 				<tr>
-					<td>时间</td><td><input type="text" name="action_time" value=""/></td>
-					<td>提货联系人</td><td><input type="text" name="contact" value=""/></td>
-					<td>联系人电话</td><td><input type="text" name="tel" value=""/></td>
-					<td>提货数量</td><td><input type="text" name="qty" value=""/></td>
-					<td>备注</td><td><textarea name="remark"></textarea></td>
+					<td>{{_('Time')}}</td><td><input type="text" name="pickup_action_time" id="pickup_action_time" value=""/></td>
+					<td>{{_('Pickup Contact')}}</td><td><input type="text" name="pickup_contact" id="pickup_contact" value=""/></td>
+					<td>{{_('Contact Tel')}}</td><td><input type="text" name="pickup_tel" id="pickup_tel" value=""/></td>
+					<td>{{_('Pickup Qty')}}</td><td><input type="text" name="pickup_qty" id="pickup_qty" value=""/></td>
+					<td>{{_('Remark')}}</td><td><textarea name="pickup_remark" id="pickup_remark"></textarea></td>
 				</tr>
 			</table>
-			<p><input type="button" value="保存" onclick="save_pickup()"/></p>
+			<p><input type="button" value="{{_('Save')}}" onclick="save_pickup()"/></p>
 		</div>
 		<table>
 			<thead>
 				<tr>
-					<td>时间</td><td>提货联系人</td><td>联系人电话</td><td>提货数量</td><td>备注</td>
+					<td>{{_('Time')}}</td><td>{{_('Pickup Contact')}}</td><td>{{_('Contact Tel')}}</td><td>{{_('Pickup Qty')}}</td><td>{{_('Remark')}}</td>
 				</tr>
+			<thead>
+			<tbody id="pickup_list">
 				{% for t in header.pickup_details %}
 					<tr>
 						<td>{{t.action_time}}</td>
@@ -213,17 +328,24 @@
 						<td>{{t.remark}}</td>
 					</tr>
 				{% endfor %}
-			<thead>
+			</tbody>
 		</table>
 	</div>
-	
+
 	<!-- fin info -->
-	<div>
+	<div class="order_add_info_tab_body" id="tabs-6">
 	
 	</div>
+	
 	
 	<!-- history info -->
-	<div>
+	<div class="order_add_info_tab_body" id="tabs-7">
 	
 	</div>
+</div>
+
+
+</div>
+</div>
+
 {% endblock %}

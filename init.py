@@ -12,7 +12,7 @@ from sys2do.model import metadata, engine, DBSession, Permission, Group, User
 import sys
 from sys2do.model.master import CustomerProfile, Customer, \
     ItemUnit, InventoryLocation, WeightUnit, ShipmentType, Payment, Supplier, \
-    SupplierProfile, Ratio
+    SupplierProfile, Ratio, PickupType, PackType
 reload(sys)
 sys.setdefaultencoding('utf8')
 
@@ -26,13 +26,13 @@ def init():
         print "insert default value"
         #add the default value here
 
-        uAdmin = User(name = 'admin', email = 'admin@sfhlwl.com', password = 'admin', first_name = 'Admin', last_name = '')
-        uKinlong = User(name = u'kinlong', email = 'customer@test.com', password = '123', first_name = u'坚朗', last_name = '')
-        uWeiqian = User(name = u'weiqian', email = 'customer@test.com', password = '123', first_name = u'味千', last_name = '')
-        uKefu1 = User(name = u'kefu1', email = 'kefu1@sfhlwl.com', password = '123', first_name = u'客服1', last_name = '')
-        uKefu2 = User(name = u'kefu2', email = 'kefu2@sfhlwl.com', password = '123', first_name = u'客服2', last_name = '')
-        uSupplier = User(name = 'supplier', email = 'supplier@test.com', password = '123', first_name = 'Supplier', last_name = 'Test')
-        uWarehouse = User(name = 'warehouse', email = 'warehouse@sfhlwl.com', password = '123', first_name = 'Warehouse', last_name = 'Test')
+        uAdmin = User(name = 'admin', email = 'admin@sfhlwl.com', password = 'admin')
+        uKinlong = User(name = u'kinlong', email = 'customer@test.com', password = '123')
+        uWeiqian = User(name = u'weiqian', email = 'customer@test.com', password = '123')
+        uKefu1 = User(name = u'kefu1', email = 'kefu1@sfhlwl.com', password = '123')
+        uKefu2 = User(name = u'kefu2', email = 'kefu2@sfhlwl.com', password = '123')
+        uSupplier = User(name = 'supplier', email = 'supplier@test.com', password = '123')
+        uWarehouse = User(name = 'warehouse', email = 'warehouse@sfhlwl.com', password = '123')
 
 
 
@@ -143,6 +143,17 @@ def init():
         DBSession.add(Ratio(type = "QTY", value = 10))
         DBSession.add(Ratio(type = "VOL", value = 0.33))
         DBSession.add(Ratio(type = "WEIGHT", value = 0.5))
+
+        DBSession.add(PickupType(name = u"自提"))
+        DBSession.add(PickupType(name = u"送货"))
+        DBSession.add(PickupType(name = u"司机直送"))
+        DBSession.add(PickupType(name = u"送货上门"))
+        DBSession.add(PickupType(name = u"送货上楼"))
+
+        DBSession.add(PackType(name = u"纸箱"))
+        DBSession.add(PackType(name = u"袋装"))
+        DBSession.add(PackType(name = u"桶装"))
+        DBSession.add(PackType(name = u"林架"))
 
         kinlong = Customer(name = u"广东坚朗五金制品股份有限公司", address = u"广东省东莞市塘厦镇大坪村工业区卢地坑路3号", phone = "0769-82166666", contact_person = None)
         kinlong_profile = CustomerProfile(name = "KINLONG_PROFILE", customer = kinlong, group = gKinlongGroup)

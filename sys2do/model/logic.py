@@ -13,7 +13,7 @@ from sqlalchemy.orm import relation, backref, synonym
 from sys2do.model import DeclarativeBase, metadata, DBSession
 from auth import SysMixin
 from sys2do.model.master import Customer, Supplier, ItemUnit, ShipmentType, \
-    WeightUnit, InventoryLocation, Payment
+    WeightUnit, InventoryLocation, Payment, PickupType, PackType
 from sys2do.model.auth import CRUDMixin
 from sys2do.model.system import UploadFile
 from sqlalchemy.sql.expression import and_
@@ -45,6 +45,7 @@ class OrderHeader(DeclarativeBase, SysMixin, CRUDMixin):
     payment = relation(Payment)
 
     item = Column(Text)
+    item_remark = Column(Text)
     qty = Column(Float, default = None) #client order qty
     unit_id = Column(Integer, ForeignKey('master_item_unit.id'))
     unit = relation(ItemUnit)
@@ -57,6 +58,12 @@ class OrderHeader(DeclarativeBase, SysMixin, CRUDMixin):
 
     shipment_type_id = Column(Integer, ForeignKey('master_shipment_type.id'))
     shipment_type = relation(ShipmentType)
+
+    pickup_type_id = Column(Integer, ForeignKey('master_pickup_type.id'))
+    pickup_type = relation(PickupType)
+
+    pack_type_id = Column(Integer, ForeignKey('master_pack_type.id'))
+    pack_type = relation(PackType)
 
     destination_station = Column(Text)
     destination_company = Column(Text)
@@ -131,7 +138,7 @@ class OrderHeader(DeclarativeBase, SysMixin, CRUDMixin):
                                                 TransferLog.active == 0,
                                                 TransferLog.type == 0,
                                                 TransferLog.refer_id == self.id
-                                                )).order_by(TransferLog.id)
+                                                )).order_by(TransferLog.transfer_date)
 
 
 
@@ -165,16 +172,16 @@ class WarehouseDetail(DeclarativeBase, SysMixin):
 
 
 
-class TransitDetail(DeclarativeBase, SysMixin):
-    __tablename__ = 'order_transit_detail'
-
-    id = Column(Integer, autoincrement = True, primary_key = True)
-    header_id = Column(Integer, ForeignKey('order_header.id'))
-    header = relation(OrderHeader, backref = backref("transit_details", order_by = id), primaryjoin = "and_(OrderHeader.id == TransitDetail.header_id, TransitDetail.active == 0)")
-
-    action_time = Column(Text)
-    action_location = Column(Text)
-    remark = Column(Text)
+#class TransitDetail(DeclarativeBase, SysMixin):
+#    __tablename__ = 'order_transit_detail'
+#
+#    id = Column(Integer, autoincrement = True, primary_key = True)
+#    header_id = Column(Integer, ForeignKey('order_header.id'))
+#    header = relation(OrderHeader, backref = backref("transit_details", order_by = id), primaryjoin = "and_(OrderHeader.id == TransitDetail.header_id, TransitDetail.active == 0)")
+#
+#    action_time = Column(Text)
+#    action_location = Column(Text)
+#    remark = Column(Text)
 
 
 

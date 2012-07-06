@@ -159,22 +159,19 @@ class User(DeclarativeBase, SysMixin, CRUDMixin):
     name = Column(Text, unique = True, nullable = False)
     email = Column(Text)
     _password = Column('password', Text)
-    first_name = Column(Text)
-    last_name = Column(Text)
     phone = Column(Text)
     mobile = Column(Text)
-#    birthday = Column(Date, default = None)
     image_url = Column(Text)
     last_login = Column(DateTime, default = dt.now)
 
 #    customer_profile_id = Column(Integer, ForeignKey('order_detail.id'))
 #    customer_profile = relation(CustomerProfile, backref = backref("users", order_by = id), primaryjoin = "and_(CustomerProfile.id == User.customer_profile_id, User.active == 0)")
 
-    def __repr__(self): return "%s %s" % (self.first_name, self.last_name)
+    def __repr__(self): return self.name
 
-    def __str__(self): return "%s %s" % (self.first_name, self.last_name)
+    def __str__(self): return self.name
 
-    def __unicode__(self): return "%s %s" % (self.first_name, self.last_name)
+    def __unicode__(self): return self.name
 
     @property
     def permissions(self):
@@ -256,8 +253,6 @@ class User(DeclarativeBase, SysMixin, CRUDMixin):
                 'name' : self.name,
                 'password' : self.password,
                 'email' : self.email,
-                'first_name' : self.first_name,
-                'last_name' : self.last_name,
                 'image_url' : self.image_url,
                 'phone' : self.phone,
 #                'birthday' : self.birthday,

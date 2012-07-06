@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2012-06-26 00:29+0800\n"
-"PO-Revision-Date: 2012-06-26 00:53+0800\n"
+"POT-Creation-Date: 2012-07-06 19:24+0800\n"
+"PO-Revision-Date: 2012-07-06 19:26+0800\n"
 "Last-Translator: CL.Lam <lamciuloeng@gmail.com>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
 "Plural-Forms: nplurals=1; plural=0\n"
@@ -24,27 +24,6 @@ msgstr "该页面不存在！"
 #: templates/500.html:6
 msgid "Internal Server Error!"
 msgstr "内部服务器错误！"
-
-#: templates/login.html:3
-msgid "Login"
-msgstr "登录"
-
-#: templates/login.html:39
-#: templates/register.html:52
-#: templates/admin/group_new.html:27
-#: templates/admin/group_update.html:34
-#: templates/admin/user_index.html:58
-#: templates/admin/user_new.html:11
-#: templates/admin/user_update.html:12
-msgid "User Name"
-msgstr "用户名"
-
-#: templates/login.html:53
-#: templates/register.html:60
-#: templates/admin/user_new.html:15
-#: templates/admin/user_update.html:16
-msgid "Password"
-msgstr "密码"
 
 #: templates/master.html:9
 msgid "Logistics Management"
@@ -63,11 +42,7 @@ msgstr "注册"
 #: templates/deliver/revise_deliver.html:66
 #: templates/deliver/select_orders.html:19
 #: templates/deliver/view.html:70
-#: templates/order/add.html:83
 #: templates/order/add_by_customer.html:70
-#: templates/order/index.html:64
-#: templates/order/review.html:24
-#: templates/order/revise.html:22
 #: templates/order/search_by_customer.html:90
 msgid "Customer"
 msgstr "客户"
@@ -92,18 +67,30 @@ msgstr "用户"
 #: templates/admin/supplier_index.html:64
 #: templates/admin/supplier_new.html:15
 #: templates/admin/supplier_update.html:15
-#: templates/order/add.html:94
 #: templates/order/add_by_customer.html:77
-#: templates/order/review.html:26
-#: templates/order/revise.html:23
 msgid "Address"
 msgstr "地址"
+
+#: templates/register.html:52
+#: templates/admin/group_new.html:27
+#: templates/admin/group_update.html:34
+#: templates/admin/user_index.html:58
+#: templates/admin/user_new.html:11
+#: templates/admin/user_update.html:12
+msgid "User Name"
+msgstr "用户名"
 
 #: templates/register.html:56
 #: templates/admin/user_new.html:23
 #: templates/admin/user_update.html:24
 msgid "E-mail"
 msgstr "电子邮箱"
+
+#: templates/register.html:60
+#: templates/admin/user_new.html:15
+#: templates/admin/user_update.html:16
+msgid "Password"
+msgstr "密码"
 
 #: templates/register.html:63
 msgid "Confirmed Password"
@@ -130,10 +117,7 @@ msgstr "姓"
 #: templates/admin/supplier_update.html:29
 #: templates/admin/user_new.html:35
 #: templates/admin/user_update.html:36
-#: templates/order/add.html:98
 #: templates/order/add_by_customer.html:81
-#: templates/order/review.html:29
-#: templates/order/revise.html:24
 msgid "Phone"
 msgstr "电话"
 
@@ -142,11 +126,17 @@ msgid "Mobile"
 msgstr "手提电话"
 
 #: templates/register.html:82
-#: templates/order/revise.html:10
+#: templates/order/revise.html:239
+#: templates/order/revise.html:260
+#: templates/order/revise.html:292
 msgid "Save"
 msgstr "保存"
 
 #: templates/search_orders.html:14
+#: templates/order/revise.html:256
+#: templates/order/revise.html:265
+#: templates/order/revise.html:285
+#: templates/order/revise.html:297
 msgid "Time"
 msgstr "时间"
 
@@ -165,7 +155,7 @@ msgstr "下单时间"
 #: templates/track.html:12
 #: templates/deliver/vendor_input.html:58
 #: templates/deliver/view.html:62
-#: templates/order/index.html:88
+#: templates/order/index.html:82
 #: templates/order/search_by_customer.html:105
 msgid "Status"
 msgstr "状态"
@@ -188,9 +178,7 @@ msgstr "联系人"
 #: templates/admin/user_index.html:70
 #: templates/deliver/index.html:25
 #: templates/deliver/vendor_select.html:41
-#: templates/order/add.html:116
 #: templates/order/add_by_customer.html:101
-#: templates/order/index.html:94
 msgid "Action"
 msgstr "操作"
 
@@ -203,7 +191,6 @@ msgstr "操作"
 #: templates/admin/user_index.html:78
 #: templates/deliver/index.html:39
 #: templates/deliver/view.html:11
-#: templates/order/index.html:107
 msgid "Revise"
 msgstr "修改"
 
@@ -216,8 +203,6 @@ msgstr "修改"
 #: templates/admin/user_index.html:78
 #: templates/common/search.html:11
 #: templates/deliver/index.html:39
-#: templates/order/index.html:109
-#: templates/order/revise.html:13
 msgid "Delete"
 msgstr "删除"
 
@@ -233,7 +218,6 @@ msgstr "删除"
 #: templates/admin/supplier_profile_update.html:18
 #: templates/admin/supplier_profile_update.html:29
 #: templates/admin/supplier_update.html:18
-#: templates/order/add.html:86
 msgid "Please Select One"
 msgstr "请选择一个"
 
@@ -246,10 +230,9 @@ msgstr "请选择一个"
 #: templates/admin/supplier_profile_update.html:37
 #: templates/admin/supplier_update.html:37
 #: templates/deliver/add_deliver.html:60
-#: templates/deliver/add_deliver.html:80
+#: templates/deliver/add_deliver.html:81
 #: templates/deliver/revise_deliver.html:55
 #: templates/deliver/revise_deliver.html:75
-#: templates/deliver/select_orders.html:27
 #: templates/deliver/vendor_input.html:38
 #: templates/deliver/vendor_input.html:73
 #: templates/deliver/vendor_input.html:117
@@ -257,17 +240,20 @@ msgstr "请选择一个"
 #: templates/deliver/view.html:79
 #: templates/deliver/view.html:109
 #: templates/deliver/view.html:128
-#: templates/order/add.html:106
-#: templates/order/add.html:127
+#: templates/order/add.html:156
+#: templates/order/add.html:221
+#: templates/order/add.html:228
 #: templates/order/add_by_customer.html:89
 #: templates/order/add_by_customer.html:112
-#: templates/order/review.html:31
-#: templates/order/review.html:48
-#: templates/order/review.html:83
-#: templates/order/review.html:105
-#: templates/order/review.html:124
-#: templates/order/revise.html:26
-#: templates/order/revise.html:41
+#: templates/order/received.html:48
+#: templates/order/review.html:41
+#: templates/order/revise.html:122
+#: templates/order/revise.html:198
+#: templates/order/revise.html:206
+#: templates/order/revise.html:257
+#: templates/order/revise.html:265
+#: templates/order/revise.html:289
+#: templates/order/revise.html:297
 msgid "Remark"
 msgstr "备注"
 
@@ -289,8 +275,6 @@ msgstr "备注"
 #: templates/deliver/vendor_select.html:25
 #: templates/deliver/view.html:113
 #: templates/deliver/view.html:132
-#: templates/order/review.html:87
-#: templates/order/review.html:128
 msgid "Submit"
 msgstr "提交"
 
@@ -309,7 +293,6 @@ msgstr "提交"
 #: templates/admin/user_new.html:60
 #: templates/admin/user_update.html:67
 #: templates/deliver/view.html:12
-#: templates/order/revise.html:12
 msgid "Cancel"
 msgstr "取消"
 
@@ -354,7 +337,9 @@ msgstr "组名"
 #: templates/deliver/vendor_input.html:74
 #: templates/deliver/vendor_select.html:36
 #: templates/deliver/view.html:46
-#: templates/order/index.html:70
+#: templates/order/add.html:105
+#: templates/order/index.html:79
+#: templates/order/revise.html:63
 msgid "Create Time"
 msgstr "创建时间"
 
@@ -449,21 +434,16 @@ msgid "Deliver Number"
 msgstr "送货单号码"
 
 #: templates/deliver/add_deliver.html:40
-#: templates/deliver/add_deliver.html:73
 #: templates/deliver/index.html:16
 #: templates/deliver/revise_deliver.html:39
 #: templates/deliver/revise_deliver.html:68
-#: templates/deliver/select_orders.html:20
 #: templates/deliver/vendor_input.html:22
 #: templates/deliver/vendor_input.html:66
 #: templates/deliver/vendor_select.html:16
 #: templates/deliver/vendor_select.html:35
 #: templates/deliver/view.html:26
 #: templates/deliver/view.html:72
-#: templates/order/add.html:122
 #: templates/order/add_by_customer.html:108
-#: templates/order/review.html:43
-#: templates/order/revise.html:37
 #: templates/order/search_by_customer.html:66
 #: templates/order/search_by_customer.html:95
 msgid "Destination"
@@ -486,24 +466,21 @@ msgid "Supplier Tel"
 msgstr "承运商电话"
 
 #: templates/deliver/add_deliver.html:52
-#: templates/deliver/add_deliver.html:77
+#: templates/deliver/add_deliver.html:78
 #: templates/deliver/revise_deliver.html:51
 #: templates/deliver/revise_deliver.html:72
-#: templates/deliver/select_orders.html:24
+#: templates/deliver/select_orders.html:26
 #: templates/deliver/vendor_input.html:34
 #: templates/deliver/vendor_input.html:70
 #: templates/deliver/view.html:38
 #: templates/deliver/view.html:76
-#: templates/order/add.html:125
 #: templates/order/add_by_customer.html:111
-#: templates/order/review.html:46
-#: templates/order/revise.html:40
+#: templates/order/received.html:47
+#: templates/order/review.html:40
 msgid "Expect Time"
 msgstr "期望到达时间"
 
 #: templates/deliver/add_deliver.html:56
-#: templates/order/add.html:126
-#: templates/order/review.html:47
 msgid "Charge"
 msgstr "费用"
 
@@ -511,68 +488,100 @@ msgstr "费用"
 #: templates/deliver/revise_deliver.html:67
 #: templates/deliver/select_orders.html:18
 #: templates/deliver/view.html:71
-#: templates/order/index.html:58
+#: templates/order/index.html:51
+#: templates/order/index.html:71
 #: templates/order/search_by_customer.html:85
 msgid "Order Number"
 msgstr "订单号码"
 
+#: templates/deliver/add_deliver.html:73
+#: templates/deliver/select_orders.html:21
+#: templates/order/add.html:93
+#: templates/order/index.html:54
+#: templates/order/index.html:74
+#: templates/order/received.html:27
+#: templates/order/review.html:21
+#: templates/order/revise.html:57
+msgid "Destination Station"
+msgstr "目地站"
+
 #: templates/deliver/add_deliver.html:74
 #: templates/deliver/revise_deliver.html:69
-#: templates/deliver/select_orders.html:21
+#: templates/deliver/select_orders.html:22
 #: templates/deliver/vendor_input.html:67
 #: templates/deliver/view.html:73
-#: templates/order/add.html:117
+#: templates/order/add.html:150
 #: templates/order/add_by_customer.html:102
+#: templates/order/received.html:46
 #: templates/order/review.html:39
-#: templates/order/revise.html:33
+#: templates/order/revise.html:116
 msgid "Item"
 msgstr "物品"
 
 #: templates/deliver/add_deliver.html:75
 #: templates/deliver/revise_deliver.html:70
-#: templates/deliver/select_orders.html:22
+#: templates/deliver/select_orders.html:23
 #: templates/deliver/vendor_input.html:68
 #: templates/deliver/view.html:74
-#: templates/order/add.html:118
+#: templates/order/add.html:162
+#: templates/order/add.html:218
+#: templates/order/add.html:228
 #: templates/order/add_by_customer.html:103
-#: templates/order/review.html:40
-#: templates/order/revise.html:34
+#: templates/order/index.html:76
+#: templates/order/revise.html:127
+#: templates/order/revise.html:195
+#: templates/order/revise.html:206
 msgid "Qty"
 msgstr "数量"
 
 #: templates/deliver/add_deliver.html:76
+#: templates/deliver/select_orders.html:24
+#: templates/order/add.html:166
+#: templates/order/add.html:219
+#: templates/order/add.html:228
+#: templates/order/revise.html:131
+#: templates/order/revise.html:196
+#: templates/order/revise.html:206
+msgid "Vol"
+msgstr "体积"
+
+#: templates/deliver/add_deliver.html:77
 #: templates/deliver/revise_deliver.html:71
-#: templates/deliver/select_orders.html:23
+#: templates/deliver/select_orders.html:25
 #: templates/deliver/vendor_input.html:69
 #: templates/deliver/view.html:75
-#: templates/order/add.html:120
+#: templates/order/add.html:164
+#: templates/order/add.html:220
+#: templates/order/add.html:228
 #: templates/order/add_by_customer.html:105
-#: templates/order/review.html:41
-#: templates/order/revise.html:35
+#: templates/order/index.html:77
+#: templates/order/revise.html:129
+#: templates/order/revise.html:197
+#: templates/order/revise.html:206
 msgid "Weight"
 msgstr "重量"
 
-#: templates/deliver/add_deliver.html:78
+#: templates/deliver/add_deliver.html:79
 #: templates/deliver/revise_deliver.html:73
-#: templates/deliver/select_orders.html:25
+#: templates/deliver/select_orders.html:27
 #: templates/deliver/vendor_input.html:71
 #: templates/deliver/view.html:77
-#: templates/order/review.html:44
-#: templates/order/revise.html:38
+#: templates/order/add.html:115
+#: templates/order/received.html:55
+#: templates/order/review.html:47
+#: templates/order/revise.html:73
 msgid "Destination Contact"
-msgstr "目的地联系人"
+msgstr "收货人"
 
-#: templates/deliver/add_deliver.html:79
+#: templates/deliver/add_deliver.html:80
 #: templates/deliver/revise_deliver.html:74
-#: templates/deliver/select_orders.html:26
+#: templates/deliver/select_orders.html:28
 #: templates/deliver/vendor_input.html:72
 #: templates/deliver/view.html:78
-#: templates/order/review.html:45
-#: templates/order/revise.html:39
 msgid "Destination Tel"
-msgstr "目的地联系电话"
+msgstr "收货人电话"
 
-#: templates/deliver/add_deliver.html:81
+#: templates/deliver/add_deliver.html:82
 #: templates/deliver/index.html:22
 #: templates/deliver/revise_deliver.html:78
 #: templates/deliver/vendor_input.html:50
@@ -583,7 +592,7 @@ msgstr "目的地联系电话"
 msgid "Update Time"
 msgstr "更新时间"
 
-#: templates/deliver/add_deliver.html:82
+#: templates/deliver/add_deliver.html:83
 #: templates/deliver/index.html:23
 #: templates/deliver/revise_deliver.html:79
 #: templates/deliver/vendor_input.html:54
@@ -591,7 +600,7 @@ msgstr "更新时间"
 #: templates/deliver/vendor_select.html:39
 #: templates/deliver/view.html:58
 #: templates/deliver/view.html:81
-#: templates/order/index.html:82
+#: templates/order/index.html:81
 msgid "Last Updator"
 msgstr "最后更新人"
 
@@ -601,14 +610,14 @@ msgstr "最后更新人"
 #: templates/deliver/vendor_input.html:75
 #: templates/deliver/vendor_select.html:37
 #: templates/deliver/view.html:50
-#: templates/order/index.html:76
+#: templates/order/index.html:80
+#: templates/order/received.html:23
+#: templates/order/review.html:17
 msgid "Creator"
 msgstr "创建人"
 
 #: templates/deliver/index.html:24
 #: templates/deliver/vendor_select.html:40
-#: templates/order/review.html:33
-#: templates/order/revise.html:27
 msgid "Order Status"
 msgstr "订单状态"
 
@@ -619,6 +628,16 @@ msgstr "查看"
 #: templates/deliver/select_orders.html:12
 msgid "New Delivery"
 msgstr "新的送货单"
+
+#: templates/deliver/select_orders.html:20
+#: templates/order/add.html:71
+#: templates/order/index.html:52
+#: templates/order/index.html:72
+#: templates/order/received.html:17
+#: templates/order/review.html:11
+#: templates/order/revise.html:54
+msgid "Source Station"
+msgstr "始发站"
 
 #: templates/deliver/vendor_input.html:104
 msgid "Date"
@@ -659,78 +678,200 @@ msgstr "输入"
 msgid "Arrival Time"
 msgstr "到达时间"
 
-#: templates/order/add.html:102
-#: templates/order/add.html:123
+#: templates/order/add.html:68
+msgid "Now Order"
+msgstr "新建订单"
+
+#: templates/order/add.html:106
+#: templates/order/index.html:53
+#: templates/order/index.html:73
+#: templates/order/received.html:41
+#: templates/order/revise.html:64
+msgid "Source Company"
+msgstr "发货公司"
+
+#: templates/order/add.html:109
+#: templates/order/index.html:55
+#: templates/order/index.html:75
+#: templates/order/received.html:54
+#: templates/order/revise.html:67
+msgid "Destination Company"
+msgstr "收货公司"
+
+#: templates/order/add.html:112
+#: templates/order/received.html:42
+#: templates/order/review.html:35
+#: templates/order/revise.html:70
+msgid "Source Contact"
+msgstr "发货人"
+
+#: templates/order/add.html:118
+#: templates/order/received.html:43
+#: templates/order/review.html:36
+#: templates/order/revise.html:76
+msgid "Source Address"
+msgstr "发货地址"
+
+#: templates/order/add.html:121
+#: templates/order/received.html:56
+#: templates/order/review.html:48
+#: templates/order/revise.html:79
+msgid "Destination Address"
+msgstr "收货地址"
+
+#: templates/order/add.html:124
+#: templates/order/received.html:44
+#: templates/order/review.html:37
+#: templates/order/revise.html:82
+msgid "Source Phone"
+msgstr "发货人电话"
+
+#: templates/order/add.html:127
+#: templates/order/received.html:45
+#: templates/order/review.html:38
+#: templates/order/revise.html:85
+msgid "Source Mobile"
+msgstr "发货人手机"
+
+#: templates/order/add.html:130
+#: templates/order/received.html:57
+#: templates/order/review.html:49
+#: templates/order/revise.html:88
+msgid "Destination Phone"
+msgstr "收货人电话"
+
+#: templates/order/add.html:133
+#: templates/order/received.html:58
+#: templates/order/review.html:50
+#: templates/order/revise.html:91
+msgid "Destination Mobile"
+msgstr "收货人手机"
+
+#: templates/order/add.html:136
+#: templates/order/revise.html:94
+msgid "Pickup Type"
+msgstr "提货方式"
+
+#: templates/order/add.html:143
+#: templates/order/revise.html:105
+msgid "Package Type"
+msgstr "包装方式"
+
+#: templates/order/add.html:153
+#: templates/order/revise.html:119
+msgid "Item Remark"
+msgstr "货物详情"
+
+#: templates/order/add.html:163
+#: templates/order/revise.html:128
+msgid "Qty Ratio"
+msgstr "件数费率"
+
+#: templates/order/add.html:165
+#: templates/order/revise.html:130
+msgid "Weight Ratio"
+msgstr "重量费率"
+
+#: templates/order/add.html:167
+#: templates/order/revise.html:132
+msgid "Vol Ratio"
+msgstr "体积费率"
+
+#: templates/order/add.html:168
+#: templates/order/index.html:78
+#: templates/order/revise.html:133
+msgid "Amount"
+msgstr "金额"
+
+#: templates/order/add.html:169
+#: templates/order/received.html:59
+#: templates/order/review.html:51
+#: templates/order/revise.html:134
+msgid "Payment"
+msgstr "付款方式"
+
+#: templates/order/add.html:211
+msgid "Item Details"
+msgstr "货物详情"
+
+#: templates/order/add.html:217
+#: templates/order/add.html:228
+#: templates/order/revise.html:194
+#: templates/order/revise.html:206
+msgid "Item Name"
+msgstr "货物名称"
+
+#: templates/order/add.html:223
+#: templates/order/revise.html:201
+msgid "Add"
+msgstr "添加"
+
 #: templates/order/add_by_customer.html:85
 #: templates/order/add_by_customer.html:109
-#: templates/order/review.html:30
-#: templates/order/revise.html:25
 msgid "Contact"
 msgstr "联系人"
 
-#: templates/order/add.html:111
 #: templates/order/add_by_customer.html:96
 msgid "Add Line"
 msgstr "添加行"
 
-#: templates/order/add.html:119
 #: templates/order/add_by_customer.html:104
 msgid "Unit"
 msgstr "单位"
 
-#: templates/order/add.html:121
 #: templates/order/add_by_customer.html:106
 msgid "Weight Unit"
 msgstr "重量单位"
 
-#: templates/order/add.html:124
+#: templates/order/add_by_customer.html:107
+msgid "Shipment Type"
+msgstr "送货类型"
+
 #: templates/order/add_by_customer.html:110
 msgid "Tel"
 msgstr "电话"
 
-#: templates/order/add.html:133
 #: templates/order/add_by_customer.html:117
+#: templates/order/revise.html:217
+#: templates/order/revise.html:273
 msgid "Del"
 msgstr "删除"
 
-#: templates/order/add_by_customer.html:107
-#: templates/order/review.html:42
-#: templates/order/revise.html:36
-msgid "Shipment Type"
-msgstr "送货类型"
+#: templates/order/index.html:57
+msgid "Search"
+msgstr "查询"
 
-#: templates/order/review.html:18
-#: templates/order/revise.html:16
-msgid "Order Information"
-msgstr "订单信息"
+#: templates/order/index.html:63
+msgid "Input the conditions and search."
+msgstr "输入条件以查询。"
 
-#: templates/order/review.html:23
-#: templates/order/revise.html:21
+#: templates/order/received.html:20
+#: templates/order/review.html:14
+msgid "No#"
+msgstr "单号"
+
+#: templates/order/revise.html:51
+msgid "Order Detail"
+msgstr "订单详情"
+
+#: templates/order/revise.html:286
+#: templates/order/revise.html:297
+msgid "Pickup Contact"
+msgstr "提货联系人"
+
+#: templates/order/revise.html:287
+#: templates/order/revise.html:297
+msgid "Contact Tel"
+msgstr "联系人电话"
+
+#: templates/order/revise.html:288
+#: templates/order/revise.html:297
+msgid "Pickup Qty"
+msgstr "提货件数"
+
 #: templates/order/search_by_customer.html:64
 msgid "Order No"
 msgstr "订单号码"
-
-#: templates/order/review.html:32
-msgid "Amount"
-msgstr "总额"
-
-#: templates/order/review.html:75
-#: templates/order/review.html:97
-msgid "Picker"
-msgstr "收货人"
-
-#: templates/order/review.html:79
-#: templates/order/review.html:101
-msgid "Picker Contact"
-msgstr "收件联系人"
-
-#: templates/order/review.html:114
-msgid "Warehouse"
-msgstr "仓库"
-
-#: templates/order/revise.html:11
-msgid "Reset"
-msgstr "重置"
 
 #: util/decorator.py:50
 #: util/decorator.py:65
