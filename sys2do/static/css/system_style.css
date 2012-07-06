@@ -1,0 +1,349 @@
+body{
+	background-color:#ebebeb;
+}
+.top_header_div {
+	background-image: url(/static/images/system/order_manage_02.jpg);
+	background-repeat: repeat-x;
+	height: 55px;
+	width: 100%;
+}
+.top_logo {
+	background-image: url(/static/images/system/order_manage_01.jpg);
+	float: left;
+	height: 55px;
+	width: 431px;
+}
+.top_system_right {
+	background-image: url(/static/images/system/order_manage_04.jpg);
+	float: right;
+	height: 55px;
+	width: 96px;
+	margin-right: 50px;
+}
+.main_menu {
+	background-image: url(/static/images/system/order_manage_10.jpg);
+	height: 27px;
+	border-bottom-width: 2px;
+	border-bottom-style: solid;
+	border-bottom-color: #F90;
+}
+.main_menu table tr td.bt_normal {
+	font-family: "宋体";
+	font-size: 12px;
+	font-weight: bold;
+	text-decoration: none;
+	background-image: url(/static/images/system/order_manage_10.jpg);
+	background-repeat: repeat-x;
+	color: #FFF;
+	text-align:center;
+	width: 120px;
+	cursor:pointer;
+	vertical-align:middle;
+}
+.main_menu table tr td.bt_highlight {
+	font-family: "宋体";
+	font-size: 12px;
+	font-weight: bold;
+	text-decoration: none;
+	background-image:url(/static/images/system/order_manage_12.jpg);
+	background-repeat: repeat-x;
+	color: #FFF;
+	text-align:center;
+	width: 120px;
+	cursor:pointer;
+	vertical-align:middle;
+}
+
+.main_menu table tr td.gap1 {
+	background-color: #FFF;
+	background-image: url(/static/images/system/order_manage_08.jpg);
+	background-repeat: no-repeat;
+	background-position: right;
+	width: 2px;
+}
+
+.main_menu table tr td.gap2 {
+	background-color: #FFF;
+	background-image: url(/static/images/system/order_manage_08.jpg);
+	background-repeat: no-repeat;
+	width: 1px;
+}
+.inner_menu {
+	background-color: #d7cfca;
+	height: 30px;
+	width: auto;
+}
+.inner_menu ul li {
+	float: left;
+	margin-top: 5px;
+	margin-left: 10px;
+}
+.title_fonts_display {
+	padding:10px 0px 0px 30px;
+	font-family: "宋体";
+	font-size: 14px;
+	color: #990000;
+	text-decoration: none;
+	font-weight:bold;
+}
+.user_display {
+	font-family: "宋体";
+	font-size: 12px;
+	color:#FC0;
+	text-decoration: none;
+}
+.search_div {
+	width: 950px;
+	margin-top: 12px;
+	margin-left: 30px;
+	margin-bottom: 6px;
+}
+.search_div_header {
+	background-color: #6f8992;
+	height: 22px;
+	width: auto;
+	font-family: "宋体";
+	font-size: 12px;
+	line-height: 22px;
+	color: #FFF;
+	font-weight: bold;
+	padding-left: 25px;
+}
+.search_div_body {
+	padding:10px;
+	width: auto;
+	border: 1px solid #d6d6d6;
+	background-color: #FFF;
+}
+.search_div_body ul li {
+	float: left;
+	width: 250px;
+	margin-top: 5px;
+	margin-right: 5px;
+	margin-bottom: 5px;
+	margin-left: 0px;
+	border-right-width: 1px;
+	border-right-style: solid;
+	border-right-color: #d6d6d6;
+}
+.search_div_body ul li select {
+	font-family: "宋体";
+	font-size: 12px;
+	border: 1px solid #999;
+	width: 150px;
+	background-color: #FFFFDF;	
+}
+.search_div_body ul li input {
+	font-family: "宋体";
+	font-size: 12px;
+	border: 1px solid #999;
+	width: 150px;
+	background-color: #FFFFDF;
+}
+.search_div_body ul li span {
+	text-align:right;
+	float:left;
+	font-family: "宋体";
+	font-size: 12px;
+	padding-right: 10px;
+	display:block;
+	width: 80px;
+}
+.search_div_body .button_div {
+	float:left;
+	width: 900px;
+	text-align: left;
+	padding:0px 0px 0px 90px;
+}
+.order_add_div {
+	width: 980px;
+	margin-top: 12px;
+	margin-left: 30px;
+	margin-bottom: 6px;
+}
+.order_add_div_header {
+	background-color: #6f8992;
+	height: 22px;
+	width: auto;
+	font-family: "宋体";
+	font-size: 12px;
+	line-height: 22px;
+	color: #FFF;
+	font-weight: bold;
+	padding-left: 25px;
+}
+.order_add_div_body {
+	padding:5px;
+	width: auto;
+	border: 1px solid #d6d6d6;
+	background-color: #FFF;
+}
+.order_add_div_body ul {
+	padding-left: 10px;
+}
+.order_add_div_body ul li {
+	float: left;
+	width: 280px;
+	margin-top: 5px;
+	margin-right: 5px;
+	margin-bottom: 5px;
+	margin-left: 0px;
+	border-right-width: 1px;
+	border-right-style: solid;
+	border-right-color: #d6d6d6;
+}
+.order_add_div_body ul li select {
+	font-family: "宋体";
+	font-size: 12px;
+	border: 1px solid #999;
+	width: 150px;
+	background-color: #FFC;	
+}
+.order_add_div_body ul li input,textarea{
+	font-family: "宋体";
+	font-size: 12px;
+	border: 1px solid #999;
+	width: 150px;
+	background-color: #FFC;
+}
+.order_add_div_body_input {
+	font-family: "宋体";
+	font-size: 12px;
+	border: 1px solid #999;
+	width: 150px;
+	background-color: #FFC;
+}
+.order_add_div_body ul li span {
+	text-align:right;
+	float:left;
+	font-family: "宋体";
+	font-size: 12px;
+	padding-right: 10px;
+	width: 60px;
+	display:block;
+}
+.order_add_div_body .button_div {
+	float:left;
+	width: 100%;
+	text-align: center;
+	margin-top: 10px;
+}
+
+.order_add_info_tab_div {
+	padding:0px 5px 0px 5px;
+	width: 99%;
+	margin-top: 6px;
+	margin-bottom: 6px;
+}
+.order_add_info_tab_header {
+	background-color: #6f8992;
+	height: 22px;
+	width: auto;
+	font-family: "宋体";
+	font-size: 12px;
+	line-height: 22px;
+	color: #FFF;
+	font-weight: bold;
+	border-bottom-width: 2px;
+	border-bottom-style: solid;
+	border-bottom-color: #F93;
+}
+.order_add_info_tab_header ul {
+	padding: 0px !important;
+}
+.order_add_info_tab_header ul li {
+	text-align:center;
+	float: left;
+	width: 100px;
+	margin: 0px;
+	border-right: 2px #FFF solid;
+	font-family: "宋体";
+	font-size: 12px;
+	font-weight: bold;
+	text-decoration: none;
+	background-color: #6F8992;
+	cursor:pointer;
+}
+.order_add_info_tab_header ul li.hover {
+	background-color:#ff9933;
+}
+.order_add_info_tab_body {
+	padding:5px;
+	width: auto;
+	border: 1px solid #F93;
+	background-color: #d7cfca;
+}
+
+.point_div {
+	font-family: "宋体";
+	font-size: 12px;
+	line-height: 28px;
+	background-color: #d9d9d9;
+	height: 29px;
+	width: 929px;
+	border: 1px solid #999999;
+	margin-left: 30px;
+	padding-left: 20px;
+	margin-bottom: 6px;
+}
+.point_div span {
+	font-family: "宋体";
+	font-size: 12px;
+	color: #F00;
+	padding-left: 15px;
+}
+.field_head th{
+	background-color:#8f8f8f;
+	height:28px;
+	line-height:28px;
+	color:#FFFFFF;
+	font-family:"宋体";
+	font-size:12px;
+	font-weight:bold;
+	background-image: url(/static/images/system/data_bg.jpg);
+	width:90px;
+
+}
+.field_head td{
+	background-color:#8f8f8f;
+	height:28px;
+	line-height:28px;
+	color:#FFFFFF;
+	font-family:"宋体";
+	font-size:12px;
+	font-weight:bold;
+	background-image: url(/static/images/system/data_bg.jpg);
+	width:180px;
+
+}
+.data_table_tr th{
+	border-bottom:#dddddd 1px solid;
+	height:24px;
+	line-height:24px;
+	text-align:center;
+	border-left:#fafafa 1px solid;
+	width:90px;
+}
+.data_table_tr td{
+	border-bottom:#dddddd 1px solid;
+	height:24px;
+	line-height:24px;
+	text-align:center;
+	border-left:#fafafa 1px solid;
+	width:180px;
+}
+
+.data_table_tr_odd{
+	background-color:#F3F3F3;
+}
+.data_table_tr_even{
+	background-color:#FFFFDF;
+}
+
+.point_login_td{
+	padding:80px 0px 0px 0px;
+	font-family: "宋体";
+	font-size: 14px;
+	color:#F00;
+	text-decoration: none;
+}
