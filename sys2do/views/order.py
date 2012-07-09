@@ -44,7 +44,7 @@ bpOrder = Blueprint('bpOrder', __name__)
 
 class OrderView(BasicView):
 
-#    decorators = [login_required]
+    decorators = [login_required]
 
     @templated('order/index.html')
 #    @login_required
@@ -70,7 +70,14 @@ class OrderView(BasicView):
             conditions.append(OrderHeader.destination_company.op('like')('%%%s%%' % values['destination_company']))
 
         result = DBSession.query(OrderHeader).filter(and_(*conditions))
-        return {'result' : result , 'values' : values}
+
+        total_qty = total_vol = total_weight = 0
+        for r in result:
+            if r.qty : total_qty += r.qty
+            if r.vol : total_vol += r.vol
+            if r.weight : total_weight += r.weight
+
+        return {'result' : result , 'values' : values , 'total_qty' : total_qty , 'total_vol' : total_vol, 'total_weight' : total_weight}
 
 
     @templated('order/add.html')

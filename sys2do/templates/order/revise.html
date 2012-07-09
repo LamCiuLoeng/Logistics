@@ -42,8 +42,8 @@
 	<ul>
     	<li><img src="/static/images/system/order_manage_25.jpg" width="71" height="21" id="Image1" onmouseover="MM_swapImage('Image1','','/static/images/system/order_manage_h_25.jpg',1)" onmouseout="MM_swapImgRestore()" /></li>
         
-        <li><img src="/static/images/system/order_manage_37.jpg" width="77" height="21" id="Image5" onmouseover="MM_swapImage('Image5','','/static/images/system/order_manage_h_37.jpg',1)" onmouseout="MM_swapImgRestore()" /></li>
         <!-- 
+        <li><img src="/static/images/system/order_manage_37.jpg" width="77" height="21" id="Image5" onmouseover="MM_swapImage('Image5','','/static/images/system/order_manage_h_37.jpg',1)" onmouseout="MM_swapImgRestore()" /></li>
         <li><img src="/static/images/system/order_manage_35.jpg" width="94" height="21" id="Image4" onmouseover="MM_swapImage('Image4','','/static/images/system/order_manage_h_35.jpg',1)" onmouseout="MM_swapImgRestore()" /></li>
         <li><img src="/static/images/system/order_manage_39.jpg" width="101" height="21" id="Image6" onmouseover="MM_swapImage('Image6','','/static/images/system/order_manage_h_39.jpg',1)" onmouseout="MM_swapImgRestore()" /></li>
         <li><img src="/static/images/system/order_manage_41.jpg" width="101" height="21" id="Image7" onmouseover="MM_swapImage('Image7','','/static/images/system/order_manage_h_41.jpg',1)" onmouseout="MM_swapImgRestore()" /></li>
@@ -211,12 +211,16 @@
 			<div id="item_details">
 				<table>
 				<tr>
-					<td>{{_('Item Name')}}</td><td><input type="text" name="item_name" id="item_name" value=""></td>
-					<td>{{_('Qty')}}</td><td><input type="text" name="item_qty" id="item_qty" value=""></td>
-					<td>{{_('Vol')}}</td><td><input type="text" name="item_vol" id="item_vol" value=""></td>
-					<td>{{_('Weight')}}</td><td><input type="text" name="item_weight" id="item_weight" value=""></td>
-				</tr>
-				<tr><td>{{_('Remark')}}</td><td><textarea name="item_remark" id="item_remark"></textarea></td></tr>
+					<td valign="top">{{_('Item Name')}}</td>
+					<td valign="top"><input type="text" name="item_name" id="item_name" value="" ></td>
+					<td valign="top">{{_('Qty')}}</td>
+					<td valign="top"><input type="text" name="item_qty" id="item_qty" value="" class="numeric"/></td>
+					<td valign="top">{{_('Vol')}}</td>
+					<td valign="top"><input type="text" name="item_vol" id="item_vol" value="" class="numeric"/></td>
+					<td valign="top">{{_('Weight')}}</td>
+					<td valign="top"><input type="text" name="item_weight" id="item_weight" value="" class="numeric"/></td>
+				    <td valign="top">{{_('Remark')}}</td>
+				    <td valign="top"><textarea name="item_remark" id="item_remark"></textarea></td></tr>
 			</table>
 				</table>
 				<p><input type="button" value="{{_('Add')}}" onclick="save_item()"/></p>
@@ -224,7 +228,12 @@
 			<table>
 				<thead>
 					<tr class="field_head">
-						<td>{{_('Item Name')}}</td><td>{{_('Qty')}}</td><td>{{_('Vol')}}</td><td>{{_('Weight')}}</td><td>{{_('Remark')}}</td><td>&nbsp;</td>
+						<td align="center">{{_('Item Name')}}</td>
+						<td align="center">{{_('Qty')}}</td>
+						<td align="center">{{_('Vol')}}</td>
+						<td align="center">{{_('Weight')}}</td>
+						<td align="center">{{_('Remark')}}</td>
+						<td>&nbsp;</td>
 					</tr>
 				</thead>
 				<tbody id="item_list">
@@ -251,10 +260,14 @@
 		<div>
 			<table>
 				<tr>
-					<td>收件联系人</td><td><input type="text" name="receiver_contact" id="receiver_contact" value="{{header.receiver_contact|f}}"/></td>
-					<td>联系人电话</td><td><input type="text" name="receiver_tel" id="receiver_tel" value="{{header.receiver_tel|f}}"/></td>
-					<td>联系手机</td><td><input type="text" name="receiver_mobile" id="receiver_mobile" value="{{header.receiver_mobile|f}}"/></td>
-					<td>备注</td><td><textarea name="receiver_remark" id="receiver_remark">{{header.receiver_remark|f}}</textarea></td>
+					<td valign="top">收件联系人</td>
+					<td valign="top"><input type="text" name="receiver_contact" id="receiver_contact" value="{{header.receiver_contact|f}}"/></td>
+					<td valign="top">联系人电话</td>
+					<td valign="top"><input type="text" name="receiver_tel" id="receiver_tel" value="{{header.receiver_tel|f}}"/></td>
+					<td valign="top">联系手机</td>
+					<td valign="top"><input type="text" name="receiver_mobile" id="receiver_mobile" value="{{header.receiver_mobile|f}}"/></td>
+					<td valign="top">备注</td>
+					<td valign="top"><textarea name="receiver_remark" id="receiver_remark">{{header.receiver_remark|f}}</textarea></td>
 				</tr>
 			</table>
 			<p><input type="button" value="{{_('Save')}}" onclick="save_receiver()"/></p>
@@ -274,21 +287,24 @@
 		<div>
 			<table>
 				<tr>
-					<td>{{_('Time')}}</td><td><input type="text" name="transit_action_time" id="transit_action_time" value=""/></td>
-					<td>{{_('Remark')}}</td><td><textarea name="transit_remark" id="transit_remark"></textarea></td>
+					<td valign="top">{{_('Time')}}</td>
+					<td valign="top"><input type="text" name="transit_action_time" id="transit_action_time" value="" class="datepicker"/></td>
+					<td valign="top">{{_('Remark')}}</td>
+					<td valign="top"><textarea name="transit_remark" id="transit_remark"></textarea></td>
 				</tr>
 			</table>
 			<p><input type="button" value="{{_('Save')}}" onclick="save_transit()"/></p>
 		</div>
 		<table>
 			<thead>
-				<tr>
-					<td>{{_('Time')}}</td><td>{{_('Remark')}}</td><td>&nbsp;</td>
+				<tr class="field_head">
+					<td align="center">{{_('Time')}}</td>
+					<td align="center">{{_('Remark')}}</td><td>&nbsp;</td>
 				</tr>
 			<thead>
 			<tbody id="transit_list">
 				{% for t in header.get_logs() %}
-					<tr>
+					<tr class="data_table_tr">
 						<td>{{t.transfer_date|ft}}</td>
 						<td>{{t.remark}}</td>
 						<td><input type="button" value="{{_('Del')}}" onclick="del_transit({{t.id}},this)"/></td>
@@ -303,24 +319,33 @@
 		<div>
 			<table>
 				<tr>
-					<td>{{_('Time')}}</td><td><input type="text" name="pickup_action_time" id="pickup_action_time" value=""/></td>
-					<td>{{_('Pickup Contact')}}</td><td><input type="text" name="pickup_contact" id="pickup_contact" value=""/></td>
-					<td>{{_('Contact Tel')}}</td><td><input type="text" name="pickup_tel" id="pickup_tel" value=""/></td>
-					<td>{{_('Pickup Qty')}}</td><td><input type="text" name="pickup_qty" id="pickup_qty" value=""/></td>
-					<td>{{_('Remark')}}</td><td><textarea name="pickup_remark" id="pickup_remark"></textarea></td>
+					<td valign="top">{{_('Time')}}</td>
+					<td valign="top"><input type="text" name="pickup_action_time" id="pickup_action_time" value="" class="datepicker"/></td>
+					<td valign="top">{{_('Pickup Contact')}}</td>
+					<td valign="top"><input type="text" name="pickup_contact" id="pickup_contact" value=""/></td>
+					<td valign="top">{{_('Contact Tel')}}</td>
+					<td valign="top"><input type="text" name="pickup_tel" id="pickup_tel" value=""/></td>
+					<td valign="top">{{_('Pickup Qty')}}</td>
+					<td valign="top"><input type="text" name="pickup_qty" id="pickup_qty" value="" class="numeric"/></td>
+					<td valign="top">{{_('Remark')}}</td>
+					<td valign="top"><textarea name="pickup_remark" id="pickup_remark"></textarea></td>
 				</tr>
 			</table>
 			<p><input type="button" value="{{_('Save')}}" onclick="save_pickup()"/></p>
 		</div>
-		<table>
+		<table width="100%" border="0" cellspacing="0" cellpadding="0">
 			<thead>
-				<tr>
-					<td>{{_('Time')}}</td><td>{{_('Pickup Contact')}}</td><td>{{_('Contact Tel')}}</td><td>{{_('Pickup Qty')}}</td><td>{{_('Remark')}}</td>
+				<tr class="field_head">
+					<td align="center">{{_('Time')}}</td>
+					<td align="center">{{_('Pickup Contact')}}</td>
+					<td align="center">{{_('Contact Tel')}}</td>
+					<td align="center">{{_('Pickup Qty')}}</td>
+					<td align="center">{{_('Remark')}}</td>
 				</tr>
 			<thead>
 			<tbody id="pickup_list">
 				{% for t in header.pickup_details %}
-					<tr>
+					<tr class="data_table_tr">
 						<td>{{t.action_time}}</td>
 						<td>{{t.contact}}</td>
 						<td>{{t.tel}}</td>
