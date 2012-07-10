@@ -2,40 +2,76 @@
 
 {% block extJS %}
 <script src="{{url_for('static', filename='js/customer/deliver_select_orders.js')}}" type="text/javascript"></script>
+
+<script language="JavaScript" type="text/javascript">
+//<![CDATA[
+	function allselect(obj){
+		var t = $(obj);
+		if(t.attr('checked')){
+			$("input[type='checkbox'][name='order_ids']").attr('checked','checked');
+		}else{
+		    $("input[type='checkbox'][name='order_ids']").removeAttr('checked');
+		}
+	}
+	
+	
+	function tosubmit(){
+		$("form").submit();
+	}
+//]]>
+</script>
 {% endblock %}
+
+
+
+{% block inner_menu %}
+<div class="inner_menu">
+	<ul>
+        <li><img src="/static/images/system/order_manage_31.jpg" width="77" height="21" id="Image2" onmouseover="MM_swapImage('Image2','','/static/images/system/order_manage_h_31.jpg',1)" onmouseout="MM_swapImgRestore()" onclick="tosubmit()"/></li>
+        <!-- 
+        <li><img src="/static/images/system/order_manage_41.jpg" width="101" height="21" id="Image7" onmouseover="MM_swapImage('Image7','','/static/images/system/order_manage_h_41.jpg',1)" onmouseout="MM_swapImgRestore()" onclick="return toexp();"/></li>
+        <li><img src="/static/images/system/order_manage_37.jpg" width="77" height="21" id="Image5" onmouseover="MM_swapImage('Image5','','/static/images/system/order_manage_h_37.jpg',1)" onmouseout="MM_swapImgRestore()" onclick="toprint();"/></li>
+    	<li><img src="/static/images/system/order_manage_25.jpg" width="71" height="21" id="Image1" onmouseover="MM_swapImage('Image1','','/static/images/system/order_manage_h_25.jpg',1)" onmouseout="MM_swapImgRestore()" /></li>
+        <li><img src="/static/images/system/order_manage_35.jpg" width="94" height="21" id="Image4" onmouseover="MM_swapImage('Image4','','/static/images/system/order_manage_h_35.jpg',1)" onmouseout="MM_swapImgRestore()" /></li>
+        <li><img src="/static/images/system/order_manage_33.jpg" width="77" height="21" id="Image3" onmouseover="MM_swapImage('Image3','','/static/images/system/order_manage_h_33.jpg',1)" onmouseout="MM_swapImgRestore()" /></li>
+        <li><img src="/static/images/system/order_manage_39.jpg" width="101" height="21" id="Image6" onmouseover="MM_swapImage('Image6','','/static/images/system/order_manage_h_39.jpg',1)" onmouseout="MM_swapImgRestore()" /></li>
+        -->
+        <li style="padding:0px; margin:0px 55px 0px 0px; float:right"><a href="{{url_for('bpAuth.logout')}}"><img src="/static/images/system/order_manage_22.jpg" width="56" height="29" /></a></li>
+    </ul>
+</div>
+{% endblock %}
+
 
 {% block content %}
 	<div style="background-color: #fff;padding: 10px;">
 		
 	<form method="post" action="{{url_for('.view',action='add_deliver')}}">
-	<p>
-		<input type="submit" value="{{_('New Delivery')}}"/>
-	</p>
+
 	<table border="1" cellpadding="3" cellspacing="3">
 		<thead>
-			<tr>
-				<td><input type="checkbox" onclick=""/></td>
-				<td>{{_('Order Number')}}</td>
-				<td>{{_('Customer')}}</td>
-				<td>{{_('Source Station')}}</td>
-				<td>{{_('Destination Station')}}</td>
-				<td>{{_('Item')}}</td>
-				<td>{{_('Qty')}}</td>
-				<td>{{_('Vol')}}</td>
-				<td>{{_('Weight')}}</td>
-				<td>{{_('Expect Time')}}</td>
-				<td>{{_('Destination Contact')}}</td>
-				<td>{{_('Destination Tel')}}</td>
+			<tr class="field_head">
+				<th style="text-align:center"><input type="checkbox" onclick="allselect(this);"/></th>
+				<th>{{_('Order Number')}}</th>
+				<th>{{_('Customer')}}</th>
+				<th>{{_('Source Station')}}</th>
+				<th>{{_('Destination Station')}}</th>
+				<th>{{_('Item')}}</th>
+				<th>{{_('Qty')}}</th>
+				<th>{{_('Vol')}}</th>
+				<th>{{_('Weight')}}</th>
+				<th>{{_('Expect Time')}}</th>
+				<th>{{_('Destination Contact')}}</th>
+				<th>{{_('Destination Tel')}}</th>
 			</tr>
 			{% for r in result%}
-			<tr>
-				<td>
+			<tr class="data_table_tr {{ loop.cycle('data_table_tr_odd', 'data_table_tr_even') }}">
+				<th>
 					{% if r.id in session.get('deliver_order_ids',{})%}
 						<input type="checkbox" name="order_ids" value="{{r.id}}" checked="checked" onclick="check_ids({{r.id}},this)"/>
 					{% else %}
 						<input type="checkbox" name="order_ids" value="{{r.id}}" onclick="check_ids({{r.id}},this)"/>
 					{% endif %}
-				</td>
+				</th>
 				<td>{{r.no|f}}</td>
 				<td>{{r.customer|f}}</td>
 				<td>{{r.dsource_station|f}}</td>

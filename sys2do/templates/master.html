@@ -66,13 +66,13 @@
 			    <tr>
 			      <td width="50" height="27" background="/static/images/system/order_manage_06.jpg"><img src="/static/images/system/order_manage_06.jpg" width="30" height="27" /></td>
 			      <td class="gap1"></td>
-			      <td class="bt_normal" onmouseover="menu_move_over(this)" onmouseout="menu_move_out(this)" onclick="redirect('{{url_for('bpOrder.view')}}')">订单管理</td>
+			      <td class="bt_highlight" onmouseover="menu_move_over(this)" onmouseout="menu_move_out(this)" onclick="redirect('{{url_for('bpOrder.view')}}')">订单管理</td>
+			      <td class="gap2"></td>
+			      <td class="bt_normal" onmouseover="menu_move_over(this)" onmouseout="menu_move_out(this)" onclick="redirect('{{url_for('bpDeliver.view')}}')">送货单管理</td>
 			      <td class="gap2"></td>
 			      
 			      
 			      <!-- 
-			      <td class="bt_normal" onmouseover="menu_move_over(this)" onmouseout="menu_move_out(this)" onclick="redirect('{{url_for('bpAdmin.view',action='user')}}')">用户管理</td>
-			      <td class="gap2"></td>
 			      <td class="bt_normal" onmouseover="menu_move_over(this)" onmouseout="menu_move_out(this)" onclick="redirect('{{url_for('bpAdmin.view',action='group')}}')">组管理</td>
 			      <td class="gap2"></td>
 			      <td class="bt_normal" onmouseover="menu_move_over(this)" onmouseout="menu_move_out(this)" onclick="redirect('{{url_for('bpAdmin.view',action='permission')}}')">权限管理</td>
@@ -84,7 +84,7 @@
 			        <tr>
 			          <td style="padding:0px; margin:0px">&nbsp;</td>
 			          <td width="30" style="padding:0px; margin:0px"><img src="/static/images/system/order_manage_14.jpg" width="20" height="27" /></td>
-			          <td width="230" class="user_display">{{session['user_profile']['name']}}</td>
+			          <td width="230" class="user_display"></td>
 			        </tr>
 			      </table></td>
 			    </tr>

@@ -19,7 +19,7 @@ import traceback
 from sys2do.constant import MSG_RECORD_NOT_EXIST, MSG_NO_FILE_UPLOADED, \
     MSG_INVALID_FILE_TO_UPLOAD
 
-__all__ = ['_g', '_gl', '_gp', '_debug', '_info', '_error', 'getOr404', 'upload', 'makeException']
+__all__ = ['_g', '_gl', '_gp', '_debug', '_info', '_error', 'getOr404', 'upload', 'makeException', 'number2alphabet']
 
 
 
@@ -98,3 +98,25 @@ def makeException(msg):
 
 
 
+def number2alphabet(n):
+    result = []
+    while n > 0 :
+        x , y = n / 26, n % 26
+        result.append(y)
+        if x > 0 :
+            n = x
+        else:
+            break
+
+    p = 0
+    for i in range(len(result)):
+        result[i] += p
+        if result[i] <= 0 and i + 1 < len(result):
+            result[i] += 26
+            p = -1
+        else:
+            p = 0
+
+    if result[-1] <= 0 : result = result[:-1]
+    result.reverse()
+    return "".join(map(lambda v:chr(v + 64), result))

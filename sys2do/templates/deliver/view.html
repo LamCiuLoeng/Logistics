@@ -1,139 +1,173 @@
 {% extends "master.html" %}
 
 {% block extJS %}
-
+<script language="JavaScript" type="text/javascript">
+//<![CDATA[
+	$(document).ready(function(){
+		$(".order_add_info_tab_div").tabs();
+	});		
+//]]>
+</script>
 {% endblock %}
 
 {% block content %}
-	<div style="background-color: #fff;padding: 10px;">
-		
-	<ul>
-		<li><a href="{{url_for('.view', action = 'revise')}}">{{_('Revise')}}</a></li>
-		<li><a href="{{url_for('.view', action = 'cancel')}}">{{_('Cancel')}}</a></li>
-		<li><a href="{{url_for('.view')}}">{{_('Return')}}</a></li>
-	</ul>	
+<div class="order_add_div">
+	<div class="order_add_div_header">送货单详情</div>
 	
-	<table border="1" cellpadding="5" cellspacing="5">
-		<tr>
-			<td width="200">{{_('3rd Party Supplier')}}</td>
-			<td width="200">{{values.get('supplier','')|ifFalse}}</td>
-		</tr>
-		<tr>
-			<td>{{_('Deliver Number')}}</td>
-			<td>{{values.get('no','')|ifFalse}}</td>
-		</tr>
-		<tr>
-			<td>{{_('Destination')}}</td>
-			<td>{{values.get('destination_address','')|ifFalse}}</td>
-		</tr>
-		<tr>
-			<td>{{_('Supplier Contact')}}</td>
-			<td>{{values.get('supplier_contact','')|ifFalse}}</td>
-		</tr>
-		<tr>
-			<td>{{_('Supplier Tel')}}</td>
-			<td>{{values.get('supplier_tel','')|ifFalse}}</td>
-		</tr>
-		<tr>
-			<td>{{_('Expect Time')}}</td>
-			<td>{{values.get('expect_time','')|ifFalse}}</td>
-		</tr>
-		<tr>
-			<td>{{_('Remark')}}</td>
-			<td>{{values.get('remark','')|ifFalse}}</td>
-		</tr>
-		<tr>
-			<td>{{_('Create Time')}}</td>
-			<td>{{values.get('create_time','')|ft}}</td>
-		</tr>
-		<tr>
-			<td>{{_('Creator')}}</td>
-			<td>{{values.get('create_by','')|ifFalse}}</td>
-		</tr>
-		<tr>
-			<td>{{_('Update Time')}}</td>
-			<td>{{values.get('update_time','')|ft}}</td>
-		</tr>
-		<tr>
-			<td>{{_('Last Updator')}}</td>
-			<td>{{values.get('update_by','')|ifFalse}}</td>
-		</tr>
-		<tr>
-			<td>{{_('Status')}}</td>
-			<td>{{values.get('status','')|showStatus}}</td>
-		</tr>
-	</table>
-	<br />
-	<table border="1" cellpadding="5" cellspacing="5">
-		<thead>
+	<div class="order_add_div_body">
+	
+		<table border="1" cellpadding="5" cellspacing="5">
 			<tr>
-				<td>{{_('Customer')}}</td>
-				<td>{{_('Order Number')}}</td>
+				<td width="200">{{_('3rd Party Supplier')}}</td>
+				<td width="200">{{values.get('supplier','')|ifFalse}}</td>
+			</tr>
+			<tr>
+				<td>{{_('Deliver Number')}}</td>
+				<td>{{values.get('no','')|ifFalse}}</td>
+			</tr>
+			<tr>
 				<td>{{_('Destination')}}</td>
-				<td>{{_('Item')}}</td>
-				<td>{{_('Qty')}}</td>
-				<td>{{_('Weight')}}</td>
-				<td>{{_('Expect Time')}}</td>
-				<td>{{_('Destination Contact')}}</td>
-				<td>{{_('Destination Tel')}}</td>
-				<td>{{_('Remark')}}</td>
-				<td>{{_('Update Time')}}</td>
-				<td>{{_('Last Updator')}}</td>
+				<td>{{values.get('destination_address','')|ifFalse}}</td>
 			</tr>
-		</thead>
-		{% for d in details %}
 			<tr>
-				<td>{{d.order_header.customer}}</td>
-				<td>{{d.order_header.no}}</td>
-				<td>{{d.order_header.destination_address}}</td>
-				<td>{{d.order_header.item}}</td>
-				<td>{{d.order_header.qty}}</td>
-				<td>{{d.order_header.weight}}</td>
-				<td>{{d.order_header.expect_time|ifFalse}}</td>
-				<td>{{d.order_header.destination_contact}}</td>
-				<td>{{d.order_header.destination_tel}}</td>
-				<td>{{d.order_header.remark|ifFalse}}</td>
-				<td>{{d.order_header.update_time|ft}}</td>
-				<td>{{d.order_header.update_by|ifFalse}}</td>
+				<td>{{_('Supplier Contact')}}</td>
+				<td>{{values.get('supplier_contact','')|ifFalse}}</td>
 			</tr>
-		{% endfor %}
-	</table>
-	
-	<br />
-	
-	{% if values.get('status','') in [ORDER_NEW[0],]%}
-		<p>确认发货</p>
-		<form action="{{url_for('.view', action = 'do_action',id=values.get('id',''),sc='SEND_OUT')}}" method="post">
-			<table>
-				<tr>
-					<td>{{_('Remark')}}</td>
-					<td><textarea name="send_out_remark"></textarea></td>
+			<tr>
+				<td>{{_('Supplier Tel')}}</td>
+				<td>{{values.get('supplier_tel','')|ifFalse}}</td>
+			</tr>
+			<tr>
+				<td>{{_('Expect Time')}}</td>
+				<td>{{values.get('expect_time','')|ifFalse}}</td>
+			</tr>
+			<tr>
+				<td>{{_('Remark')}}</td>
+				<td>{{values.get('remark','')|ifFalse}}</td>
+			</tr>
+			<tr>
+				<td>{{_('Create Time')}}</td>
+				<td>{{values.get('create_time','')|ft}}</td>
+			</tr>
+			<tr>
+				<td>{{_('Creator')}}</td>
+				<td>{{values.get('create_by','')|ifFalse}}</td>
+			</tr>
+			<tr>
+				<td>{{_('Update Time')}}</td>
+				<td>{{values.get('update_time','')|ft}}</td>
+			</tr>
+			<tr>
+				<td>{{_('Last Updator')}}</td>
+				<td>{{values.get('update_by','')|ifFalse}}</td>
+			</tr>
+			<tr>
+				<td>{{_('Status')}}</td>
+				<td>{{values.get('status','')|showStatus}}</td>
+			</tr>
+		</table>
+		<br />
+		<table border="1" cellpadding="5" cellspacing="5">
+			<thead>
+				<tr class="field_head">
+					<th>{{_('Order Number')}}</th>
+					<th>{{_('Source Station')}}</th>
+					<th>{{_('Destination Station')}}</th>
+					<th>{{_('Item')}}</th>
+					<th>{{_('Qty')}}</th>
+					<th>{{_('Vol')}}</th>
+					<th>{{_('Weight')}}</th>
+					<th>{{_('Destination Contact')}}</th>
+					<th>{{_('Destination Tel')}}</th>
+					<th>{{_('Update Time')}}</th>
+					<th>{{_('Last Updator')}}</th>
 				</tr>
-				<tr>
-					<td colspan="2"><input type="submit" value="{{_('Submit')}}"/></td>
+			</thead>
+			{% for d in details %}
+				<tr class="data_table_tr {{ loop.cycle('data_table_tr_odd', 'data_table_tr_even') }}">
+					<th>{{d.order_header.ref_no}}</th>
+					<td>{{d.order_header.source_station}}</td>
+					<td>{{d.order_header.destination_station|f}}</td>
+					<td>{{d.order_header.item}}</td>
+					<td>{{d.order_header.qty}}</td>
+					<td>{{d.order_header.vol}}</td>
+					<td>{{d.order_header.weight}}</td>
+					<td>{{d.order_header.destination_contact}}</td>
+					<td>{{d.order_header.destination_tel}}</td>
+					<td>{{d.order_header.update_time|ft}}</td>
+					<td>{{d.order_header.update_by|ifFalse}}</td>
 				</tr>
-			</table>
-		</form>
-	{% endif %}
-	
-	{% if header.status in [SEND_OUT[0],]%}
-		<p>确认货物到达</p>
-		<form action="{{url_for('.view', action = 'do_action',id=values.get('id',''),sc='GOODS_ARRIVED')}}" method="post">
-			<table>
-				<tr>
-					<td>{{_('Arrival Time')}}</td>
-					<td><input type="text" name="actual_time" /></td>
-				</tr>
-				<tr>
-					<td>{{_('Remark')}}</td>
-					<td><textarea name="arrived_remark"></textarea></td>
-				</tr>
-				<tr>
-					<td colspan="2"><input type="submit" value="{{_('Submit')}}"/></td>
-				</tr>
-			</table>
-		</form>
-	{% endif %}
+			{% endfor %}
+		</table>
+		
+		<br />
+		
+		
+		
+		<div class="order_add_info_tab_div">
+			<div class="order_add_info_tab_header">
+				<ul>
+					<li><a href="#tabs-1">发货详情</a></li>
+					<li><a href="#tabs-2">运输信息</a></li>
+					<li><a href="#tabs-3">货物到达</a></li>
+					<li><a href="#tabs-4">异常信息</a></li>
+					<li><a href="#tabs-5">历史记录</a></li>
+					
+					<!-- 
+					<li><a href="#tabs-5">提货信息</a></li>
+					<li><a href="#tabs-6">财务信息</a></li>
+					 -->
+				</ul>
+			</div>
+			
+			
+			<!-- send out -->
+			<div class="order_add_info_tab_body" id="tabs-1">
+				<form action="{{url_for('.view', action = 'do_action',id=values.get('id',''),sc='SEND_OUT')}}" method="post">
+					<table>
+						<tr>
+							<td valign="top">{{_('Remark')}}</td>
+							<td valign="top"><textarea name="send_out_remark"></textarea></td>
+						</tr>
+					</table>
+					<p><input type="button" value="确认发货" onclick=""/></p>
+				</form>
+			</div>
+			
+			<!-- transit -->
+			<div class="order_add_info_tab_body" id="tabs-2">
+				
+				<form action="{{url_for('.view', action = 'do_action',id=values.get('id',''),sc='GOODS_ARRIVED')}}" method="post">
+					<table>
+						<tr>
+							<td valign="top">{{_('Arrival Time')}}</td>
+							<td valign="top"><input type="text" name="actual_time" class="datepicker"/></td>
+						</tr>
+						<tr>
+							<td valign="top">{{_('Remark')}}</td>
+							<td valign="top"><textarea name="arrived_remark"></textarea></td>
+						</tr>
+					</table>
+					
+					<p><input type="button" value="确认货物到达" onclick=""/></p>
+				</form>
+			</div>
+			
+			
+			<div class="order_add_info_tab_body" id="tabs-3">
+			
+			</div>
+			
+			<!-- error -->
+			<div class="order_add_info_tab_body" id="tabs-4">
+			
+			</div>
+			
+			<!-- history -->
+			<div class="order_add_info_tab_body" id="tabs-5">
+			
+			</div>
+		</div>
 	</div>
-	
+</div>
 {% endblock %}

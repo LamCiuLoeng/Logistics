@@ -17,6 +17,9 @@ UPLOAD_FOLDER_URL = "/static/upload"
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'doc'])
 
 
+TMP_FOLDER = os.path.join(os.path.dirname(__file__), "static", "tmp")
+TEMPLATE_FOLDER = os.path.join(os.path.dirname(__file__), "static", "template")
+
 #session setting
 SECRET_KEY = str(uuid.uuid4())
 USE_X_SENDFILE = False

@@ -12,6 +12,26 @@
 	$(document).ready(function(){
 
 	});
+	
+	
+	function toexp(){
+		if($("input[name='order_ids']:checked").length < 1){
+			$.modaldialog.error('请先选择订单然后再导出！');
+			return false;
+		}
+	
+		$("#records").attr('action',"{{ url_for('.view',action='export') }}");
+		$("#records").submit();
+	}
+	
+	function allselect(obj){
+		var t = $(obj);
+		if(t.attr('checked')){
+			$("input[type='checkbox'][name='order_ids']").attr('checked','checked');
+		}else{
+		    $("input[type='checkbox'][name='order_ids']").removeAttr('checked');
+		}
+	}
 //]]>
 </script>
 
@@ -22,13 +42,13 @@
 <div class="inner_menu">
 	<ul>
         <li><a href="{{url_for('.view',action='add')}}"><img src="/static/images/system/order_manage_31.jpg" width="77" height="21" id="Image2" onmouseover="MM_swapImage('Image2','','/static/images/system/order_manage_h_31.jpg',1)" onmouseout="MM_swapImgRestore()" /></a></li>
+        <li><img src="/static/images/system/order_manage_41.jpg" width="101" height="21" id="Image7" onmouseover="MM_swapImage('Image7','','/static/images/system/order_manage_h_41.jpg',1)" onmouseout="MM_swapImgRestore()" onclick="return toexp();"/></li>
         <!-- 
+        <li><img src="/static/images/system/order_manage_37.jpg" width="77" height="21" id="Image5" onmouseover="MM_swapImage('Image5','','/static/images/system/order_manage_h_37.jpg',1)" onmouseout="MM_swapImgRestore()" onclick="toprint();"/></li>
     	<li><img src="/static/images/system/order_manage_25.jpg" width="71" height="21" id="Image1" onmouseover="MM_swapImage('Image1','','/static/images/system/order_manage_h_25.jpg',1)" onmouseout="MM_swapImgRestore()" /></li>
-        <li><img src="/static/images/system/order_manage_33.jpg" width="77" height="21" id="Image3" onmouseover="MM_swapImage('Image3','','/static/images/system/order_manage_h_33.jpg',1)" onmouseout="MM_swapImgRestore()" /></li>
         <li><img src="/static/images/system/order_manage_35.jpg" width="94" height="21" id="Image4" onmouseover="MM_swapImage('Image4','','/static/images/system/order_manage_h_35.jpg',1)" onmouseout="MM_swapImgRestore()" /></li>
-        <li><img src="/static/images/system/order_manage_37.jpg" width="77" height="21" id="Image5" onmouseover="MM_swapImage('Image5','','/static/images/system/order_manage_h_37.jpg',1)" onmouseout="MM_swapImgRestore()" /></li>
+        <li><img src="/static/images/system/order_manage_33.jpg" width="77" height="21" id="Image3" onmouseover="MM_swapImage('Image3','','/static/images/system/order_manage_h_33.jpg',1)" onmouseout="MM_swapImgRestore()" /></li>
         <li><img src="/static/images/system/order_manage_39.jpg" width="101" height="21" id="Image6" onmouseover="MM_swapImage('Image6','','/static/images/system/order_manage_h_39.jpg',1)" onmouseout="MM_swapImgRestore()" /></li>
-        <li><img src="/static/images/system/order_manage_41.jpg" width="101" height="21" id="Image7" onmouseover="MM_swapImage('Image7','','/static/images/system/order_manage_h_41.jpg',1)" onmouseout="MM_swapImgRestore()" /></li>
         -->
         <li style="padding:0px; margin:0px 55px 0px 0px; float:right"><a href="{{url_for('bpAuth.logout')}}"><img src="/static/images/system/order_manage_22.jpg" width="56" height="29" /></a></li>
     </ul>
@@ -48,7 +68,7 @@
           <li style="width:100%; border-right:#E2FEFE 1px solid;"><span>起始日期</span>
         	  <input type="text" class="datepicker" name="create_time_from" value="{{values.get('create_time_from','')|f}}"/>&nbsp;&nbsp;-&nbsp;&nbsp;<input type="text" class="datepicker" name="create_time_to" value="{{values.get('create_time_to','')|f}}"/>
           </li>
-          <li><span>{{_('Order Number')}}</span><input type="text" name="no" value="{{values.get('no','')|f}}"/></li>
+          <li><span>{{_('Order Number')}}</span><input type="text" name="ref_no" value="{{values.get('ref_no','')|f}}"/></li>
           <li><span>{{_('Source Station')}}</span><input type="text" name="source_station" value="{{values.get('source_station','')|f}}"/></li>
           <li><span>{{_('Source Company')}}</span><input type="text" name="source_company" value="{{values.get('source_company','')|f}}"/></li>
           <li><span>{{_('Destination Station')}}</span><input type="text" name="destination_station" value="{{values.get('destination_station','')|f}}"/></li>
@@ -60,14 +80,16 @@
     </div>
 </div>
 
-<div class="point_div"><img src="images/order_manage_54.jpg" width="22" height="28" /><span>{{_('Input the conditions and search.')}}</span></div>
+<div class="point_div"><img src="/static/images/system/order_manage_54.jpg" width="22" height="28" /><span>{{_('Input the conditions and search.')}}</span></div>
 
 
 
+
+<form method="post" action="" id="records">
 
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
   <tr class="field_head">
-    <th width="20" align="center"><input type="checkbox"/></th>
+    <th width="20" align="center"><input type="checkbox" onclick="allselect(this);"/></th>
     <td align="center"><img src="images/group_manage_58.gif" width="12" height="19" align="absmiddle" />{{_('Order Number')}}</td>
     <td align="center"><img src="images/group_manage_58down.gif" width="12" height="19" align="absmiddle" />{{_('Source Station')}}</td>
     <td align="center"><img src="images/group_manage_58down.gif" width="12" height="19" align="absmiddle" />{{_('Source Company')}}</td>
@@ -83,21 +105,21 @@
   </tr>
   
   {% for r in result %}
-	  <tr class="data_table_tr {{ loop.cycle('data_table_tr_odd', 'data_table_tr_even') }}">
-	    <th><input type="checkbox" name="orders" value="{{r.id}}" /></th>
-	    <td><a href="{{url_for('.view', action = 'revise',id=r.id)}}">{{r.no|f}}</a></td>
-		<td>{{r.source_station|f}}</td>
-		<td>{{r.source_company|f}}</td>
-		<td>{{r.destination_station|f}}</td>
-		<td>{{r.destination_company|f}}</td>
-		<td>{{r.qty|f}}</td>
-		<td>{{r.weight|f}}</td>
-		<td>{{r.weight|f}}</td>
-		<td>{{r.amount|ft}}</td>
-		<td>{{r.create_by|f}}</td>
-		<td>{{r.update_by|f}}</td>
-		<td>{{r.status|showStatus}}</td>
-	  </tr>
+		  <tr class="data_table_tr {{ loop.cycle('data_table_tr_odd', 'data_table_tr_even') }}">
+		    <th><input type="checkbox" name="order_ids" value="{{r.id}}" /></th>
+		    <td><a href="{{url_for('.view', action = 'revise',id=r.id)}}">{{r.ref_no|f('没有订单号')}}</a></td>
+			<td>{{r.source_station|f}}</td>
+			<td>{{r.source_company|f}}</td>
+			<td>{{r.destination_station|f}}</td>
+			<td>{{r.destination_company|f}}</td>
+			<td>{{r.qty|f}}</td>
+			<td>{{r.weight|f}}</td>
+			<td>{{r.weight|f}}</td>
+			<td>{{r.amount|ft}}</td>
+			<td>{{r.create_by|f}}</td>
+			<td>{{r.update_by|f}}</td>
+			<td>{{r.status|showStatus}}</td>
+		  </tr>
   {% endfor %}
       <tr class="data_table_tr">
       	<th></th>
@@ -109,6 +131,7 @@
       </tr>
 </table>
 
+</form>
 
 
 {% endblock %}

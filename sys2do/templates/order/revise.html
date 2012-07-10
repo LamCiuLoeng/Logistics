@@ -30,8 +30,7 @@
 		var amount = qty * qty_ratio + vol * vol_ratio + weight * weight_ratio;
 		$("#amount").val(amount);
 	}
-	});
-		
+	});		
 //]]>
 </script>
 
@@ -42,8 +41,8 @@
 	<ul>
     	<li><img src="/static/images/system/order_manage_25.jpg" width="71" height="21" id="Image1" onmouseover="MM_swapImage('Image1','','/static/images/system/order_manage_h_25.jpg',1)" onmouseout="MM_swapImgRestore()" /></li>
         
+        <li><a href="{{url_for('.view',action='print_barcode',id=header.id)}}" target="_blank"><img src="/static/images/system/order_manage_37.jpg" width="77" height="21" id="Image5" onmouseover="MM_swapImage('Image5','','/static/images/system/order_manage_h_37.jpg',1)" onmouseout="MM_swapImgRestore()" /></a></li>
         <!-- 
-        <li><img src="/static/images/system/order_manage_37.jpg" width="77" height="21" id="Image5" onmouseover="MM_swapImage('Image5','','/static/images/system/order_manage_h_37.jpg',1)" onmouseout="MM_swapImgRestore()" /></li>
         <li><img src="/static/images/system/order_manage_35.jpg" width="94" height="21" id="Image4" onmouseover="MM_swapImage('Image4','','/static/images/system/order_manage_h_35.jpg',1)" onmouseout="MM_swapImgRestore()" /></li>
         <li><img src="/static/images/system/order_manage_39.jpg" width="101" height="21" id="Image6" onmouseover="MM_swapImage('Image6','','/static/images/system/order_manage_h_39.jpg',1)" onmouseout="MM_swapImgRestore()" /></li>
         <li><img src="/static/images/system/order_manage_41.jpg" width="101" height="21" id="Image7" onmouseover="MM_swapImage('Image7','','/static/images/system/order_manage_h_41.jpg',1)" onmouseout="MM_swapImgRestore()" /></li>
@@ -69,8 +68,8 @@
     	  <li style="width:366px;"><span>{{_('Destination Station')}}</span>
     	    <input name="destination_station" id="destination_station" type="text" style="width:160px" value="{{header.destination_station|f}}"/>
    	      </li>
-    	  <li style="width:180px;"><span>单据条码</span>
-    	    <input name="no" id="no" type="text" class="numeric" style="width:100px" value="{{header.no|f}}"/>
+    	  <li style="width:180px;"><span>单号</span>
+    	    <input name="ref_no" id="ref_no" type="text" style="width:100px" value="{{header.ref_no|f}}"/>
   	    </li>
     	  <li style="width:180px;"><span>{{_('Create Time')}}</span>{{header.create_time|ft}}</li>
     	  <li style="width:459px;"><span>{{_('Source Company')}}</span>
@@ -228,11 +227,11 @@
 			<table>
 				<thead>
 					<tr class="field_head">
-						<td align="center">{{_('Item Name')}}</td>
-						<td align="center">{{_('Qty')}}</td>
-						<td align="center">{{_('Vol')}}</td>
-						<td align="center">{{_('Weight')}}</td>
-						<td align="center">{{_('Remark')}}</td>
+						<th align="center">{{_('Item Name')}}</th>
+						<th align="center">{{_('Qty')}}</th>
+						<th align="center">{{_('Vol')}}</th>
+						<th align="center">{{_('Weight')}}</th>
+						<th align="center">{{_('Remark')}}</th>
 						<td>&nbsp;</td>
 					</tr>
 				</thead>
@@ -298,15 +297,15 @@
 		<table>
 			<thead>
 				<tr class="field_head">
-					<td align="center">{{_('Time')}}</td>
-					<td align="center">{{_('Remark')}}</td><td>&nbsp;</td>
+					<th align="center">{{_('Time')}}</th>
+					<th align="center">{{_('Remark')}}</th><th>&nbsp;</th>
 				</tr>
 			<thead>
 			<tbody id="transit_list">
 				{% for t in header.get_logs() %}
 					<tr class="data_table_tr">
 						<td>{{t.transfer_date|ft}}</td>
-						<td>{{t.remark}}</td>
+						<td>{{t.remark|f}}</td>
 						<td><input type="button" value="{{_('Del')}}" onclick="del_transit({{t.id}},this)"/></td>
 					</tr>
 				{% endfor %}
@@ -336,21 +335,21 @@
 		<table width="100%" border="0" cellspacing="0" cellpadding="0">
 			<thead>
 				<tr class="field_head">
-					<td align="center">{{_('Time')}}</td>
-					<td align="center">{{_('Pickup Contact')}}</td>
-					<td align="center">{{_('Contact Tel')}}</td>
-					<td align="center">{{_('Pickup Qty')}}</td>
-					<td align="center">{{_('Remark')}}</td>
+					<th align="center">{{_('Time')}}</th>
+					<th align="center">{{_('Pickup Contact')}}</th>
+					<th align="center">{{_('Contact Tel')}}</th>
+					<th align="center">{{_('Pickup Qty')}}</th>
+					<th align="center">{{_('Remark')}}</th>
 				</tr>
 			<thead>
 			<tbody id="pickup_list">
 				{% for t in header.pickup_details %}
 					<tr class="data_table_tr">
-						<td>{{t.action_time}}</td>
-						<td>{{t.contact}}</td>
-						<td>{{t.tel}}</td>
-						<td>{{t.qty}}</td>
-						<td>{{t.remark}}</td>
+						<td>{{t.action_time|f}}</td>
+						<td>{{t.contact|f}}</td>
+						<td>{{t.tel|f}}</td>
+						<td>{{t.qty|f}}</td>
+						<td>{{t.remark|f}}</td>
 					</tr>
 				{% endfor %}
 			</tbody>

@@ -26,7 +26,7 @@ from sys2do.views import BasicView
 from sys2do.model.logic import DeliverHeader, OrderHeader, \
     DeliverDetail, TransferLog
 from sys2do.util.common import _gl, _g, _gp, getOr404, getMasterAll, _debug, \
-    _error
+    _error, _info
 #from sys2do.util.logic_helper import updateDeliverHeaderStatus
 from sys2do.model.master import Supplier, InventoryItem
 
@@ -42,8 +42,28 @@ class DeliverView(BasicView):
 
     @templated('deliver/index.html')
     def index(self):
+
+        values = {}
+        for f in ['create_time_from', 'create_time_to', 'no', 'destination_address', 'supplier_id',
+                  ] :
+            values[f] = _g(f)
+
+
+        conditions = [OrderHeader.active == 0]
+        if values['create_time_from']:
+            conditions.append(DeliverHeader.create_time > values['create_time_from'])
+        if values['create_time_to']:
+            conditions.append(DeliverHeader.create_time < values['create_time_to'])
+        if values['no']:
+            conditions.append(DeliverHeader.no.op('like')('%%%s%%' % values['no']))
+        if values['destination_address']:
+            conditions.append(DeliverHeader.destination_address.op('like')('%%%s%%' % values['destination_address']))
+        if values['supplier_id']:
+            conditions.append(DeliverHeader.supplier_id == values['supplier_id'])
+
+
         result = DBSession.query(DeliverHeader).filter(DeliverHeader.active == 0)
-        return {'result' : result}
+        return {'result' : result, 'values' : values, 'suppliers' : getMasterAll(Supplier)}
 
     @templated('deliver/select_orders.html')
     def select_orders(self):
@@ -74,7 +94,10 @@ class DeliverView(BasicView):
 
     @templated('deliver/add_deliver.html')
     def add_deliver(self):
-        ids = _gl('order_detail_ids')
+        ids = _gl('order_ids')
+
+        _info(ids)
+
         order_headers = DBSession.query(OrderHeader).filter(OrderHeader.id.in_(ids))
         suppliers = getMasterAll(Supplier)
         return {'result' : order_headers, 'suppliers' : suppliers}

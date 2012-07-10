@@ -14,11 +14,7 @@ function check_ids(id,obj){
             '/deliver/ajax_check_ids',
             params,
             function (r){
-                if(r.code == 0){
-                    alert('OK');
-                }else{
-                    alert('error');
-                }
+                
             }
     )
 }

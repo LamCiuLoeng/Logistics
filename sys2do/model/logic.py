@@ -29,7 +29,9 @@ class OrderHeader(DeclarativeBase, SysMixin, CRUDMixin):
     __tablename__ = 'order_header'
 
     id = Column(Integer, autoincrement = True, primary_key = True)
+
     no = Column(Text)
+    ref_no = Column(Text)
 
     customer_id = Column(Integer, ForeignKey('master_customer.id'))
     customer = relation(Customer, backref = backref("orders", order_by = id), primaryjoin = "and_(Customer.id == OrderHeader.customer_id, OrderHeader.active == 0)")

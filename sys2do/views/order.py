@@ -6,14 +6,19 @@
 #  Description:
 ###########################################
 '''
+import os
 from datetime import datetime as dt
 from datetime import timedelta
 import traceback
+import shutil
+import random
+
+
 
 from flask import Blueprint, render_template, url_for, session, Response
 from flask.views import View
 from werkzeug.utils import redirect
-from flask.helpers import flash, jsonify
+from flask.helpers import flash, jsonify, send_file
 
 from sys2do.model.logic import OrderHeader, TransferLog, \
     DeliverDetail, ItemDetail, PickupDetail
@@ -36,6 +41,10 @@ from sys2do.util.logic_helper import genSystemNo
 from sqlalchemy.sql.expression import and_
 from sys2do.util.barcode_helper import generate_barcode_file
 from flask.globals import request
+from sys2do.util.excel_helper import SummaryReport
+from sys2do.setting import TMP_FOLDER, TEMPLATE_FOLDER
+
+
 
 
 __all__ = ['bpOrder']
@@ -44,13 +53,13 @@ bpOrder = Blueprint('bpOrder', __name__)
 
 class OrderView(BasicView):
 
-    decorators = [login_required]
+#    decorators = [login_required]
 
     @templated('order/index.html')
 #    @login_required
     def index(self):
         values = {}
-        for f in ['create_time_from', 'create_time_to', 'no', 'source_station', 'source_company', 'destination_station', 'destination_company'] :
+        for f in ['create_time_from', 'create_time_to', 'ref_no', 'source_station', 'source_company', 'destination_station', 'destination_company'] :
             values[f] = _g(f)
 
         conditions = [OrderHeader.active == 0]
@@ -58,8 +67,8 @@ class OrderView(BasicView):
             conditions.append(OrderHeader.create_time > values['create_time_from'])
         if values['create_time_to']:
             conditions.append(OrderHeader.create_time < values['create_time_to'])
-        if values['no']:
-            conditions.append(OrderHeader.no.op('like')('%%%s%%' % values['no']))
+        if values['ref_no']:
+            conditions.append(OrderHeader.ref_no.op('like')('%%%s%%' % values['ref_no']))
         if values['source_station']:
             conditions.append(OrderHeader.source_station.op('like')('%%%s%%' % values['source_station']))
         if values['source_company']:
@@ -124,18 +133,18 @@ class OrderView(BasicView):
         params = {}
         for k in ['source_station', 'source_company', 'source_address', 'source_contact', 'source_tel', 'source_mobile',
                   'destination_station', 'destination_company', 'destination_address', 'destination_contact', 'destination_tel', 'destination_mobile',
-                  'no', 'order_time', 'item', 'item_remark', 'expect_time', 'remark',
+                  'ref_no', 'order_time', 'item', 'item_remark', 'expect_time', 'remark',
                  'payment_id', 'pickup_type_id', 'pack_type_id', 'qty', 'qty_ratio', 'vol', 'vol_ratio',
                   'weight', 'weight_ratio', 'weight_ratio', 'amount',
                   ]:
             params[k] = _g(k)
         order = OrderHeader(**params)
         DBSession.add(order)
+        DBSession.flush()
+
+        order.no = genSystemNo(order.id)
         order.barcode = generate_barcode_file(order.no)
 
-        _info(type(order.no))
-
-        DBSession.flush()
         DBSession.add(TransferLog(
                                   refer_id = order.id,
                                   transfer_date = dt.now().strftime("%Y-%m-%d"),
@@ -354,7 +363,7 @@ class OrderView(BasicView):
 
 
     @templated('order/barcode.html')
-    def barcode(self):
+    def print_barcode(self):
         header = OrderHeader.get(_g('id'))
 
         if not header :
@@ -420,7 +429,7 @@ class OrderView(BasicView):
         header = DBSession.query(OrderHeader).get(id)
 
         if type == 'order_header':
-            fields = ['no', 'source_station', 'source_company', 'source_address', 'source_contact', 'source_tel', 'source_mobile',
+            fields = ['ref_no', 'source_station', 'source_company', 'source_address', 'source_contact', 'source_tel', 'source_mobile',
                       'payment_id', 'item', 'qty', 'weight', 'vol', 'shipment_type_id',
                       'destination_station', 'destination_company', 'destination_address', 'destination_contact', 'destination_tel', 'destination_mobile',
                       'order_time', 'expect_time', 'actual_time', 'qty_ratio', 'weight_ratio', 'vol_ratio', 'amount', 'cost', 'remark',
@@ -500,6 +509,40 @@ class OrderView(BasicView):
                 obj.active = 1
                 DBSession.commit()
                 return jsonify({'code' : 0 , 'msg' : unicode(MSG_DELETE_SUCC)})
+
+
+
+    def export(self):
+        ids = _gl('order_ids')
+
+        _info(ids)
+
+        data = []
+        for r in DBSession.query(OrderHeader).filter(OrderHeader.id.in_(ids)).order_by(OrderHeader.create_time):
+            row = [r.create_time, r.no, r.destination_station, r.destination_contact, r.qty, r.weight, r.destination_tel,
+                   '', '', '', '', '',
+                   ]
+            data.append(row)
+
+        if not data : data = [['', ], ]
+
+
+        if not os.path.exists(TMP_FOLDER): os.makedirs(TMP_FOLDER)
+        current = dt.now()
+        templatePath = os.path.join(TEMPLATE_FOLDER, "template.xls")
+        tempFileName = os.path.join(TMP_FOLDER, "report_tmp_%s_%d.xls" % (current.strftime("%Y%m%d%H%M%S"), random.randint(0, 1000)))
+        realFileName = os.path.join(TMP_FOLDER, "report_%s.xls" % (dt.now().strftime("%Y%m%d%H%M%S")))
+        shutil.copy(templatePath, tempFileName)
+        report_xls = SummaryReport(templatePath = tempFileName, destinationPath = realFileName)
+
+        report_xls.inputData(data = data)
+        report_xls.outputData()
+        try:
+            os.remove(tempFileName)
+        except:
+            pass
+        return send_file(realFileName, as_attachment = True)
+
 
 
 bpOrder.add_url_rule('/', view_func = OrderView.as_view('view'), defaults = {'action':'index'})

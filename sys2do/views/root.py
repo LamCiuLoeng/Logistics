@@ -11,7 +11,7 @@ from sqlalchemy import and_
 
 from sys2do import app
 from sys2do.model import DBSession, User
-from flask.helpers import jsonify
+from flask.helpers import jsonify, send_file
 from sys2do.util.decorator import templated, login_required
 from sys2do.util.common import _g, _gp, _gl
 from sys2do.constant import MESSAGE_ERROR, MESSAGE_INFO, MSG_NO_SUCH_ACTION, \
@@ -36,6 +36,7 @@ class RootView(BasicView):
     #    flash('SHIT!', MESSAGE_ERROR)
 #        app.logger.debug('A value for debugging')
 #        flash(TEST_MSG, MESSAGE_INFO)
+#        return send_file('d:/new.png', as_attachment = True)
         return {"content" : _("Hello,World!")}
 
 
