@@ -19,12 +19,36 @@
 			t.change(compute);
 		});
 		
+		
+		$("#source_company").autocomplete({
+			source: function( request, response ) {
+				$.ajax({
+					url: "{{url_for('bpRoot.view', action = 'ajax_master')}}",
+					dataType: "json",
+					data: {
+						m : 'customer',
+						name : $("#source_company").val() 
+					},
+					success: function( r ) {
+						if(r.code == 0){
+							response( $.map( r.data, function( item ) {
+								return {
+									label: item.name,
+									value: item.name
+								}
+							}));
+						}else{
+							
+						}
+					}
+				});
+			},
+			minLength: 1			
+		});
+		
 	});
 
-	function tosave(){
-		$(".template").remove();
-		$("form").submit();
-	}
+	
 	
 	
 	function compute(){
@@ -68,7 +92,7 @@
   <div class="order_add_div_header">{{_('Now Order')}}</div>
     <div class="order_add_div_body">
   <ul>
-    	<li style="width:180px;"><span>{{_('Source Station')}}</span>
+    	<li style="width:180px;"><span><sup class="warn">*</sup>{{_('Source Station')}}</span>
     	  <input name="source_station" id="source_station" type="text" style="width:100px"/>
     	</li>
     	
@@ -87,10 +111,10 @@
         -->
         
         
-    	  <li style="width:180px;"><span>单号</span>
+    	 <li style="width:180px;"><span><sup class="warn">*</sup>单号</span>
     	    <input name="ref_no" id="ref_no" type="text" class="numeric" style="width:100px"/>
   	    </li>
-    	  <li style="width:366px;"><span>{{_('Destination Station')}}</span>
+    	  <li style="width:366px;"><span><sup class="warn">*</sup>{{_('Destination Station')}}</span>
     	    <input name="destination_station" id="destination_station" type="text" style="width:160px"/>
     	    <!-- <input name="input10" type="text" style="width:120px"/> -->      
    	      </li>
@@ -103,16 +127,16 @@
   	    </li>
    	       -->
     	  <li style="width:180px;"><span>{{_('Create Time')}}</span>{{current}}</li>
-    	  <li style="width:459px;"><span>{{_('Source Company')}}</span>
+    	  <li style="width:459px;"><span><sup class="warn">*</sup>{{_('Source Company')}}</span>
     	    <input name="source_company" id="source_company" type="text" style="width:360px"/>
     	  </li>
-    	  <li style="width:459px;"><span>{{_('Destination Company')}}</span>
+    	  <li style="width:459px;"><span><sup class="warn">*</sup>{{_('Destination Company')}}</span>
     	    <input name="destination_company" id="destination_company" type="text" style="width:360px"/>
     	  </li>
-    	  <li style="width:459px;"><span>{{_('Source Contact')}}</span>
+    	  <li style="width:459px;"><span><sup class="warn">*</sup>{{_('Source Contact')}}</span>
     	    <input name="source_contact" id="source_contact" type="text" style="width:360px"/>
     	  </li>
-    	  <li style="width:459px;"><span>{{_('Destination Contact')}}</span>
+    	  <li style="width:459px;"><span><sup class="warn">*</sup>{{_('Destination Contact')}}</span>
     	    <input name="destination_contact" id="destination_contact" type="text" style="width:360px"/>
     	  </li>
     	  <li style="width:459px;"><span>{{_('Source Address')}}</span>
@@ -147,6 +171,10 @@
     	  		{% endfor %}
     	    </select>
   	    </li>
+  	    <li style="width:226px;"><span>{{_('Expect Time')}}</span>
+    	    <input type="text" style="width:140px" id="expect_time" name="expect_time" class="datepicker"/>
+  	    </li>
+  	    
     	  <li style="width:459px;"><span>{{_('Item')}}</span>
     	    <input name="item" id="item" type="text" style="width:360px"/>
   	    </li>
@@ -165,7 +193,7 @@
     <td width="9%" align="center">{{_('Weight Ratio')}}</td>
     <td width="9%" align="center">{{_('Vol')}}</td>
     <td width="9%" align="center">{{_('Vol Ratio')}}</td>
-    <td width="9%" align="center">{{_('Amount')}}</td>
+    <td width="9%" align="center"><sup class="warn">*</sup>{{_('Amount')}}</td>
     <td width="9%" align="center">{{_('Payment')}}</td>
     </tr>
   <tr>
@@ -203,7 +231,12 @@
 </table>
 
 <div style="clear:both"></div>
-      
+
+<ul>
+	<li><p>标记 <sup class="warn">*</sup> 的项为必填项。</p></li>
+</ul>
+
+<div style="clear:both"></div>    
 
 <div class="order_add_info_tab_div">
 	<div class="order_add_info_tab_header">
@@ -215,15 +248,16 @@
 		<div id="item_details">
 			<table>
 				<tr>
-					<td>{{_('Item Name')}}</td><td><input type="text" name="item_name" id="item_name" value=""></td>
-					<td>{{_('Qty')}}</td><td><input type="text" name="item_qty" id="item_qty" value=""></td>
-					<td>{{_('Vol')}}</td><td><input type="text" name="item_vol" id="item_vol" value=""></td>
-					<td>{{_('Weight')}}</td><td><input type="text" name="item_weight" id="item_weight" value=""></td>
+					<td valign="top"><sup class="warn">*</sup>{{_('Item Name')}}</td><td valign="top"><input type="text" name="item_name" id="item_name" value=""></td>
+					<td valign="top">{{_('Qty')}}</td><td valign="top"><input type="text" name="item_qty" id="item_qty" value=""></td>
+					<td valign="top">{{_('Vol')}}</td><td valign="top"><input type="text" name="item_vol" id="item_vol" value=""></td>
+					<td valign="top">{{_('Weight')}}</td><td valign="top"><input type="text" name="item_weight" id="item_weight" value=""></td>
+				    <td valign="top">{{_('Remark')}}</td><td valign="top"><textarea name="item_remark" id="item_remark"></textarea></td>
 				</tr>
-				<tr><td>{{_('Remark')}}</td><td><textarea name="item_remark" id="item_remark"></textarea></td></tr>
 			</table>
 			<p><input type="button" value="{{_('Add')}}" onclick="add_item()"/></p>
 		</div>
+		<br />
 		<table>
 			<thead>
 				<tr class="field_head">

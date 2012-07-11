@@ -36,14 +36,6 @@ def _gp(prefix):
 def _allowedFile(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-#def _debug(msg):
-#    app.logger.debug(msg)
-#
-#def _info(msg):
-#    app.logger.debug(msg)
-#
-#def _error(msg):
-#    app.logger.debug(msg)
 
 _debug = lambda msg : app.logger.debug(msg)
 

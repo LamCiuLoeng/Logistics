@@ -1,0 +1,20 @@
+.warn{
+	color: red;
+	font-weight: bold;
+}
+
+
+
+.main_menu table tr td.bt_highlight_fix {
+	font-family: "宋体";
+	font-size: 12px;
+	font-weight: bold;
+	text-decoration: none;
+	background-image:url(/static/images/system/order_manage_12.jpg);
+	background-repeat: repeat-x;
+	color: #FFF;
+	text-align:center;
+	width: 120px;
+	cursor:pointer;
+	vertical-align:middle;
+}

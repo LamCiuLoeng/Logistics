@@ -6,7 +6,7 @@
 #  Description:
 ###########################################
 '''
-
+from datetime import datetime as dt
 from flaskext.babel import _
 
 
@@ -51,15 +51,16 @@ ASSIGN_RECEIVER = (10, T('Assign Receiver'))
 FETCH_GOODS = (11, T('Fetch Goods'))
 IN_WAREHOUSE = (20, T('In Warehouse'))
 SORTING = (30, T('Sorting'))
-#OUT_WAREHOUSE = (40, _('Out Warehouse'))
+OUT_WAREHOUSE = (40, _('Out Warehouse'))
 SEND_OUT = (50, T('Sent Out'))
 IN_TRAVEL = (60, T('In Travel'))
 GOODS_ARRIVED = (70, T('Goods Arrived'))
 GOODS_SIGNED = (90, T('Goods Signed'))
+GOODS_PICKUP = (95, T('Goods Pickuped'))
 
 STATUS_LIST = [
-               ORDER_CANCELLED, ORDER_NEW, ORDER_CONFIRMED, ASSIGN_RECEIVER, IN_WAREHOUSE, SORTING, SEND_OUT, IN_TRAVEL,
-               GOODS_ARRIVED, GOODS_SIGNED
+               ORDER_CANCELLED, ORDER_NEW, ORDER_CONFIRMED, ASSIGN_RECEIVER, IN_WAREHOUSE, SORTING, OUT_WAREHOUSE, SEND_OUT, IN_TRAVEL,
+               GOODS_ARRIVED, GOODS_SIGNED, GOODS_PICKUP
                ]
 
 
@@ -75,4 +76,4 @@ BTN_CANCEL = T('Cancel')
 BTN_RETURN = T('Return')
 
 
-
+SYSTEM_NOW = lambda : dt.now()

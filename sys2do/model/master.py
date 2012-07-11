@@ -123,15 +123,9 @@ class Customer(DeclarativeBase, SysMixin, CRUDMixin):
     id = Column(Integer, autoincrement = True, primary_key = True)
 
     name = Column(Text)
-#    province_id = Column(Integer, ForeignKey('master_province.id'))
-#    provice = relation(Province)
-#    city_id = Column(Integer, ForeignKey('master_city.id'))
-#    city = relation(City)
-#    district_id = Column(Integer, ForeignKey('master_district.id'))
-#    district = relation(District)
     address = Column(Text)
-    phone = Column(Text)
     contact_person = Column(Text)
+    phone = Column(Text)
     remark = Column(Text)
 
 

@@ -27,3 +27,47 @@ function add_item() {
 function del_item(obj){
     $($(obj).parents('tr')[0]).remove(); 
 }
+
+function tosave(){
+    var msg = Array();
+    
+    if(!$('#source_station').val()){
+        msg.push('请填写始发站！');
+    }
+    
+    if(!$('#ref_no').val()){
+        msg.push('请填写单号！');
+    }
+    if(!$('#destination_station').val()){
+        msg.push('请填写目的站！');
+    }
+    if(!$('#source_company').val()){
+        msg.push('请填写发货公司！');
+    }
+    if(!$('#source_contact').val()){
+        msg.push('请填写发货人！');
+    }
+    if(!$('#destination_company').val()){
+        msg.push('请填写收货公司！');
+    }
+    if(!$('#destination_contact').val()){
+        msg.push('请填写收货人！');
+    }
+    if(!$('#amount').val()){
+        msg.push('请填写金额！');
+    }
+    
+    if(msg.length < 1){
+        $("form").submit();
+    }else{
+        var s = '<ul>';
+        for(var i=0;i<msg.length;i++){
+            s += '<li>' + msg[i] + '</li>';
+        }
+        s += '</ul>';
+        
+        $.modaldialog.error(s);
+        return false;
+    }
+    
+}

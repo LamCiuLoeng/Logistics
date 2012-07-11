@@ -1,8 +1,8 @@
 function menu_move_over(menu_bt) {
-    $(menu_bt).attr("class", "bt_highlight");
+    $(menu_bt).addClass('bt_highlight');
 }
 function menu_move_out(menu_bt) {
-    $(menu_bt).attr("class", "bt_normal");
+    $(menu_bt).removeClass('bt_highlight');
 }
 
 function MM_preloadImages() { //v3.0

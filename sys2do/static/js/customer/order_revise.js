@@ -8,27 +8,81 @@ function ajax_save(params,handler){
 }
 
 function save_header() {
-    var params = {
-            'form_type' : 'order_header'
-    };
-    $("input[type=text],input[type=hidden],select,textarea","#order_header").each(function(){
-       var t = $(this);
-       var name = t.attr("name");
-       var value = t.val();
-       params[name] = value;
-    });
+    var msg = Array();
     
-    ajax_save(params, function(r){
-        if(r.code == 0){
-            alert(r.msg);
-        }else{
-            alert(r.msg);
+    if(!$('#source_station').val()){
+        msg.push('请填写始发站！');
+    }
+    
+    if(!$('#ref_no').val()){
+        msg.push('请填写单号！');
+    }
+    if(!$('#destination_station').val()){
+        msg.push('请填写目的站！');
+    }
+    if(!$('#source_company').val()){
+        msg.push('请填写发货公司！');
+    }
+    if(!$('#source_contact').val()){
+        msg.push('请填写发货人！');
+    }
+    if(!$('#destination_company').val()){
+        msg.push('请填写收货公司！');
+    }
+    if(!$('#destination_contact').val()){
+        msg.push('请填写收货人！');
+    }
+    if(!$('#amount').val()){
+        msg.push('请填写金额！');
+    }
+    
+    
+    if(msg.length < 1){
+        var params = {
+                'form_type' : 'order_header'
+        };
+        $("input[type=text],input[type=hidden],select,textarea","#order_header").each(function(){
+           var t = $(this);
+           var name = t.attr("name");
+           var value = t.val();
+           params[name] = value;
+        });
+        
+        ajax_save(params, function(r){
+            if(r.code == 0){
+                alert(r.msg);
+            }else{
+                alert(r.msg);
+            }
+        })
+    }else{
+        var s = '';
+        for(var i=0;i<msg.length;i++){
+            s += msg[i] + '\n';
         }
-    })
-    
+        alert(s);  
+    }
 }
 
 function save_item(){
+    var msg = Array();
+    
+    if(!$('#item_name').val()){
+        msg.push('请填写货物名称！');
+    }
+    if(!$('#item_qty').val()){
+        msg.push('请填写货物数量！');
+    }
+    
+    if(msg.length > 0){
+        var s = '';
+        for(var i=0;i<msg.length;i++){
+            s += msg[i] + '\n';
+        }
+        alert(s);  
+        return false;
+    }
+    
     var params = {
             'form_type' : 'item_detail',
             'action_type' : 'ADD',
@@ -81,6 +135,24 @@ function del_item(id,obj) {
 }
 
 function save_receiver() {
+    var msg = Array();
+    
+    if(!$('#receiver_contact').val()){
+        msg.push('请填写收件联系人！');
+    }
+    if(!$('#receiver_tel').val() && !$('#receiver_mobile').val()){
+        msg.push('请填写联系人电话或者手机！');
+    }
+    
+    if(msg.length > 0){
+        var s = '';
+        for(var i=0;i<msg.length;i++){
+            s += msg[i] + '\n';
+        }
+        alert(s);  
+        return false;
+    }
+    
     var params = {
             'form_type' : 'receiver',
             'receiver_contact' : $("#receiver_contact").val(),
@@ -99,7 +171,58 @@ function save_receiver() {
     
 }
 
+
+function save_warehouse(type){
+    
+    var msg = Array();
+    if(!$('#wh_time').val()){
+        if(type == 'IN'){
+            msg.push('请填写货物入仓时间！');
+        }else{
+            msg.push('请填写货物出仓时间！');
+        }
+    }
+
+    if(msg.length > 0){
+        var s = '';
+        for(var i=0;i<msg.length;i++){
+            s += msg[i] + '\n';
+        }
+        alert(s);  
+        return false;
+    }
+    
+    var params = {
+            'form_type' : 'warehouse',
+            'action' : type,
+            'wh_time' : $("#wh_time").val(),
+            'wh_remark' : $("#wh_remark").val()
+    }
+    
+    ajax_save(params,function(r){
+        if(r.code == 0){
+            alert(r.msg);
+        }else{
+            alert(r.msg);
+        }
+    })
+}
+
 function save_transit() {
+    var msg = Array();
+    if(!$('#transit_action_time').val()){
+        msg.push('请填写运输信息时间！');
+    }
+
+    if(msg.length > 0){
+        var s = '';
+        for(var i=0;i<msg.length;i++){
+            s += msg[i] + '\n';
+        }
+        alert(s);  
+        return false;
+    }
+    
     var params = {
             'form_type' : 'transit',
             'action_type' : 'ADD',
@@ -110,10 +233,10 @@ function save_transit() {
     ajax_save(params, function(r){
         if(r.code == 0){
             alert(r.msg);
-            var html = '<tr>';
+            var html = '<tr class="data_table_tr">';
             html += '<td>'+$("#transit_action_time").val()+'</td>';
             html += '<td>'+$('#transit_remark').val()+'</td>';
-            html += '<td><input type="button" value="删除" onclick="del_transit('+r.transit_id+',this)"/></td>';
+            /*html += '<td><input type="button" value="删除" onclick="del_transit('+r.transit_id+',this)"/></td>'; */
             html += '</tr>';
             
             $("#transit_list").append(html);
@@ -143,7 +266,64 @@ function del_transit(id,obj) {
 }
 
 
+function save_signed(){
+var msg = Array();
+    
+    if(!$('#signed_contact').val()){
+        msg.push('请填写签收联系人！');
+    }
+    if(!$('#signed_time').val()){
+        msg.push('请填写签收时间！');
+    }
+    
+    if(msg.length > 0){
+        var s = '';
+        for(var i=0;i<msg.length;i++){
+            s += msg[i] + '\n';
+        }
+        alert(s);  
+        return false;
+    }
+    
+    var params = {
+            'form_type' : 'signed',
+            'signed_contact' : $("#signed_contact").val(),
+            'signed_tel' : $("#signed_tel").val(),
+            'signed_time' : $("#signed_time").val(),
+            'signed_remark' : $("#signed_remark").val()
+    }
+    
+    ajax_save(params,function(r){
+        if(r.code == 0){
+            alert(r.msg);
+        }else{
+            alert(r.msg);
+        }
+    })
+}
+
+
 function save_pickup() {
+    var msg = Array();
+    if(!$('#pickup_action_time').val()){
+        msg.push('请填写提货信息时间！');
+    }
+    if(!$('#pickup_contact').val()){
+        msg.push('请填写提货联系人！');
+    }
+    if(!$('#pickup_qty').val()){
+        msg.push('请填写提货数量！');
+    }
+
+    if(msg.length > 0){
+        var s = '';
+        for(var i=0;i<msg.length;i++){
+            s += msg[i] + '\n';
+        }
+        alert(s);  
+        return false;
+    }
+    
     var params = {
             'form_type' : 'pickup',
             'action_type' : 'ADD',
@@ -157,7 +337,7 @@ function save_pickup() {
     ajax_save(params, function(r){
         if(r.code == 0){
             alert(r.msg);
-            var html = '<tr>';
+            var html = '<tr class="data_table_tr">';
             html += '<td>'+$("#pickup_action_time").val()+'</td>';
             html += '<td>'+$('#pickup_contact').val()+'</td>';
             html += '<td>'+$('#pickup_tel').val()+'</td>';

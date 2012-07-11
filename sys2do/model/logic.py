@@ -74,9 +74,9 @@ class OrderHeader(DeclarativeBase, SysMixin, CRUDMixin):
     destination_tel = Column(Text)
     destination_mobile = Column(Text)
 
-    order_time = Column(Date, default = None)
-    expect_time = Column(Date, default = None)
-    actual_time = Column(Date, default = None)
+    order_time = Column(Text)
+    expect_time = Column(Text)
+    actual_time = Column(Text)
 
     qty_ratio = Column(Float, default = None)
     weight_ratio = Column(Float, default = None)
@@ -90,6 +90,11 @@ class OrderHeader(DeclarativeBase, SysMixin, CRUDMixin):
     receiver_mobile = Column(Text)
     receiver_remark = Column(Text)
 
+
+    signed_contact = Column(Text)
+    signed_tel = Column(Text)
+    signed_time = Column(Text)
+    signed_remark = Column(Text)
 
     barcode_id = Column(Integer, ForeignKey('system_upload_file.id'))
     barcode = relation(UploadFile)
@@ -142,6 +147,13 @@ class OrderHeader(DeclarativeBase, SysMixin, CRUDMixin):
                                                 TransferLog.refer_id == self.id
                                                 )).order_by(TransferLog.transfer_date)
 
+
+    def get_deliver_header(self):
+        try:
+            deliver = DBSession.query(DeliverDetail).filter(and_(DeliverDetail.active == 0, DeliverDetail.order_header_id == self.id)).one()
+            return deliver.header
+        except:
+            return None
 
 
 class ItemDetail(DeclarativeBase, SysMixin):
@@ -225,9 +237,10 @@ class DeliverHeader(DeclarativeBase, SysMixin, CRUDMixin):
 
     need_transfer = Column(Text)
 
-    send_out_remark = Column(Text)
-    arrived_remark = Column(Text)
+#    send_out_remark = Column(Text)
+#    arrived_remark = Column(Text)
 
+    sendout_time = Column(Date, default = None)
     expect_time = Column(Date, default = None)
     actual_time = Column(Date, default = None)
 

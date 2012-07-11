@@ -20,7 +20,7 @@ from sys2do.constant import MESSAGE_ERROR, MSG_NO_SUCH_ACTION, MESSAGE_INFO, \
     ORDER_CANCELLED, MSG_DELETE_SUCC, SORTING, MSG_RECORD_NOT_EXIST, SEND_OUT, \
     GOODS_ARRIVED, IN_TRAVEL, GOODS_SIGNED, MSG_SERVER_ERROR, LOG_GOODS_SORTED, \
     LOG_GOODS_SENT_OUT, LOG_GOODS_ARRIVAL, MSG_NO_ID_SUPPLIED
-from sys2do.util.decorator import templated, login_required
+from sys2do.util.decorator import templated, login_required, tab_highlight
 from sys2do.model import DBSession
 from sys2do.views import BasicView
 from sys2do.model.logic import DeliverHeader, OrderHeader, \
@@ -38,7 +38,7 @@ bpDeliver = Blueprint('bpDeliver', __name__)
 
 class DeliverView(BasicView):
 
-#    decorators = [login_required]
+    decorators = [login_required, tab_highlight('TAB_DELIVER'), ]
 
     @templated('deliver/index.html')
     def index(self):
@@ -62,7 +62,7 @@ class DeliverView(BasicView):
             conditions.append(DeliverHeader.supplier_id == values['supplier_id'])
 
 
-        result = DBSession.query(DeliverHeader).filter(DeliverHeader.active == 0)
+        result = DBSession.query(DeliverHeader).filter(and_(*conditions))
         return {'result' : result, 'values' : values, 'suppliers' : getMasterAll(Supplier)}
 
     @templated('deliver/select_orders.html')
@@ -129,7 +129,7 @@ class DeliverView(BasicView):
                                       refer_id = header.id,
                                       transfer_date = dt.now().strftime("%Y-%m-%d"),
                                       type = 1,
-                                      remark = unicode(LOG_GOODS_SORTED)
+                                      remark = u'货物已分拣'
                                       ))
             DBSession.commit()
         except:
@@ -323,6 +323,56 @@ class DeliverView(BasicView):
         else:
             flash(MSG_SAVE_SUCC, MESSAGE_INFO)
             return redirect(url_for('.view', action = 'vendor_select'))
+
+
+
+
+    def ajax_save(self):
+        id = _g("id")
+        type = _g('form_type')
+        if type not in ['sendout', 'transit', 'exception', 'arrived']:
+            return jsonify({'code' :-1, 'msg' : unicode(MSG_NO_SUCH_ACTION)})
+
+        header = DeliverHeader.get(id)
+        if type == 'sendout':
+            header.status = SEND_OUT[0]
+            DBSession.add(TransferLog(
+                                      refer_id = header.id,
+                                      transfer_date = _g('send_out_time'),
+                                      type = 1,
+                                      remark = _g('send_out_remark')
+                                      ))
+            header.sendout_time = _g('send_out_time')
+            DBSession.commit()
+            return jsonify({'code' : 0 , 'msg' : unicode(MSG_SAVE_SUCC)})
+
+        if type == 'transit':
+            DBSession.add(TransferLog(
+                                      refer_id = header.id,
+                                      transfer_date = _g('transit_time'),
+                                      type = 1,
+                                      remark = _g('transit_remark')
+                                      ))
+            DBSession.commit()
+            return jsonify({'code' : 0 , 'msg' : unicode(MSG_SAVE_SUCC)})
+
+
+        if type == 'arrived' :
+            header.status = GOODS_ARRIVED[0]
+            DBSession.add(TransferLog(
+                                      refer_id = header.id,
+                                      transfer_date = _g('arrived_time'),
+                                      type = 1,
+                                      remark = _g('arrived_remark')
+                                      ))
+
+            for d in header.details:
+                order_header = d.order_header
+                order_header.actual_time = _g('arrived_time')
+
+            DBSession.commit()
+            return jsonify({'code' : 0 , 'msg' : unicode(MSG_SAVE_SUCC)})
+
 
 
 

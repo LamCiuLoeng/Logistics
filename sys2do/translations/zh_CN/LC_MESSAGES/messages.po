@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2012-07-06 19:24+0800\n"
-"PO-Revision-Date: 2012-07-06 19:26+0800\n"
+"PO-Revision-Date: 2012-07-11 17:03+0800\n"
 "Last-Translator: CL.Lam <lamciuloeng@gmail.com>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
 "Plural-Forms: nplurals=1; plural=0\n"
@@ -58,7 +58,7 @@ msgstr "其它"
 #: templates/admin/customer_new.html:11
 #: templates/admin/customer_update.html:11
 msgid "Customer Name"
-msgstr "用户"
+msgstr "客户名称"
 
 #: templates/register.html:45
 #: templates/admin/customer_index.html:64
@@ -478,7 +478,7 @@ msgstr "承运商电话"
 #: templates/order/received.html:47
 #: templates/order/review.html:40
 msgid "Expect Time"
-msgstr "期望到达时间"
+msgstr "到达预期"
 
 #: templates/deliver/add_deliver.html:56
 msgid "Charge"
@@ -503,7 +503,7 @@ msgstr "订单号码"
 #: templates/order/review.html:21
 #: templates/order/revise.html:57
 msgid "Destination Station"
-msgstr "目地站"
+msgstr "目的站"
 
 #: templates/deliver/add_deliver.html:74
 #: templates/deliver/revise_deliver.html:69

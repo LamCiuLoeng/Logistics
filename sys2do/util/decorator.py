@@ -15,9 +15,10 @@ from flask import request, redirect, url_for, render_template, session, flash
 from flask import current_app as app
 
 from sys2do.constant import MESSAGE_ERROR
+from sys2do.util.common import _info
 
 
-__all__ = ['login_required', 'templated', 'has_all_permissions', 'is_all_groups', 'is_any_groups']
+__all__ = ['login_required', 'tab_highlight', 'templated', 'has_all_permissions', 'is_all_groups', 'is_any_groups']
 
 
 def login_required(f):
@@ -27,6 +28,16 @@ def login_required(f):
             return redirect(url_for('bpAuth.login', next = request.url))
         return f(*args, **kwargs)
     return decorated_function
+
+
+def tab_highlight(tab):
+    def decorator(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            session['tab-highlight'] = tab
+            return f(*args, **kwargs)
+        return decorated_function
+    return decorator
 
 
 def templated(template = None):

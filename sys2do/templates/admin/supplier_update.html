@@ -1,8 +1,26 @@
 {% extends "master.html" %}
 
 {% block extJS %}
+<script language="JavaScript" type="text/javascript">
+//<![CDATA[
 
+	function tosave(){
+		$("form").submit();
+	}
+
+//]]>
+</script>
 {% endblock %}
+
+{% block inner_menu %}
+<div class="inner_menu">
+	<ul>
+        <li><input type="image" src="/static/images/system/order_manage_33.jpg" width="77" height="21" id="Image3" onmouseover="MM_swapImage('Image3','','/static/images/system/order_manage_h_33.jpg',1)" onmouseout="MM_swapImgRestore()" onclick="tosave()"/></li>
+        <li style="padding:0px; margin:0px 55px 0px 0px; float:right"><a href="{{url_for('bpAuth.logout')}}"><img src="/static/images/system/order_manage_22.jpg" width="56" height="29" /></a></li>
+    </ul>
+</div>
+{% endblock %}
+
 
 {% block content %}
 	<form action="{{url_for('.view', action = 'supplier',m='SAVE_UPDATE')}}" method="post">
@@ -14,14 +32,6 @@
 			<tr>
 				<td>{{_('Address')}}</td>
 				<td>
-					<select name="province_id" id="province_id">
-						<option>{{_('Please Select One')}}</option>
-						{% for p in provinces %}
-							<option value="{{p.id}}">{{p}}</option>
-						{% endfor %}
-					</select>
-					<select name="city_id" id="city_id"></select>
-					<select name="district_id" id="district_id"></select>
 					<input type="text" name="address" id="address" value="{{obj.address}}"/>
 				</td>
 			</tr>

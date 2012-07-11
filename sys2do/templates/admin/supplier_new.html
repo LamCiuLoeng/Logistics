@@ -14,15 +14,7 @@
 			<tr>
 				<td>{{_('Address')}}</td>
 				<td>
-					<select name="source_province_id" id="source_province_id">
-						<option>{{_('Please Select One')}}</option>
-						{% for p in provinces %}
-							<option value="{{p.id}}">{{p}}</option>
-						{% endfor %}
-					</select>
-					<select name="source_city_id" id="source_city_id"></select>
-					<select name="source_district_id" id="source_district_id"></select>
-					<input type="text" name="source_address" id="source_address" value=""/>
+					<input type="text" name="address" id="address" value=""/>
 				</td>
 			</tr>
 			<tr>

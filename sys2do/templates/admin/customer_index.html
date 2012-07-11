@@ -4,6 +4,17 @@
 
 {% endblock %}
 
+
+{% block inner_menu %}
+<div class="inner_menu">
+	<ul>
+        <li><a href="{{url_for('.view',action='customer',m='NEW')}}"><img src="/static/images/system/order_manage_31.jpg" width="77" height="21" id="Image2" onmouseover="MM_swapImage('Image2','','/static/images/system/order_manage_h_31.jpg',1)" onmouseout="MM_swapImgRestore()" /></a></li>
+        <li style="padding:0px; margin:0px 55px 0px 0px; float:right"><a href="{{url_for('bpAuth.logout')}}"><img src="/static/images/system/order_manage_22.jpg" width="56" height="29" /></a></li>
+    </ul>
+</div>
+{% endblock %}
+
+
 {% block content %}
 	<table width="100%" border="0" cellspacing="0" cellpadding="0">
       <tr>
@@ -52,44 +63,18 @@
             </table>
               <table width="99%" border="0" cellspacing="0" cellpadding="0">
                 <tr class="field_head">
-                  <td align="center"><table width="80%" border="0" cellspacing="0" cellpadding="0">
-                    <tr>
-                      <td width="20%" align="right"><img src="/static/images/system/group_manage_58.jpg" width="12" height="19" /></td>
-                      <td width="80%" align="left">{{_('Customer Name')}}</td>
-                    </tr>
-                  </table></td>
-                  <td align="center"><table width="80%" border="0" cellspacing="0" cellpadding="0">
-                    <tr>
-                      <td width="20%" align="right"><img src="/static/images/system/group_manage_58.jpg" width="12" height="19" /></td>
-                      <td width="80%" align="left">{{_('Address')}}</td>
-                    </tr>
-                  </table></td>
-                  <td align="center"><table width="80%" border="0" cellspacing="0" cellpadding="0">
-                    <tr>
-                      <td width="20%" align="right"><img src="/static/images/system/group_manage_58.jpg" width="12" height="19" /></td>
-                      <td width="80%" align="left">{{_('Contact Person')}}</td>
-                    </tr>
-                  </table></td>
-                  <td align="center"><table width="80%" border="0" cellspacing="0" cellpadding="0">
-                    <tr>
-                      <td width="20%" align="right"><img src="/static/images/system/group_manage_58.jpg" width="12" height="19" /></td>
-                      <td width="80%" align="left">{{_('Phone')}}</td>
-                    </tr>
-                  </table></td>
-                  <td align="center"><table width="80%" border="0" cellspacing="0" cellpadding="0">
-                    <tr>
-                      <td width="20%" align="right"><img src="/static/images/system/group_manage_58.jpg" width="12" height="19" /></td>
-                      <td width="80%" align="left">{{_('Action')}}</td>
-                    </tr>
-                  </table></td>
+                  <td align="center">{{_('Customer Name')}}</td>
+                  <td align="center">{{_('Address')}}</td>
+                  <td align="center">{{_('Contact Person')}}</td>
+                  <td align="center">{{_('Phone')}}</td>
                 </tr>
 				{% for r in records %}
 					<tr class="data_table_tr">
-						<td>{{r}}</td>
+						<td><a href="{{url_for('.view', action = 'customer',m = 'UPDATE',id=r.id)}}">{{r}}</a></td>
 						<td>{{r.provice|ifFalse}}{{r.city|ifFalse}}{{r.district|ifFalse}}{{r.address|ifFalse}}</td>
 						<td>{{r.contact_person|ifFalse}}</td>
 						<td>{{r.phone|ifFalse}}</td>
-						<td><a href="{{url_for('.view', action = 'customer',m = 'UPDATE',id=r.id)}}">{{_('Revise')}}</a>&nbsp|&nbsp;<a href="{{url_for('.view', action = 'customer',m = 'DELETE',id=r.id)}}">{{_('Delete')}}</a></td>
+						
 					</tr>
 				{% endfor %}
               </table></td>

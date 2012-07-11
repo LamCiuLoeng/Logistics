@@ -23,17 +23,18 @@ from flask.helpers import flash, jsonify, send_file
 from sys2do.model.logic import OrderHeader, TransferLog, \
     DeliverDetail, ItemDetail, PickupDetail
 from sys2do.model import DBSession
-from sys2do.util.decorator import templated, login_required
+from sys2do.util.decorator import templated, login_required, tab_highlight
 from sys2do import app
 from sys2do.constant import MESSAGE_ERROR, MESSAGE_INFO, MSG_UPDATE_SUCC, \
     MSG_DELETE_SUCC, MSG_NO_ID_SUPPLIED, MSG_SERVER_ERROR, MSG_NO_SUCH_ACTION, \
     MSG_SAVE_SUCC, ORDER_CANCELLED, STATUS_LIST, IN_TRAVEL, \
     MSG_RECORD_NOT_EXIST, IN_WAREHOUSE, \
     LOG_CREATE_ORDER, LOG_GOODS_IN_WAREHOUSE, ORDER_NEW, \
-    ASSIGN_RECEIVER, LOG_SEND_RECEIVER
+    ASSIGN_RECEIVER, LOG_SEND_RECEIVER, OUT_WAREHOUSE, GOODS_PICKUP, \
+    GOODS_SIGNED
 from sys2do.views import BasicView
 from sys2do.util.common import _g, getOr404, _gp, getMasterAll, _debug, _info, \
-    _gl
+    _gl, _error
 from sys2do.model.master import CustomerProfile, InventoryLocation, \
     Customer, ItemUnit, WeightUnit, ShipmentType, \
     InventoryItem, Payment, Ratio, PickupType, PackType
@@ -53,7 +54,7 @@ bpOrder = Blueprint('bpOrder', __name__)
 
 class OrderView(BasicView):
 
-#    decorators = [login_required]
+    decorators = [login_required, tab_highlight('TAB_ORDER'), ]
 
     @templated('order/index.html')
 #    @login_required
@@ -149,7 +150,7 @@ class OrderView(BasicView):
                                   refer_id = order.id,
                                   transfer_date = dt.now().strftime("%Y-%m-%d"),
                                   type = 0,
-                                  remark = unicode(LOG_CREATE_ORDER),
+                                  remark = u'新建订单',
                                   ))
         return (0, order)
 
@@ -174,11 +175,26 @@ class OrderView(BasicView):
             return redirect(self.default())
 
         header = DBSession.query(OrderHeader).get(id)
+
+        logs = []
+        logs.extend(header.get_logs())
+        try:
+            deliver_detail = DBSession.query(DeliverDetail).filter(and_(DeliverDetail.active == 0, DeliverDetail.order_header_id == header.id)).one()
+            deliver_heaer = deliver_detail.header
+            for f in deliver_heaer.get_logs() : _info(f.remark)
+            logs.extend(deliver_heaer.get_logs())
+        except:
+            pass
+
+        sorted(logs, cmp = lambda x, y: cmp(x.transfer_date, y.transfer_date))
+
+
         return {
                 'header' : header ,
                 'payment' : getMasterAll(Payment),
                 'pickup_type' : getMasterAll(PickupType, 'id'),
                 'pack_type' : getMasterAll(PackType, 'id'),
+                'transit_logs' : logs
                 }
 
 
@@ -423,7 +439,7 @@ class OrderView(BasicView):
     def ajax_save(self):
         type = _g('form_type')
         id = _g("id")
-        if type not in ['order_header', 'item_detail', 'receiver' , 'transit', 'pickup']:
+        if type not in ['order_header', 'item_detail', 'receiver', 'warehouse' , 'transit', 'signed', 'pickup']:
             return jsonify({'code' :-1, 'msg' : unicode(MSG_NO_SUCH_ACTION)})
 
         header = DBSession.query(OrderHeader).get(id)
@@ -437,8 +453,13 @@ class OrderView(BasicView):
                       ]
             for f in fields:
                 setattr(header, f, _g(f))
-            DBSession.commit()
-            return jsonify({'code' : 0 , 'msg' : unicode(MSG_SAVE_SUCC)})
+            try:
+                DBSession.commit()
+                return jsonify({'code' : 0 , 'msg' : unicode(MSG_SAVE_SUCC)})
+            except:
+                _error(traceback.print_exc())
+                DBSession.rollback()
+                return jsonify({'code' : 1 , 'msg' : unicode(MSG_SERVER_ERROR)})
 
         elif type == 'item_detail':
             action_type = _g('action_type')
@@ -449,13 +470,22 @@ class OrderView(BasicView):
                     params[f] = _g(f)
                 obj = ItemDetail(**params)
                 DBSession.add(obj)
-                DBSession.commit()
-                return jsonify({'code' : 0 , 'msg' : unicode(MSG_SAVE_SUCC) , 'id' : obj.id})
+                try:
+                    DBSession.commit()
+                    return jsonify({'code' : 0 , 'msg' : unicode(MSG_SAVE_SUCC) , 'id' : obj.id})
+                except:
+                    DBSession.rollback()
+                    return jsonify({'code' : 1 , 'msg' : unicode(MSG_SERVER_ERROR)})
+
             else:
                 line = DBSession.query(ItemDetail).get(_g('item_id'))
                 line.active = 1
-                DBSession.commit()
-                return jsonify({'code' : 0 , 'msg' : unicode(MSG_DELETE_SUCC)})
+                try:
+                    DBSession.commit()
+                    return jsonify({'code' : 0 , 'msg' : unicode(MSG_DELETE_SUCC)})
+                except:
+                    DBSession.rollback()
+                    return jsonify({'code' : 1 , 'msg' : unicode(MSG_SERVER_ERROR)})
 
         elif type == 'receiver' :
             for f in ['receiver_contact', 'receiver_tel', 'receiver_mobile', 'receiver_remark', ]:
@@ -467,11 +497,47 @@ class OrderView(BasicView):
                                   refer_id = header.id,
                                   transfer_date = dt.now().strftime("%Y-%m-%d"),
                                   type = 0,
-                                  remark = unicode(LOG_SEND_RECEIVER),
+                                  remark = u'已派遣收件人收货。',
                                   ))
+            try:
+                DBSession.commit()
+                return jsonify({'code' : 0 , 'msg' : unicode(MSG_SAVE_SUCC)})
+            except:
+                    DBSession.rollback()
+                    return jsonify({'code' : 1 , 'msg' : unicode(MSG_SERVER_ERROR)})
 
-            DBSession.commit()
-            return jsonify({'code' : 0 , 'msg' : unicode(MSG_SAVE_SUCC)})
+        elif type == 'warehouse' :
+            action = _g('action')
+            if action not in ['IN', 'OUT'] : return jsonify({'code' :-1, 'msg' : unicode(MSG_NO_SUCH_ACTION)})
+            if action == 'IN' :
+                header.update_status(IN_WAREHOUSE[0])
+                DBSession.add(TransferLog(
+                                  refer_id = header.id,
+                                  transfer_date = _g('wh_time'),
+                                  type = 0,
+                                  remark = _g('wh_remark'),
+                                  ))
+                try:
+                    DBSession.commit()
+                    return jsonify({'code' : 0 , 'msg' : unicode(MSG_SAVE_SUCC)})
+                except:
+                    DBSession.rollback()
+                    return jsonify({'code' : 1 , 'msg' : unicode(MSG_SERVER_ERROR)})
+
+            else:
+                header.update_status(OUT_WAREHOUSE[0])
+                DBSession.add(TransferLog(
+                                  refer_id = header.id,
+                                  transfer_date = _g('wh_time'),
+                                  type = 0,
+                                  remark = _g('wh_remark'),
+                                  ))
+                try:
+                    DBSession.commit()
+                    return jsonify({'code' : 0 , 'msg' : unicode(MSG_SAVE_SUCC)})
+                except:
+                    DBSession.rollback()
+                    return jsonify({'code' : 1 , 'msg' : unicode(MSG_SERVER_ERROR)})
 
         elif type == 'transit':
             action_type = _g('action_type')
@@ -481,17 +547,26 @@ class OrderView(BasicView):
                                   refer_id = header.id,
                                   transfer_date = _g('action_time'),
                                   type = 0,
-                                  remark = _g('remark'),
+                                  remark = u'货物在途。' + (_g('remark') or ''),
                                   )
                 DBSession.add(obj)
-                DBSession.commit()
-                return jsonify({'code' : 0 , 'msg' : unicode(MSG_SAVE_SUCC) , 'transit_id' : obj.id})
+                try:
+                    DBSession.commit()
+                    return jsonify({'code' : 0 , 'msg' : unicode(MSG_SAVE_SUCC) , 'transit_id' : obj.id})
+                except:
+                    DBSession.rollback()
+                    return jsonify({'code' : 1 , 'msg' : unicode(MSG_SERVER_ERROR)})
+
             else:
                 transit_id = _g('transit_id')
                 obj = DBSession.query(TransferLog).get(transit_id)
                 obj.active = 1
-                DBSession.commit()
-                return jsonify({'code' : 0 , 'msg' : unicode(MSG_DELETE_SUCC)})
+                try:
+                    DBSession.commit()
+                    return jsonify({'code' : 0 , 'msg' : unicode(MSG_DELETE_SUCC)})
+                except:
+                    DBSession.rollback()
+                    return jsonify({'code' : 1 , 'msg' : unicode(MSG_SERVER_ERROR)})
 
         elif type == 'pickup':
             action_type = _g('action_type')
@@ -501,15 +576,49 @@ class OrderView(BasicView):
                 for f in ['action_time', 'contact', 'tel', 'qty', 'remark']: params[f] = _g(f)
                 obj = PickupDetail(header = header, **params)
                 DBSession.add(obj)
-                DBSession.commit()
-                return jsonify({'code' : 0 , 'msg' : unicode(MSG_SAVE_SUCC) , 'pickup_id' : obj.id})
+
+                header.update_status(GOODS_PICKUP[0])
+                DBSession.add(TransferLog(
+                                  refer_id = header.id,
+                                  transfer_date = _g('action_time'),
+                                  type = 0,
+                                  remark = u'订单已被提货。' + (_g('remark') or ''),
+                                  ))
+                try:
+                    DBSession.commit()
+                    return jsonify({'code' : 0 , 'msg' : unicode(MSG_SAVE_SUCC) , 'pickup_id' : obj.id})
+                except:
+                    DBSession.rollback()
+                    return jsonify({'code' : 1 , 'msg' : unicode(MSG_SERVER_ERROR)})
             else:
                 pickup_id = _g('pickup_id')
                 obj = DBSession.query(PickupDetail).get(pickup_id)
                 obj.active = 1
-                DBSession.commit()
-                return jsonify({'code' : 0 , 'msg' : unicode(MSG_DELETE_SUCC)})
+                try:
+                    DBSession.commit()
+                    return jsonify({'code' : 0 , 'msg' : unicode(MSG_DELETE_SUCC)})
+                except:
+                    DBSession.rollback()
+                    return jsonify({'code' : 1 , 'msg' : unicode(MSG_SERVER_ERROR)})
 
+        if type == 'signed':
+            for f in ['signed_contact', 'signed_tel', 'signed_time', 'signed_remark', ]:
+                setattr(header, f, _g(f))
+
+            if header.status < GOODS_SIGNED[0]:
+                header.update_status(GOODS_SIGNED[0])
+                DBSession.add(TransferLog(
+                                  refer_id = header.id,
+                                  transfer_date = _g('signed_time'),
+                                  type = 0,
+                                  remark = u'货物已签收。' + (_g('signed_remark') or ''),
+                                  ))
+            try:
+                DBSession.commit()
+                return jsonify({'code' : 0 , 'msg' : unicode(MSG_SAVE_SUCC)})
+            except:
+                    DBSession.rollback()
+                    return jsonify({'code' : 1 , 'msg' : unicode(MSG_SERVER_ERROR)})
 
 
     def export(self):
@@ -519,9 +628,26 @@ class OrderView(BasicView):
 
         data = []
         for r in DBSession.query(OrderHeader).filter(OrderHeader.id.in_(ids)).order_by(OrderHeader.create_time):
-            row = [r.create_time, r.no, r.destination_station, r.destination_contact, r.qty, r.weight, r.destination_tel,
-                   '', '', '', '', '',
-                   ]
+            row = [r.create_time, r.no, r.destination_station, r.destination_contact, r.qty, r.weight, r.destination_tel, '', ] #A - H
+            deliver_header = r.get_deliver_header()
+            if deliver_header :
+                row.extend(['', deliver_header.no, deliver_header.sendout_time, '', '', deliver_header.expect_time, deliver_header.actual_time, '', ]) #I - P
+            else:
+                row.extend(['', '', '', '', '', '', '', '', ]) #I - P
+
+            pickup_info = ['', '', '', '', '', '0.5', '', '', ]
+            tmp_count = 0
+            for index, d in enumerate(r.pickup_details):
+                if index > 2: break
+                pickup_info[index + 1] = d.qty
+                tmp_count += d.qty
+            pickup_info[4] = r.qty - tmp_count
+            row.extend(pickup_info) #Q - X
+            row.extend(['', '', '',
+                        'Y' if r.actual_time > r.expect_time else 'N',
+                        'Y' if r.signed_time else 'N',
+                        r.signed_contact or '', r.signed_time, '', '', ]) #Y - AG
+
             data.append(row)
 
         if not data : data = [['', ], ]

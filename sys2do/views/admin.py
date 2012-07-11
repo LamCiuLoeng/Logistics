@@ -11,7 +11,7 @@ from flask.views import View
 from flask.helpers import flash
 from werkzeug.utils import redirect
 
-from sys2do.util.decorator import templated, login_required
+from sys2do.util.decorator import templated, login_required, tab_highlight
 from sys2do.views import BasicView
 from sys2do.model import DBSession
 from sys2do.model.auth import User, Group, Permission
@@ -217,7 +217,7 @@ class AdminView(BasicView):
             flash(MSG_UPDATE_SUCC, MESSAGE_INFO)
             return redirect(url_for('.view', action = 'permission'))
 
-
+    @tab_highlight('TAB_CUSTOMER')
     def customer(self):
         method = _g('m', 'LIST')
         if method not in ['LIST', 'NEW', 'UPDATE', 'DELETE', 'SAVE_NEW', 'SAVE_UPDATE']:
@@ -227,9 +227,7 @@ class AdminView(BasicView):
             customers = DBSession.query(Customer).filter(Customer.active == 0).order_by(Customer.name).all()
             return render_template('admin/customer_index.html', records = customers)
         elif method == 'NEW':
-            ps = getMasterAll(Province)
-            return render_template('admin/customer_new.html', provinces = ps)
-
+            return render_template('admin/customer_new.html')
         elif method == 'UPDATE':
             id = _g('id', None)
             if not id :
@@ -256,9 +254,6 @@ class AdminView(BasicView):
         elif method == 'SAVE_NEW':
             obj = Customer(
                                 name = _g('name'),
-                                province_id = _g('province_id'),
-                                city_id = _g('city_id'),
-                                district_id = _g('district_id'),
                                 address = _g('address'),
                                 phone = _g('phone'),
                                 contact_person = _g('contact_person'),
@@ -278,7 +273,7 @@ class AdminView(BasicView):
             if not obj :
                 flash(MSG_RECORD_NOT_EXIST, MESSAGE_ERROR)
                 return redirect(url_for('.view', action = 'customer'))
-            for f in ['name', 'province_id', 'city_id', 'district_id', 'address', 'phone', 'contact_person', 'remark']:
+            for f in ['name', 'address', 'phone', 'contact_person', 'remark']:
                 setattr(obj, f, _g(f))
             DBSession.commit()
             flash(MSG_UPDATE_SUCC, MESSAGE_INFO)
@@ -350,7 +345,7 @@ class AdminView(BasicView):
 
 
 
-
+    @tab_highlight('TAB_SUPPLIER')
     def supplier(self):
         method = _g('m', 'LIST')
         if method not in ['LIST', 'NEW', 'UPDATE', 'DELETE', 'SAVE_NEW', 'SAVE_UPDATE']:
@@ -360,8 +355,7 @@ class AdminView(BasicView):
             suppliers = DBSession.query(Supplier).filter(Supplier.active == 0).order_by(Supplier.name).all()
             return render_template('admin/supplier_index.html', records = suppliers)
         elif method == 'NEW':
-            ps = getMasterAll(Province)
-            return render_template('admin/supplier_new.html', provices = ps)
+            return render_template('admin/supplier_new.html')
 
         elif method == 'UPDATE':
             id = _g('id', None)
@@ -389,9 +383,6 @@ class AdminView(BasicView):
         elif method == 'SAVE_NEW':
             obj = Supplier(
                                 name = _g('name'),
-                                province_id = _g('province_id'),
-                                city_id = _g('city_id'),
-                                district_id = _g('district_id'),
                                 address = _g('address'),
                                 phone = _g('phone'),
                                 contact_person = _g('contact_person'),
@@ -411,7 +402,7 @@ class AdminView(BasicView):
             if not obj :
                 flash(MSG_RECORD_NOT_EXIST, MESSAGE_ERROR)
                 return redirect(url_for('.view', action = 'supplier'))
-            for f in ['name', 'province_id', 'city_id', 'district_id', 'address', 'phone', 'contact_person', 'remark']:
+            for f in ['name', 'address', 'phone', 'contact_person', 'remark']:
                 setattr(obj, f, _g(f))
             DBSession.commit()
             flash(MSG_UPDATE_SUCC, MESSAGE_INFO)

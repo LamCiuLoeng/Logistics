@@ -82,6 +82,9 @@ def check():
                                 break
 
             u.last_login = dt.now()
+
+            session.permanent = True
+
             DBSession.commit()
             if _g('next') : return redirect(_g('next'))
             return redirect(index_url())
