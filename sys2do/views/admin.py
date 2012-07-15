@@ -20,7 +20,7 @@ from sys2do.constant import MESSAGE_ERROR, MSG_NO_SUCH_ACTION, \
     MSG_UPDATE_SUCC, MSG_DELETE_SUCC
 from sys2do.util.common import _g, _gl, getMasterAll
 from sys2do.model.master import Customer, CustomerProfile, \
-    SupplierProfile, Supplier
+    SupplierProfile, Supplier, Payment
 
 __all__ = ['bpAdmin']
 
@@ -217,6 +217,7 @@ class AdminView(BasicView):
             flash(MSG_UPDATE_SUCC, MESSAGE_INFO)
             return redirect(url_for('.view', action = 'permission'))
 
+
     @tab_highlight('TAB_CUSTOMER')
     def customer(self):
         method = _g('m', 'LIST')
@@ -227,7 +228,7 @@ class AdminView(BasicView):
             customers = DBSession.query(Customer).filter(Customer.active == 0).order_by(Customer.name).all()
             return render_template('admin/customer_index.html', records = customers)
         elif method == 'NEW':
-            return render_template('admin/customer_new.html')
+            return render_template('admin/customer_new.html', payment = getMasterAll(Payment))
         elif method == 'UPDATE':
             id = _g('id', None)
             if not id :
@@ -237,7 +238,7 @@ class AdminView(BasicView):
             if not obj :
                 flash(MSG_RECORD_NOT_EXIST, MESSAGE_ERROR)
                 return redirect(url_for('.view', action = 'customer'))
-            return render_template('admin/customer_update.html', obj = obj)
+            return render_template('admin/customer_update.html', obj = obj , payment = getMasterAll(Payment))
         elif method == 'DELETE':
             id = _g('id', None)
             if not id :
@@ -253,10 +254,14 @@ class AdminView(BasicView):
             return redirect(url_for('.view', action = 'customer'))
         elif method == 'SAVE_NEW':
             obj = Customer(
+                                no = _g('no'),
                                 name = _g('name'),
                                 address = _g('address'),
                                 phone = _g('phone'),
+                                mobile = _g('mobile'),
                                 contact_person = _g('contact_person'),
+                                email = _g('email'),
+                                payment_id = _g('payment_id'),
                                 remark = _g('remark')
                                 )
             DBSession.add(obj)
@@ -273,7 +278,7 @@ class AdminView(BasicView):
             if not obj :
                 flash(MSG_RECORD_NOT_EXIST, MESSAGE_ERROR)
                 return redirect(url_for('.view', action = 'customer'))
-            for f in ['name', 'address', 'phone', 'contact_person', 'remark']:
+            for f in ['no', 'name', 'address', 'phone', 'contact_person', 'remark', 'email', 'payment_id', 'mobile', ]:
                 setattr(obj, f, _g(f))
             DBSession.commit()
             flash(MSG_UPDATE_SUCC, MESSAGE_INFO)
@@ -355,7 +360,7 @@ class AdminView(BasicView):
             suppliers = DBSession.query(Supplier).filter(Supplier.active == 0).order_by(Supplier.name).all()
             return render_template('admin/supplier_index.html', records = suppliers)
         elif method == 'NEW':
-            return render_template('admin/supplier_new.html')
+            return render_template('admin/supplier_new.html', payment = getMasterAll(Payment))
 
         elif method == 'UPDATE':
             id = _g('id', None)
@@ -366,7 +371,7 @@ class AdminView(BasicView):
             if not obj :
                 flash(MSG_RECORD_NOT_EXIST, MESSAGE_ERROR)
                 return redirect(url_for('.view', action = 'supplier'))
-            return render_template('admin/supplier_update.html', obj = obj)
+            return render_template('admin/supplier_update.html', obj = obj, payment = getMasterAll(Payment))
         elif method == 'DELETE':
             id = _g('id', None)
             if not id :
@@ -382,11 +387,15 @@ class AdminView(BasicView):
             return redirect(url_for('.view', action = 'supplier'))
         elif method == 'SAVE_NEW':
             obj = Supplier(
+                                no = _g('no'),
                                 name = _g('name'),
                                 address = _g('address'),
                                 phone = _g('phone'),
+                                mobile = _g('mobile'),
+                                email = _g('email'),
                                 contact_person = _g('contact_person'),
-                                remark = _g('remark')
+                                remark = _g('remark'),
+                                payment_id = _g('payment_id'),
                                 )
             DBSession.add(obj)
             DBSession.commit()
@@ -398,11 +407,11 @@ class AdminView(BasicView):
             if not id :
                 flash(MSG_NO_ID_SUPPLIED, MESSAGE_ERROR)
                 return redirect(url_for('.view', action = 'supplier'))
-            obj = DBSession.query(Customer).get(id)
+            obj = DBSession.query(Supplier).get(id)
             if not obj :
                 flash(MSG_RECORD_NOT_EXIST, MESSAGE_ERROR)
                 return redirect(url_for('.view', action = 'supplier'))
-            for f in ['name', 'address', 'phone', 'contact_person', 'remark']:
+            for f in ['no', 'name', 'address', 'phone', 'mobile', 'contact_person', 'remark', 'email', 'payment_id']:
                 setattr(obj, f, _g(f))
             DBSession.commit()
             flash(MSG_UPDATE_SUCC, MESSAGE_INFO)

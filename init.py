@@ -12,7 +12,7 @@ from sys2do.model import metadata, engine, DBSession, Permission, Group, User
 import sys
 from sys2do.model.master import CustomerProfile, Customer, \
     ItemUnit, InventoryLocation, WeightUnit, ShipmentType, Payment, Supplier, \
-    SupplierProfile, Ratio, PickupType, PackType
+    SupplierProfile, Ratio, PickupType, PackType, Diqu
 reload(sys)
 sys.setdefaultencoding('utf8')
 
@@ -173,6 +173,8 @@ def init():
     except:
         traceback.print_exc()
         DBSession.rollback()
+
+
 
 if __name__ == '__main__':
     init()

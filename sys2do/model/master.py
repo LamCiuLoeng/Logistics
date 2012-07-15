@@ -14,9 +14,19 @@ from auth import SysMixin
 from sqlalchemy.sql.expression import and_
 from sys2do.model.auth import CRUDMixin, Group
 
-
-
 #__all__ = ['']
+
+class Payment(DeclarativeBase, SysMixin):
+    __tablename__ = 'master_payment'
+
+    id = Column(Integer, autoincrement = True, primary_key = True)
+    name = Column(Text)
+    remark = Column(Text)
+
+
+    def __str__(self): return self.name
+    def __unicode__(self): return self.name
+    def __repr__(self): return self.name
 
 
 class ShipmentType(DeclarativeBase, SysMixin):
@@ -65,13 +75,35 @@ class Ratio(DeclarativeBase, SysMixin):
     def __unicode__(self): return self.name
 
 
+
+class Diqu(DeclarativeBase, SysMixin):
+    __tablename__ = 'master_diqu'
+
+    id = Column(Integer, autoincrement = True, primary_key = True)
+    name = Column(Text)
+    code = Column(Text)
+    parent_id = Column(Integer, default = None)
+    full_path = Column(Text)
+
+    @property
+    def parent(self):
+        try:
+            return DBSession.query(Diqu).filter(Diqu.id == self.parent_id).one()
+        except:
+            return None
+
+    @property
+    def children(self):
+        return DBSession.query(Diqu).filter(Diqu.parent_id == self.id).all()
+
+
 #class Province(DeclarativeBase, SysMixin):
 #    __tablename__ = 'master_province'
 #
 #    id = Column(Integer, autoincrement = True, primary_key = True)
 #    name = Column(Text)
 #    is_direct = Column(Integer, default = 0)
-#    remark = Column(Text)
+#    code = Column(Text)
 #
 #    def __str__(self): return self.name
 #    def __repr__(self): return self.name
@@ -89,7 +121,8 @@ class Ratio(DeclarativeBase, SysMixin):
 #    name = Column(Text)
 #    province_id = Column(Integer, ForeignKey('master_province.id'))
 #    province = relation(Province, backref = backref("cities", order_by = id), primaryjoin = "and_(Province.id == City.province_id, City.active == 0)")
-#
+#    code = Column(Text)
+
 #    def __str__(self): return self.name
 #    def __repr__(self): return self.name
 #    def __unicode__(self): return self.name
@@ -106,7 +139,8 @@ class Ratio(DeclarativeBase, SysMixin):
 #    name = Column(Text)
 #    city_id = Column(Integer, ForeignKey('master_city.id'))
 #    city = relation(City, backref = backref("districts", order_by = id), primaryjoin = "and_(City.id == District.city_id, District.active == 0)")
-#
+#    code = Column(Text)
+
 #    def __str__(self): return self.name
 #
 #    def __repr__(self): return self.name
@@ -121,13 +155,16 @@ class Customer(DeclarativeBase, SysMixin, CRUDMixin):
     __tablename__ = 'master_customer'
 
     id = Column(Integer, autoincrement = True, primary_key = True)
-
+    no = Column(Text)
     name = Column(Text)
     address = Column(Text)
     contact_person = Column(Text)
+    mobile = Column(Text)
     phone = Column(Text)
+    email = Column(Text)
     remark = Column(Text)
-
+    payment_id = Column(Integer, ForeignKey('master_payment.id'))
+    payment = relation(Payment)
 
     def __str__(self): return self.name
     def __repr__(self): return self.name
@@ -156,6 +193,7 @@ class CustomerProfile(DeclarativeBase, SysMixin):
     __tablename__ = 'master_customer_profile'
 
     id = Column(Integer, autoincrement = True, primary_key = True)
+
     name = Column(Text)
     remark = Column(Text)
 
@@ -175,7 +213,7 @@ class Supplier(DeclarativeBase, SysMixin, CRUDMixin):
     __tablename__ = 'master_supplier'
 
     id = Column(Integer, autoincrement = True, primary_key = True)
-
+    no = Column(Text)
     name = Column(Text)
 #    province_id = Column(Integer, ForeignKey('master_province.id'))
 #    provice = relation(Province)
@@ -185,8 +223,12 @@ class Supplier(DeclarativeBase, SysMixin, CRUDMixin):
 #    district = relation(District)
     address = Column(Text)
     phone = Column(Text)
+    mobile = Column(Text)
+    email = Column(Text)
     contact_person = Column(Text)
     remark = Column(Text)
+    payment_id = Column(Integer, ForeignKey('master_payment.id'))
+    payment = relation(Payment)
 
     def __str__(self): return self.name
     def __repr__(self): return self.name
@@ -315,17 +357,7 @@ class InventoryItem(DeclarativeBase, SysMixin):
 #        return DBSession.query(OrderDetail).get(self.refer_order_detail_id)
 
 
-class Payment(DeclarativeBase, SysMixin):
-    __tablename__ = 'master_payment'
 
-    id = Column(Integer, autoincrement = True, primary_key = True)
-    name = Column(Text)
-    remark = Column(Text)
-
-
-    def __str__(self): return self.name
-    def __unicode__(self): return self.name
-    def __repr__(self): return self.name
 
 
 

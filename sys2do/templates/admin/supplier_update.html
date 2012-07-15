@@ -15,7 +15,8 @@
 {% block inner_menu %}
 <div class="inner_menu">
 	<ul>
-        <li><input type="image" src="/static/images/system/order_manage_33.jpg" width="77" height="21" id="Image3" onmouseover="MM_swapImage('Image3','','/static/images/system/order_manage_h_33.jpg',1)" onmouseout="MM_swapImgRestore()" onclick="tosave()"/></li>
+	    <li><a href="{{url_for('.view', action = 'supplier')}}"><img width="71" height="21" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image1','','/static/images/system/order_manage_h_25.jpg',1)" id="Image1" src="/static/images/system/order_manage_25.jpg"/></a></li>
+        <li><input type="image" src="/static/images/system/order_manage_33.jpg" width="77" height="21" id="Image3" onmouseover="MM_swapImage('Image3','','/static/images/system/order_manage_h_33.jpg',1)" onmouseout="MM_swapImgRestore()" onclick="return tosave()"/></li>
         <li style="padding:0px; margin:0px 55px 0px 0px; float:right"><a href="{{url_for('bpAuth.logout')}}"><img src="/static/images/system/order_manage_22.jpg" width="56" height="29" /></a></li>
     </ul>
 </div>
@@ -23,34 +24,70 @@
 
 
 {% block content %}
-	<form action="{{url_for('.view', action = 'supplier',m='SAVE_UPDATE')}}" method="post">
-		<table>
-			<tr>
-				<td>{{_('Supplier Name')}}</td>
-				<td><input type="text" name="name" value="{{obj.name|ifFalse}}"/></td>
-			</tr>
-			<tr>
-				<td>{{_('Address')}}</td>
-				<td>
-					<input type="text" name="address" id="address" value="{{obj.address}}"/>
-				</td>
-			</tr>
-			<tr>
-				<td>{{_('Phone')}}</td>
-				<td><input type="text" name="phone" id="phone" value="{{obj.phone|ifFalse}}"/></td>
-			</tr>
-			<tr>
-				<td>{{_('Contact Person')}}</td>
-				<td><input type="text" name="contact_person" id="contact_person" value="{{obj.contact_person|ifFalse}}"/></td>
-			</tr>
-			<tr>
-				<td>{{_('Remark')}}</td>
-				<td><textarea id="remark" name="remark">{{obj.remark|ifFalse}}</textarea></td>
-			</tr>
-			<tr>
-				<td colspan="2"><input type="submit" value="{{_('Submit')}}"/>&nbsp;&nbsp;&nbsp;<input type="button" value="{{_('Cancel')}}" onclick="redirect('{{url_for('.view', action = 'supplier')}}')"/></td>
-			</tr>
-		</table>
-	</form>
+<table width="100%" cellspacing="0" cellpadding="0" border="0">
+  <tbody><tr>
+    <td class="title_fonts_display">· 承运商管理</td>
+  </tr>
+</tbody></table>
+
+
+<form action="{{url_for('.view', action = 'supplier',m='SAVE_UPDATE')}}" method="post">
+
+<input type="hidden" name="id" value="{{obj.id}}"/>
+
+<div class="order_add_div">
+  <div class="order_add_div_header">承运商详情</div>
+    <div class="order_add_div_body">
+  <ul>
+        	<li style="width:450px;"><span><sup class="warn">*</sup>{{_('Supplier Name')}}</span>
+        	  <input type="text" class="must_input" style="width:300px" name="name" value="{{obj.name|f}}"/>
+        	</li>
+       	  <li style="width:180px;"><span>承运商编号</span>
+    	    <input type="text" style="width:100px" name="no" value="{{obj.no|f}}"/>
+  	    </li>
+  	    <li style="width:280px;"><span>创建日期</span>
+    	    {{obj.create_time|ft}}
+  	    </li>
+    	  <li style="width:859px;"><span>{{_('Address')}}</span>
+    	    <input type="text" style="width:760px" name="address" value="{{obj.address|f}}"/>
+    	  </li>
+    	  <li style="width:459px;"><span>{{_('Contact Person')}}</span>
+    	    <input type="text" style="width:360px" name="contact_person" value="{{obj.contact_person|f}}"/>
+    	  </li>
+    	  <li style="width:459px;"><span>{{_('Mobile')}}</span>
+    	    <input type="text" style="width:360px" name="mobile" value="{{obj.mobile|f}}"/>
+    	  </li>
+    	  <li style="width:227px;"><span>{{_('Phone')}}</span>
+    	    <input type="text" style="width:140px" name="phone" value="{{obj.phone|f}}"/>
+  	    </li>
+    	  <li style="width:260px;"><span>公司邮箱</span>
+    	    <input type="text" style="width:170px" name="email" value="{{obj.email|f}}"/>
+  	    </li>
+  	    <li style="width:200px;"><span>创建人</span>
+    	    {{obj.create_by|f}}
+  	    </li>
+    	  <li style="width:220px;">付款方式
+    	    <select name="payment_id">
+    	  		{% for p in payment %}
+    	  			{% if p.id == obj.payment_id %}
+    	  				<option value="{{p.id}}" selected="selected">{{p}}</option>
+    	  			{% else %}
+    	  				<option value="{{p.id}}">{{p}}</option>
+    	  			{% endif %}
+    	  		{% endfor %}
+    	  	</select>
+  	    </li>
+    	  <li style="width:925px;"><span>{{_('Remark')}}</span>
+    	    <textarea class="order_add_div_body_input" style="width:840px; height:300px" name="remark">{{obj.remark|f}}</textarea>
+        </li>
+      </ul>
+  <div style="clear:both"></div>
+  </div>
+</div>
+</form>
+
+
+
+	
 	
 {% endblock %}

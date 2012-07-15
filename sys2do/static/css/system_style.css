@@ -208,6 +208,10 @@ body{
 	width: 150px;
 	background-color: #FFC;
 }
+.must_input{
+	background-color:#FEE !important;
+	border:#F60 1px solid !important;
+}
 .order_add_div_body_input {
 	font-family: "宋体";
 	font-size: 12px;
@@ -272,8 +276,8 @@ body{
 .order_add_info_tab_body {
 	padding:5px;
 	width: auto;
-	border: 1px solid #F93;
-	background-color: #d7cfca;
+	border: 2px solid #F93;
+	background-color:#efefef;
 }
 
 .point_div {
@@ -304,6 +308,7 @@ body{
 	font-weight:bold;
 	background-image: url(/static/images/system/data_bg.jpg);
 	width:90px;
+	text-align:center;
 
 }
 .field_head td{
@@ -316,7 +321,11 @@ body{
 	font-weight:bold;
 	background-image: url(/static/images/system/data_bg.jpg);
 	width:180px;
+	text-align:center;
 
+}
+.data_table_tr{
+	background:#FFF;
 }
 .data_table_tr th{
 	border-bottom:#dddddd 1px solid;
@@ -347,4 +356,7 @@ body{
 	font-size: 14px;
 	color:#F00;
 	text-decoration: none;
+}
+.number_input_right{
+	text-align:right;
 }

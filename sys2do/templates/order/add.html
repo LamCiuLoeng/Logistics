@@ -92,8 +92,8 @@
   <div class="order_add_div_header">{{_('Now Order')}}</div>
     <div class="order_add_div_body">
   <ul>
-    	<li style="width:180px;"><span><sup class="warn">*</sup>{{_('Source Station')}}</span>
-    	  <input name="source_station" id="source_station" type="text" style="width:100px"/>
+    	<li style="width:180px;"><span><sup class="warn">*</sup>&nbsp;{{_('Source Station')}}</span>
+    	  <input name="source_station" id="source_station" type="text" style="width:100px" class="must_input"/>
     	</li>
     	
     	
@@ -111,11 +111,11 @@
         -->
         
         
-    	 <li style="width:180px;"><span><sup class="warn">*</sup>单号</span>
-    	    <input name="ref_no" id="ref_no" type="text" class="numeric" style="width:100px"/>
+    	 <li style="width:180px;"><span><sup class="warn">*</sup>&nbsp;单号</span>
+    	    <input name="ref_no" id="ref_no" type="text" class="numeric must_input" style="width:100px"/>
   	    </li>
-    	  <li style="width:366px;"><span><sup class="warn">*</sup>{{_('Destination Station')}}</span>
-    	    <input name="destination_station" id="destination_station" type="text" style="width:160px"/>
+    	  <li style="width:366px;"><span><sup class="warn">*</sup>&nbsp;{{_('Destination Station')}}</span>
+    	    <input name="destination_station" id="destination_station" type="text" style="width:160px" class="must_input"/>
     	    <!-- <input name="input10" type="text" style="width:120px"/> -->      
    	      </li>
    	      <!-- 
@@ -127,17 +127,17 @@
   	    </li>
    	       -->
     	  <li style="width:180px;"><span>{{_('Create Time')}}</span>{{current}}</li>
-    	  <li style="width:459px;"><span><sup class="warn">*</sup>{{_('Source Company')}}</span>
-    	    <input name="source_company" id="source_company" type="text" style="width:360px"/>
+    	  <li style="width:459px;"><span><sup class="warn">*</sup>&nbsp;{{_('Source Company')}}</span>
+    	    <input name="source_company" id="source_company" type="text" style="width:360px" class="must_input"/>
     	  </li>
-    	  <li style="width:459px;"><span><sup class="warn">*</sup>{{_('Destination Company')}}</span>
-    	    <input name="destination_company" id="destination_company" type="text" style="width:360px"/>
+    	  <li style="width:459px;"><span><sup class="warn">*</sup>&nbsp;{{_('Destination Company')}}</span>
+    	    <input name="destination_company" id="destination_company" type="text" style="width:360px" class="must_input"/>
     	  </li>
-    	  <li style="width:459px;"><span><sup class="warn">*</sup>{{_('Source Contact')}}</span>
-    	    <input name="source_contact" id="source_contact" type="text" style="width:360px"/>
+    	  <li style="width:459px;"><span><sup class="warn">*</sup>&nbsp;{{_('Source Contact')}}</span>
+    	    <input name="source_contact" id="source_contact" type="text" style="width:360px" class="must_input"/>
     	  </li>
-    	  <li style="width:459px;"><span><sup class="warn">*</sup>{{_('Destination Contact')}}</span>
-    	    <input name="destination_contact" id="destination_contact" type="text" style="width:360px"/>
+    	  <li style="width:459px;"><span><sup class="warn">*</sup>&nbsp;{{_('Destination Contact')}}</span>
+    	    <input name="destination_contact" id="destination_contact" type="text" style="width:360px" class="must_input"/>
     	  </li>
     	  <li style="width:459px;"><span>{{_('Source Address')}}</span>
     	    <input name="source_address" id="source_address" type="text" style="width:360px"/>
@@ -193,7 +193,7 @@
     <td width="9%" align="center">{{_('Weight Ratio')}}</td>
     <td width="9%" align="center">{{_('Vol')}}</td>
     <td width="9%" align="center">{{_('Vol Ratio')}}</td>
-    <td width="9%" align="center"><sup class="warn">*</sup>{{_('Amount')}}</td>
+    <td width="9%" align="center"><sup class="warn">*</sup>&nbsp;{{_('Amount')}}</td>
     <td width="9%" align="center">{{_('Payment')}}</td>
     </tr>
   <tr>
@@ -216,7 +216,7 @@
       <input name="weight_ratio" id="weight_ratio" type="text" class="order_add_div_body_input numeric compute" style="width:70px" value="{{ratios.get('WEIGHT',0)}}"/>
     </span></td>
     <td align="center"><span style="width:180px;">
-      <input name="amount" id="amount" type="text" class="order_add_div_body_input numeric" style="width:70px"/>
+      <input name="amount" id="amount" type="text" class="order_add_div_body_input numeric must_input" style="width:70px"/>
     </span></td>
     <td align="center">
     	<span style="width:180px;">
@@ -246,16 +246,28 @@
 	</div>
 	  <div class="order_add_info_tab_body" id="tabs-1">
 		<div id="item_details">
-			<table>
+			<table border="0" cellpadding="0" cellspacing="0">
 				<tr>
-					<td valign="top"><sup class="warn">*</sup>{{_('Item Name')}}</td><td valign="top"><input type="text" name="item_name" id="item_name" value=""></td>
-					<td valign="top">{{_('Qty')}}</td><td valign="top"><input type="text" name="item_qty" id="item_qty" value=""></td>
-					<td valign="top">{{_('Vol')}}</td><td valign="top"><input type="text" name="item_vol" id="item_vol" value=""></td>
-					<td valign="top">{{_('Weight')}}</td><td valign="top"><input type="text" name="item_weight" id="item_weight" value=""></td>
-				    <td valign="top">{{_('Remark')}}</td><td valign="top"><textarea name="item_remark" id="item_remark"></textarea></td>
+				  <td valign="top" align="center">&nbsp;</td>
+				  <td valign="top">&nbsp;</td>
+				  <td valign="top" align="center">&nbsp;</td>
+				  <td valign="top">&nbsp;</td>
+				  <td valign="top" align="center">&nbsp;</td>
+				  <td valign="top">&nbsp;</td>
+				  <td valign="top" align="center">&nbsp;</td>
+				  <td valign="top">&nbsp;</td>
+				  <td valign="top" align="center">&nbsp;</td>
+				  <td valign="top">&nbsp;</td>
+			  </tr>
+				<tr>
+					<td valign="top" width="70px" align="center"><sup class="warn">*</sup>&nbsp;{{_('Item Name')}}</td><td valign="top"><input type="text" name="item_name" id="item_name" value="" class="must_input"></td>
+					<td valign="top" width="70px" align="center">{{_('Qty')}}</td><td valign="top"><input type="text" name="item_qty" id="item_qty" value="" class="order_add_div_body_input" style="width:80px;"></td>
+					<td valign="top" width="70px" align="center">{{_('Vol')}}</td><td valign="top"><input type="text" name="item_vol" id="item_vol" value="" class="order_add_div_body_input" style="width:80px;"></td>
+					<td valign="top" width="70px" align="center">{{_('Weight')}}</td><td valign="top"><input type="text" name="item_weight" id="item_weight" value="" class="order_add_div_body_input" style="width:80px;"></td>
+				    <td valign="top" width="70px" align="center">{{_('Remark')}}</td><td valign="top"><textarea name="item_remark" id="item_remark"></textarea></td>
 				</tr>
 			</table>
-			<p><input type="button" value="{{_('Add')}}" onclick="add_item()"/></p>
+		  <p><input type="button" value="{{_('Add')}}" onclick="add_item()"/></p>
 		</div>
 		<br />
 		<table>

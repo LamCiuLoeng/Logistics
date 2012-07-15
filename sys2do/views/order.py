@@ -6,44 +6,41 @@
 #  Description:
 ###########################################
 '''
-import os
-from datetime import datetime as dt
-from datetime import timedelta
-import traceback
-import shutil
-import random
-
-
-
+from datetime import datetime as dt, timedelta
 from flask import Blueprint, render_template, url_for, session, Response
-from flask.views import View
-from werkzeug.utils import redirect
+from flask.globals import request
 from flask.helpers import flash, jsonify, send_file
-
-from sys2do.model.logic import OrderHeader, TransferLog, \
-    DeliverDetail, ItemDetail, PickupDetail
-from sys2do.model import DBSession
-from sys2do.util.decorator import templated, login_required, tab_highlight
+from flask.views import View
+from sqlalchemy.sql.expression import and_
 from sys2do import app
 from sys2do.constant import MESSAGE_ERROR, MESSAGE_INFO, MSG_UPDATE_SUCC, \
     MSG_DELETE_SUCC, MSG_NO_ID_SUPPLIED, MSG_SERVER_ERROR, MSG_NO_SUCH_ACTION, \
-    MSG_SAVE_SUCC, ORDER_CANCELLED, STATUS_LIST, IN_TRAVEL, \
-    MSG_RECORD_NOT_EXIST, IN_WAREHOUSE, \
-    LOG_CREATE_ORDER, LOG_GOODS_IN_WAREHOUSE, ORDER_NEW, \
-    ASSIGN_RECEIVER, LOG_SEND_RECEIVER, OUT_WAREHOUSE, GOODS_PICKUP, \
-    GOODS_SIGNED
-from sys2do.views import BasicView
+    MSG_SAVE_SUCC, ORDER_CANCELLED, STATUS_LIST, IN_TRAVEL, MSG_RECORD_NOT_EXIST, \
+    IN_WAREHOUSE, LOG_CREATE_ORDER, LOG_GOODS_IN_WAREHOUSE, ORDER_NEW, \
+    ASSIGN_RECEIVER, LOG_SEND_RECEIVER, OUT_WAREHOUSE, GOODS_PICKUP, GOODS_SIGNED
+from sys2do.model import DBSession
+from sys2do.model.logic import OrderHeader, TransferLog, DeliverDetail, \
+    ItemDetail, PickupDetail
+from sys2do.model.master import CustomerProfile, InventoryLocation, Customer, \
+    ItemUnit, WeightUnit, ShipmentType, InventoryItem, Payment, Ratio, PickupType, \
+    PackType
+from sys2do.setting import TMP_FOLDER, TEMPLATE_FOLDER
+from sys2do.util.barcode_helper import generate_barcode_file
 from sys2do.util.common import _g, getOr404, _gp, getMasterAll, _debug, _info, \
     _gl, _error
-from sys2do.model.master import CustomerProfile, InventoryLocation, \
-    Customer, ItemUnit, WeightUnit, ShipmentType, \
-    InventoryItem, Payment, Ratio, PickupType, PackType
-from sys2do.util.logic_helper import genSystemNo
-from sqlalchemy.sql.expression import and_
-from sys2do.util.barcode_helper import generate_barcode_file
-from flask.globals import request
+from sys2do.util.decorator import templated, login_required, tab_highlight
 from sys2do.util.excel_helper import SummaryReport
-from sys2do.setting import TMP_FOLDER, TEMPLATE_FOLDER
+from sys2do.util.logic_helper import genSystemNo
+from sys2do.views import BasicView
+from werkzeug.utils import redirect
+import os
+import random
+import shutil
+import traceback
+
+
+
+
 
 
 
@@ -232,53 +229,53 @@ class OrderView(BasicView):
         return redirect(url_for('.view', action = 'index'))
 
 
-    def do_action(self):
-        header = OrderHeader.get(_g('id'))
-
-        if not header :
-            flash(MSG_RECORD_NOT_EXIST)
-            return redirect(self.default())
-
-        if _g('sc') == 'ASSIGN_PICKER' :
-            header.receiver = _g('receiver')
-            header.receiver_contact = _g('receiver_contact')
-            header.receiver_remark = _g('receiver_remark')
-            header.status = ASSIGN_PICKER[0]
-            for d in header.details: d.status = ASSIGN_PICKER[0]
-
-            DBSession.add(TransferLog(
-                                      refer_id = header.id,
-                                      transfer_date = dt.now().strftime("%Y-%m-%d"),
-                                      type = 0,
-                                      remark = LOG_SEND_PICKER
-                                      ))
-
-        elif _g('sc') == 'IN_WAREHOUSE' :
-            header.in_warehouse_remark = _g('in_warehouse_remark')
-            header.status = IN_WAREHOUSE[0]
-            location_id = _g('location_id')
-            for d in header.details:
-                d.status = IN_WAREHOUSE[0]
-
-                if location_id:
-                    DBSession.add(InventoryItem(
-                                                item = d.item,
-                                                location_id = location_id,
-                                                qty = d.order_qty,
-                                                refer_order_header = unicode(header),
-                                                refer_order_detail_id = d.id,
-                                                ))
-
-            DBSession.add(TransferLog(
-                                      refer_id = header.id,
-                                      transfer_date = dt.now().strftime("%Y-%m-%d"),
-                                      type = 0,
-                                      remark = LOG_GOODS_IN_WAREHOUSE
-                                      ))
-
-        DBSession.commit()
-        flash(MSG_UPDATE_SUCC, MESSAGE_INFO)
-        return redirect(self.default())
+#    def do_action(self):
+#        header = OrderHeader.get(_g('id'))
+#
+#        if not header :
+#            flash(MSG_RECORD_NOT_EXIST)
+#            return redirect(self.default())
+#
+#        if _g('sc') == 'ASSIGN_PICKER' :
+#            header.receiver = _g('receiver')
+#            header.receiver_contact = _g('receiver_contact')
+#            header.receiver_remark = _g('receiver_remark')
+#            header.status = ASSIGN_PICKER[0]
+#            for d in header.details: d.status = ASSIGN_PICKER[0]
+#
+#            DBSession.add(TransferLog(
+#                                      refer_id = header.id,
+#                                      transfer_date = dt.now().strftime("%Y-%m-%d"),
+#                                      type = 0,
+#                                      remark = LOG_SEND_PICKER
+#                                      ))
+#
+#        elif _g('sc') == 'IN_WAREHOUSE' :
+#            header.in_warehouse_remark = _g('in_warehouse_remark')
+#            header.status = IN_WAREHOUSE[0]
+#            location_id = _g('location_id')
+#            for d in header.details:
+#                d.status = IN_WAREHOUSE[0]
+#
+#                if location_id:
+#                    DBSession.add(InventoryItem(
+#                                                item = d.item,
+#                                                location_id = location_id,
+#                                                qty = d.order_qty,
+#                                                refer_order_header = unicode(header),
+#                                                refer_order_detail_id = d.id,
+#                                                ))
+#
+#            DBSession.add(TransferLog(
+#                                      refer_id = header.id,
+#                                      transfer_date = dt.now().strftime("%Y-%m-%d"),
+#                                      type = 0,
+#                                      remark = LOG_GOODS_IN_WAREHOUSE
+#                                      ))
+#
+#        DBSession.commit()
+#        flash(MSG_UPDATE_SUCC, MESSAGE_INFO)
+#        return redirect(self.default())
 
 
 #
@@ -318,59 +315,58 @@ class OrderView(BasicView):
     #===========================================================================
     # not very important
     #===========================================================================
-    def save_new_by_customer(self):
-        code = self._save_new_process()
-        if code == 0:
-            flash(MSG_SAVE_SUCC, MESSAGE_INFO)
-        else:
-            flash(MSG_SERVER_ERROR, MESSAGE_ERROR)
-        return redirect(url_for('.view', action = 'search_by_customer'))
+#    def save_new_by_customer(self):
+#        code = self._save_new_process()
+#        if code == 0:
+#            flash(MSG_SAVE_SUCC, MESSAGE_INFO)
+#        else:
+#            flash(MSG_SERVER_ERROR, MESSAGE_ERROR)
+#        return redirect(url_for('.view', action = 'search_by_customer'))
 
 
-    @templated('order/search_by_customer.html')
-    def search_by_customer(self):
-        if not session.get('customer_profile', None) or not session['customer_profile'].get('id', None):
-            flash(MSG_NO_SUCH_ACTION, MESSAGE_ERROR)
-            return redirect(url_for('bpRoot.view', action = "index"))
-        conditions = [OrderHeader.active == 0,
-                      OrderDetail.active == 0,
-                      OrderHeader.id == OrderDetail.header_id,
-                      OrderHeader.customer_id == session['customer_profile']['id'],
-                      ]
-        if _g('no'):
-            conditions.append(OrderHeader.no.like('%%%s%%' % _g('no')))
-        if _g('destination_address'):
-            conditions.append(OrderDetail.destination_address.like(_g('destination_address')))
-        if _g('create_time_from'):
-            conditions.append(OrderHeader.create_time > _g('create_time_from'))
-        if _g('create_time_to'):
-            conditions.append(OrderHeader.create_time < _g('create_time_to'))
+#    @templated('order/search_by_customer.html')
+#    def search_by_customer(self):
+#        if not session.get('customer_profile', None) or not session['customer_profile'].get('id', None):
+#            flash(MSG_NO_SUCH_ACTION, MESSAGE_ERROR)
+#            return redirect(url_for('bpRoot.view', action = "index"))
+#        conditions = [OrderHeader.active == 0,
+#                      OrderDetail.active == 0,
+#                      OrderHeader.id == OrderDetail.header_id,
+#                      OrderHeader.customer_id == session['customer_profile']['id'],
+#                      ]
+#        if _g('no'):
+#            conditions.append(OrderHeader.no.like('%%%s%%' % _g('no')))
+#        if _g('destination_address'):
+#            conditions.append(OrderDetail.destination_address.like(_g('destination_address')))
+#        if _g('create_time_from'):
+#            conditions.append(OrderHeader.create_time > _g('create_time_from'))
+#        if _g('create_time_to'):
+#            conditions.append(OrderHeader.create_time < _g('create_time_to'))
+#
+#        result = DBSession.query(OrderHeader, OrderDetail).filter(and_(*conditions)).order_by(OrderHeader.no)
+#        return {'result' : result, 'values' : {
+#                                              'no' : _g('no'), 'destination_address' : _g('destination_address'),
+#                                              'create_time_from' : _g('create_time_from'), 'create_time_to' : _g('create_time_to')
+#                                              }}
+#
 
-        result = DBSession.query(OrderHeader, OrderDetail).filter(and_(*conditions)).order_by(OrderHeader.no)
-        return {'result' : result, 'values' : {
-                                              'no' : _g('no'), 'destination_address' : _g('destination_address'),
-                                              'create_time_from' : _g('create_time_from'), 'create_time_to' : _g('create_time_to')
-                                              }}
-
-
-
-    @templated('order/search_transfer_log.html')
-    def search_transfer_log(self):
-        header = OrderHeader.get(_g('id'))
-
-        if not header :
-            flash(MSG_RECORD_NOT_EXIST)
-            return redirect(self.default())
-
-        order_log = header.get_logs()
-        detail_log = {}
-        for d in header.details:
-            logs = []
-            for dd in DBSession.query(DeliverDetail).filter(and_(DeliverDetail.active == 0, DeliverDetail.order_header_id == d.id)).order_by(DeliverDetail.id):
-                logs.extend(dd.header.get_logs())
-            detail_log[d.id] = logs
-
-        return {'order_log' : order_log, 'detail_log' : detail_log}
+#    @templated('order/search_transfer_log.html')
+#    def search_transfer_log(self):
+#        header = OrderHeader.get(_g('id'))
+#
+#        if not header :
+#            flash(MSG_RECORD_NOT_EXIST)
+#            return redirect(self.default())
+#
+#        order_log = header.get_logs()
+#        detail_log = {}
+#        for d in header.details:
+#            logs = []
+#            for dd in DBSession.query(DeliverDetail).filter(and_(DeliverDetail.active == 0, DeliverDetail.order_header_id == d.id)).order_by(DeliverDetail.id):
+#                logs.extend(dd.header.get_logs())
+#            detail_log[d.id] = logs
+#
+#        return {'order_log' : order_log, 'detail_log' : detail_log}
 
 
     def ajax_todo_list(self):
@@ -389,50 +385,7 @@ class OrderView(BasicView):
         return {'header' : header}
 
 
-    def hh(self):
-        print request.values
-        type = _g('type')
-        barcode = _g('barcode')
 
-        if type == 'search':
-            try:
-                d = DBSession.query(OrderDetail).filter(OrderDetail.no == barcode).one()
-                h = d.header
-                params = {
-                          'NO' : h.no,
-                          'CUSTOMER' : unicode(h.customer),
-                          'TEL' : h.source_tel,
-                          'DESTINATION' : d.destination_full_address,
-                          }
-            except:
-                params = {
-                          'NO' : 'NO SUCH NO#',
-                          'CUSTOMER' : '',
-                          'TEL' : '',
-                          'DESTINATION' : '',
-                          }
-
-            xml = []
-            xml.append('<?xml version="1.0" encoding="UTF-8" ?>')
-            xml.append('<ORDER>')
-            xml.append('<NO>%s</NO>' % params['NO'])
-            xml.append('<CUSTOMER>%s</CUSTOMER>' % params['CUSTOMER'])
-            xml.append('<TEL>%s</TEL>' % params['TEL'])
-            xml.append('<DESTINATION>%s</DESTINATION>' % params['DESTINATION'])
-            xml.append('</ORDER>')
-            rv = app.make_response("".join(xml))
-            rv.mimetype = 'text/xml'
-            return rv
-        elif type == 'submit':
-            try:
-                d = DBSession.query(OrderDetail).filter(OrderDetail.no == barcode).one()
-                d.update_status(_g('id'))
-                DBSession.commit()
-                return unicode(MSG_UPDATE_SUCC)
-            except:
-                return unicode(MSG_RECORD_NOT_EXIST)
-        else:
-            return unicode(MSG_NO_SUCH_ACTION)
 
 
 
