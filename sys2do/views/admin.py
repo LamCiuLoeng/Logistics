@@ -34,7 +34,7 @@ class AdminView(BasicView):
     def index(self):
         return {}
 
-
+    @tab_highlight('TAB_USER')
     def user(self):
         method = _g('m', 'LIST')
         if method not in ['LIST', 'NEW', 'UPDATE', 'DELETE', 'SAVE_NEW', 'SAVE_UPDATE']:
@@ -95,6 +95,7 @@ class AdminView(BasicView):
             return redirect(url_for('.view', action = 'user'))
 
 
+    @tab_highlight('TAB_GROUP')
     def group(self):
         method = _g('m', 'LIST')
         if method not in ['LIST', 'NEW', 'UPDATE', 'DELETE', 'SAVE_NEW', 'SAVE_UPDATE']:
@@ -159,6 +160,8 @@ class AdminView(BasicView):
             return redirect(url_for('.view', action = 'group'))
 
 
+
+    @tab_highlight('TAB_PERMISSION')
     def permission(self):
         method = _g('m', 'LIST')
         if method not in ['LIST', 'NEW', 'UPDATE', 'DELETE', 'SAVE_NEW', 'SAVE_UPDATE']:
@@ -193,7 +196,7 @@ class AdminView(BasicView):
                 return redirect(url_for('.view', action = 'permission'))
             obj.active = 1
             obj.groups = []
-            obj.commit()
+            DBSession.commit()
             flash(MSG_DELETE_SUCC, MESSAGE_INFO)
             return redirect(url_for('.view', action = 'permission'))
         elif method == 'SAVE_NEW':

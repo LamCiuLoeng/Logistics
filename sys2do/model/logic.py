@@ -240,9 +240,9 @@ class DeliverHeader(DeclarativeBase, SysMixin, CRUDMixin):
 #    send_out_remark = Column(Text)
 #    arrived_remark = Column(Text)
 
-    sendout_time = Column(Date, default = None)
-    expect_time = Column(Date, default = None)
-    actual_time = Column(Date, default = None)
+    sendout_time = Column(Text)
+    expect_time = Column(Text)
+    actual_time = Column(Text)
 
     amount = Column(Float, default = 0)
 

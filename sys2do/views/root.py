@@ -15,7 +15,8 @@ from flask.helpers import jsonify, send_file
 from sys2do.util.decorator import templated, login_required
 from sys2do.util.common import _g, _gp, _gl
 from sys2do.constant import MESSAGE_ERROR, MESSAGE_INFO, MSG_NO_SUCH_ACTION, \
-    MSG_SAVE_SUCC, GOODS_PICKUP, GOODS_SIGNED, OUT_WAREHOUSE, IN_WAREHOUSE
+    MSG_SAVE_SUCC, GOODS_PICKUP, GOODS_SIGNED, OUT_WAREHOUSE, IN_WAREHOUSE, \
+    MSG_RECORD_NOT_EXIST
 from sys2do.views import BasicView
 from sys2do.model.master import CustomerProfile, Customer, Supplier
 from sys2do.model.logic import OrderHeader, TransferLog, PickupDetail
@@ -37,7 +38,7 @@ class RootView(BasicView):
 #        app.logger.debug('A value for debugging')
 #        flash(TEST_MSG, MESSAGE_INFO)
 #        return send_file('d:/new.png', as_attachment = True)
-        return {"content" : _("Hello,World!")}
+        return {}
 
 
     def ajax_master(self):
@@ -65,7 +66,7 @@ class RootView(BasicView):
             try:
                 h = DBSession.query(OrderHeader).filter(OrderHeader.no == barcode).one()
                 params = {
-                          'no' : h.no,
+                          'no' : h.ref_no,
                           'source_station' : h.source_station,
                           'source_company' : h.source_company,
                           'destination_station' : h.destination_station,
@@ -73,7 +74,7 @@ class RootView(BasicView):
                           }
             except:
                 params = {
-                          'no' : 'NO SUCH NO#',
+                          'no' : unicode(MSG_RECORD_NOT_EXIST),
                           'source_station' : '',
                           'source_company' : '',
                           'destination_station' : '',
@@ -107,6 +108,8 @@ class RootView(BasicView):
                     remark = u'货物已签收。' + (_g('remark') or '')
                     h.signed_time = _g('time')
                     h.signed_remark = _g('remark')
+                    h.signed_contact = _g('contact')
+                    h.signed_tel = _g('tel')
                 elif action_type == GOODS_PICKUP[0]:
                     remark = u'订单已被提货。' + (_g('remark') or '')
                     params = {
@@ -146,6 +149,10 @@ class RootView(BasicView):
             rv.mimetype = 'text/xml'
             return rv
 
+    @templated("index.html")
+    def test(self):
+        flash(GOODS_PICKUP[1], MESSAGE_ERROR)
+        return {}
 
 bpRoot.add_url_rule('/', view_func = RootView.as_view('view'), defaults = {'action':'index'})
 bpRoot.add_url_rule('/<action>', view_func = RootView.as_view('view'))

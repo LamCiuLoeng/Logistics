@@ -17,7 +17,8 @@ from sys2do.constant import MESSAGE_ERROR, MESSAGE_INFO, MSG_UPDATE_SUCC, \
     MSG_DELETE_SUCC, MSG_NO_ID_SUPPLIED, MSG_SERVER_ERROR, MSG_NO_SUCH_ACTION, \
     MSG_SAVE_SUCC, ORDER_CANCELLED, STATUS_LIST, IN_TRAVEL, MSG_RECORD_NOT_EXIST, \
     IN_WAREHOUSE, LOG_CREATE_ORDER, LOG_GOODS_IN_WAREHOUSE, ORDER_NEW, \
-    ASSIGN_RECEIVER, LOG_SEND_RECEIVER, OUT_WAREHOUSE, GOODS_PICKUP, GOODS_SIGNED
+    ASSIGN_RECEIVER, LOG_SEND_RECEIVER, OUT_WAREHOUSE, GOODS_PICKUP, GOODS_SIGNED, \
+    LOG_GOODS_SIGNED, LOG_GOODS_PICKUPED, LOG_GOODS_IN_TRAVEL
 from sys2do.model import DBSession
 from sys2do.model.logic import OrderHeader, TransferLog, DeliverDetail, \
     ItemDetail, PickupDetail
@@ -78,13 +79,20 @@ class OrderView(BasicView):
 
         result = DBSession.query(OrderHeader).filter(and_(*conditions))
 
-        total_qty = total_vol = total_weight = 0
+        total_qty = total_vol = total_weight = total_amount = 0
         for r in result:
             if r.qty : total_qty += r.qty
             if r.vol : total_vol += r.vol
             if r.weight : total_weight += r.weight
+            if r.amount : total_amount += r.amount
 
-        return {'result' : result , 'values' : values , 'total_qty' : total_qty , 'total_vol' : total_vol, 'total_weight' : total_weight}
+        return {'result' : result ,
+                'values' : values ,
+                'total_qty' : total_qty ,
+                'total_vol' : total_vol,
+                'total_weight' : total_weight,
+                'total_amount' : total_amount,
+                }
 
 
     @templated('order/add.html')
@@ -131,7 +139,7 @@ class OrderView(BasicView):
         params = {}
         for k in ['source_station', 'source_company', 'source_address', 'source_contact', 'source_tel', 'source_mobile',
                   'destination_station', 'destination_company', 'destination_address', 'destination_contact', 'destination_tel', 'destination_mobile',
-                  'ref_no', 'order_time', 'item', 'item_remark', 'expect_time', 'remark',
+                  'ref_no', 'order_time', 'item', 'item_remark', 'expect_time', 'actual_time', 'remark',
                  'payment_id', 'pickup_type_id', 'pack_type_id', 'qty', 'qty_ratio', 'vol', 'vol_ratio',
                   'weight', 'weight_ratio', 'weight_ratio', 'amount',
                   ]:
@@ -147,7 +155,7 @@ class OrderView(BasicView):
                                   refer_id = order.id,
                                   transfer_date = dt.now().strftime("%Y-%m-%d"),
                                   type = 0,
-                                  remark = u'新建订单',
+                                  remark = unicode(LOG_CREATE_ORDER),
                                   ))
         return (0, order)
 
@@ -223,7 +231,8 @@ class OrderView(BasicView):
 
     def delete(self):
         header = getOr404(OrderHeader, _g('id'), redirect_url = self.default())
-        header.status = ORDER_CANCELLED[0]
+#        header.status = ORDER_CANCELLED[0]
+        header.active = 1
         DBSession.commit()
         flash(MSG_DELETE_SUCC, MESSAGE_INFO)
         return redirect(url_for('.view', action = 'index'))
@@ -450,7 +459,7 @@ class OrderView(BasicView):
                                   refer_id = header.id,
                                   transfer_date = dt.now().strftime("%Y-%m-%d"),
                                   type = 0,
-                                  remark = u'已派遣收件人收货。',
+                                  remark = unicode(LOG_SEND_RECEIVER),
                                   ))
             try:
                 DBSession.commit()
@@ -500,7 +509,7 @@ class OrderView(BasicView):
                                   refer_id = header.id,
                                   transfer_date = _g('action_time'),
                                   type = 0,
-                                  remark = u'货物在途。' + (_g('remark') or ''),
+                                  remark = LOG_GOODS_IN_TRAVEL + (_g('remark') or ''),
                                   )
                 DBSession.add(obj)
                 try:
@@ -535,7 +544,7 @@ class OrderView(BasicView):
                                   refer_id = header.id,
                                   transfer_date = _g('action_time'),
                                   type = 0,
-                                  remark = u'订单已被提货。' + (_g('remark') or ''),
+                                  remark = LOG_GOODS_PICKUPED + (_g('remark') or ''),
                                   ))
                 try:
                     DBSession.commit()
@@ -564,7 +573,7 @@ class OrderView(BasicView):
                                   refer_id = header.id,
                                   transfer_date = _g('signed_time'),
                                   type = 0,
-                                  remark = u'货物已签收。' + (_g('signed_remark') or ''),
+                                  remark = LOG_GOODS_SIGNED + (_g('signed_remark') or ''),
                                   ))
             try:
                 DBSession.commit()
@@ -581,7 +590,7 @@ class OrderView(BasicView):
 
         data = []
         for r in DBSession.query(OrderHeader).filter(OrderHeader.id.in_(ids)).order_by(OrderHeader.create_time):
-            row = [r.create_time, r.no, r.destination_station, r.destination_contact, r.qty, r.weight, r.destination_tel, '', ] #A - H
+            row = [r.create_time, r.ref_no, r.destination_station, r.destination_contact, r.qty, r.weight, r.destination_tel, '', ] #A - H
             deliver_header = r.get_deliver_header()
             if deliver_header :
                 row.extend(['', deliver_header.no, deliver_header.sendout_time, '', '', deliver_header.expect_time, deliver_header.actual_time, '', ]) #I - P
@@ -592,8 +601,9 @@ class OrderView(BasicView):
             tmp_count = 0
             for index, d in enumerate(r.pickup_details):
                 if index > 2: break
-                pickup_info[index + 1] = d.qty
-                tmp_count += d.qty
+                if d.qty :
+                    pickup_info[index + 1] = d.qty
+                    tmp_count += d.qty
             pickup_info[4] = r.qty - tmp_count
             row.extend(pickup_info) #Q - X
             row.extend(['', '', '',

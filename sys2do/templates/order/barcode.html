@@ -43,7 +43,7 @@ body, table, tr, td{
             <td><table width="100%" border="0" cellspacing="0" cellpadding="0">
               <tr>
                 <td width="50" align="right">单号：</td>
-                <td align="left">{{header.no}}</td>
+                <td align="left">{{header.ref_no}}</td>
                 <td width="50" align="right">日期：</td>
                 <td align="left">{{header.create_time|fd}}</td>
                 </tr>
@@ -70,15 +70,15 @@ body, table, tr, td{
     <table width="100%" border="0" cellspacing="0" cellpadding="0">
       <tr>
         <td width="75" height="25" align="right">发货公司：</td>
-        <td width="330" align="left">{{header.source_company}}</td>
+        <td width="330" align="left">{{header.source_company|f}}</td>
         <td width="65" align="right">发货人：</td>
-        <td align="left">{{header.source_contact}}</td>
+        <td align="left">{{header.source_contact|f}}</td>
       </tr>
     </table>
       <table width="100%" border="0" cellspacing="0" cellpadding="0">
         <tr>
           <td width="75" height="25" align="right">发货地址：</td>
-          <td align="left">{{header.source_address}}</td>
+          <td align="left">{{header.source_address|f}}</td>
         </tr>
     </table>
       <table width="100%" border="0" cellspacing="0" cellpadding="0">
@@ -101,7 +101,7 @@ body, table, tr, td{
       <table width="100%" border="0" cellspacing="0" cellpadding="0">
         <tr>
           <td width="75" height="25" align="right">收货地址：</td>
-          <td align="left">{{header.destination_address}}</td>
+          <td align="left">{{header.destination_address|f}}</td>
         </tr>
     </table>
       <table width="100%" border="0" cellspacing="0" cellpadding="0">
@@ -115,11 +115,11 @@ body, table, tr, td{
       <table width="100%" border="0" cellspacing="0" cellpadding="0">
         <tr>
           <td width="65" height="45" align="right">数量：</td>
-          <td align="left" class="print_big_td">{{header.qty}}</td>
+          <td align="left" class="print_big_td">{{header.qty|f}}&nbsp;</td>
           <td width="65" align="right">重量：</td>
-          <td align="left" class="print_big_td">{{header.weight}}</td>
+          <td align="left" class="print_big_td">{{header.weight|f}}&nbsp;</td>
           <td width="65" align="right">体积：</td>
-          <td align="left" class="print_big_td">{{header.vol}}</td>
+          <td align="left" class="print_big_td">{{header.vol|f}}&nbsp;</td>
         </tr>
     </table></td>
   </tr>

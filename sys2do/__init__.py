@@ -18,6 +18,7 @@ babel = Babel(app)
 
 @babel.localeselector
 def get_locale():
+    return None  #force the system to use the default setting, zh_CN
     return request.accept_languages.best_match(['zh_CN', 'zh_HK', 'en'])
 
 

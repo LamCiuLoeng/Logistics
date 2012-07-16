@@ -121,15 +121,13 @@ class DeliverView(BasicView):
                                             order_header = order_header,
                                             line_no = line_no))
                 line_no += 1
-                _debug('------- save detail')
-
             DBSession.flush()
 
             DBSession.add(TransferLog(
                                       refer_id = header.id,
                                       transfer_date = dt.now().strftime("%Y-%m-%d"),
                                       type = 1,
-                                      remark = u'货物已分拣'
+                                      remark = unicode(LOG_GOODS_SORTED)
                                       ))
             DBSession.commit()
         except:
@@ -159,62 +157,62 @@ class DeliverView(BasicView):
 
     def delete(self):
         header = getOr404(DeliverHeader, _g('id'), redirect_url = self.default())
-        header.status = ORDER_CANCELLED[0]
+        header.active = 1
         DBSession.commit()
         flash(MSG_DELETE_SUCC, MESSAGE_INFO)
         return redirect(url_for('.view', action = 'index'))
 
 
-    def do_action(self):
-        header = DeliverHeader.get(_g('id'))
-        if not header :
-            flash(MSG_RECORD_NOT_EXIST)
-            return redirect(self.default())
-
-        if _g('sc') not in ['SEND_OUT', 'GOODS_ARRIVED']:
-            flash(MSG_NO_SUCH_ACTION, MESSAGE_ERROR)
-            return redirect(self.default())
-
-        try:
-            if _g('sc') == 'SEND_OUT' :
-                header.send_out_remark = _g('send_out_remark')
-                header.status = SEND_OUT[0]
-                for d in header.details :
-                    #delete the item form inventory
-                    for r in DBSession.query(InventoryItem).filter(and_(InventoryItem.active == 0, InventoryItem.refer_order_detail_id == d.order_detail_id)):
-                        r.active = 1
-
-
-                DBSession.add(TransferLog(
-                                      refer_id = header.id,
-                                      transfer_date = dt.now().strftime("%Y-%m-%d"),
-                                      type = 1,
-                                      remark = unicode(LOG_GOODS_SENT_OUT)
-                                      ))
-
-            elif _g('sc') == 'GOODS_ARRIVED':
-                header.actual_time = _g('actual_time')
-                header.arrived_remark = _g('arrived_remark')
-                header.update_status(GOODS_ARRIVED[0])
-                for d in header.details :
-                    d.order_detail.update_status(GOODS_ARRIVED[0])
-                    d.order_detail.actual_time = _g('actual_time')
-
-                DBSession.add(TransferLog(
-                                      refer_id = header.id,
-                                      transfer_date = dt.now().strftime("%Y-%m-%d"),
-                                      type = 1,
-                                      remark = LOG_GOODS_ARRIVAL
-                                      ))
-            DBSession.commit()
-        except:
-            DBSession.rollback()
-            _error(traceback.print_exc())
-            flash(MSG_SERVER_ERROR, MESSAGE_ERROR)
-            return redirect(self.default())
-        else:
-            flash(MSG_UPDATE_SUCC, MESSAGE_INFO)
-            return redirect(self.default())
+#    def do_action(self):
+#        header = DeliverHeader.get(_g('id'))
+#        if not header :
+#            flash(MSG_RECORD_NOT_EXIST)
+#            return redirect(self.default())
+#
+#        if _g('sc') not in ['SEND_OUT', 'GOODS_ARRIVED']:
+#            flash(MSG_NO_SUCH_ACTION, MESSAGE_ERROR)
+#            return redirect(self.default())
+#
+#        try:
+#            if _g('sc') == 'SEND_OUT' :
+#                header.send_out_remark = _g('send_out_remark')
+#                header.status = SEND_OUT[0]
+#                for d in header.details :
+#                    #delete the item form inventory
+#                    for r in DBSession.query(InventoryItem).filter(and_(InventoryItem.active == 0, InventoryItem.refer_order_detail_id == d.order_detail_id)):
+#                        r.active = 1
+#
+#
+#                DBSession.add(TransferLog(
+#                                      refer_id = header.id,
+#                                      transfer_date = dt.now().strftime("%Y-%m-%d"),
+#                                      type = 1,
+#                                      remark = unicode(LOG_GOODS_SENT_OUT)
+#                                      ))
+#
+#            elif _g('sc') == 'GOODS_ARRIVED':
+#                header.actual_time = _g('actual_time')
+#                header.arrived_remark = _g('arrived_remark')
+#                header.update_status(GOODS_ARRIVED[0])
+#                for d in header.details :
+#                    d.order_detail.update_status(GOODS_ARRIVED[0])
+#                    d.order_detail.actual_time = _g('actual_time')
+#
+#                DBSession.add(TransferLog(
+#                                      refer_id = header.id,
+#                                      transfer_date = dt.now().strftime("%Y-%m-%d"),
+#                                      type = 1,
+#                                      remark = LOG_GOODS_ARRIVAL
+#                                      ))
+#            DBSession.commit()
+#        except:
+#            DBSession.rollback()
+#            _error(traceback.print_exc())
+#            flash(MSG_SERVER_ERROR, MESSAGE_ERROR)
+#            return redirect(self.default())
+#        else:
+#            flash(MSG_UPDATE_SUCC, MESSAGE_INFO)
+#            return redirect(self.default())
 
 
 

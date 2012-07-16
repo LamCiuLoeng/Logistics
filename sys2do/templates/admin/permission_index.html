@@ -4,30 +4,18 @@
 
 {% endblock %}
 
+{% block inner_menu %}
+<div class="inner_menu">
+	<ul>
+        <li><a href="{{url_for('.view', action = 'permission',m = 'NEW')}}"><img src="/static/images/system/order_manage_31.jpg" width="77" height="21" id="Image2" onmouseover="MM_swapImage('Image2','','/static/images/system/order_manage_h_31.jpg',1)" onmouseout="MM_swapImgRestore()" /></a></li>
+        <li style="padding:0px; margin:0px 55px 0px 0px; float:right"><a href="{{url_for('bpAuth.logout')}}"><img src="/static/images/system/order_manage_22.jpg" width="56" height="29" /></a></li>
+    </ul>
+</div>
+{% endblock %}
+
+
 {% block content %}
 	<table width="100%" border="0" cellspacing="0" cellpadding="0">
-      <tr>
-        <td><table width="100%" border="0" cellspacing="0" cellpadding="0">
-          <tr>
-            <td width="18"><img src="/static/images/system/group_manage_20.jpg" width="18" height="35" /></td>
-            <td width="2"><img src="/static/images/system/group_manage_21.jpg" width="2" height="35" /></td>
-            <td width="107"><a href="{{url_for('.view', action = 'permission',m = 'NEW')}}"><img src="/static/images/system/group_manage_22.jpg" width="107" height="35" /></a></td>
-			<td width="2"><img src="/static/images/system/group_manage_21.jpg" width="2" height="35" /></td>
-            
-            
-            <!-- 
-            <td width="106"><img src="/static/images/system/group_manage_24.jpg" width="106" height="35" /></td>
-			<td width="2"><img src="/static/images/system/group_manage_21.jpg" width="2" height="35" /></td>
-            <td width="107"><img src="/static/images/system/group_manage_26.jpg" width="107" height="35" /></td>
-			<td width="2"><img src="/static/images/system/group_manage_21.jpg" width="2" height="35" /></td>
-            <td width="106"><img src="/static/images/system/group_manage_28.jpg" width="106" height="35" /></td>
-			<td width="2"><img src="/static/images/system/group_manage_21.jpg" width="2" height="35" /></td>
-            -->
-            <td background="/static/images/system/group_manage_30.jpg">&nbsp;</td>
-            <td width="16"><img src="/static/images/system/group_manage_33.jpg" width="16" height="35" /></td>
-          </tr>
-        </table></td>
-      </tr>
       <tr>
         <td>&nbsp;</td>
       </tr>
@@ -35,47 +23,36 @@
         <td align="left">
         
         	<table width="99%" border="0" cellspacing="0" cellpadding="0" bgcolor="#FFFFFF">
-          <tr>
-            <td width="13"><img src="/static/images/system/group_manage_40.jpg" width="13" height="13" /></td>
+         <tr>
+            <td width="13">&nbsp;</td>
             <td></td>
-            <td width="13"><img src="/static/images/system/group_manage_46.jpg" width="13" height="13" /></td>
+            <td width="13">&nbsp;</td>
           </tr>
           <tr>
             <td>&nbsp;</td>
             <td><table width="100%" border="0" cellspacing="0" cellpadding="0">
               <tr>
-                <td class="title_fonts_display">权限管理</td>
+                <td class="title_fonts_display">{{_('Permission Management')}}</td>
               </tr>
               <tr>
                 <td>&nbsp;</td>
               </tr>
             </table>
-              <table width="99%" border="0" cellspacing="0" cellpadding="0">
+              <table border="0" cellspacing="0" cellpadding="0">
                 <tr class="field_head">
-                  <td align="center"><table width="50%" border="0" cellspacing="0" cellpadding="0">
-                    <tr>
-                      <td width="20%" align="right"><img src="/static/images/system/group_manage_58.jpg" width="12" height="19" /></td>
-                      <td width="80%" align="left">{{_('Permission Name')}}</td>
-                    </tr>
-                  </table></td>
-                  <td align="center"><table width="20%" border="0" cellspacing="0" cellpadding="0">
-                    <tr>
-                      <td width="20%" align="right"><img src="/static/images/system/group_manage_58.jpg" width="12" height="19" /></td>
-                      <td width="80%" align="left">{{_('Create Time')}}</td>
-                    </tr>
-                  </table></td>
-                  <td align="center"><table width="20%" border="0" cellspacing="0" cellpadding="0">
-                    <tr>
-                      <td width="20%" align="right"><img src="/static/images/system/group_manage_58.jpg" width="12" height="19" /></td>
-                      <td width="80%" align="left">{{_('Action')}}</td>
-                    </tr>
-                  </table></td>
+                  <td align="center" style="width:200px;">{{_('Permission Name')}}</td>
+                  <td align="center" style="width:200px;">{{_('Create Time')}}</td>
+                  <td align="center" style="width:200px;">{{_('Creator')}}</td>
+                  <td align="center" style="width:200px;">{{_('Update Time')}}</td>
+                  <td align="center" style="width:200px;">{{_('Last Updator')}}</td>
                 </tr>
 				{% for r in records %}
-					<tr class="data_table_tr">
-						<td>{{r}}</td>
+					<tr class="data_table_tr {{ loop.cycle('data_table_tr_odd', 'data_table_tr_even') }}">
+						<td><a href="{{url_for('.view', action = 'permission',m = 'UPDATE',id=r.id)}}">{{r}}</a></td>
 						<td>{{r.create_time|ft}}</td>
-						<td><a href="{{url_for('.view', action = 'permission',m = 'UPDATE',id=r.id)}}">{{_('Revise')}}</a>&nbsp|&nbsp;<a href="{{url_for('.view', action = 'permission',m = 'DELETE',id=r.id)}}">{{_('Delete')}}</a></td>
+						<td>{{r.create_by|f}}</td>
+						<td>{{r.update_time|ft}}</td>
+						<td>{{r.update_by|f}}</td>
 					</tr>
 				{% endfor %}
               </table></td>
@@ -85,6 +62,7 @@
           <!-- 
           <tr>
             <td>&nbsp;</td>
+						
             <td height="50"><table width="90%" border="0" cellspacing="0" cellpadding="0">
               <tr>
                 <td>&nbsp;</td>
@@ -102,10 +80,10 @@
             <td>&nbsp;</td>
           </tr>
           -->
-          <tr>
-            <td><img src="/static/images/system/group_manage_47.jpg" width="13" height="13" /></td>
+         <tr>
+            <td width="13">&nbsp;</td>
             <td></td>
-            <td><img src="/static/images/system/group_manage_47-27.jpg" width="13" height="13" /></td>
+            <td width="13">&nbsp;</td>
           </tr>
         </table></td>
       </tr>

@@ -98,7 +98,7 @@
     <td align="center">{{_('Qty')}}</td>
     <td align="center">{{_('Weight')}}</td>
     <td align="center">{{_('Amount')}}</td>
-    <td align="center"><img src="/static/images/system/group_manage_58up.gif" width="12" height="19" align="absmiddle" />{{_('Create Time')}}</td>
+    <td align="center">{{_('Create Time')}}</td>
     <td align="center">{{_('Creator')}}</td>
     <td align="center">{{_('Last Updator')}}</td>
     <td align="center">{{_('Status')}}</td>
@@ -114,19 +114,19 @@
 			<td>{{r.destination_company|f}}</td>
 			<td>{{r.qty|f}}</td>
 			<td>{{r.weight|f}}</td>
-			<td>{{r.weight|f}}</td>
 			<td>{{r.amount|ft}}</td>
+			<td>{{r.create_time|ft}}</td>
 			<td>{{r.create_by|f}}</td>
 			<td>{{r.update_by|f}}</td>
-			<td>{{_(r.status|showStatus)}}</td>
+			<td>{{r.status|showStatus}}</td>
 		  </tr>
   {% endfor %}
       <tr class="data_table_tr">
       	<th></th>
       	<td colspan="5">&nbsp;</td>
       	<td>{{total_qty}}</td>
-      	<td>{{total_vol}}</td>
       	<td>{{total_weight}}</td>
+      	<td>{{total_amount}}</td>
       	<td colspan="100">&nbsp;</td>
       </tr>
 </table>

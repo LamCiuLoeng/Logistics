@@ -22,31 +22,31 @@
 		<table border="1" cellpadding="5" cellspacing="5">
 			<tr>
 				<td width="200">{{_('3rd Party Supplier')}}</td>
-				<td width="200">{{values.get('supplier','')|ifFalse}}</td>
+				<td width="200">{{values.get('supplier','')|f}}</td>
 			</tr>
 			<tr>
 				<td>{{_('Deliver Number')}}</td>
-				<td>{{values.get('no','')|ifFalse}}</td>
+				<td>{{values.get('no','')|f}}</td>
 			</tr>
 			<tr>
 				<td>{{_('Destination')}}</td>
-				<td>{{values.get('destination_address','')|ifFalse}}</td>
+				<td>{{values.get('destination_address','')|f}}</td>
 			</tr>
 			<tr>
 				<td>{{_('Supplier Contact')}}</td>
-				<td>{{values.get('supplier_contact','')|ifFalse}}</td>
+				<td>{{values.get('supplier_contact','')|f}}</td>
 			</tr>
 			<tr>
 				<td>{{_('Supplier Tel')}}</td>
-				<td>{{values.get('supplier_tel','')|ifFalse}}</td>
+				<td>{{values.get('supplier_tel','')|f}}</td>
 			</tr>
 			<tr>
 				<td>{{_('Expect Time')}}</td>
-				<td>{{values.get('expect_time','')|ifFalse}}</td>
+				<td>{{values.get('expect_time','')|f}}</td>
 			</tr>
 			<tr>
 				<td>{{_('Remark')}}</td>
-				<td>{{values.get('remark','')|ifFalse}}</td>
+				<td>{{values.get('remark','')|f}}</td>
 			</tr>
 			<tr>
 				<td>{{_('Create Time')}}</td>
@@ -54,7 +54,7 @@
 			</tr>
 			<tr>
 				<td>{{_('Creator')}}</td>
-				<td>{{values.get('create_by','')|ifFalse}}</td>
+				<td>{{values.get('create_by','')|f}}</td>
 			</tr>
 			<tr>
 				<td>{{_('Update Time')}}</td>
@@ -62,7 +62,7 @@
 			</tr>
 			<tr>
 				<td>{{_('Last Updator')}}</td>
-				<td>{{values.get('update_by','')|ifFalse}}</td>
+				<td>{{values.get('update_by','')|f}}</td>
 			</tr>
 			<tr>
 				<td>{{_('Status')}}</td>
@@ -91,14 +91,14 @@
 					<th>{{d.order_header.ref_no}}</th>
 					<td>{{d.order_header.source_station}}</td>
 					<td>{{d.order_header.destination_station|f}}</td>
-					<td>{{d.order_header.item}}</td>
-					<td>{{d.order_header.qty}}</td>
-					<td>{{d.order_header.vol}}</td>
-					<td>{{d.order_header.weight}}</td>
-					<td>{{d.order_header.destination_contact}}</td>
-					<td>{{d.order_header.destination_tel}}</td>
+					<td>{{d.order_header.item|f}}</td>
+					<td>{{d.order_header.qty|f}}</td>
+					<td>{{d.order_header.vol|f}}</td>
+					<td>{{d.order_header.weight|f}}</td>
+					<td>{{d.order_header.destination_contact|f}}</td>
+					<td>{{d.order_header.destination_tel|f}}</td>
 					<td>{{d.order_header.update_time|ft}}</td>
-					<td>{{d.order_header.update_by|ifFalse}}</td>
+					<td>{{d.order_header.update_by|f}}</td>
 				</tr>
 			{% endfor %}
 		</table>

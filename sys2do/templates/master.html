@@ -67,15 +67,23 @@
 			    <tr>
 			      <td width="50" height="27" background="/static/images/system/order_manage_06.jpg"><img src="/static/images/system/order_manage_06.jpg" width="30" height="27" /></td>
 			      <td class="gap1"></td>
-			      <td class="{{ 'bt_highlight_fix' if session.get('tab-highlight','') == 'TAB_ORDER' else 'bt_normal'}}" onmouseover="menu_move_over(this)" onmouseout="menu_move_out(this)" onclick="redirect('{{url_for('bpOrder.view')}}')">订单管理</td>
+			      <td class="{{ 'bt_highlight_fix' if session.get('tab-highlight','') == 'TAB_ORDER' else 'bt_normal'}}" onmouseover="menu_move_over(this)" onmouseout="menu_move_out(this)" onclick="redirect('{{url_for('bpOrder.view')}}')">{{_('Order Management')}}</td>
 			      <td class="gap2"></td>
-			      <td class="{{ 'bt_highlight_fix' if session.get('tab-highlight','') == 'TAB_DELIVER' else 'bt_normal'}}" onmouseover="menu_move_over(this)" onmouseout="menu_move_out(this)" onclick="redirect('{{url_for('bpDeliver.view')}}')">送货单管理</td>
+			      <td class="{{ 'bt_highlight_fix' if session.get('tab-highlight','') == 'TAB_DELIVER' else 'bt_normal'}}" onmouseover="menu_move_over(this)" onmouseout="menu_move_out(this)" onclick="redirect('{{url_for('bpDeliver.view')}}')">{{_('Deliver Management')}}</td>
 			      <td class="gap2"></td>
-			      <td class="{{ 'bt_highlight_fix' if session.get('tab-highlight','') == 'TAB_CUSTOMER' else 'bt_normal'}}" onmouseover="menu_move_over(this)" onmouseout="menu_move_out(this)" onclick="redirect('{{url_for('bpAdmin.view',action='customer')}}')">客户管理</td>
+			      <td class="{{ 'bt_highlight_fix' if session.get('tab-highlight','') == 'TAB_CUSTOMER' else 'bt_normal'}}" onmouseover="menu_move_over(this)" onmouseout="menu_move_out(this)" onclick="redirect('{{url_for('bpAdmin.view',action='customer')}}')">{{_('Customer Management')}}</td>
 			      <td class="gap2"></td>
-			      <td class="{{ 'bt_highlight_fix' if session.get('tab-highlight','') == 'TAB_SUPPLIER' else 'bt_normal'}}" onmouseover="menu_move_over(this)" onmouseout="menu_move_out(this)" onclick="redirect('{{url_for('bpAdmin.view',action='supplier')}}')">承运商管理</td>
+			      <td class="{{ 'bt_highlight_fix' if session.get('tab-highlight','') == 'TAB_SUPPLIER' else 'bt_normal'}}" onmouseover="menu_move_over(this)" onmouseout="menu_move_out(this)" onclick="redirect('{{url_for('bpAdmin.view',action='supplier')}}')">{{_('Supplier Management')}}</td>
 			      <td class="gap2"></td>
 			      
+			      {% if 'ADMIN' is in_group%}
+			      <td class="{{ 'bt_highlight_fix' if session.get('tab-highlight','') == 'TAB_USER' else 'bt_normal'}}" onmouseover="menu_move_over(this)" onmouseout="menu_move_out(this)" onclick="redirect('{{url_for('bpAdmin.view',action='user')}}')">{{_('User Management')}}</td>
+			      <td class="gap2"></td>
+			      <td class="{{ 'bt_highlight_fix' if session.get('tab-highlight','') == 'TAB_GROUP' else 'bt_normal'}}" onmouseover="menu_move_over(this)" onmouseout="menu_move_out(this)" onclick="redirect('{{url_for('bpAdmin.view',action='group')}}')">{{_('Group Management')}}</td>
+			      <td class="gap2"></td>
+			      <td class="{{ 'bt_highlight_fix' if session.get('tab-highlight','') == 'TAB_PERMISSION' else 'bt_normal'}}" onmouseover="menu_move_over(this)" onmouseout="menu_move_out(this)" onclick="redirect('{{url_for('bpAdmin.view',action='permission')}}')">{{_('Permission Management')}}</td>
+			      <td class="gap2"></td>
+			      {% endif %}
 			      
 			      <!-- 
 			      <td class="bt_normal" onmouseover="menu_move_over(this)" onmouseout="menu_move_out(this)"><a href="{{url_for('bpOrder.view')}}">客户关系管理</a></td>
@@ -85,7 +93,7 @@
 			        <tr>
 			          <td style="padding:0px; margin:0px">&nbsp;</td>
 			          <td width="30" style="padding:0px; margin:0px"><img src="/static/images/system/order_manage_14.jpg" width="20" height="27" /></td>
-			          <td width="230" class="user_display"></td>
+			          <td width="230" class="user_display">{{session['user_profile']['name']}}</td>
 			        </tr>
 			      </table></td>
 			    </tr>

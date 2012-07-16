@@ -67,18 +67,12 @@
 
 {% endblock %}
 
+
 {% block inner_menu %}
 <div class="inner_menu">
 	<ul>
     	<li><img src="/static/images/system/order_manage_25.jpg" width="71" height="21" id="Image1" onmouseover="MM_swapImage('Image1','','/static/images/system/order_manage_h_25.jpg',1)" onmouseout="MM_swapImgRestore()" onclick="redirect('{{url_for('.view')}}')"/></li>
-        
         <li><input type="image" src="/static/images/system/order_manage_33.jpg" width="77" height="21" id="Image3" onmouseover="MM_swapImage('Image3','','/static/images/system/order_manage_h_33.jpg',1)" onmouseout="MM_swapImgRestore()" onclick="tosave()"/></li>
-        <!-- 
-        <li><img src="/static/images/system/order_manage_35.jpg" width="94" height="21" id="Image4" onmouseover="MM_swapImage('Image4','','/static/images/system/order_manage_h_35.jpg',1)" onmouseout="MM_swapImgRestore()" /></li>
-        <li><img src="/static/images/system/order_manage_37.jpg" width="77" height="21" id="Image5" onmouseover="MM_swapImage('Image5','','/static/images/system/order_manage_h_37.jpg',1)" onmouseout="MM_swapImgRestore()" /></li>
-        <li><img src="/static/images/system/order_manage_39.jpg" width="101" height="21" id="Image6" onmouseover="MM_swapImage('Image6','','/static/images/system/order_manage_h_39.jpg',1)" onmouseout="MM_swapImgRestore()" /></li>
-        <li><img src="/static/images/system/order_manage_41.jpg" width="101" height="21" id="Image7" onmouseover="MM_swapImage('Image7','','/static/images/system/order_manage_h_41.jpg',1)" onmouseout="MM_swapImgRestore()" /></li>
-        -->
         <li style="padding:0px; margin:0px 55px 0px 0px; float:right"><a href="{{url_for('bpAuth.logout')}}"><img src="/static/images/system/order_manage_22.jpg" width="56" height="29" /></a></li>
     </ul>
 </div>
@@ -114,8 +108,8 @@
     	 <li style="width:180px;"><span><sup class="warn">*</sup>&nbsp;单号</span>
     	    <input name="ref_no" id="ref_no" type="text" class="numeric must_input" style="width:100px"/>
   	    </li>
-    	  <li style="width:366px;"><span><sup class="warn">*</sup>&nbsp;{{_('Destination Station')}}</span>
-    	    <input name="destination_station" id="destination_station" type="text" style="width:160px" class="must_input"/>
+    	  <li style="width:180px;"><span><sup class="warn">*</sup>&nbsp;{{_('Destination Station')}}</span>
+    	    <input name="destination_station" id="destination_station" type="text" style="width:100px" class="must_input"/>
     	    <!-- <input name="input10" type="text" style="width:120px"/> -->      
    	      </li>
    	      <!-- 
@@ -126,7 +120,7 @@
     	    <input name="input7" type="text" style="width:100px"/>
   	    </li>
    	       -->
-    	  <li style="width:180px;"><span>{{_('Create Time')}}</span>{{current}}</li>
+    	  <li style="width:280px;"><span>{{_('Create Time')}}</span>{{current}}</li>
     	  <li style="width:459px;"><span><sup class="warn">*</sup>&nbsp;{{_('Source Company')}}</span>
     	    <input name="source_company" id="source_company" type="text" style="width:360px" class="must_input"/>
     	  </li>
@@ -157,7 +151,7 @@
     	  <li style="width:226px;"><span>{{_('Destination Mobile')}}</span>
     	    <input name="destination_mobile" id="destination_mobile" type="text" style="width:140px"/>
   	    </li>
-    	  <li style="width:459px;"><span>{{_('Pickup Type')}}</span>
+    	  <li style="width:226px;"><span>{{_('Pickup Type')}}</span>
     	  	<select name="pickup_type_id" id="pickup_type_id">
     	  		{% for p in pickup_type %}
     	  			<option value="{{p.id}}">{{p}}</option>
@@ -174,7 +168,9 @@
   	    <li style="width:226px;"><span>{{_('Expect Time')}}</span>
     	    <input type="text" style="width:140px" id="expect_time" name="expect_time" class="datepicker"/>
   	    </li>
-  	    
+  	    <li style="width:226px;"><span>{{_('Actual Time')}}</span>
+    	    <input type="text" style="width:140px" id="actual_time" name="actual_time" class="datepicker"/>
+  	    </li>
     	  <li style="width:459px;"><span>{{_('Item')}}</span>
     	    <input name="item" id="item" type="text" style="width:360px"/>
   	    </li>

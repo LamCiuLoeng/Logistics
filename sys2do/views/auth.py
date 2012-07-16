@@ -51,6 +51,10 @@ def check():
         flash(MSG_USER_NOT_EXIST, MESSAGE_ERROR)
         return redirect(url_for('bpAuth.login', next = _g('next')))
     else:
+        if not _g('password'):
+            flash(MSG_WRONG_PASSWORD, MESSAGE_ERROR)
+            return redirect(url_for('bpAuth.login', next = _g('next')))
+
         if not u.validate_password(_g('password')):
             flash(MSG_WRONG_PASSWORD, MESSAGE_ERROR)
             return redirect(url_for('bpAuth.login', next = _g('next')))
