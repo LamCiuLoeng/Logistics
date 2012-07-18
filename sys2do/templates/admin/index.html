@@ -6,9 +6,18 @@
 
 {% block content %}
 	<ul>
-		<li><a href="{{url_for('bpAdmin.view', action = 'user')}}">管理用户</a></li>
-		<li><a href="{{url_for('bpAdmin.view', action = 'group')}}">管理组</a></li>
-		<li><a href="{{url_for('bpAdmin.view', action = 'permission')}}">管理权限</a></li>
+	    <li><a href="{{url_for('bpAdmin.view',action='customer')}}">{{_('Customer Management')}}</a></li>
+	    <li><a href="{{url_for('bpAdmin.view',action='supplier')}}">{{_('Supplier Management')}}</a></li>
+	    <li><a href="{{url_for('bpAdmin.view',action='receiver')}}">{{_('Receiver Management')}}</a></li>
+	    
+	    
+	    <li><a href="{{url_for('bpAdmin.view',action='item')}}">{{_('Item Management')}}</a></li>
+	    <li><a href="{{url_for('bpAdmin.view',action='payment')}}">{{_('Payment Management')}}</a></li>
+	    <li><a href="{{url_for('bpAdmin.view',action='pickuptype')}}">{{_('Pickup Management')}}</a></li>
+	    <li><a href="{{url_for('bpAdmin.view',action='packtype')}}">{{_('Package Management')}}</a></li>
+	    <li><a href="{{url_for('bpAdmin.view',action='ratio',m='UPDATE')}}">{{_('Ratio Management')}}</a></li>
+	    
+	    <li><a href="{{url_for('bpAdmin.view',action='warehouse')}}">{{_('Warehouse Management')}}</a></li>
 	</ul>
 	
 {% endblock %}

@@ -17,10 +17,12 @@ from sys2do.model import DBSession
 from sys2do.model.auth import User, Group, Permission
 from sys2do.constant import MESSAGE_ERROR, MSG_NO_SUCH_ACTION, \
     MSG_NO_ID_SUPPLIED, MSG_RECORD_NOT_EXIST, MESSAGE_INFO, MSG_SAVE_SUCC, \
-    MSG_UPDATE_SUCC, MSG_DELETE_SUCC
-from sys2do.util.common import _g, _gl, getMasterAll
+    MSG_UPDATE_SUCC, MSG_DELETE_SUCC, MSG_SERVER_ERROR
+from sys2do.util.common import _g, _gl, getMasterAll, _error
 from sys2do.model.master import Customer, CustomerProfile, \
-    SupplierProfile, Supplier, Payment
+    SupplierProfile, Supplier, Payment, Item, PickupType, PackType, Ratio, \
+    Receiver
+import traceback
 
 __all__ = ['bpAdmin']
 
@@ -487,6 +489,123 @@ class AdminView(BasicView):
             DBSession.commit()
             flash(MSG_UPDATE_SUCC, MESSAGE_INFO)
             return redirect(url_for('.view', action = 'sprofile'))
+
+
+
+    def _template(self, DBObj, action,
+                  index_page = 'admin/template_index.html',
+                  new_page = 'admin/template_new.html',
+                  update_page = 'admin/template_update.html',
+                  ):
+        method = _g('m', 'LIST')
+        if method not in ['LIST', 'NEW', 'UPDATE', 'DELETE', 'SAVE_NEW', 'SAVE_UPDATE']:
+            flash(MSG_NO_SUCH_ACTION, MESSAGE_ERROR);
+            return redirect(url_for('.view', action = 'index'))
+        if method == 'LIST':
+            objs = DBSession.query(DBObj).filter(DBObj.active == 0).order_by(DBObj.name).all()
+            return render_template(index_page, records = objs, action = action)
+        elif method == 'NEW':
+            return render_template(new_page, action = action)
+        elif method == 'UPDATE':
+            id = _g('id', None)
+            if not id :
+                flash(MSG_NO_ID_SUPPLIED, MESSAGE_ERROR)
+                return redirect(url_for('.view', action = action))
+            obj = DBSession.query(DBObj).get(id)
+            if not obj :
+                flash(MSG_RECORD_NOT_EXIST, MESSAGE_ERROR)
+                return redirect(url_for('.view', action = action))
+            return render_template(update_page, v = obj.populate(), action = action)
+
+        elif method == 'DELETE':
+            id = _g('id', None)
+            if not id :
+                flash(MSG_NO_ID_SUPPLIED, MESSAGE_ERROR)
+                return redirect(url_for('.view', action = action))
+            obj = DBSession.query(DBObj).get(id)
+            if not obj :
+                flash(MSG_RECORD_NOT_EXIST, MESSAGE_ERROR)
+                return redirect(url_for('.view', action = action))
+            obj.active = 1
+            DBSession.commit()
+            flash(MSG_DELETE_SUCC, MESSAGE_INFO)
+            return redirect(url_for('.view', action = action))
+        elif method == 'SAVE_NEW':
+            try:
+                obj = DBObj.saveAsNew(request.values)
+                DBSession.commit()
+                flash(MSG_SAVE_SUCC, MESSAGE_INFO)
+            except:
+                _error(traceback.print_exc())
+                DBSession.rollback()
+                flash(MSG_SERVER_ERROR, MESSAGE_ERROR)
+            return redirect(url_for('.view', action = action))
+        elif method == 'SAVE_UPDATE':
+            id = _g('id', None)
+            if not id :
+                flash(MSG_NO_ID_SUPPLIED, MESSAGE_ERROR)
+                return redirect(url_for('.view', action = 'user'))
+            obj = DBSession.query(DBObj).get(id)
+            if not obj :
+                flash(MSG_RECORD_NOT_EXIST, MESSAGE_ERROR)
+                return redirect(url_for('.view', action = 'user'))
+            try:
+                obj.saveAsUpdate(request.values)
+                DBSession.commit()
+                flash(MSG_UPDATE_SUCC, MESSAGE_INFO)
+            except:
+                DBSession.rollback()
+                flash(MSG_SERVER_ERROR, MESSAGE_ERROR)
+            return redirect(url_for('.view', action = action))
+
+
+    @tab_highlight('TAB_MASTER')
+    def item(self):
+        return self._template(Item, 'item')
+
+    @tab_highlight('TAB_MASTER')
+    def payment(self):
+        return self._template(Payment, 'payment')
+
+    @tab_highlight('TAB_MASTER')
+    def pickuptype(self):
+        return self._template(PickupType, 'pickuptype')
+
+    @tab_highlight('TAB_MASTER')
+    def packtype(self):
+        return self._template(PackType, 'packtype')
+
+
+
+    def ratio(self):
+        method = _g('m', 'LIST')
+        if method not in ['UPDATE', 'SAVE_UPDATE']:
+            flash(MSG_NO_SUCH_ACTION, MESSAGE_ERROR);
+            return redirect(url_for('.view', action = 'index'))
+        if method == 'UPDATE':
+            ratios = {}
+            for r in DBSession.query(Ratio).filter(Ratio.active == 0):
+                ratios[r.type] = r.value
+            return render_template('admin/ratio.html', ratios = ratios)
+        elif method == 'SAVE_UPDATE':
+            for r in DBSession.query(Ratio).filter(Ratio.active == 0):
+                if r.type in request.values:
+                    r.value = _g(r.type) or 0
+            DBSession.commit()
+            flash(MSG_SAVE_SUCC, MESSAGE_INFO)
+            return redirect(url_for('bpAdmin.view'))
+
+
+    @tab_highlight('TAB_MASTER')
+    def receiver(self):
+        return self._template(Receiver, 'receiver',
+                              index_page = 'admin/receiver_index.html',
+                              new_page = 'admin/receiver_new.html',
+                              update_page = 'admin/receiver_update.html',)
+
+
+
+
 
 bpAdmin.add_url_rule('/', view_func = AdminView.as_view('view'), defaults = {'action':'index'})
 bpAdmin.add_url_rule('/<action>', view_func = AdminView.as_view('view'))

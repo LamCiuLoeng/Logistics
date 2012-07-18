@@ -1,16 +1,13 @@
 {% extends "master.html" %}
 
-{% block extCSS %}
-<style type="text/css">
 
-</style>
-{% endblock %}
 
 {% block extJS %}
 <script src="{{url_for('static', filename='js/customer/order_common.js')}}" type="text/javascript"></script>
 <script language="JavaScript" type="text/javascript">
-//<![CDATA[	
-	var index = 1;
+//<![CDATA[
+	var index = {{header.item_details|length}} + 1;
+
 //]]>
 </script>
 <script src="{{url_for('static', filename='js/customer/order_add.js')}}" type="text/javascript"></script>
@@ -37,76 +34,93 @@
     <div class="order_add_div_body">
   <ul>
     	<li style="width:180px;"><span><sup class="warn">*</sup>&nbsp;{{_('Source Station')}}</span>
-    	  <input name="source_station" id="source_station" type="text" style="width:100px" class="must_input"/>
+    	  <input name="source_station" id="source_station" type="text" style="width:100px" class="must_input" value="{{header.source_station|f}}"/>
     	</li>
     	 <li style="width:180px;"><span><sup class="warn">*</sup>&nbsp;单号</span>
-    	    <input name="ref_no" id="ref_no" type="text" class="must_input" style="width:100px"/>
+    	    <input name="ref_no" id="ref_no" type="text" class="must_input" style="width:100px" value="{{header.ref_no|f}}"/>
   	    </li>
     	  <li style="width:180px;"><span><sup class="warn">*</sup>&nbsp;{{_('Destination Station')}}</span>
-    	    <input name="destination_station" id="destination_station" type="text" style="width:100px" class="must_input"/>
+    	    <input name="destination_station" id="destination_station" type="text" style="width:100px" class="must_input" value="{{header.destination_station|f}}"/>
    	      </li>
     	  <li style="width:280px;"><span>{{_('Create Time')}}</span>{{current}}</li>
     	  <li style="width:459px;"><span><sup class="warn">*</sup>&nbsp;{{_('Source Company')}}</span>
     	      <select name="source_company_id" id="source_company_id" style="width:360px" class="must_input">
-    	          <option></option>
     	          {% for c in customers %}
+    	              {% if c.id == header.source_company_id %}
+    	              <option value="{{c.id}}" selected="selected">{{c}}</option>
+    	              {% else %}
     	              <option value="{{c.id}}">{{c}}</option>
+    	              {% endif %}
     	          {% endfor %}
-    	  	  </select>
+    	      </select>
     	  </li>
     	  <li style="width:459px;"><span><sup class="warn">*</sup>&nbsp;{{_('Destination Company')}}</span>
-    	  	<select name="destination_company_id" id="destination_company_id"style="width:360px" class="must_input">
-    	        
-    	    </select>
+    	  	<select name="destination_company_id" id="destination_company_id" style="width:360px" class="must_input">
+    	          <option value=""></option>
+    	          {% for t in targets %}
+    	        	{% if t.id == header.destination_company_id %}
+    	        	    <option value="{{t.id}}" selected="selected">{{t}}</option>
+    	        	{% else %}
+    	        	    <option value="{{t.id}}">{{t}}</option>
+    	        	{% endif %}
+    	        {% endfor %}
+    	      </select>
     	  </li>
     	  <br style="clear:both"/>
     	  <li style="width:459px;"><span><sup class="warn">*</sup>&nbsp;{{_('Source Contact')}}</span>
-    	    <input name="source_contact" id="source_contact" type="text" style="width:360px" class="must_input"/>
+    	    <input name="source_contact" id="source_contact" type="text" style="width:360px" class="must_input" value="{{header.source_contact|f}}"/>
     	  </li>
     	  <li style="width:459px;"><span><sup class="warn">*</sup>&nbsp;{{_('Destination Contact')}}</span>
-    	    <input name="destination_contact" id="destination_contact" type="text" style="width:360px" class="must_input"/>
+    	    <input name="destination_contact" id="destination_contact" type="text" style="width:360px" class="must_input" value="{{header.destination_contact|f}}"/>
     	  </li>
     	  <li style="width:459px;"><span>{{_('Source Address')}}</span>
-    	    <input name="source_address" id="source_address" type="text" style="width:360px"/>
+    	    <input name="source_address" id="source_address" type="text" style="width:360px" value="{{header.source_address|f}}"/>
     	  </li>
     	  <li style="width:459px;"><span>{{_('Destination Address')}}</span>
-    	    <input name="destination_address" id="destination_address" type="text" style="width:360px"/>
+    	    <input name="destination_address" id="destination_address" type="text" style="width:360px" value="{{header.destination_address|f}}"/>
     	  </li>
     	  <li style="width:227px;"><span>{{_('Source Phone')}}</span>
-    	    <input name="source_tel" id="source_tel" type="text" style="width:140px"/>
+    	    <input name="source_tel" id="source_tel" type="text" style="width:140px" value="{{header.source_tel|f}}"/>
   	    </li>
     	  <li style="width:226px;"><span>{{_('Source Mobile')}}</span>
-    	    <input name="source_mobile" id="source_mobile" type="text" style="width:140px"/>
+    	    <input name="source_mobile" id="source_mobile" type="text" style="width:140px" value="{{header.source_mobile|f}}"/>
   	    </li>
         <li style="width:227px;"><span>{{_('Destination Phone')}}</span>
-    	    <input name="destination_tel" id="destination_tel" type="text" style="width:140px"/>
+    	    <input name="destination_tel" id="destination_tel" type="text" style="width:140px" value="{{header.destination_tel|f}}"/>
   	    </li>
     	  <li style="width:226px;"><span>{{_('Destination Mobile')}}</span>
-    	    <input name="destination_mobile" id="destination_mobile" type="text" style="width:140px"/>
+    	    <input name="destination_mobile" id="destination_mobile" type="text" style="width:140px" value="{{header.destination_mobile|f}}"/>
   	    </li>
     	  <li style="width:226px;"><span>{{_('Pickup Type')}}</span>
     	  	<select name="pickup_type_id" id="pickup_type_id">
     	  		{% for p in pickup_type %}
-    	  			<option value="{{p.id}}">{{p}}</option>
+    	  			{% if p.id == header.pickup_type_id %}
+    	  				<option value="{{p.id}}" checked="checked">{{p}}</option>
+    	  			{% else %}
+    	  				<option value="{{p.id}}">{{p}}</option>
+    	  			{% endif %}
     	  		{% endfor %}
     	    </select>
   	    </li>
     	  <li style="width:227px;"><span>{{_('Package Type')}}</span>
-    	    <select name="pickup_type_id" id="pickup_type_id">
+    	    <select name="pack_type_id" id="pack_type_id">
     	  		{% for p in pack_type%}
-    	  			<option value="{{p.id}}">{{p}}</option>
+    	  			{% if p.id == header.pack_type_id %}
+    	  				<option value="{{p.id}}" checked="checked">{{p}}</option>
+    	  			{% else %}
+    	  				<option value="{{p.id}}">{{p}}</option>
+    	  			{% endif %}
     	  		{% endfor %}
     	    </select>
   	    </li>
   	    <li style="width:226px;"><span>{{_('Expect Time')}}</span>
-    	    <input type="text" style="width:140px" id="expect_time" name="expect_time" class="datepicker"/>
+    	    <input type="text" style="width:140px" id="expect_time" name="expect_time" class="datepicker" value="{{header.expect_time|fd}}"/>
   	    </li>
   	    <li style="width:226px;"><span>{{_('Actual Time')}}</span>
     	    <input type="text" style="width:140px" id="actual_time" name="actual_time" class="datepicker"/>
   	    </li>
     	  <li style="width:925px;"><span>{{_('Remark')}}</span>
-    	  	<textarea name="remark" id="remark" style="width:840px">深圳深福合力物流 服务热线：400-888-0900</textarea>
-    	    
+    	  	<textarea name="remark" id="remark" style="width:840px">{{header.remark|f}}</textarea>   
   	    </li>
       </ul><table width="100%" border="0" cellspacing="0" cellpadding="0" style="float:left;">
   <tr>
@@ -121,25 +135,25 @@
     </tr>
   <tr>
     <td height="30" align="center"><span style="width:180px;">
-      <input name="qty" id="qty" type="text" class="order_add_div_body_input numeric compute" style="width:70px"/>
+      <input name="qty" id="qty" type="text" class="order_add_div_body_input numeric compute" style="width:70px" value="{{header.qty|f}}"/>
     </span></td>
     <td align="center"><span style="width:180px;">
-      <input name="qty_ratio" id="qty_ratio" type="text" class="order_add_div_body_input numeric compute" style="width:70px" value="{{ratios.get('QTY',0)}}"/>
+      <input name="qty_ratio" id="qty_ratio" type="text" class="order_add_div_body_input numeric compute" style="width:70px" value="{{header.qty_ratio|f}}"/>
     </span></td>
     <td align="center"><span style="width:180px;">
-      <input name="vol" id="vol" type="text" class="order_add_div_body_input numeric compute" style="width:70px"/>
+      <input name="weight" id="weight" type="text" class="order_add_div_body_input numeric compute" style="width:70px" value="{{header.weight|f}}"/>
     </span></td>
     <td align="center"><span style="width:180px;">
-      <input name="vol_ratio" id="vol_ratio" type="text" class="order_add_div_body_input numeric compute" style="width:70px" value="{{ratios.get('VOL',0)}}"/>
+      <input name="weight_ratio" id="weight_ratio" type="text" class="order_add_div_body_input numeric compute" style="width:70px" value="{{header.weight_ratio|f}}"/>
     </span></td>
     <td align="center"><span style="width:180px;">
-      <input name="weight" id="weight" type="text" class="order_add_div_body_input numeric compute" style="width:70px"/>
+      <input name="vol" id="vol" type="text" class="order_add_div_body_input numeric compute" style="width:70px" value="{{header.vol|f}}"/>
     </span></td>
     <td align="center"><span style="width:180px;">
-      <input name="weight_ratio" id="weight_ratio" type="text" class="order_add_div_body_input numeric compute" style="width:70px" value="{{ratios.get('WEIGHT',0)}}"/>
+      <input name="vol_ratio" id="vol_ratio" type="text" class="order_add_div_body_input numeric compute" style="width:70px" value="{{header.vol_ratio|f}}"/>
     </span></td>
     <td align="center"><span style="width:180px;">
-      <input name="amount" id="amount" type="text" class="order_add_div_body_input numeric must_input" style="width:70px"/>
+      <input name="amount" id="amount" type="text" class="order_add_div_body_input numeric must_input" style="width:70px" value="{{header.amount|f}}"/>
     </span></td>
     <td align="center">
     	<span style="width:180px;">
@@ -192,10 +206,24 @@
 		<table>
 			<thead>
 				<tr class="field_head">
-					<td>{{_('Item Name')}}</td><td>{{_('Qty')}}</td><td>{{_('Vol')}}</td><td>{{_('Weight')}}</td><td>{{_('Remark')}}</td><td>&nbsp;</td>
+					<th>{{_('Item Name')}}</th>
+					<th>{{_('Qty')}}</th>
+					<th>{{_('Vol')}}</th>
+					<th>{{_('Weight')}}</th>
+					<th>{{_('Remark')}}</th><td>&nbsp;</td>
 				</tr>
 			</thead>
 			<tbody id="item_list">
+			{% for l in header.item_details %}
+					<tr class="data_table_tr">
+						<th>{{l.item|f}}<input type="hidden" name="item_name_{{loop.index}}" value="{{l.item|f}}"/></td>
+						<td>{{l.qty|f}}<input type="hidden" name="item_qty_{{loop.index}}" value="{{l.qty|f}}"/></td>
+						<td>{{l.vol|f}}<input type="hidden" name="item_vol_{{loop.index}}" value="{{l.vol|f}}"/></td>
+						<td>{{l.weight|f}}<input type="hidden" name="item_weight_{{loop.index}}" value="{{l.weight|f}}"/></td>
+						<td>{{l.remark|f}}<input type="hidden" name="item_remark_{{loop.index}}" value="{{l.remark|f}}"/></td>
+						<td><input type="button" value="{{_('Del')}}" onclick="del_item({{l.id}},this)"/></td>
+					</tr>
+				{% endfor %}
 			</tbody>
 		</table>
 	  <div style="clear:both"></div>

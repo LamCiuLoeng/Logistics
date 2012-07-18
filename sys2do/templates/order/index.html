@@ -43,13 +43,6 @@
 	<ul>
         <li><a href="{{url_for('.view',action='add')}}"><img src="/static/images/system/order_manage_31.jpg" width="77" height="21" id="Image2" onmouseover="MM_swapImage('Image2','','/static/images/system/order_manage_h_31.jpg',1)" onmouseout="MM_swapImgRestore()" /></a></li>
         <li><img src="/static/images/system/order_manage_41.jpg" width="101" height="21" id="Image7" onmouseover="MM_swapImage('Image7','','/static/images/system/order_manage_h_41.jpg',1)" onmouseout="MM_swapImgRestore()" onclick="return toexp();"/></li>
-        <!-- 
-        <li><img src="/static/images/system/order_manage_37.jpg" width="77" height="21" id="Image5" onmouseover="MM_swapImage('Image5','','/static/images/system/order_manage_h_37.jpg',1)" onmouseout="MM_swapImgRestore()" onclick="toprint();"/></li>
-    	<li><img src="/static/images/system/order_manage_25.jpg" width="71" height="21" id="Image1" onmouseover="MM_swapImage('Image1','','/static/images/system/order_manage_h_25.jpg',1)" onmouseout="MM_swapImgRestore()" /></li>
-        <li><img src="/static/images/system/order_manage_35.jpg" width="94" height="21" id="Image4" onmouseover="MM_swapImage('Image4','','/static/images/system/order_manage_h_35.jpg',1)" onmouseout="MM_swapImgRestore()" /></li>
-        <li><img src="/static/images/system/order_manage_33.jpg" width="77" height="21" id="Image3" onmouseover="MM_swapImage('Image3','','/static/images/system/order_manage_h_33.jpg',1)" onmouseout="MM_swapImgRestore()" /></li>
-        <li><img src="/static/images/system/order_manage_39.jpg" width="101" height="21" id="Image6" onmouseover="MM_swapImage('Image6','','/static/images/system/order_manage_h_39.jpg',1)" onmouseout="MM_swapImgRestore()" /></li>
-        -->
         <li style="padding:0px; margin:0px 55px 0px 0px; float:right"><a href="{{url_for('bpAuth.logout')}}"><img src="/static/images/system/order_manage_22.jpg" width="56" height="29" /></a></li>
     </ul>
 </div>
@@ -64,15 +57,42 @@
 	<div class="search_div_header">订单搜索</div>
     <div class="search_div_body">
     	<form action="{{url_for('.view')}}" method="post">
+
     	<ul>
           <li style="width:100%; border-right:#E2FEFE 1px solid;"><span>起始日期</span>
         	  <input type="text" class="datepicker" name="create_time_from" value="{{values.get('create_time_from','')|f}}"/>&nbsp;&nbsp;-&nbsp;&nbsp;<input type="text" class="datepicker" name="create_time_to" value="{{values.get('create_time_to','')|f}}"/>
           </li>
+         
+          
           <li><span>{{_('Order Number')}}</span><input type="text" name="ref_no" value="{{values.get('ref_no','')|f}}"/></li>
+          <li style="width:500px"><span>{{_('System Number')}}</span><input type="text" name="no" value="{{values.get('no','')|f}}"/></li>
+                 
           <li><span>{{_('Source Station')}}</span><input type="text" name="source_station" value="{{values.get('source_station','')|f}}"/></li>
-          <li><span>{{_('Source Company')}}</span><input type="text" name="source_company" value="{{values.get('source_company','')|f}}"/></li>
-          <li><span>{{_('Destination Station')}}</span><input type="text" name="destination_station" value="{{values.get('destination_station','')|f}}"/></li>
-          <li><span>{{_('Destination Company')}}</span><input type="text" name="destination_company" value="{{values.get('destination_company','')|f}}"/></li>
+          <li style="width:500px"><span>{{_('Destination Station')}}</span><input type="text" name="destination_station" value="{{values.get('destination_station','')|f}}"/></li>
+          <li><span>{{_('Source Company')}}</span>
+              <select name="source_company_id" id="source_company_id">
+                  <option value=""></option>
+                  {% for c in customers%}
+                      {% if '%s' % c.id == values.get('source_company_id',None) %}
+                          <option value="{{c.id}}" selected="selected">{{c}}</option>
+                      {% else %}
+                          <option value="{{c.id}}">{{c}}</option>
+                      {% endif %}
+                  {% endfor %}
+          	  </select>
+          </li>
+          <li><span>{{_('Destination Company')}}</span>
+          		<select name="destination_company_id" id="destination_company_id">
+          		    <option value=""></option>
+          		    {% for t in targets %}
+          		         {% if '%s' % t.id == values.get('destination_company_id',None)%}
+          		             <option value="{{t.id}}" selected="selected">{{t}}</option>
+          		         {% else %}
+          		             <option value="{{t.id}}">{{t}}</option>
+          		         {% endif %}
+          		    {% endfor %}
+          		</select>
+          </li>
         </ul>
         <div class="button_div"><input type="submit" value="{{_('Search')}}"/></div>
     	</form>
@@ -87,27 +107,29 @@
 
 <form method="post" action="" id="records">
 
-<table width="100%" border="0" cellpadding="0" cellspacing="0">
+<table border="0" cellpadding="0" cellspacing="0">
   <tr class="field_head">
-    <th width="20" align="center"><input type="checkbox" onclick="allselect(this);"/></th>
-    <td align="center">{{_('Order Number')}}</td>
-    <td align="center">{{_('Source Station')}}</td>
-    <td align="center">{{_('Source Company')}}</td>
-    <td align="center">{{_('Destination Station')}}</td>
-    <td align="center">{{_('Destination Company')}}</td>
-    <td align="center">{{_('Qty')}}</td>
-    <td align="center">{{_('Weight')}}</td>
-    <td align="center">{{_('Amount')}}</td>
-    <td align="center">{{_('Create Time')}}</td>
-    <td align="center">{{_('Creator')}}</td>
-    <td align="center">{{_('Last Updator')}}</td>
-    <td align="center">{{_('Status')}}</td>
+    <th align="center" style="width:15px;"><input type="checkbox" onclick="allselect(this);"/></th>
+    <td align="center" style="width:200px;">{{_('Order Number')}}</td>
+    <td align="center" style="width:200px;">{{_('System Number')}}</td>
+    <td align="center" style="width:100px;">{{_('Source Station')}}</td>
+    <td align="center" style="width:300px;">{{_('Source Company')}}</td>
+    <td align="center" style="width:100px;">{{_('Destination Station')}}</td>
+    <td align="center" style="width:300px;">{{_('Destination Company')}}</td>
+    <td align="center" style="width:50px;">{{_('Qty')}}</td>
+    <td align="center" style="width:50px;">{{_('Weight')}}</td>
+    <td align="center" style="width:50px;">{{_('Amount')}}</td>
+    <td align="center" style="width:200px;">{{_('Create Time')}}</td>
+    <td align="center" style="width:100px;">{{_('Creator')}}</td>
+    <td align="center" style="width:20px;">{{_('Last Updator')}}</td>
+    <td align="center" style="width:150px;">{{_('Status')}}</td>
   </tr>
   
   {% for r in result %}
 		  <tr class="data_table_tr {{ loop.cycle('data_table_tr_odd', 'data_table_tr_even') }}">
 		    <th><input type="checkbox" name="order_ids" value="{{r.id}}" /></th>
 		    <td><a href="{{url_for('.view', action = 'revise',id=r.id)}}">{{r.ref_no|f('没有订单号')}}</a></td>
+		    <td>{{r.no|f}}</td>
 			<td>{{r.source_station|f}}</td>
 			<td>{{r.source_company|f}}</td>
 			<td>{{r.destination_station|f}}</td>
@@ -123,7 +145,7 @@
   {% endfor %}
       <tr class="data_table_tr">
       	<th></th>
-      	<td colspan="5">&nbsp;</td>
+      	<td colspan="6" style="text-align:left">&nbsp;合计</td>
       	<td>{{total_qty}}</td>
       	<td>{{total_weight}}</td>
       	<td>{{total_amount}}</td>

@@ -320,8 +320,8 @@ body{
 	font-size:12px;
 	font-weight:bold;
 	background-image: url(/static/images/system/data_bg.jpg);
-	width:180px;
 	text-align:center;
+	/*width:180px;*/
 
 }
 .data_table_tr{
@@ -333,7 +333,7 @@ body{
 	line-height:24px;
 	text-align:center;
 	border-left:#fafafa 1px solid;
-	width:90px;
+	/*width:90px;*/
 }
 .data_table_tr td{
 	border-bottom:#dddddd 1px solid;
@@ -359,4 +359,58 @@ body{
 }
 .number_input_right{
 	text-align:right;
+}
+.todo_list_div {
+	font-family: "宋体";
+	font-size: 12px;
+	width: 198px;
+	border-top:#ccc solid 1px;
+	border-right:#ccc solid 1px;
+	border-bottom:#ccc solid 1px;
+	border-left:#ccc solid 1px;
+	background-color:#fff;
+	padding:0px 10px 10px 10px;
+}
+
+.todo_list_header {
+	line-height:30px; font-size:16px; font-family:'微软雅黑'; color:#600; width:220px; text-align:center;
+}
+.todo_list_div .level_one {
+	margin-left:10px;
+	margin-right:15px;
+	color:#036;
+	font-weight:bold;
+	background:url(/static/images/system/connavico.png) no-repeat scroll right transparent;
+	padding:7px 0px;
+	font-size: 12px;
+	border-top:1px solid #eee;
+	border-bottom:1px solid #eee;
+	
+}
+.todo_list_div div{
+	margin-top:17px;
+}
+.todo_list_div .level_two {
+	color:#666;
+	background:url(/static/images/system/pro_navico.png) no-repeat scroll left transparent;
+	padding:7px 10px;
+	font-size: 12px;
+	margin-left:15px;
+}
+
+.todo_list_div .level_two a:link{
+	color:#666;
+	text-decoration: none;
+}
+.todo_list_div .level_two a:visited{
+	color:#666;
+	text-decoration: none;
+}
+.todo_list_div .level_two a:hover{
+	color:#f90;
+	text-decoration: none;
+}
+.todo_list_div .level_two a:active{
+	color:#f90;
+	text-decoration: none;
 }

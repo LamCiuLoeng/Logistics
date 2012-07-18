@@ -1,0 +1,78 @@
+{% extends "master.html" %}
+
+{% block extJS %}
+
+{% endblock %}
+
+{% block inner_menu %}
+<div class="inner_menu">
+	<ul>
+        <li><a href="{{url_for('.view', action = action,m = 'NEW')}}"><img src="/static/images/system/order_manage_31.jpg" width="77" height="21" id="Image2" onmouseover="MM_swapImage('Image2','','/static/images/system/order_manage_h_31.jpg',1)" onmouseout="MM_swapImgRestore()" /></a></li>
+        <li style="padding:0px; margin:0px 55px 0px 0px; float:right"><a href="{{url_for('bpAuth.logout')}}"><img src="/static/images/system/order_manage_22.jpg" width="56" height="29" /></a></li>
+    </ul>
+</div>
+{% endblock %}
+
+
+{% block content %}
+	<table width="100%" border="0" cellspacing="0" cellpadding="0">
+      <tr>
+        <td>&nbsp;</td>
+      </tr>
+      <tr>
+        <td align="left">
+        
+        	<table width="99%" border="0" cellspacing="0" cellpadding="0" bgcolor="#FFFFFF">
+         <tr>
+            <td width="13">&nbsp;</td>
+            <td></td>
+            <td width="13">&nbsp;</td>
+          </tr>
+          <tr>
+            <td>&nbsp;</td>
+            <td><table width="100%" border="0" cellspacing="0" cellpadding="0">
+              <tr>
+                <td class="title_fonts_display">{{_('Receiver Management')}}</td>
+              </tr>
+              <tr>
+                <td>&nbsp;</td>
+              </tr>
+            </table>
+              <table border="0" cellspacing="0" cellpadding="0">
+                <tr class="field_head">
+                  <td align="center" style="width:200px;">{{_('Code')}}</td>
+                  <td align="center" style="width:200px;">{{_('Name')}}</td>
+                  <td align="center" style="width:200px;">{{_('Tel')}}</td>
+                  <td align="center" style="width:200px;">{{_('Mobile')}}</td>
+                  <td align="center" style="width:200px;">{{_('Create Time')}}</td>
+                  <td align="center" style="width:200px;">{{_('Creator')}}</td>
+                  <td align="center" style="width:200px;">{{_('Update Time')}}</td>
+                  <td align="center" style="width:200px;">{{_('Last Updator')}}</td>
+                </tr>
+				{% for r in records %}
+					<tr class="data_table_tr {{ loop.cycle('data_table_tr_odd', 'data_table_tr_even') }}">
+						<td><a href="{{url_for('.view', action = action ,m = 'UPDATE',id=r.id)}}">{{r.code|f}}</a></td>
+						<td>{{r.name}}</td>
+						<td>{{r.tel|f}}</td>
+						<td>{{r.mobile|ft}}</td>
+						<td>{{r.create_time|ft}}</td>
+						<td>{{r.create_by|f}}</td>
+						<td>{{r.update_time|ft}}</td>
+						<td>{{r.update_by|f}}</td>
+					</tr>
+				{% endfor %}
+              </table></td>
+            <td>&nbsp;</td>
+          </tr>
+         <tr>
+            <td width="13">&nbsp;</td>
+            <td></td>
+            <td width="13">&nbsp;</td>
+          </tr>
+        </table></td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+      </tr>
+    </table>
+{% endblock %}

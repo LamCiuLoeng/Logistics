@@ -61,8 +61,18 @@ function MM_jumpMenu(targ, selObj, restore) { //v3.0
     if (restore)
         selObj.selectedIndex = 0;
 }
+
+
 function redirect(url) {
     window.location = url;
+}
+
+function redirect_alert(msg,url){
+    if(confirm(msg)){
+        redirect(url);
+    }else{
+        return false;
+    }
 }
 
 function bind_province_city_district(province_id,city_id,district_id){
@@ -119,4 +129,9 @@ function bind_province_city_district(province_id,city_id,district_id){
         });
     }
     
+}
+
+
+function nowstr(){
+    return Date.parse(new Date())
 }

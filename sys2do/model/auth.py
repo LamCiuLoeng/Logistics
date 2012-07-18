@@ -58,6 +58,8 @@ class SysMixin(object):
 
 class CRUDMixin(object):
 
+#    __fields = []
+
     @classmethod
     def get(clz, id):
         try:
@@ -69,15 +71,33 @@ class CRUDMixin(object):
     def all(clz, order_by = "name"):
         return DBSession.query(clz).filter(clz.active == 0).order_by(getattr(clz, order_by)).all()
 
+    @classmethod
+    def _get_fields(clz):
+        return []
+
     def populate(self):
-        return None
+        result = {
+                  'id' : self.id
+                  }
+        for f in self._get_fields():
+            result[f] = unicode(getattr(self, f) or '')
+        return result
+
 
     @classmethod
     def saveAsNew(clz, v):
-        return None
+        params = {}
+        for f in clz._get_fields():
+            params[f] = v.get(f, None) or None
+        obj = clz(**params)
+        DBSession.add(obj)
+        return obj
+
 
     def saveAsUpdate(self, v):
-        return None
+        for f in self._get_fields():
+            setattr(self, f, v.get(f, None) or None)
+        return self
 
 #{ Association tables
 

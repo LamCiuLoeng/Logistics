@@ -7,6 +7,12 @@
 ###########################################
 '''
 from datetime import datetime as dt, timedelta
+import os
+import random
+import shutil
+import traceback
+
+
 from flask import Blueprint, render_template, url_for, session, Response
 from flask.globals import request
 from flask.helpers import flash, jsonify, send_file
@@ -18,13 +24,13 @@ from sys2do.constant import MESSAGE_ERROR, MESSAGE_INFO, MSG_UPDATE_SUCC, \
     MSG_SAVE_SUCC, ORDER_CANCELLED, STATUS_LIST, IN_TRAVEL, MSG_RECORD_NOT_EXIST, \
     IN_WAREHOUSE, LOG_CREATE_ORDER, LOG_GOODS_IN_WAREHOUSE, ORDER_NEW, \
     ASSIGN_RECEIVER, LOG_SEND_RECEIVER, OUT_WAREHOUSE, GOODS_PICKUP, GOODS_SIGNED, \
-    LOG_GOODS_SIGNED, LOG_GOODS_PICKUPED, LOG_GOODS_IN_TRAVEL
+    LOG_GOODS_SIGNED, LOG_GOODS_PICKUPED, LOG_GOODS_IN_TRAVEL, SORTING
 from sys2do.model import DBSession
 from sys2do.model.logic import OrderHeader, TransferLog, DeliverDetail, \
     ItemDetail, PickupDetail
 from sys2do.model.master import CustomerProfile, InventoryLocation, Customer, \
     ItemUnit, WeightUnit, ShipmentType, InventoryItem, Payment, Ratio, PickupType, \
-    PackType
+    PackType, CustomerTarget, Receiver
 from sys2do.setting import TMP_FOLDER, TEMPLATE_FOLDER
 from sys2do.util.barcode_helper import generate_barcode_file
 from sys2do.util.common import _g, getOr404, _gp, getMasterAll, _debug, _info, \
@@ -34,10 +40,6 @@ from sys2do.util.excel_helper import SummaryReport
 from sys2do.util.logic_helper import genSystemNo
 from sys2do.views import BasicView
 from werkzeug.utils import redirect
-import os
-import random
-import shutil
-import traceback
 
 
 
@@ -58,24 +60,36 @@ class OrderView(BasicView):
 #    @login_required
     def index(self):
         values = {}
-        for f in ['create_time_from', 'create_time_to', 'ref_no', 'source_station', 'source_company', 'destination_station', 'destination_company'] :
+        for f in ['no', 'create_time_from', 'create_time_to', 'ref_no', 'source_station',
+                  'source_company_id', 'destination_station', 'destination_company_id'] :
             values[f] = _g(f)
+
+        if not values['create_time_from'] and not values['create_time_to']:
+            values['create_time_to'] = dt.now().strftime("%Y-%m-%d")
+            values['create_time_from'] = (dt.now() - timedelta(days = 30)).strftime("%Y-%m-%d")
+
 
         conditions = [OrderHeader.active == 0]
         if values['create_time_from']:
             conditions.append(OrderHeader.create_time > values['create_time_from'])
         if values['create_time_to']:
-            conditions.append(OrderHeader.create_time < values['create_time_to'])
+            conditions.append(OrderHeader.create_time < '%s 23:59' % values['create_time_to'])
         if values['ref_no']:
             conditions.append(OrderHeader.ref_no.op('like')('%%%s%%' % values['ref_no']))
+        if values['no']:
+            conditions.append(OrderHeader.no.op('like')('%%%s%%' % values['no']))
         if values['source_station']:
             conditions.append(OrderHeader.source_station.op('like')('%%%s%%' % values['source_station']))
-        if values['source_company']:
-            conditions.append(OrderHeader.source_company.op('like')('%%%s%%' % values['source_company']))
+        if values['source_company_id']:
+            conditions.append(OrderHeader.source_company_id == values['source_company_id'])
+            targets = DBSession.query(CustomerTarget).filter(and_(CustomerTarget.active == 0, CustomerTarget.customer_id == values['source_company_id']))
+        else:
+            targets = []
+
         if values['destination_station']:
             conditions.append(OrderHeader.destination_station.op('like')('%%%s%%' % values['destination_station']))
-        if values['destination_company']:
-            conditions.append(OrderHeader.destination_company.op('like')('%%%s%%' % values['destination_company']))
+        if values['destination_company_id']:
+            conditions.append(OrderHeader.destination_company_id == values['destination_company_id'])
 
         result = DBSession.query(OrderHeader).filter(and_(*conditions))
 
@@ -92,6 +106,8 @@ class OrderView(BasicView):
                 'total_vol' : total_vol,
                 'total_weight' : total_weight,
                 'total_amount' : total_amount,
+                'customers' : getMasterAll(Customer),
+                'targets' : targets,
                 }
 
 
@@ -101,9 +117,6 @@ class OrderView(BasicView):
         for r in DBSession.query(Ratio).filter(Ratio.active == 0):
             ratios[r.type] = r.value
         return {'customers' :getMasterAll(Customer),
-#                'units' : getMasterAll(ItemUnit),
-#                'wunits' : getMasterAll(WeightUnit),
-#                'shiptype' : getMasterAll(ShipmentType),
                 'payment' : getMasterAll(Payment, 'id'),
                 'pickup_type' : getMasterAll(PickupType, 'id'),
                 'pack_type' : getMasterAll(PackType, 'id'),
@@ -137,9 +150,9 @@ class OrderView(BasicView):
 
     def _save_new_process(self):
         params = {}
-        for k in ['source_station', 'source_company', 'source_address', 'source_contact', 'source_tel', 'source_mobile',
-                  'destination_station', 'destination_company', 'destination_address', 'destination_contact', 'destination_tel', 'destination_mobile',
-                  'ref_no', 'order_time', 'item', 'item_remark', 'expect_time', 'actual_time', 'remark',
+        for k in ['source_station', 'source_company_id', 'source_address', 'source_contact', 'source_tel', 'source_mobile',
+                  'destination_station', 'destination_company_id', 'destination_address', 'destination_contact', 'destination_tel', 'destination_mobile',
+                  'ref_no', 'order_time', 'expect_time', 'actual_time', 'remark',
                  'payment_id', 'pickup_type_id', 'pack_type_id', 'qty', 'qty_ratio', 'vol', 'vol_ratio',
                   'weight', 'weight_ratio', 'weight_ratio', 'amount',
                   ]:
@@ -193,14 +206,58 @@ class OrderView(BasicView):
 
         sorted(logs, cmp = lambda x, y: cmp(x.transfer_date, y.transfer_date))
 
-
+        if header.source_company_id:
+            targets = header.source_company.targets
+        else:
+            targets = {}
         return {
                 'header' : header ,
                 'payment' : getMasterAll(Payment),
                 'pickup_type' : getMasterAll(PickupType, 'id'),
                 'pack_type' : getMasterAll(PackType, 'id'),
-                'transit_logs' : logs
+                'transit_logs' : logs,
+                'targets' : targets,
+                'customers' : getMasterAll(Customer),
+                'receivers' : getMasterAll(Receiver)
                 }
+
+
+    @templated('order/copy.html')
+    def copy(self):
+        id = _g('id') or None
+        if not id :
+            flash(MSG_NO_ID_SUPPLIED, MESSAGE_ERROR)
+            return redirect(self.default())
+
+        header = DBSession.query(OrderHeader).get(id)
+
+        logs = []
+        logs.extend(header.get_logs())
+        try:
+            deliver_detail = DBSession.query(DeliverDetail).filter(and_(DeliverDetail.active == 0, DeliverDetail.order_header_id == header.id)).one()
+            deliver_heaer = deliver_detail.header
+            for f in deliver_heaer.get_logs() : _info(f.remark)
+            logs.extend(deliver_heaer.get_logs())
+        except:
+            pass
+
+        sorted(logs, cmp = lambda x, y: cmp(x.transfer_date, y.transfer_date))
+
+        if header.source_company_id:
+            targets = header.source_company.targets
+        else:
+            targets = {}
+        return {
+                'header' : header ,
+                'payment' : getMasterAll(Payment),
+                'pickup_type' : getMasterAll(PickupType, 'id'),
+                'pack_type' : getMasterAll(PackType, 'id'),
+                'transit_logs' : logs,
+                'targets' : targets,
+                'customers' : getMasterAll(Customer),
+                'receivers' : getMasterAll(Receiver)
+                }
+
 
 
     def save_update(self):
@@ -379,9 +436,25 @@ class OrderView(BasicView):
 
 
     def ajax_todo_list(self):
-        new_orders = DBSession.query(OrderHeader).filer(and_(OrderHeader.active == 0 , OrderHeader.status == ORDER_NEW[0])).order_by(OrderHeader.create_time).all()
-        return jsonify(result = 0, data = [{'id' : order.id, 'no' : unicode(order)} for order in new_orders])
 
+        def f(v):
+            result = []
+            data = DBSession.query(OrderHeader).filter(and_(OrderHeader.active == 0 , OrderHeader.status == v)).order_by(OrderHeader.create_time)
+            for l in data[:5]:
+                result.append({'id' : l.id, 'ref_no' : l.ref_no})
+            return {'list' : result, 'count' : data.count()}
+
+        try:
+            data = {
+                "orders_new" : f(ORDER_NEW[0]),
+                "order_receiver" : f(ASSIGN_RECEIVER[0]),
+                "order_inhouse" : f(IN_WAREHOUSE[0]),
+                "order_sorted" : f(SORTING[0]),
+                    }
+            return jsonify(result = 0, data = data)
+        except:
+            _error(traceback.print_exc())
+            return jsonify(result = 1, data = [])
 
     @templated('order/barcode.html')
     def print_barcode(self):
@@ -407,9 +480,9 @@ class OrderView(BasicView):
         header = DBSession.query(OrderHeader).get(id)
 
         if type == 'order_header':
-            fields = ['ref_no', 'source_station', 'source_company', 'source_address', 'source_contact', 'source_tel', 'source_mobile',
-                      'payment_id', 'item', 'qty', 'weight', 'vol', 'shipment_type_id',
-                      'destination_station', 'destination_company', 'destination_address', 'destination_contact', 'destination_tel', 'destination_mobile',
+            fields = ['ref_no', 'source_station', 'source_company_id', 'source_address', 'source_contact', 'source_tel', 'source_mobile',
+                      'payment_id', 'qty', 'weight', 'vol', 'shipment_type_id',
+                      'destination_station', 'destination_company_id', 'destination_address', 'destination_contact', 'destination_tel', 'destination_mobile',
                       'order_time', 'expect_time', 'actual_time', 'qty_ratio', 'weight_ratio', 'vol_ratio', 'amount', 'cost', 'remark',
                       'pickup_type_id', 'pack_type_id',
                       ]
@@ -450,7 +523,7 @@ class OrderView(BasicView):
                     return jsonify({'code' : 1 , 'msg' : unicode(MSG_SERVER_ERROR)})
 
         elif type == 'receiver' :
-            for f in ['receiver_contact', 'receiver_tel', 'receiver_mobile', 'receiver_remark', ]:
+            for f in ['receiver_contact_id', 'receiver_tel', 'receiver_mobile', 'receiver_remark', ]:
                 setattr(header, f, _g(f))
 
             if header.status < ASSIGN_RECEIVER[0]:
@@ -509,7 +582,7 @@ class OrderView(BasicView):
                                   refer_id = header.id,
                                   transfer_date = _g('action_time'),
                                   type = 0,
-                                  remark = LOG_GOODS_IN_TRAVEL + (_g('remark') or ''),
+                                  remark = unicode(LOG_GOODS_IN_TRAVEL) + (_g('remark') or ''),
                                   )
                 DBSession.add(obj)
                 try:
@@ -544,7 +617,7 @@ class OrderView(BasicView):
                                   refer_id = header.id,
                                   transfer_date = _g('action_time'),
                                   type = 0,
-                                  remark = LOG_GOODS_PICKUPED + (_g('remark') or ''),
+                                  remark = unicode(LOG_GOODS_PICKUPED) + (_g('remark') or ''),
                                   ))
                 try:
                     DBSession.commit()
@@ -573,7 +646,7 @@ class OrderView(BasicView):
                                   refer_id = header.id,
                                   transfer_date = _g('signed_time'),
                                   type = 0,
-                                  remark = LOG_GOODS_SIGNED + (_g('signed_remark') or ''),
+                                  remark = unicode(LOG_GOODS_SIGNED) + (_g('signed_remark') or ''),
                                   ))
             try:
                 DBSession.commit()

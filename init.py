@@ -12,7 +12,7 @@ from sys2do.model import metadata, engine, DBSession, Permission, Group, User
 import sys
 from sys2do.model.master import CustomerProfile, Customer, \
     ItemUnit, InventoryLocation, WeightUnit, ShipmentType, Payment, Supplier, \
-    SupplierProfile, Ratio, PickupType, PackType, Diqu
+    SupplierProfile, Ratio, PickupType, PackType, Diqu, CustomerTarget, Receiver
 reload(sys)
 sys.setdefaultencoding('utf8')
 
@@ -136,9 +136,10 @@ def init():
 #        DBSession.add(ShipmentType(name = u"水运"))
 #        DBSession.add(ShipmentType(name = u"空运"))
 
-        DBSession.add(Payment(name = u"月付"))
-        DBSession.add(Payment(name = u"到付"))
-        DBSession.add(Payment(name = u"现付"))
+        payment1 = Payment(name = u"月付")
+        payment2 = Payment(name = u"到付")
+        payment3 = Payment(name = u"现付")
+        DBSession.add_all([payment1, payment2, payment3])
 
         DBSession.add(Ratio(type = "QTY", value = 10))
         DBSession.add(Ratio(type = "VOL", value = 0.33))
@@ -155,19 +156,34 @@ def init():
         DBSession.add(PackType(name = u"桶装"))
         DBSession.add(PackType(name = u"林架"))
 
-        kinlong = Customer(name = u"广东坚朗五金制品股份有限公司", address = u"广东省东莞市塘厦镇大坪村工业区卢地坑路3号", phone = "0769-82166666", contact_person = None)
+        kinlong = Customer(name = u"广东坚朗五金制品股份有限公司", address = u"广东省东莞市塘厦镇大坪村工业区卢地坑路3号", phone = "0769-82166666", contact_person = u'陈先生', mobile = '12800138999', payment = payment1)
         kinlong_profile = CustomerProfile(name = "KINLONG_PROFILE", customer = kinlong, group = gKinlongGroup)
 
-        weiqian = Customer(name = u"味千（中国）控股有限公司", address = u"广东省深圳市福田区金田路3037号金中环商务大厦主楼23号", phone = "0755-8280 5333", contact_person = None)
+        kinlong_target1 = CustomerTarget(customer = kinlong, name = u'收货公司一', address = u'福建省福州市', contact_person = u'李先生', mobile = u'13880138111', phone = u'123456')
+        kinlong_target2 = CustomerTarget(customer = kinlong, name = u'收货公司二', address = u'广东省深圳市', contact_person = u'张小姐', mobile = u'13800138222', phone = u'456789')
+        kinlong_target3 = CustomerTarget(customer = kinlong, name = u'收货公司三', address = u'湖南省长沙市', contact_person = u'林先生', mobile = u'13800138333', phone = u'369852')
+
+        weiqian = Customer(name = u"味千（中国）控股有限公司", address = u"广东省深圳市福田区金田路3037号金中环商务大厦主楼23号", phone = "0755-8280 5333", contact_person = u'胡先生', mobile = '12800138999', payment = payment1)
         weiqian_profile = CustomerProfile(name = "WEIQIAN_PROFILE", customer = weiqian, group = gWeiqianGroup)
 
+        weiqian_target1 = CustomerTarget(customer = weiqian, name = u'味千收货公司一', address = u'福建省福清市', contact_person = u'张先生', mobile = u'1388013111', phone = u'123456')
+        weiqian_target2 = CustomerTarget(customer = weiqian, name = u'味千收货公司二', address = u'广东省珠海市', contact_person = u'郭先生', mobile = u'1388013111', phone = u'123456')
+        weiqian_target3 = CustomerTarget(customer = weiqian, name = u'味千收货公司三', address = u'湖北省武汉市', contact_person = u'赵先生', mobile = u'1388013111', phone = u'123456')
 
         supplier1 = Supplier(name = u"承运商一", address = u"广东省珠海市斗门区", phone = "0756-25361422", contact_person = u"林先生")
         supplier1_profile = SupplierProfile(name = "SUPPLIER1_PROFILE", supplier = supplier1, group = gSupplier1)
 
 
-        DBSession.add_all([kinlong, kinlong_profile, weiqian, weiqian_profile, supplier1, supplier1_profile])
+        DBSession.add_all([kinlong, kinlong_profile, kinlong_target1, kinlong_target2, kinlong_target3,
+                           weiqian, weiqian_profile, weiqian_target1, weiqian_target2, weiqian_target3,
+                           supplier1, supplier1_profile])
 
+
+        receiver1 = Receiver(code = 'C001', name = '李司机', tel = '0755-12345671', mobile = '13800138111',)
+        receiver2 = Receiver(code = 'C002', name = '张司机', tel = '0755-12345672', mobile = '13800138222',)
+        receiver3 = Receiver(code = 'C003', name = '黄司机', tel = '0755-12345673', mobile = '13800138333',)
+        receiver4 = Receiver(code = 'C004', name = '王司机', tel = '0755-12345674', mobile = '13800138444',)
+        DBSession.add_all([receiver1, receiver2, receiver3, receiver4])
         DBSession.commit()
         print "finish init!"
     except:

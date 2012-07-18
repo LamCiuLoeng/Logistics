@@ -20,13 +20,13 @@ function save_header() {
     if(!$('#destination_station').val()){
         msg.push('请填写目的站！');
     }
-    if(!$('#source_company').val()){
+    if(!$('#source_company_id').val()){
         msg.push('请填写发货公司！');
     }
     if(!$('#source_contact').val()){
         msg.push('请填写发货人！');
     }
-    if(!$('#destination_company').val()){
+    if(!$('#destination_company_id').val()){
         msg.push('请填写收货公司！');
     }
     if(!$('#destination_contact').val()){
@@ -137,7 +137,7 @@ function del_item(id,obj) {
 function save_receiver() {
     var msg = Array();
     
-    if(!$('#receiver_contact').val()){
+    if(!$('#receiver_contact_id').val()){
         msg.push('请填写收件联系人！');
     }
     if(!$('#receiver_tel').val() && !$('#receiver_mobile').val()){
@@ -155,7 +155,7 @@ function save_receiver() {
     
     var params = {
             'form_type' : 'receiver',
-            'receiver_contact' : $("#receiver_contact").val(),
+            'receiver_contact_id' : $("#receiver_contact_id").val(),
             'receiver_tel' : $("#receiver_tel").val(),
             'receiver_mobile' : $("#receiver_mobile").val(),
             'receiver_remark' : $("#receiver_remark").val()
@@ -373,4 +373,32 @@ function del_pickup(id,obj){
             alert(r.msg);
         }
     })
+}
+
+
+function change_receiver(obj){
+    var t = $(obj);
+    
+    $("#receiver_tel").val('');
+    $("#receiver_mobile").val('');
+    
+    if(!t.val()){
+        return;
+    }
+    
+    $.getJSON('/ajax_master',
+              {
+                  'm' : 'receiver_detail',
+                  't' : nowstr(),
+                  'id' : t.val()
+              },
+              function(r){
+                  if(r.code!=0){
+                      return;
+                  }
+                  $("#receiver_tel").val(r.data.tel);
+                  $("#receiver_mobile").val(r.data.mobile);
+              }
+    );
+    
 }

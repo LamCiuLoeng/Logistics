@@ -7,7 +7,9 @@
 ###########################################
 '''
 import traceback
-from datetime import datetime as dt
+from datetime import datetime as dt, timedelta
+
+
 from flask import session
 from flask.blueprints import Blueprint
 from flask.views import View
@@ -48,12 +50,15 @@ class DeliverView(BasicView):
                   ] :
             values[f] = _g(f)
 
+        if not values['create_time_from'] and not values['create_time_to']:
+            values['create_time_to'] = dt.now().strftime("%Y-%m-%d")
+            values['create_time_from'] = (dt.now() - timedelta(days = 30)).strftime("%Y-%m-%d")
 
         conditions = [OrderHeader.active == 0]
         if values['create_time_from']:
             conditions.append(DeliverHeader.create_time > values['create_time_from'])
         if values['create_time_to']:
-            conditions.append(DeliverHeader.create_time < values['create_time_to'])
+            conditions.append(DeliverHeader.create_time < '%s 23:59' % values['create_time_to'])
         if values['no']:
             conditions.append(DeliverHeader.no.op('like')('%%%s%%' % values['no']))
         if values['destination_address']:

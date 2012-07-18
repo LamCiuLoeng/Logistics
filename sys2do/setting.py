@@ -44,8 +44,9 @@ BABEL_DEFAULT_TIMEZONE = 'UTC'
 
 #database setting
 #sqlite
-SQLALCHEMY_DATABASE_URI = 'sqlite:///%s' % (os.path.join(os.path.dirname(__file__), ".." , "logistics.db"))
+#SQLALCHEMY_DATABASE_URI = 'sqlite:///%s' % (os.path.join(os.path.dirname(__file__), ".." , "logistics.db"))
 #mysql
 #SQLALCHEMY_DATABASE_URI = sqlalchemy.url=mysql://username:password@hostname:port/databasename
+#SQLALCHEMY_DATABASE_URI = 'mysql://root:admin@192.168.21.157:3306/logistics'
 #postgresql
-#SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:admin@localhost:5432/Logistics'
+SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:admin@192.168.21.157:5432/logistics'

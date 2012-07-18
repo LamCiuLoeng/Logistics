@@ -9,27 +9,12 @@
 {% endblock %}
 
 {% block extJS %}
+<script src="{{url_for('static', filename='js/customer/order_common.js')}}" type="text/javascript"></script>
 <script src="{{url_for('static', filename='js/customer/order_revise.js')}}" type="text/javascript"></script>
 <script language="JavaScript" type="text/javascript">
 //<![CDATA[
 	$(document).ready(function(){
-		$(".order_add_info_tab_div").tabs();
-		
-		$(".compute").each(function(){
-			var t = $(this);
-			t.change(compute);
-		});
-		
-		function compute(){
-		var qty = $("#qty").val();
-		var qty_ratio = $("#qty_ratio").val();
-		var vol = $("#vol").val();
-		var vol_ratio = $("#vol_ratio").val();
-		var weight = $("#weight").val();
-		var weight_ratio = $("#weight_ratio").val();
-		var amount = qty * qty_ratio + vol * vol_ratio + weight * weight_ratio;
-		$("#amount").val(amount);
-	}
+
 	});	
 	
 	
@@ -41,7 +26,11 @@
     		return false;
     	}
 	}
-		
+	
+	
+	function toreturn(){
+		return redirect_alert("确认不保存而离开这个页面吗？","{{url_for('.view')}}");
+	}	
 //]]>
 </script>
 
@@ -50,14 +39,11 @@
 {% block inner_menu %}
 <div class="inner_menu">
 	<ul>
-    	<li><img src="/static/images/system/order_manage_25.jpg" width="71" height="21" id="Image1" onmouseover="MM_swapImage('Image1','','/static/images/system/order_manage_h_25.jpg',1)" onmouseout="MM_swapImgRestore()" /></li>
-        
+    	<li><img src="/static/images/system/order_manage_25.jpg" width="71" height="21" id="Image1" onmouseover="MM_swapImage('Image1','','/static/images/system/order_manage_h_25.jpg',1)" onmouseout="MM_swapImgRestore()" onclick="toreturn()"/></li>
+        <li><img src="/static/images/system/order_manage_33.jpg" width="77" height="21" id="Image2" onmouseover="MM_swapImage('Image2','','/static/images/system/order_manage_h_33.jpg',1)" onmouseout="MM_swapImgRestore()" onclick="save_header()"/></li>
         <li><a href="{{url_for('.view',action='print_barcode',id=header.id)}}" target="_blank"><img src="/static/images/system/order_manage_11_35.jpg" width="77" height="21" id="Image5" onmouseover="MM_swapImage('Image5','','/static/images/system/order_manage_1_35.jpg',1)" onmouseout="MM_swapImgRestore()" /></a></li>
+        <li><a href="{{url_for('.view',action='copy',id=header.id)}}"><img src="/static/images/system/order_manage_11_35.jpg" width="77" height="21" id="Image7" onmouseover="MM_swapImage('Image7','','/static/images/system/order_manage_1_35.jpg',1)" onmouseout="MM_swapImgRestore()" /></a></li>
         <li><img src="/static/images/system/order_manage_29.jpg" width="77" height="21" id="Image6" onmouseover="MM_swapImage('Image6','','/static/images/system/order_manage_h_29.jpg',1)" onmouseout="MM_swapImgRestore()" onclick="return todelete()"/></li>
-        <!-- 
-        <li><img src="/static/images/system/order_manage_35.jpg" width="94" height="21" id="Image4" onmouseover="MM_swapImage('Image4','','/static/images/system/order_manage_h_35.jpg',1)" onmouseout="MM_swapImgRestore()" /></li>
-        <li><img src="/static/images/system/order_manage_41.jpg" width="101" height="21" id="Image7" onmouseover="MM_swapImage('Image7','','/static/images/system/order_manage_h_41.jpg',1)" onmouseout="MM_swapImgRestore()" /></li>
-        -->
         <li style="padding:0px; margin:0px 55px 0px 0px; float:right"><a href="{{url_for('bpAuth.logout')}}"><img src="/static/images/system/order_manage_22.jpg" width="56" height="29" /></a></li>
     </ul>
 </div>
@@ -82,12 +68,29 @@
     	  <li style="width:180px;"><span><sup class="warn">*</sup>&nbsp;单号</span>
     	    <input name="ref_no" id="ref_no" type="text" style="width:100px" value="{{header.ref_no|f}}" class="must_input"/>
   	    </li>
-    	  <li style="width:300px;"><span>{{_('Create Time')}}</span>{{header.create_time|ft}}</li>
+    	  <li style="width:300px;"><span>{{_('System Number')}}</span>{{header.no|f}}</li>
     	  <li style="width:459px;"><span><sup class="warn">*</sup>&nbsp;{{_('Source Company')}}</span>
-    	    <input name="source_company" id="source_company" type="text" style="width:360px" value="{{header.source_company|f}}" class="must_input"/>
+    	      <select name="source_company_id" id="source_company_id" style="width:360px" class="must_input">
+    	          {% for c in customers %}
+    	              {% if c.id == header.source_company_id %}
+    	              <option value="{{c.id}}" selected="selected">{{c}}</option>
+    	              {% else %}
+    	              <option value="{{c.id}}">{{c}}</option>
+    	              {% endif %}
+    	          {% endfor %}
+    	      </select>
     	  </li>
     	  <li style="width:459px;"><span><sup class="warn">*</sup>&nbsp;{{_('Destination Company')}}</span>
-    	    <input name="destination_company" id="destination_company" type="text" style="width:360px" value="{{header.destination_company|f}}" class="must_input"/>
+    	      <select name="destination_company_id" id="destination_company_id" style="width:360px" class="must_input">
+    	          <option value=""></option>
+    	          {% for t in targets %}
+    	        	{% if t.id == header.destination_company_id %}
+    	        	    <option value="{{t.id}}" selected="selected">{{t}}</option>
+    	        	{% else %}
+    	        	    <option value="{{t.id}}">{{t}}</option>
+    	        	{% endif %}
+    	        {% endfor %}
+    	      </select>
     	  </li>
     	  <li style="width:459px;"><span><sup class="warn">*</sup>&nbsp;{{_('Source Contact')}}</span>
     	    <input name="source_contact" id="source_contact" type="text" style="width:360px" value="{{header.source_contact|f}}" class="must_input"/>
@@ -140,12 +143,6 @@
   	    </li>
   	    <li style="width:226px;"><span>{{_('Actual Time')}}</span>
     	    <input type="text" style="width:140px" id="actual_time" name="actual_time" class="datepicker" value="{{header.actual_time|fd}}"/>
-  	    </li>
-    	  <li style="width:459px;"><span>{{_('Item')}}</span>
-    	    <input name="item" id="item" type="text" style="width:360px" value="{{header.item|f}}"/>
-  	    </li>
-    	  <li style="width:925px;"><span>{{_('Item Remark')}}</span>
-    	    <input name="item_remark" id="item_remark" type="text" style="width:840px" value="{{header.item_remark|f}}"/>
   	    </li>
     	  <li style="width:925px;"><span>{{_('Remark')}}</span>
     	    <textarea name="remark" id="remark" style="width:840px">{{header.remark|f}}</textarea>
@@ -203,16 +200,8 @@
 </table>
 	</div>
 
-      <div style="clear:both"></div>
-
-	<ul>
-		<li><p>标记 <sup class="warn">*</sup> 的项为必填项。</p></li>
-	</ul>
 	
 	<div style="clear:both"></div> 
-
-
-<p align="center" style="height:30px;"><input type="image" src="/static/images/system/order_manage_33.jpg" width="77" height="21" onclick="save_header()"/></p>
 
 <div class="order_add_info_tab_div">
 	<div class="order_add_info_tab_header">
@@ -284,11 +273,22 @@
 			<table>
 				<tr>
 					<td valign="top" width="80px"><sup class="warn">*</sup>&nbsp;收件联系人</td>
-					<td valign="top"><input type="text" name="receiver_contact" id="receiver_contact" value="{{header.receiver_contact|f}}" class="must_input" style="width:140px;"/></td>
+					<td valign="top">
+						<select name="receiver_contact_id" id="receiver_contact_id" class="must_input" style="width:140px;" onchange="change_receiver(this)">
+							<option></option>
+							{% for r in receivers %}
+								{% if r.id == header.receiver_contact_id %}
+									<option value="{{r.id}}" selected="selected">{{r}}</option>
+								{% else %}
+									<option value="{{r.id}}">{{r}}</option>
+								{% endif %}
+							{% endfor %}
+						</select>					
+					</td>
 					<td valign="top" width="80px" align="center">联系人电话</td>
 					<td valign="top"><input type="text" name="receiver_tel" id="receiver_tel" value="{{header.receiver_tel|f}}" class="order_add_div_body_input" style="width:120px;"/></td>
 					<td valign="top" width="80px" align="center">联系手机</td>
-					<td valign="top"><input type="text" name="receiver_mobile" id="receiver_mobile" value="{{header.receiver_mobile|f}}" class="order_add_div_body_input" style="width:120px;"/></td>
+					<td valign="top"><input type="text" name="receiver_mobile" id="receiver_mobile" value="{{header.receiver_mobile|f}}" class="order_add_div_body_input numeric" style="width:120px;"/></td>
 					<td valign="top" width="80px" align="center">备注</td>
 					<td valign="top"><textarea name="receiver_remark" id="receiver_remark">{{header.receiver_remark|f}}</textarea></td>
 				</tr>
@@ -305,7 +305,7 @@
 			<p>入仓信息</p>
 			<table>
 				<tr>
-					<td><sup class="warn">*</sup>{{_('Time')}}</td><td><input type="text" name="wh_time" id="wh_time" value="{{SYSTEM_NOW()|fd}}" class="datepicker"/></td>
+					<td><sup class="warn">*</sup>{{_('Time')}}</td><td><input type="text" name="wh_time" id="wh_time" value="{{SYSTEM_NOW()|fd}}" class="datetimepicker"/></td>
 				</tr>
 				<!-- 
 				<tr>
@@ -322,7 +322,7 @@
 			<p>出仓信息</p>
 			<table>
 				<tr>
-					<td><sup class="warn">*</sup>{{_('Time')}}</td><td><input type="text" name="wh_time" id="wh_time" value="{{SYSTEM_NOW()|fd}}" class="datepicker"/></td>
+					<td><sup class="warn">*</sup>{{_('Time')}}</td><td><input type="text" name="wh_time" id="wh_time" value="{{SYSTEM_NOW()|fd}}" class="datetimepicker"/></td>
 				</tr>
 				<tr>
 					<td>{{_('Remark')}}</td><td><textarea name="wh_remark" id="wh_remark">订单: {{header.ref_no}} 确认出仓</textarea></td>
@@ -341,7 +341,7 @@
 			<table>
 				<tr>
 					<td valign="top" width="80px" align="center"><sup class="warn">*</sup>&nbsp;{{_('Time')}}</td>
-					<td valign="top"><input type="text" name="transit_action_time" id="transit_action_time" value="" class="datepicker must_input"/></td>
+					<td valign="top"><input type="text" name="transit_action_time" id="transit_action_time" value="" class="datetimepicker must_input"/></td>
 					<td valign="top" width="80px" align="center">{{_('Remark')}}</td>
 					<td valign="top"><textarea name="transit_remark" id="transit_remark" style="width:500px;"></textarea></td>
 				</tr>
@@ -377,8 +377,8 @@
 				<tr>
 					<td valign="top" width="80px"><sup class="warn">*</sup>&nbsp;签收联系人</td>
 					<td valign="top"><input type="text" name="signed_contact" id="signed_contact" value="{{header.signed_contact|f}}" class="must_input" style="width:140px;"/></td>
-					<td valign="top" width="80px" align="center"><sup class="warn">*</sup>&nbsp;签收日期</td>
-					<td valign="top"><input type="text" name="signed_time" id="signed_time" value="{{header.signed_time|f}}" class="datepicker must_input"/></td>
+					<td valign="top" width="80px" align="center"><sup class="warn">*</sup>&nbsp;签收时间</td>
+					<td valign="top"><input type="text" name="signed_time" id="signed_time" value="{{header.signed_time|f}}" class="datetimepicker must_input"/></td>
 					<td valign="top" width="80px" align="center">联系人电话</td>
 					<td valign="top"><input type="text" name="signed_tel" id="signed_tel" value="{{header.signed_tel|f}}" class="order_add_div_body_input" style="width:120px;"/></td>
 					<td valign="top" width="80px" align="center">备注</td>
@@ -395,7 +395,7 @@
 			<table>
 				<tr>
 					<td valign="top" width="40px"><sup class="warn">*</sup>&nbsp;{{_('Time')}}</td>
-					<td valign="top"><input type="text" name="pickup_action_time" id="pickup_action_time" value="" class="datepicker must_input"/></td>
+					<td valign="top"><input type="text" name="pickup_action_time" id="pickup_action_time" value="" class="datetimepicker must_input"/></td>
 					<td valign="top" width="80px" align="center"><sup class="warn">*</sup>&nbsp;{{_('Pickup Contact')}}</td>
 					<td valign="top"><input type="text" name="pickup_contact" id="pickup_contact" value="" class="must_input"/></td>
 					<td valign="top" width="80px" align="center">{{_('Contact Tel')}}</td>
@@ -442,7 +442,22 @@
 	
 	<!-- history info -->
 	<div class="order_add_info_tab_body" id="tabs-8">
-	
+		<table>
+			<tr>
+				<td width="100">{{_('Creator')}}</td>
+				<td width="100">{{header.create_by|f}}</td>
+				<td width="10">&nbsp;</td>
+				<td width="100">{{_('Create Time')}}</td>
+				<td width="150">{{header.create_time|ft}}</td>
+			</tr>
+			<tr>
+				<td>{{_('Last Updator')}}</td>
+				<td>{{header.update_by|f}}</td>
+				<td>&nbsp;</td>
+				<td>{{_('Update Time')}}</td>
+				<td>{{header.update_time|ft}}</td>
+			</tr>
+		</table>
 	</div>
 </div>
 

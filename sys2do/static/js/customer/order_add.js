@@ -1,6 +1,19 @@
-var index = 1;
+
 
 function add_item() {
+    var msg = new Array();
+    if(!$("#item_name").val()){
+        msg.push('请填写货物名称！');
+    }
+    if(!$("#item_qty").val() && !$("#item_vol").val() && !$("#item_weight").val()){
+        msg.push('请填写数量，体积或者重量中的一项或者多项！');
+    }
+    
+    if(msg.length>0){
+        alert(msg.join("\n"));
+        return;
+    }
+    
     var item_name = $("#item_name").val();
     var item_qty = $("#item_qty").val();
     var item_vol = $("#item_vol").val();
@@ -12,7 +25,7 @@ function add_item() {
     html += '<td><input type="hidden" name="item_vol_'+index+'" value="'+item_vol+'"/>'+item_vol+'</td>';
     html += '<td><input type="hidden" name="item_weight_'+index+'" value="'+item_weight+'"/>'+item_weight+'</td>';
     html += '<td><input type="hidden" name="item_remark_'+index+'" value="'+item_remark+'"/>'+item_remark+'</td>';
-    html += '<td><input type="button" onclick="del_item(this)" value="Del"/></td>';
+    html += '<td><input type="button" onclick="del_item(this)" value="删除"/></td>';
     html += '</tr>';
     $("#item_list").append(html);
     index++;
@@ -41,13 +54,13 @@ function tosave(){
     if(!$('#destination_station').val()){
         msg.push('请填写目的站！');
     }
-    if(!$('#source_company').val()){
+    if(!$('#source_company_id').val()){
         msg.push('请填写发货公司！');
     }
     if(!$('#source_contact').val()){
         msg.push('请填写发货人！');
     }
-    if(!$('#destination_company').val()){
+    if(!$('#destination_company_id').val()){
         msg.push('请填写收货公司！');
     }
     if(!$('#destination_contact').val()){
@@ -71,3 +84,11 @@ function tosave(){
     }
     
 }
+
+
+
+$(document).ready(function(){
+    
+    
+    
+});

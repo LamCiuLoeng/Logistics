@@ -13,7 +13,8 @@ from sqlalchemy.orm import relation, backref, synonym
 from sys2do.model import DeclarativeBase, metadata, DBSession
 from auth import SysMixin
 from sys2do.model.master import Customer, Supplier, ItemUnit, ShipmentType, \
-    WeightUnit, InventoryLocation, Payment, PickupType, PackType
+    WeightUnit, InventoryLocation, Payment, PickupType, PackType, CustomerTarget, \
+    Receiver
 from sys2do.model.auth import CRUDMixin
 from sys2do.model.system import UploadFile
 from sqlalchemy.sql.expression import and_
@@ -33,11 +34,11 @@ class OrderHeader(DeclarativeBase, SysMixin, CRUDMixin):
     no = Column(Text)
     ref_no = Column(Text)
 
-    customer_id = Column(Integer, ForeignKey('master_customer.id'))
-    customer = relation(Customer, backref = backref("orders", order_by = id), primaryjoin = "and_(Customer.id == OrderHeader.customer_id, OrderHeader.active == 0)")
+    source_company_id = Column(Integer, ForeignKey('master_customer.id'))
+    source_company = relation(Customer, backref = backref("orders", order_by = id), primaryjoin = "and_(Customer.id == OrderHeader.source_company_id, OrderHeader.active == 0)")
 
     source_station = Column(Text)
-    source_company = Column(Text)
+#    source_company = Column(Text)
     source_address = Column(Text)
     source_contact = Column(Text)
     source_tel = Column(Text)
@@ -46,8 +47,8 @@ class OrderHeader(DeclarativeBase, SysMixin, CRUDMixin):
     payment_id = Column(Integer, ForeignKey('master_payment.id'))
     payment = relation(Payment)
 
-    item = Column(Text)
-    item_remark = Column(Text)
+#    item = Column(Text)
+#    item_remark = Column(Text)
     qty = Column(Float, default = None) #client order qty
     unit_id = Column(Integer, ForeignKey('master_item_unit.id'))
     unit = relation(ItemUnit)
@@ -68,7 +69,12 @@ class OrderHeader(DeclarativeBase, SysMixin, CRUDMixin):
     pack_type = relation(PackType)
 
     destination_station = Column(Text)
-    destination_company = Column(Text)
+
+
+
+#    destination_company = Column(Text)
+    destination_company_id = Column(Integer, ForeignKey('master_customer_target.id'))
+    destination_company = relation(CustomerTarget, backref = backref("orders", order_by = id), primaryjoin = "and_(CustomerTarget.id == OrderHeader.destination_company_id, OrderHeader.active == 0)")
     destination_address = Column(Text)
     destination_contact = Column(Text)
     destination_tel = Column(Text)
@@ -84,8 +90,9 @@ class OrderHeader(DeclarativeBase, SysMixin, CRUDMixin):
     amount = Column(Float, default = 0)
     cost = Column(Float, default = 0)
 
-
-    receiver_contact = Column(Text)
+    receiver_contact_id = Column(Integer, ForeignKey('master_receiver.id'))
+    receiver_contact = relation(Receiver, backref = backref("orders", order_by = id), primaryjoin = "and_(Receiver.id == OrderHeader.receiver_contact_id, OrderHeader.active == 0)")
+#    receiver_contact = Column(Text)
     receiver_tel = Column(Text)
     receiver_mobile = Column(Text)
     receiver_remark = Column(Text)

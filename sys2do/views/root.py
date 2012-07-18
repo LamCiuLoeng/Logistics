@@ -12,13 +12,14 @@ from sqlalchemy import and_
 from sys2do import app
 from sys2do.model import DBSession, User
 from flask.helpers import jsonify, send_file
-from sys2do.util.decorator import templated, login_required
+from sys2do.util.decorator import templated, login_required, tab_highlight
 from sys2do.util.common import _g, _gp, _gl
 from sys2do.constant import MESSAGE_ERROR, MESSAGE_INFO, MSG_NO_SUCH_ACTION, \
     MSG_SAVE_SUCC, GOODS_PICKUP, GOODS_SIGNED, OUT_WAREHOUSE, IN_WAREHOUSE, \
     MSG_RECORD_NOT_EXIST
 from sys2do.views import BasicView
-from sys2do.model.master import CustomerProfile, Customer, Supplier
+from sys2do.model.master import CustomerProfile, Customer, Supplier, \
+    CustomerTarget, Receiver
 from sys2do.model.logic import OrderHeader, TransferLog, PickupDetail
 from sys2do.util.logic_helper import genSystemNo
 
@@ -31,6 +32,7 @@ bpRoot = Blueprint('bpRoot', __name__)
 class RootView(BasicView):
 
     @login_required
+    @tab_highlight('TAB_HOME')
     @templated("index.html")
     def index(self):
     #    flash('hello!', MESSAGE_INFO)
@@ -41,18 +43,38 @@ class RootView(BasicView):
         return {}
 
 
+
     def ajax_master(self):
         master = _g('m')
         if master == 'customer':
             cs = DBSession.query(Customer).filter(and_(Customer.active == 0, Customer.name.like('%%%s%%' % _g('name')))).order_by(Customer.name).all()
 
             data = [{'id' : c.id , 'name' : c.name } for c in cs]
-
             return jsonify({'code' : 0, 'msg' : '', 'data' : data})
 
-        elif master == 'supplier':
+        if master == 'customer_detail':
+            c = DBSession.query(Customer).get(_g('id'))
+            ts = [{'id' : t.id , 'name' : t.name } for t in c.targets]
+            return jsonify({'code' : 0 , 'msg' : '' , 'data' : c.populate() , 'targets' : ts})
+
+        if master == 'target':
+            ts = DBSession.query(CustomerTarget).filter(and_(CustomerTarget.active == 0, CustomerTarget.customer_id == _g('id')))
+
+            data = [{'id' : c.id , 'name' : c.name } for c in ts]
+            return jsonify({'code' : 0, 'msg' : '', 'data' : data})
+
+        if master == 'target_detail':
+            t = DBSession.query(CustomerTarget).get(_g('id'))
+            return jsonify({'code' : 0 , 'msg' : '' , 'data' : t.populate()})
+
+
+        if master == 'supplier':
             cs = DBSession.query(Supplier).filter(Supplier.active == 0).order_by(Supplier.name).all()
             return jsonify({'code' : 0, 'msg' : '', 'data' : cs})
+
+        if master == 'receiver_detail':
+            t = DBSession.query(Receiver).get(_g('id'))
+            return jsonify({'code' : 0 , 'msg' : '' , 'data' : t.populate()})
 
         return jsonify({'code' : 1, 'msg' : 'Error', })
 
