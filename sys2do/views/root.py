@@ -43,6 +43,19 @@ class RootView(BasicView):
         return {}
 
 
+    @login_required
+    @tab_highlight('TAB_MAIN')
+    @templated("main.html")
+    def main(self):
+        return {}
+
+
+    @login_required
+    @tab_highlight('TAB_DASHBOARD')
+    @templated("dashboard.html")
+    def dashboard(self):
+        return {}
+
 
     def ajax_master(self):
         master = _g('m')
@@ -67,10 +80,13 @@ class RootView(BasicView):
             t = DBSession.query(CustomerTarget).get(_g('id'))
             return jsonify({'code' : 0 , 'msg' : '' , 'data' : t.populate()})
 
-
         if master == 'supplier':
             cs = DBSession.query(Supplier).filter(Supplier.active == 0).order_by(Supplier.name).all()
             return jsonify({'code' : 0, 'msg' : '', 'data' : cs})
+
+        if master == 'supplier_detail':
+            t = DBSession.query(Supplier).get(_g('id'))
+            return jsonify({'code' : 0 , 'msg' : '' , 'data' : t.populate()})
 
         if master == 'receiver_detail':
             t = DBSession.query(Receiver).get(_g('id'))

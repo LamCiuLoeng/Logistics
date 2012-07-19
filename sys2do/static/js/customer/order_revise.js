@@ -51,6 +51,7 @@ function save_header() {
         ajax_save(params, function(r){
             if(r.code == 0){
                 alert(r.msg);
+                header_have_update = 0;
             }else{
                 alert(r.msg);
             }
@@ -67,11 +68,11 @@ function save_header() {
 function save_item(){
     var msg = Array();
     
-    if(!$('#item_name').val()){
+    if(!$('#item_id').val()){
         msg.push('请填写货物名称！');
     }
-    if(!$('#item_qty').val()){
-        msg.push('请填写货物数量！');
+    if(!$("#item_qty").val() && !$("#item_vol").val() && !$("#item_weight").val()){
+        msg.push('请填写数量，体积或者重量中的一项或者多项！');
     }
     
     if(msg.length > 0){
@@ -86,7 +87,7 @@ function save_item(){
     var params = {
             'form_type' : 'item_detail',
             'action_type' : 'ADD',
-            'item' : $("#item_name").val(),
+            'item_id' : $("#item_id").val(),
             'qty'  : $("#item_qty").val(),
             'vol'  : $("#item_vol").val(),
             'weight' : $("#item_weight").val(),
@@ -97,20 +98,27 @@ function save_item(){
         if(r.code == 0){
             alert(r.msg);
             var html = '<tr class="data_table_tr">';
-            html += '<th>'+params['item']+'</th>';
-            html += '<td>'+params['qty']+'</td>';
-            html += '<td>'+params['vol']+'</td>';
-            html += '<td>'+params['weight']+'</td>';
+            html += '<th>'+$("#item_id :selected").text()+'</th>';
+            html += '<td class="item_qty_td">'+params['qty']+'</td>';
+            html += '<td class="item_weight_td">'+params['weight']+'</td>';
+            html += '<td class="item_vol_td">'+params['vol']+'</td>';
             html += '<td>'+params['remark']+'</td>';
             html += '<td><input type="button" onclick="del_item('+r.id+',this)" value="删除"/></td>';
             html += '</tr>';
             $("#item_list").append(html);
             
-            $("#item_name").val('');
+            $("#item_id").val('');
             $("#item_qty").val('');
             $("#item_vol").val('');
             $("#item_weight").val('');
             $("#item_remark").val('');
+            
+            $("#qty").val(mysum(".item_qty_td"));
+            $("#vol").val(mysum(".item_vol_td"));
+            $("#weight").val(mysum(".item_weight_td"));
+            
+            $("#weight").trigger('change'); //to re-compute the amount
+            
         }else{
             alert(r.msg);
         }
@@ -133,6 +141,18 @@ function del_item(id,obj) {
         }
     })
 }
+
+
+function open_receiver() {
+    $("#reveiver_review_div").hide();
+    $("#reveiver_update_div").show();
+}
+
+function close_receiver() {
+    $("#reveiver_review_div").show();
+    $("#reveiver_update_div").hide();
+}
+
 
 function save_receiver() {
     var msg = Array();
@@ -164,9 +184,17 @@ function save_receiver() {
     ajax_save(params,function(r){
         if(r.code == 0){
             alert(r.msg);
+
+            $("#receiver_contact_id_span").text($("#receiver_contact_id :selected").text());
+            $("#receiver_tel_span").text($("#receiver_tel").val());
+            $("#receiver_mobile_span").text($("#receiver_mobile").val());
+            $("#receiver_remark_span").text($("#receiver_remark").val());
         }else{
             alert(r.msg);
         }
+        
+        close_receiver();
+        
     })
     
 }
@@ -266,6 +294,18 @@ function del_transit(id,obj) {
 }
 
 
+
+function open_signed() {
+    $("#signed_review_div").hide();
+    $("#signed_update_div").show();
+}
+
+function close_signed() {
+    $("#signed_review_div").show();
+    $("#signed_update_div").hide();
+}
+
+
 function save_signed(){
 var msg = Array();
     
@@ -296,9 +336,14 @@ var msg = Array();
     ajax_save(params,function(r){
         if(r.code == 0){
             alert(r.msg);
+            $('#signed_contact_span').text($('#signed_contact').val());
+            $('#signed_tel_span').text($('#signed_tel').val());
+            $('#signed_time_span').text($('#signed_time').val());
+            $('#signed_remark_span').text($('#signed_remark').val());
         }else{
             alert(r.msg);
         }
+        close_signed();
     })
 }
 

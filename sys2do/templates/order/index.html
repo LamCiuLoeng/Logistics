@@ -109,9 +109,9 @@
 
 <table border="0" cellpadding="0" cellspacing="0">
   <tr class="field_head">
-    <th align="center" style="width:15px;"><input type="checkbox" onclick="allselect(this);"/></th>
+    <th align="center" style="width:50px;"><input type="checkbox" onclick="allselect(this);"/></th>
     <td align="center" style="width:200px;">{{_('Order Number')}}</td>
-    <td align="center" style="width:200px;">{{_('System Number')}}</td>
+    <td align="center" style="width:200px;">系统订单号</td>
     <td align="center" style="width:100px;">{{_('Source Station')}}</td>
     <td align="center" style="width:300px;">{{_('Source Company')}}</td>
     <td align="center" style="width:100px;">{{_('Destination Station')}}</td>
@@ -121,7 +121,6 @@
     <td align="center" style="width:50px;">{{_('Amount')}}</td>
     <td align="center" style="width:200px;">{{_('Create Time')}}</td>
     <td align="center" style="width:100px;">{{_('Creator')}}</td>
-    <td align="center" style="width:20px;">{{_('Last Updator')}}</td>
     <td align="center" style="width:150px;">{{_('Status')}}</td>
   </tr>
   
@@ -139,7 +138,6 @@
 			<td>{{r.amount|ft}}</td>
 			<td>{{r.create_time|ft}}</td>
 			<td>{{r.create_by|f}}</td>
-			<td>{{r.update_by|f}}</td>
 			<td>{{r.status|showStatus}}</td>
 		  </tr>
   {% endfor %}

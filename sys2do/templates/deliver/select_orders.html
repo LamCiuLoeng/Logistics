@@ -16,8 +16,17 @@
 	
 	
 	function tosubmit(){
-		$("form").submit();
+		if($("input[name='order_ids']:checked").length < 1){
+			alert('请选择至少一条记录以创建送货单！');
+		}else{
+			$("form").submit();
+		}
 	}
+	
+	function toreturn(){
+		redirect("{{url_for('.view')}}");
+	}	
+	
 //]]>
 </script>
 {% endblock %}
@@ -27,15 +36,8 @@
 {% block inner_menu %}
 <div class="inner_menu">
 	<ul>
+		<li><img src="/static/images/system/order_manage_25.jpg" width="71" height="21" id="Image1" onmouseover="MM_swapImage('Image1','','/static/images/system/order_manage_h_25.jpg',1)" onmouseout="MM_swapImgRestore()" onclick="toreturn()"/></li>
         <li><img src="/static/images/system/order_manage_31.jpg" width="77" height="21" id="Image2" onmouseover="MM_swapImage('Image2','','/static/images/system/order_manage_h_31.jpg',1)" onmouseout="MM_swapImgRestore()" onclick="tosubmit()"/></li>
-        <!-- 
-        <li><img src="/static/images/system/order_manage_41.jpg" width="101" height="21" id="Image7" onmouseover="MM_swapImage('Image7','','/static/images/system/order_manage_h_41.jpg',1)" onmouseout="MM_swapImgRestore()" onclick="return toexp();"/></li>
-        <li><img src="/static/images/system/order_manage_37.jpg" width="77" height="21" id="Image5" onmouseover="MM_swapImage('Image5','','/static/images/system/order_manage_h_37.jpg',1)" onmouseout="MM_swapImgRestore()" onclick="toprint();"/></li>
-    	<li><img src="/static/images/system/order_manage_25.jpg" width="71" height="21" id="Image1" onmouseover="MM_swapImage('Image1','','/static/images/system/order_manage_h_25.jpg',1)" onmouseout="MM_swapImgRestore()" /></li>
-        <li><img src="/static/images/system/order_manage_35.jpg" width="94" height="21" id="Image4" onmouseover="MM_swapImage('Image4','','/static/images/system/order_manage_h_35.jpg',1)" onmouseout="MM_swapImgRestore()" /></li>
-        <li><img src="/static/images/system/order_manage_33.jpg" width="77" height="21" id="Image3" onmouseover="MM_swapImage('Image3','','/static/images/system/order_manage_h_33.jpg',1)" onmouseout="MM_swapImgRestore()" /></li>
-        <li><img src="/static/images/system/order_manage_39.jpg" width="101" height="21" id="Image6" onmouseover="MM_swapImage('Image6','','/static/images/system/order_manage_h_39.jpg',1)" onmouseout="MM_swapImgRestore()" /></li>
-        -->
         <li style="padding:0px; margin:0px 55px 0px 0px; float:right"><a href="{{url_for('bpAuth.logout')}}"><img src="/static/images/system/order_manage_22.jpg" width="56" height="29" /></a></li>
     </ul>
 </div>
@@ -50,18 +52,17 @@
 	<table border="1" cellpadding="3" cellspacing="3">
 		<thead>
 			<tr class="field_head">
-				<th style="text-align:center"><input type="checkbox" onclick="allselect(this);"/></th>
-				<th>{{_('Order Number')}}</th>
-				<th>{{_('Customer')}}</th>
-				<th>{{_('Source Station')}}</th>
-				<th>{{_('Destination Station')}}</th>
-				<th>{{_('Item')}}</th>
-				<th>{{_('Qty')}}</th>
-				<th>{{_('Vol')}}</th>
-				<th>{{_('Weight')}}</th>
-				<th>{{_('Expect Time')}}</th>
-				<th>{{_('Destination Contact')}}</th>
-				<th>{{_('Destination Tel')}}</th>
+				<th style="text-align:center;width:50px"><input type="checkbox" onclick="allselect(this);"/></th>
+				<th style="width:100px">{{_('Order Number')}}</th>
+				<th style="width:200px">{{_('Customer')}}</th>
+				<th style="width:50px">{{_('Source Station')}}</th>
+				<th style="width:50px">{{_('Destination Station')}}</th>
+				<th style="width:50px">{{_('Qty')}}</th>
+				<th style="width:50px">{{_('Vol')}}</th>
+				<th style="width:50px">{{_('Weight')}}</th>
+				<th style="width:80px">{{_('Expect Time')}}</th>
+				<th style="width:80px">{{_('Destination Contact')}}</th>
+				<th style="width:100px">{{_('Destination Tel')}}</th>
 			</tr>
 			{% for r in result%}
 			<tr class="data_table_tr {{ loop.cycle('data_table_tr_odd', 'data_table_tr_even') }}">
@@ -72,11 +73,10 @@
 						<input type="checkbox" name="order_ids" value="{{r.id}}" onclick="check_ids({{r.id}},this)"/>
 					{% endif %}
 				</th>
-				<td>{{r.no|f}}</td>
-				<td>{{r.customer|f}}</td>
-				<td>{{r.dsource_station|f}}</td>
+				<td><a href="{{url_for('bpOrder.view',action='revise',id=r.id)}}">{{r.ref_no|f}}</a></td>
+				<td>{{r.source_company|f}}</td>
+				<td>{{r.source_station|f}}</td>
 				<td>{{r.destination_station|f}}</td>
-				<td>{{r.item|f}}</td>
 				<td>{{r.qty|f}}</td>
 				<td>{{r.vol|f}}</td>
 				<td>{{r.weight|f}}</td>

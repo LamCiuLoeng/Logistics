@@ -6,6 +6,47 @@
 	function todave(){
 		$("form").submit();
 	}
+	
+	
+	
+	var index = 1;
+	function add_target(){
+		var target_name = $("#target_name").val();
+	    var target_contact_person = $("#target_contact_person").val();
+	    var target_address = $("#target_address").val();
+	    var target_phone = $("#target_phone").val();
+	    var target_mobile = $("#target_mobile").val();
+	    var target_remark = $("#target_remark").val();
+	    
+	    if(!target_name || !target_contact_person || !target_address){
+	    	alert('请填写必填项后再添加！');
+	    	return;
+	    }
+	    
+	    
+	    var html = '<tr class="data_table_tr">';
+	    html += '<th><input type="hidden" name="target_name_'+index+'" value="'+target_name+'"/>'+target_name+'</th>';
+	    html += '<td><input type="hidden" name="target_contact_person_'+index+'" value="'+target_contact_person+'"/>'+target_contact_person+'</td>';
+	    html += '<td><input type="hidden" name="target_address_'+index+'" value="'+target_address+'"/>'+target_address+'</td>';
+	    html += '<td><input type="hidden" name="target_phone_'+index+'" value="'+target_phone+'"/>'+target_phone+'</td>';
+	    html += '<td><input type="hidden" name="target_mobile_'+index+'" value="'+target_mobile+'"/>'+target_mobile+'</td>';
+	    html += '<td><input type="hidden" name="target_remark_'+index+'" value="'+target_remark+'"/>'+target_remark+'</td>';
+	    html += '<td><input type="button" onclick="del_item(this)" value="删除"/></td>';
+	    html += '</tr>';
+	    $("#targets_list").append(html);
+	    index++;
+	    
+	    $("#target_name").val('');
+	    $("#target_contact_person").val('');
+	    $("#target_address").val('');
+	    $("#target_phone").val('');
+	    $("#target_mobile").val('');
+	    $("#target_remark").val('');
+	}
+	
+	function del_item(obj){
+	    $($(obj).parents('tr')[0]).remove(); 
+	}	    
 //]]>
 </script>
 {% endblock %}
@@ -35,6 +76,9 @@
 
 <div class="order_add_div">
   <div class="order_add_div_header">新建客户</div>
+  
+  
+  
     <div class="order_add_div_body">
   <ul>
         	<li style="width:450px;"><span><sup class="warn">*</sup>{{_('Customer Name')}}</span>
@@ -66,14 +110,62 @@
     	  	</select>
   	    </li>
     	  <li style="width:925px;"><span>{{_('Remark')}}</span>
-    	    <textarea class="order_add_div_body_input" style="width:840px; height:300px" name="remark"></textarea>
+    	    <textarea class="order_add_div_body_input" style="width:840px; height:100px" name="remark"></textarea>
         </li>
       </ul>
   <div style="clear:both"></div>
+  
   </div>
+
+   <div class="order_add_div_header">收货公司</div>
+	<div class="order_add_div_body">
+	<table border="0" cellpadding="0" cellspacing="0">
+		<tr>
+			<td valign="top" width="100px" align="center"><sup class="warn">*</sup>{{_('Destination Company')}}</td>
+			<td valign="top"><input type="text" id="target_name" class="order_add_div_body_input must_input" style="width:150px;"/></td>
+			
+			<td valign="top" width="100px" align="center"><sup class="warn">*</sup>{{_('Destination Contact')}}</td>
+			<td valign="top"><input type="text" id="target_contact_person" value="" class="order_add_div_body_input must_input" style="width:150px;"/></td>
+			<td valign="top" width="100px" align="center">{{_('Destination Address')}}</td>
+			<td valign="top"><input type="text" id="target_address" value="" class="order_add_div_body_input must_input" style="width:250px;"/></td>
+		</tr>
+		<tr>
+			<td valign="top" align="center">{{_('Destination Phone')}}</td>
+			<td valign="top"><input type="text" id="target_phone" value="" class="order_add_div_body_input" style="width:150px;"/></td>
+			<td valign="top" align="center">{{_('Destination Mobile')}}</td>
+			<td valign="top"><input type="text" id="target_mobile" value="" class="order_add_div_body_input" style="width:150px;"/></td>
+		    <td valign="top" align="center">{{_('Remark')}}</td>
+		    <td valign="top"><textarea id="target_remark" style="width:250px;"></textarea></td>
+		</tr>
+	</table>
+			
+	<p><input type="button" value="{{_('Add')}}" onclick="add_target()"/></p>
+	
+	<br />
+  
+  <table width="99%" border="0" cellspacing="0" cellpadding="0">
+  	<thead>
+  	<tr class="field_head">
+      <th align="center">{{_('Destination Company')}}</th>
+      <th align="center">{{_('Destination Contact')}}</th>
+      <th align="center">{{_('Destination Address')}}</th>
+      <th align="center">{{_('Destination Phone')}}</th>
+      <th align="center">{{_('Destination Mobile')}}</th>
+      <th align="center">{{_('Remark')}}</th>
+      <th align="center">&nbsp;</th>
+    </tr>
+	</thead>
+	<tbody id="targets_list">
+
+	</tbody>
+  </table>
+  
+  <div style="clear:both"><br /><br /></div>
+  
+  
+	</div>
+
 </div>
-
-
 </form>
 
 {% endblock %}

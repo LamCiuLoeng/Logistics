@@ -24,13 +24,14 @@ from sys2do.constant import MESSAGE_ERROR, MESSAGE_INFO, MSG_UPDATE_SUCC, \
     MSG_SAVE_SUCC, ORDER_CANCELLED, STATUS_LIST, IN_TRAVEL, MSG_RECORD_NOT_EXIST, \
     IN_WAREHOUSE, LOG_CREATE_ORDER, LOG_GOODS_IN_WAREHOUSE, ORDER_NEW, \
     ASSIGN_RECEIVER, LOG_SEND_RECEIVER, OUT_WAREHOUSE, GOODS_PICKUP, GOODS_SIGNED, \
-    LOG_GOODS_SIGNED, LOG_GOODS_PICKUPED, LOG_GOODS_IN_TRAVEL, SORTING
+    LOG_GOODS_SIGNED, LOG_GOODS_PICKUPED, LOG_GOODS_IN_TRAVEL, SORTING, \
+    SYSTEM_DATETIME_FORMAT
 from sys2do.model import DBSession
 from sys2do.model.logic import OrderHeader, TransferLog, DeliverDetail, \
     ItemDetail, PickupDetail
 from sys2do.model.master import CustomerProfile, InventoryLocation, Customer, \
     ItemUnit, WeightUnit, ShipmentType, InventoryItem, Payment, Ratio, PickupType, \
-    PackType, CustomerTarget, Receiver
+    PackType, CustomerTarget, Receiver, Item
 from sys2do.setting import TMP_FOLDER, TEMPLATE_FOLDER
 from sys2do.util.barcode_helper import generate_barcode_file
 from sys2do.util.common import _g, getOr404, _gp, getMasterAll, _debug, _info, \
@@ -54,7 +55,7 @@ bpOrder = Blueprint('bpOrder', __name__)
 
 class OrderView(BasicView):
 
-    decorators = [login_required, tab_highlight('TAB_ORDER'), ]
+    decorators = [login_required, tab_highlight('TAB_MAIN'), ]
 
     @templated('order/index.html')
 #    @login_required
@@ -91,7 +92,7 @@ class OrderView(BasicView):
         if values['destination_company_id']:
             conditions.append(OrderHeader.destination_company_id == values['destination_company_id'])
 
-        result = DBSession.query(OrderHeader).filter(and_(*conditions))
+        result = DBSession.query(OrderHeader).filter(and_(*conditions)).order_by(OrderHeader.create_time.desc())
 
         total_qty = total_vol = total_weight = total_amount = 0
         for r in result:
@@ -121,6 +122,7 @@ class OrderView(BasicView):
                 'pickup_type' : getMasterAll(PickupType, 'id'),
                 'pack_type' : getMasterAll(PackType, 'id'),
                 'ratios' : ratios,
+                'items'  : getMasterAll(Item),
                 'current' : dt.now().strftime("%Y-%m-%d %H:%M")
                 }
 
@@ -128,19 +130,18 @@ class OrderView(BasicView):
     def save_new(self):
         try:
             code, header = self._save_new_process()
-            if code == 0:
-                flash(MSG_SAVE_SUCC, MESSAGE_INFO)
-            else:
-                flash(MSG_SERVER_ERROR, MESSAGE_ERROR)
 
-            for nk, nv in _gp('item_name_'):
+            for nk, nv in _gp('item_id_'):
                 id = nk.split("_")[2]
                 DBSession.add(ItemDetail(
-                                         header = header, item = nv , qty = _g("item_qty_%s" % id) ,
+                                         header = header, item_id = nv , qty = _g("item_qty_%s" % id) ,
                                          vol = _g("item_vol_%s" % id), weight = _g("item_weight_%s" % id)
                                          ))
             DBSession.commit()
+            flash(MSG_SAVE_SUCC, MESSAGE_INFO)
         except:
+            _error(traceback.print_exc())
+            flash(MSG_SERVER_ERROR, MESSAGE_ERROR)
             DBSession.rollback()
 
         return redirect(url_for('.view', action = 'index'))
@@ -166,9 +167,9 @@ class OrderView(BasicView):
 
         DBSession.add(TransferLog(
                                   refer_id = order.id,
-                                  transfer_date = dt.now().strftime("%Y-%m-%d"),
+                                  transfer_date = dt.now().strftime(SYSTEM_DATETIME_FORMAT),
                                   type = 0,
-                                  remark = unicode(LOG_CREATE_ORDER),
+                                  remark = LOG_CREATE_ORDER,
                                   ))
         return (0, order)
 
@@ -202,7 +203,7 @@ class OrderView(BasicView):
             for f in deliver_heaer.get_logs() : _info(f.remark)
             logs.extend(deliver_heaer.get_logs())
         except:
-            pass
+            _error(traceback.print_exc())
 
         sorted(logs, cmp = lambda x, y: cmp(x.transfer_date, y.transfer_date))
 
@@ -218,7 +219,8 @@ class OrderView(BasicView):
                 'transit_logs' : logs,
                 'targets' : targets,
                 'customers' : getMasterAll(Customer),
-                'receivers' : getMasterAll(Receiver)
+                'receivers' : getMasterAll(Receiver),
+                'items' : getMasterAll(Item),
                 }
 
 
@@ -255,7 +257,8 @@ class OrderView(BasicView):
                 'transit_logs' : logs,
                 'targets' : targets,
                 'customers' : getMasterAll(Customer),
-                'receivers' : getMasterAll(Receiver)
+                'receivers' : getMasterAll(Receiver),
+                'items' : getMasterAll(Item)
                 }
 
 
@@ -501,7 +504,7 @@ class OrderView(BasicView):
             if action_type not in ['ADD', 'DELETE']: return jsonify({'code' :-1, 'msg' : unicode(MSG_NO_SUCH_ACTION)})
             if action_type == 'ADD' :
                 params = {'header' : header}
-                for f in ['item', 'qty', 'vol', 'weight', 'remark', ]:
+                for f in ['item_id', 'qty', 'vol', 'weight', 'remark', ]:
                     params[f] = _g(f)
                 obj = ItemDetail(**params)
                 DBSession.add(obj)
@@ -530,9 +533,9 @@ class OrderView(BasicView):
                 header.update_status(ASSIGN_RECEIVER[0])
                 DBSession.add(TransferLog(
                                   refer_id = header.id,
-                                  transfer_date = dt.now().strftime("%Y-%m-%d"),
+                                  transfer_date = dt.now().strftime(SYSTEM_DATETIME_FORMAT),
                                   type = 0,
-                                  remark = unicode(LOG_SEND_RECEIVER),
+                                  remark = LOG_SEND_RECEIVER,
                                   ))
             try:
                 DBSession.commit()
@@ -582,7 +585,7 @@ class OrderView(BasicView):
                                   refer_id = header.id,
                                   transfer_date = _g('action_time'),
                                   type = 0,
-                                  remark = unicode(LOG_GOODS_IN_TRAVEL) + (_g('remark') or ''),
+                                  remark = LOG_GOODS_IN_TRAVEL + (_g('remark') or ''),
                                   )
                 DBSession.add(obj)
                 try:
@@ -617,7 +620,7 @@ class OrderView(BasicView):
                                   refer_id = header.id,
                                   transfer_date = _g('action_time'),
                                   type = 0,
-                                  remark = unicode(LOG_GOODS_PICKUPED) + (_g('remark') or ''),
+                                  remark = LOG_GOODS_PICKUPED + (_g('remark') or ''),
                                   ))
                 try:
                     DBSession.commit()
@@ -646,7 +649,7 @@ class OrderView(BasicView):
                                   refer_id = header.id,
                                   transfer_date = _g('signed_time'),
                                   type = 0,
-                                  remark = unicode(LOG_GOODS_SIGNED) + (_g('signed_remark') or ''),
+                                  remark = LOG_GOODS_SIGNED + (_g('signed_remark') or ''),
                                   ))
             try:
                 DBSession.commit()

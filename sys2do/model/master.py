@@ -243,6 +243,7 @@ class CustomerTarget(DeclarativeBase, SysMixin):
     contact_person = Column(Text)
     mobile = Column(Text)
     phone = Column(Text)
+    remark = Column(Text)
 
     def __str__(self): return self.name
     def __repr__(self): return self.name
@@ -391,7 +392,8 @@ class InventoryLocation(DeclarativeBase, SysMixin):
     remark = Column(Text)
     full_path = Column(Text)
     full_path_ids = Column(Text)
-    parent_id = Column(Integer, default = None)
+    parent_id = Column(Integer, ForeignKey('master_inventory_location.id'))
+    parent = relation('InventoryLocation', backref = backref("children", remote_side = id))
 
     def __str__(self): return self.name
     def __repr__(self): return self.name

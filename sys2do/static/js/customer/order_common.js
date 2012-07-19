@@ -1,3 +1,18 @@
+function mysum(prefix){
+    var count = 0;
+    $(prefix).each(function(){
+        var t = $(this);
+        try{
+            if(!isNaN(parseFloat(t.text()))){
+                count += parseFloat(t.text());
+            }                
+        }catch (e){
+            
+        }
+    });
+    return count;
+}
+
 function compute(){
     var qty = $("#qty").val();
     var qty_ratio = $("#qty_ratio").val();

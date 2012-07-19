@@ -363,11 +363,11 @@ body{
 .todo_list_div {
 	font-family: "宋体";
 	font-size: 12px;
-	width: 198px;
-	border-top:#ccc solid 1px;
-	border-right:#ccc solid 1px;
-	border-bottom:#ccc solid 1px;
-	border-left:#ccc solid 1px;
+	width: 194px;
+	border-top:#333 solid 3px;
+	border-right:#333 solid 3px;
+	border-bottom:#333 solid 3px;
+	border-left:#333 solid 3px;
 	background-color:#fff;
 	padding:0px 10px 10px 10px;
 }
@@ -393,7 +393,7 @@ body{
 .todo_list_div .level_two {
 	color:#666;
 	background:url(/static/images/system/pro_navico.png) no-repeat scroll left transparent;
-	padding:7px 10px;
+	padding:5px 10px;
 	font-size: 12px;
 	margin-left:15px;
 }
@@ -413,4 +413,52 @@ body{
 .todo_list_div .level_two a:active{
 	color:#f90;
 	text-decoration: none;
+}
+.nav_tab {
+	border:#333 solid 3px;
+	background:#366;
+	background:url(/static/images/system/nav_bg.jpg);
+	padding:0px;
+	border-radius: 0px 0px 20px 20px;
+	float: left;
+	height: 180px;
+	width: 200px;
+	margin-top: 0px;
+	margin-right: 15px;
+	margin-bottom: 15px;
+	margin-left: 0px;
+	cursor:pointer;
+}
+.nav_tab span{
+	border-bottom:#fc3 solid 1px;
+	color:#FFF;
+	margin:0px 0px 0px 10px;
+	font-family:"微软雅黑";
+	font-size:14px;
+	font-weight:bold;
+}
+.nav_tab img{
+	border:#CCC solid 3px;
+}
+.nav_tab p{
+	color:#FFF;
+	padding:10px;
+}
+.nav_tab .body_div{
+	padding:10px;
+}
+.nav_tab .header_div{
+	width:auto;
+	height:5px;
+	background:#fc3;
+}
+.main_left_td {
+	padding:0px 17px 17px 17px;
+	background:#D7CFCA;
+}
+.main_right_td {
+	padding:17px 17px 17px 17px;
+}
+.main_right_td_bg {
+	background:url(/static/images/system/main_bg.png) no-repeat right bottom;
 }

@@ -6,9 +6,10 @@
 #  Description:
 ###########################################
 '''
+import traceback
 from flask import Blueprint, render_template, url_for, request
 from flask.views import View
-from flask.helpers import flash
+from flask.helpers import flash, jsonify
 from werkzeug.utils import redirect
 
 from sys2do.util.decorator import templated, login_required, tab_highlight
@@ -18,11 +19,10 @@ from sys2do.model.auth import User, Group, Permission
 from sys2do.constant import MESSAGE_ERROR, MSG_NO_SUCH_ACTION, \
     MSG_NO_ID_SUPPLIED, MSG_RECORD_NOT_EXIST, MESSAGE_INFO, MSG_SAVE_SUCC, \
     MSG_UPDATE_SUCC, MSG_DELETE_SUCC, MSG_SERVER_ERROR
-from sys2do.util.common import _g, _gl, getMasterAll, _error
+from sys2do.util.common import _g, _gl, getMasterAll, _error, _gp
 from sys2do.model.master import Customer, CustomerProfile, \
     SupplierProfile, Supplier, Payment, Item, PickupType, PackType, Ratio, \
-    Receiver
-import traceback
+    Receiver, InventoryLocation, CustomerTarget
 
 __all__ = ['bpAdmin']
 
@@ -32,11 +32,12 @@ class AdminView(BasicView):
 
     decorators = [login_required, ]
 
+    @tab_highlight('TAB_MASTER')
     @templated('admin/index.html')
     def index(self):
         return {}
 
-    @tab_highlight('TAB_USER')
+    @tab_highlight('TAB_DASHBOARD')
     def user(self):
         method = _g('m', 'LIST')
         if method not in ['LIST', 'NEW', 'UPDATE', 'DELETE', 'SAVE_NEW', 'SAVE_UPDATE']:
@@ -97,7 +98,7 @@ class AdminView(BasicView):
             return redirect(url_for('.view', action = 'user'))
 
 
-    @tab_highlight('TAB_GROUP')
+    @tab_highlight('TAB_DASHBOARD')
     def group(self):
         method = _g('m', 'LIST')
         if method not in ['LIST', 'NEW', 'UPDATE', 'DELETE', 'SAVE_NEW', 'SAVE_UPDATE']:
@@ -163,7 +164,7 @@ class AdminView(BasicView):
 
 
 
-    @tab_highlight('TAB_PERMISSION')
+    @tab_highlight('TAB_DASHBOARD')
     def permission(self):
         method = _g('m', 'LIST')
         if method not in ['LIST', 'NEW', 'UPDATE', 'DELETE', 'SAVE_NEW', 'SAVE_UPDATE']:
@@ -223,10 +224,10 @@ class AdminView(BasicView):
             return redirect(url_for('.view', action = 'permission'))
 
 
-    @tab_highlight('TAB_CUSTOMER')
+    @tab_highlight('TAB_MASTER')
     def customer(self):
         method = _g('m', 'LIST')
-        if method not in ['LIST', 'NEW', 'UPDATE', 'DELETE', 'SAVE_NEW', 'SAVE_UPDATE']:
+        if method not in ['LIST', 'NEW', 'UPDATE', 'DELETE', 'SAVE_NEW', 'SAVE_UPDATE', 'ADD_TARGET', 'DELETE_TARGET']:
             flash(MSG_NO_SUCH_ACTION, MESSAGE_ERROR);
             return redirect(url_for('.view', action = 'index'))
         if method == 'LIST':
@@ -270,6 +271,18 @@ class AdminView(BasicView):
                                 remark = _g('remark')
                                 )
             DBSession.add(obj)
+
+            for nk, nv in _gp('target_name_'):
+                id = nk.split("_")[2]
+                if not nv : continue
+                DBSession.add(CustomerTarget(
+                                             customer = obj, name = nv,
+                                             address = _g("target_address_%s" % id),
+                                             contact_person = _g("target_contact_person_%s" % id),
+                                             phone = _g("item_qty_%s" % id),
+                                             mobile = _g("target_phone_%s" % id),
+                                             remark = _g("target_remark_%s" % id),
+                                             ))
             DBSession.commit()
             flash(MSG_SAVE_SUCC, MESSAGE_INFO)
             return redirect(url_for('.view', action = 'customer'))
@@ -288,8 +301,37 @@ class AdminView(BasicView):
             DBSession.commit()
             flash(MSG_UPDATE_SUCC, MESSAGE_INFO)
             return redirect(url_for('.view', action = 'customer'))
-
-
+        elif method == 'ADD_TARGET':
+            id = _g('id', None)
+            if not id : return jsonify({'code' : 1, 'msg' : MSG_NO_ID_SUPPLIED})
+            try:
+                target = CustomerTarget(customer_id = id,
+                                        name = _g('target_name'),
+                                        address = _g('target_address'),
+                                        contact_person = _g('target_contact_person'),
+                                        mobile = _g('target_mobile'),
+                                        phone = _g('target_phone'),
+                                        remark = _g('target_remark'),
+                                        )
+                DBSession.add(target)
+                DBSession.commit()
+                return jsonify({'code' : 0 , 'msg' : MSG_SAVE_SUCC , 'data' : target.populate()})
+            except:
+                _error(traceback.print_exc())
+                DBSession.rollback()
+                return jsonify({'code' : 1, 'msg' : MSG_SERVER_ERROR})
+        elif method == 'DELETE_TARGET':
+            id = _g('id', None)
+            if not id : return jsonify({'code' : 1, 'msg' : MSG_NO_ID_SUPPLIED})
+            try:
+                obj = DBSession.query(CustomerTarget).get(id)
+                obj.active = 1
+                DBSession.commit()
+                return jsonify({'code' : 0 , 'msg' : MSG_DELETE_SUCC})
+            except:
+                _error(traceback.print_exc())
+                DBSession.rollback()
+                return jsonify({'code' : 1, 'msg' : MSG_SERVER_ERROR})
 
     def cprofile(self):
         method = _g('m', 'LIST')
@@ -355,7 +397,7 @@ class AdminView(BasicView):
 
 
 
-    @tab_highlight('TAB_SUPPLIER')
+    @tab_highlight('TAB_MASTER')
     def supplier(self):
         method = _g('m', 'LIST')
         if method not in ['LIST', 'NEW', 'UPDATE', 'DELETE', 'SAVE_NEW', 'SAVE_UPDATE']:
@@ -576,7 +618,7 @@ class AdminView(BasicView):
         return self._template(PackType, 'packtype')
 
 
-
+    @tab_highlight('TAB_MASTER')
     def ratio(self):
         method = _g('m', 'LIST')
         if method not in ['UPDATE', 'SAVE_UPDATE']:
@@ -603,6 +645,83 @@ class AdminView(BasicView):
                               new_page = 'admin/receiver_new.html',
                               update_page = 'admin/receiver_update.html',)
 
+
+#    def warehouse(self, DBObj, action,
+#                  index_page = 'admin/template_index.html',
+#                  new_page = 'admin/template_new.html',
+#                  update_page = 'admin/template_update.html',
+#                  ):
+#        
+#        DBObj = InventoryLocation
+#        action = 'warehouse'
+#        
+#        
+#        method = _g('m', 'LIST')
+#        if method not in ['LIST', 'NEW', 'UPDATE', 'DELETE', 'SAVE_NEW', 'SAVE_UPDATE']:
+#            flash(MSG_NO_SUCH_ACTION, MESSAGE_ERROR);
+#            return redirect(url_for('.view', action = 'index'))
+#        if method == 'LIST':
+#            result = {}
+#            for line in DBSession.query(DBObj).filter(DBObj.active == 0):
+#                if not line.parent_id:
+#                    
+#            
+#            
+#            
+#            return render_template(index_page, records = objs, action = action)
+#        elif method == 'NEW':
+#            return render_template(new_page, action = action)
+#        elif method == 'UPDATE':
+#            id = _g('id', None)
+#            if not id :
+#                flash(MSG_NO_ID_SUPPLIED, MESSAGE_ERROR)
+#                return redirect(url_for('.view', action = action))
+#            obj = DBSession.query(DBObj).get(id)
+#            if not obj :
+#                flash(MSG_RECORD_NOT_EXIST, MESSAGE_ERROR)
+#                return redirect(url_for('.view', action = action))
+#            return render_template(update_page, v = obj.populate(), action = action)
+#
+#        elif method == 'DELETE':
+#            id = _g('id', None)
+#            if not id :
+#                flash(MSG_NO_ID_SUPPLIED, MESSAGE_ERROR)
+#                return redirect(url_for('.view', action = action))
+#            obj = DBSession.query(DBObj).get(id)
+#            if not obj :
+#                flash(MSG_RECORD_NOT_EXIST, MESSAGE_ERROR)
+#                return redirect(url_for('.view', action = action))
+#            obj.active = 1
+#            DBSession.commit()
+#            flash(MSG_DELETE_SUCC, MESSAGE_INFO)
+#            return redirect(url_for('.view', action = action))
+#        elif method == 'SAVE_NEW':
+#            try:
+#                obj = DBObj.saveAsNew(request.values)
+#                DBSession.commit()
+#                flash(MSG_SAVE_SUCC, MESSAGE_INFO)
+#            except:
+#                _error(traceback.print_exc())
+#                DBSession.rollback()
+#                flash(MSG_SERVER_ERROR, MESSAGE_ERROR)
+#            return redirect(url_for('.view', action = action))
+#        elif method == 'SAVE_UPDATE':
+#            id = _g('id', None)
+#            if not id :
+#                flash(MSG_NO_ID_SUPPLIED, MESSAGE_ERROR)
+#                return redirect(url_for('.view', action = 'user'))
+#            obj = DBSession.query(DBObj).get(id)
+#            if not obj :
+#                flash(MSG_RECORD_NOT_EXIST, MESSAGE_ERROR)
+#                return redirect(url_for('.view', action = 'user'))
+#            try:
+#                obj.saveAsUpdate(request.values)
+#                DBSession.commit()
+#                flash(MSG_UPDATE_SUCC, MESSAGE_INFO)
+#            except:
+#                DBSession.rollback()
+#                flash(MSG_SERVER_ERROR, MESSAGE_ERROR)
+#            return redirect(url_for('.view', action = action))
 
 
 

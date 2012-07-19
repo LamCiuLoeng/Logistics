@@ -1,8 +1,6 @@
-
-
 function add_item() {
     var msg = new Array();
-    if(!$("#item_name").val()){
+    if(!$("#item_id").val()){
         msg.push('请填写货物名称！');
     }
     if(!$("#item_qty").val() && !$("#item_vol").val() && !$("#item_weight").val()){
@@ -14,27 +12,34 @@ function add_item() {
         return;
     }
     
-    var item_name = $("#item_name").val();
+    var item_name = $("#item_id :selected").text();
+    var item_name_id = $("#item_id").val();
     var item_qty = $("#item_qty").val();
     var item_vol = $("#item_vol").val();
     var item_weight = $("#item_weight").val();
     var item_remark = $("#item_remark").val();
     var html = '<tr class="data_table_tr">';
-    html += '<th><input type="hidden" name="item_name_'+index+'" value="'+item_name+'"/>'+item_name+'</th>';
-    html += '<td><input type="hidden" name="item_qty_'+index+'" value="'+item_qty+'"/>'+item_qty+'</td>';
-    html += '<td><input type="hidden" name="item_vol_'+index+'" value="'+item_vol+'"/>'+item_vol+'</td>';
-    html += '<td><input type="hidden" name="item_weight_'+index+'" value="'+item_weight+'"/>'+item_weight+'</td>';
+    html += '<th><input type="hidden" name="item_id_'+index+'" value="'+item_name_id+'"/>'+item_name+'</th>';
+    html += '<td class="item_qty_td"><input type="hidden" name="item_qty_'+index+'" value="'+item_qty+'"/>'+item_qty+'</td>';
+    html += '<td class="item_weight_td"><input type="hidden" name="item_weight_'+index+'" value="'+item_weight+'"/>'+item_weight+'</td>';
+    html += '<td class="item_vol_td"><input type="hidden" name="item_vol_'+index+'" value="'+item_vol+'"/>'+item_vol+'</td>';
     html += '<td><input type="hidden" name="item_remark_'+index+'" value="'+item_remark+'"/>'+item_remark+'</td>';
     html += '<td><input type="button" onclick="del_item(this)" value="删除"/></td>';
     html += '</tr>';
     $("#item_list").append(html);
     index++;
     
-    $("#item_name").val('');
+    $("#item_id").val('');
     $("#item_qty").val('');
     $("#item_vol").val('');
     $("#item_weight").val('');
     $("#item_remark").val('');
+    
+    $("#qty").val(mysum(".item_qty_td"));
+    $("#vol").val(mysum(".item_vol_td"));
+    $("#weight").val(mysum(".item_weight_td"));
+    
+    $("#weight").trigger('change'); //to re-compute the amount
 }
 
 function del_item(obj){

@@ -14,7 +14,7 @@ from sys2do.model import DeclarativeBase, metadata, DBSession
 from auth import SysMixin
 from sys2do.model.master import Customer, Supplier, ItemUnit, ShipmentType, \
     WeightUnit, InventoryLocation, Payment, PickupType, PackType, CustomerTarget, \
-    Receiver
+    Receiver, Item
 from sys2do.model.auth import CRUDMixin
 from sys2do.model.system import UploadFile
 from sqlalchemy.sql.expression import and_
@@ -169,7 +169,11 @@ class ItemDetail(DeclarativeBase, SysMixin):
     id = Column(Integer, autoincrement = True, primary_key = True)
     header_id = Column(Integer, ForeignKey('order_header.id'))
     header = relation(OrderHeader, backref = backref("item_details", order_by = id), primaryjoin = "and_(OrderHeader.id == ItemDetail.header_id, ItemDetail.active == 0)")
-    item = Column(Text)
+
+    item_id = Column(Integer, ForeignKey('master_item.id'))
+    item = relation(Item, backref = backref("order_details", order_by = id), primaryjoin = "and_(Item.id == ItemDetail.item_id, ItemDetail.active == 0)")
+
+#    item = Column(Text)
     qty = Column(Float, default = None) #client order qty
     vol = Column(Float, default = None)
     weight = Column(Float, default = None)

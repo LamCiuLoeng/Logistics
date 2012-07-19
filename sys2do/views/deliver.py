@@ -21,7 +21,8 @@ from sys2do.constant import MESSAGE_ERROR, MSG_NO_SUCH_ACTION, MESSAGE_INFO, \
     MSG_SAVE_SUCC, IN_WAREHOUSE, MSG_UPDATE_SUCC, ORDER_NEW, \
     ORDER_CANCELLED, MSG_DELETE_SUCC, SORTING, MSG_RECORD_NOT_EXIST, SEND_OUT, \
     GOODS_ARRIVED, IN_TRAVEL, GOODS_SIGNED, MSG_SERVER_ERROR, LOG_GOODS_SORTED, \
-    LOG_GOODS_SENT_OUT, LOG_GOODS_ARRIVAL, MSG_NO_ID_SUPPLIED
+    LOG_GOODS_SENT_OUT, LOG_GOODS_ARRIVAL, MSG_NO_ID_SUPPLIED, \
+    SYSTEM_DATETIME_FORMAT
 from sys2do.util.decorator import templated, login_required, tab_highlight
 from sys2do.model import DBSession
 from sys2do.views import BasicView
@@ -40,7 +41,7 @@ bpDeliver = Blueprint('bpDeliver', __name__)
 
 class DeliverView(BasicView):
 
-    decorators = [login_required, tab_highlight('TAB_DELIVER'), ]
+    decorators = [login_required, tab_highlight('TAB_MAIN'), ]
 
     @templated('deliver/index.html')
     def index(self):
@@ -67,7 +68,7 @@ class DeliverView(BasicView):
             conditions.append(DeliverHeader.supplier_id == values['supplier_id'])
 
 
-        result = DBSession.query(DeliverHeader).filter(and_(*conditions))
+        result = DBSession.query(DeliverHeader).filter(and_(*conditions)).order_by(DeliverHeader.create_time.desc())
         return {'result' : result, 'values' : values, 'suppliers' : getMasterAll(Supplier)}
 
     @templated('deliver/select_orders.html')
@@ -104,8 +105,15 @@ class DeliverView(BasicView):
         _info(ids)
 
         order_headers = DBSession.query(OrderHeader).filter(OrderHeader.id.in_(ids))
+
+        total_qty = total_vol = total_weight = 0
+        for h in order_headers:
+            total_qty += h.qty or 0
+            total_vol += h.vol or 0
+            total_weight += h.weight or 0
+
         suppliers = getMasterAll(Supplier)
-        return {'result' : order_headers, 'suppliers' : suppliers}
+        return {'result' : order_headers, 'suppliers' : suppliers, 'total_qty' : total_qty, 'total_vol' : total_vol, 'total_weight' : total_weight}
 
 
     def deliver_save_new(self):
@@ -125,14 +133,17 @@ class DeliverView(BasicView):
                 DBSession.add(DeliverDetail(header = header,
                                             order_header = order_header,
                                             line_no = line_no))
+
+                order_header.update_status(SORTING[0])
+
                 line_no += 1
             DBSession.flush()
 
             DBSession.add(TransferLog(
                                       refer_id = header.id,
-                                      transfer_date = dt.now().strftime("%Y-%m-%d"),
+                                      transfer_date = dt.now().strftime(SYSTEM_DATETIME_FORMAT),
                                       type = 1,
-                                      remark = unicode(LOG_GOODS_SORTED)
+                                      remark = LOG_GOODS_SORTED
                                       ))
             DBSession.commit()
         except:
@@ -313,7 +324,7 @@ class DeliverView(BasicView):
 #            DBSession.add(log)
             DBSession.add(TransferLog(
                                       refer_id = header.id,
-                                      transfer_date = dt.now().strftime("%Y-%m-%d"),
+                                      transfer_date = dt.now().strftime(SYSTEM_DATETIME_FORMAT),
                                       type = 1,
                                       remark = remark
                                       ))

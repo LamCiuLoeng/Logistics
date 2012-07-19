@@ -17,7 +17,7 @@
 		e.after(html);
 	}
 
-	function refreshToDoList(){
+	$(document).ready(function(){
 		$.getJSON('/order/ajax_todo_list',
 				  {'t' : nowstr()},
 				  function(r){
@@ -30,13 +30,6 @@
 				      append('#order_sorted',r.data.order_sorted);
 				  }
 		);
-	}
-
-	setInterval(refreshToDoList,1000*60*5); //5min
-
-
-	$(document).ready(function(){
-		refreshToDoList();
 	})
 //]]>
 </script>
@@ -70,15 +63,35 @@
             </ul>
         </div>
     </div></td>
-     <td height="550" class="main_right_td main_right_td_bg" valign="top">欢迎登录到深福合力物流管理系统。</td>
+     
+     
+     
+     <td valign="top" class="main_right_td">
+
+
+      <div class="nav_tab" onclick="redirect('{{url_for('bpAdmin.view',action='user')}}')">
+        <div class="header_div"></div>
+        <div class="body_div"><img width="80" height="80" src="/static/images/system/img_um.jpg"><span>用户管理</span>
+          <p>关于订单管理的一些说明。说明订单管理功能的用法与注意事项。</p>
+        </div>
+      </div>
+      <div class="nav_tab" onclick="redirect('{{url_for('bpAdmin.view',action='group')}}')">
+        <div class="header_div"></div>
+        <div class="body_div"><img width="80" height="80" src="/static/images/system/img_gm.jpg"><span>组管理</span>
+          <p>关于订单管理的一些说明。说明订单管理功能的用法与注意事项。</p>
+        </div>
+      </div>
+      <div class="nav_tab" onclick="redirect('{{url_for('bpAdmin.view',action='permission')}}')">
+        <div class="header_div"></div>
+        <div class="body_div"><img width="80" height="80" src="/static/images/system/img_permissions.jpg"><span>权限管理</span>
+          <p>关于订单管理的一些说明。说明订单管理功能的用法与注意事项。</p>
+        </div>
+      </div></td>
+
+     
+     
+     
   </tr>
 </tbody></table>
-	
-	<!-- 
-	<ul>      
-		<li><a href="{{url_for('bpOrder.view')}}">{{_('Order Management')}}</a></li>
-		<li><a href="{{url_for('bpDeliver.view')}}">{{_('Deliver Management')}}</a></li>
-	</ul>
-	 -->
-	
+
 {% endblock %}

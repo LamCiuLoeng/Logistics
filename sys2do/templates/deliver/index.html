@@ -37,7 +37,7 @@
         	  <input type="text" class="datepicker" name="create_time_from" value="{{values.get('create_time_from','')|f}}"/>&nbsp;&nbsp;-&nbsp;&nbsp;<input type="text" class="datepicker" name="create_time_to" value="{{values.get('create_time_to','')|f}}"/>
           </li>
           <li><span>{{_('Deliver Number')}}</span><input type="text" name="no" value="{{values.get('no','')|f}}"/></li>
-          <li><span>{{_('Destination Address')}}</span><input type="text" name="destination_address" value="{{values.get('destination_address','')|f}}"/></li>
+          <li><span>{{_('Destination')}}</span><input type="text" name="destination_address" value="{{values.get('destination_address','')|f}}"/></li>
           <li><span>{{_('Supplier')}}</span>
           	  <select name="supplier_id" id="supplier_id">
           	      <option value=""></option>
@@ -67,16 +67,15 @@
 	<table border="1" cellpadding="3" cellspacing="3">
 		<thead>
 			<tr class="field_head">
-				<th>{{_('Deliver Number')}}</th>
-				<th>{{_('Destination')}}</th>
-				<th>{{_('3rd Party Supplier')}}</th>
-				<th>{{_('Supplier Contact')}}</th>
-				<th>{{_('Supplier Tel')}}</th>
-				<th>{{_('Create Time')}}</th>
-				<th>{{_('Creator')}}</th>
-				<th>{{_('Update Time')}}</th>
-				<th>{{_('Last Updator')}}</th>
-				<th>{{_('Order Status')}}</th>
+				<th style="width:200px">{{_('Deliver Number')}}</th>
+				<th style="width:80px">{{_('Destination')}}</th>
+				<th style="width:100px">{{_('3rd Party Supplier')}}</th>
+				<th style="width:80px">{{_('Supplier Contact')}}</th>
+				<th style="width:100px">{{_('Supplier Tel')}}</th>
+				<th style="width:100px">{{_('Expect Time')}}</th>
+				<th style="width:100px">{{_('Create Time')}}</th>
+				<th style="width:80px">{{_('Creator')}}</th>
+				<th style="width:80px">{{_('Order Status')}}</th>
 			</tr>
 			{% for r in result%}
 			<tr class="data_table_tr {{ loop.cycle('data_table_tr_odd', 'data_table_tr_even') }}">
@@ -85,14 +84,13 @@
 				<td>{{r.supplier}}</td>
 				<td>{{r.supplier_contact}}</td>
 				<td>{{r.supplier_tel}}</td>
+				<td>{{r.expect_time}}</td>
 				<td>{{r.create_time|ft}}</td>
 				<td>{{r.create_by|ifFalse}}</td>
-				<td>{{r.update_time|ft}}</td>
-				<td>{{r.update_by|ifFalse}}</td>
 				<td>{{r.status|showStatus}}</td>
 			</tr>
 			{% endfor %}
 		</thead>
 	</table>
-
+	<br /><br />
 {% endblock %}

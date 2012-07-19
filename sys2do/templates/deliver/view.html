@@ -6,10 +6,26 @@
 //<![CDATA[
 	$(document).ready(function(){
 		$(".order_add_info_tab_div").tabs();
-	});		
+	});	
+	
+	function toreturn(){
+		redirect("{{url_for('.view')}}");
+	}		
 //]]>
 </script>
 {% endblock %}
+
+
+
+{% block inner_menu %}
+<div class="inner_menu">
+	<ul>
+		<li><img src="/static/images/system/order_manage_25.jpg" width="71" height="21" id="Image1" onmouseover="MM_swapImage('Image1','','/static/images/system/order_manage_h_25.jpg',1)" onmouseout="MM_swapImgRestore()" onclick="toreturn()"/></li>
+        <li style="padding:0px; margin:0px 55px 0px 0px; float:right"><a href="{{url_for('bpAuth.logout')}}"><img src="/static/images/system/order_manage_22.jpg" width="56" height="29" /></a></li>
+    </ul>
+</div>
+{% endblock %}
+
 
 {% block content %}
 <input type="hidden" name="id" id="id" value="{{header.id}}"/>
@@ -73,32 +89,30 @@
 		<table border="1" cellpadding="5" cellspacing="5">
 			<thead>
 				<tr class="field_head">
-					<th>{{_('Order Number')}}</th>
-					<th>{{_('Source Station')}}</th>
-					<th>{{_('Destination Station')}}</th>
-					<th>{{_('Item')}}</th>
-					<th>{{_('Qty')}}</th>
-					<th>{{_('Vol')}}</th>
-					<th>{{_('Weight')}}</th>
-					<th>{{_('Destination Contact')}}</th>
+					<th style="width:200px">{{_('Order Number')}}</th>
+					<th style="width:50px">{{_('Source Station')}}</th>
+					<th style="width:50px">{{_('Destination Station')}}</th>
+					<th style="width:30px">{{_('Qty')}}</th>
+					<th style="width:30px">{{_('Vol')}}</th>
+					<th style="width:30px">{{_('Weight')}}</th>
+					<th style="width:80px">{{_('Destination Contact')}}</th>
 					<th>{{_('Destination Tel')}}</th>
-					<th>{{_('Update Time')}}</th>
-					<th>{{_('Last Updator')}}</th>
+					<th style="width:100px">{{_('Create Time')}}</th>
+					<th style="width:80px">{{_('Creator')}}</th>
 				</tr>
 			</thead>
 			{% for d in details %}
 				<tr class="data_table_tr {{ loop.cycle('data_table_tr_odd', 'data_table_tr_even') }}">
-					<th>{{d.order_header.ref_no}}</th>
+					<th><a href="{{url_for('bpOrder.view',action='revise',id=d.order_header_id)}}">{{d.order_header.ref_no}}</a></th>
 					<td>{{d.order_header.source_station}}</td>
 					<td>{{d.order_header.destination_station|f}}</td>
-					<td>{{d.order_header.item|f}}</td>
 					<td>{{d.order_header.qty|f}}</td>
 					<td>{{d.order_header.vol|f}}</td>
 					<td>{{d.order_header.weight|f}}</td>
 					<td>{{d.order_header.destination_contact|f}}</td>
 					<td>{{d.order_header.destination_tel|f}}</td>
-					<td>{{d.order_header.update_time|ft}}</td>
-					<td>{{d.order_header.update_by|f}}</td>
+					<td>{{d.order_header.create_time|ft}}</td>
+					<td>{{d.order_header.create_by|f}}</td>
 				</tr>
 			{% endfor %}
 		</table>
@@ -128,12 +142,10 @@
 				{% if header.status < SEND_OUT[0]%}
 					<table>
 						<tr>
-							<td valign="top">{{_('Time')}}</td>
-							<td valign="top"><input type="text" name="send_out_time" id="send_out_time" value="{{SYSTEM_NOW()|fd}}" class="datetimepicker"/></td>
-						</tr>
-						<tr>
-							<td valign="top">{{_('Remark')}}</td>
-							<td valign="top"><textarea name="send_out_remark" id="send_out_remark">运货单 : {{header.no}} 货物已发货。</textarea></td>
+							<td valign="top" width="80px" align="center"><sup class="warn">*</sup>&nbsp;{{_('Time')}}</td>
+							<td valign="top"><input type="text" name="send_out_time" id="send_out_time" value="{{SYSTEM_NOW()|fd}}" class="datetimepicker must_input"/></td>
+							<td valign="top" width="80px" align="center">{{_('Remark')}}</td>
+							<td valign="top"><textarea name="send_out_remark" id="send_out_remark" style="width:500px;">运货单 : {{header.no}} 货物已发货。</textarea></td>
 						</tr>
 					</table>
 					<p><input type="button" value="确认发货" onclick="save_sendout()"/></p>
@@ -146,12 +158,10 @@
 			<div class="order_add_info_tab_body" id="tabs-2">
 				<table>
 					<tr>
-						<td valign="top">{{_('Time')}}</td>
-						<td valign="top"><input type="text" name="transit_time" id="transit_time" value="{{SYSTEM_NOW()|fd}}" class="datetimepicker"/></td>
-					</tr>
-					<tr>
-						<td valign="top">{{_('Remark')}}</td>
-						<td valign="top"><textarea name="transit_remark" id="transit_remark"></textarea></td>
+						<td valign="top" width="80px" align="center"><sup class="warn">*</sup>&nbsp;{{_('Time')}}</td>
+						<td valign="top"><input type="text" name="transit_time" id="transit_time" value="{{SYSTEM_NOW()|fd}}" class="datetimepicker must_input"/></td>
+						<td valign="top" width="80px" align="center">{{_('Remark')}}</td>
+						<td valign="top"><textarea name="transit_remark" id="transit_remark" style="width:500px;"></textarea></td>
 					</tr>
 				</table>
 				<p><input type="button" value="{{_('Add')}}" onclick="save_transit()"/></p>
@@ -179,12 +189,10 @@
 				{% if header.status < GOODS_ARRIVED[0]%}
 						<table>
 							<tr>
-								<td valign="top">{{_('Arrival Time')}}</td>
-								<td valign="top"><input type="text" name="arrived_time" id="arrived_time" class="datetimepicker" value="{{SYSTEM_NOW()|fd}}"/></td>
-							</tr>
-							<tr>
-								<td valign="top">{{_('Remark')}}</td>
-								<td valign="top"><textarea name="arrived_remark" id="arrived_remark">运货单 : {{header.no}} 货物已到达目的地 ：{{header.destination_address}}。</textarea></td>
+								<td valign="top" width="80px" align="center"><sup class="warn">*</sup>&nbsp;{{_('Time')}}</td>
+								<td valign="top"><input type="text" name="arrived_time" id="arrived_time" class="datetimepicker must_input" value="{{SYSTEM_NOW()|ft}}"/></td>
+								<td valign="top" width="80px" align="center">{{_('Remark')}}</td>
+								<td valign="top"><textarea name="arrived_remark" id="arrived_remark" style="width:500px;">运货单 : {{header.no}} 货物已到达目的地 ：{{header.destination_address}}。</textarea></td>
 							</tr>
 						</table>
 						

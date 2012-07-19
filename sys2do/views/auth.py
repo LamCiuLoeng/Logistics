@@ -6,6 +6,7 @@
 #  Description:
 ###########################################
 '''
+import traceback
 from datetime import datetime as dt
 from flask import session
 from flask.helpers import url_for, flash
@@ -16,7 +17,7 @@ from sqlalchemy.sql.expression import and_
 
 
 from sys2do.util.decorator import templated
-from sys2do.util.common import _g, getMasterAll
+from sys2do.util.common import _g, getMasterAll, _error
 from sys2do.model import DBSession, User
 from sys2do.constant import MESSAGE_ERROR, MSG_USER_NOT_EXIST, \
     MSG_WRONG_PASSWORD, MESSAGE_INFO, MSG_SAVE_SUCC
@@ -48,6 +49,7 @@ def check():
     try:
         u = DBSession.query(User).filter(and_(User.active == 0, User.name == _g('name'))).one()
     except:
+        _error(traceback.print_exc())
         flash(MSG_USER_NOT_EXIST, MESSAGE_ERROR)
         return redirect(url_for('bpAuth.login', next = _g('next')))
     else:

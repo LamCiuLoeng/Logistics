@@ -12,7 +12,8 @@ from sys2do.model import metadata, engine, DBSession, Permission, Group, User
 import sys
 from sys2do.model.master import CustomerProfile, Customer, \
     ItemUnit, InventoryLocation, WeightUnit, ShipmentType, Payment, Supplier, \
-    SupplierProfile, Ratio, PickupType, PackType, Diqu, CustomerTarget, Receiver
+    SupplierProfile, Ratio, PickupType, PackType, Diqu, CustomerTarget, Receiver, \
+    Item
 reload(sys)
 sys.setdefaultencoding('utf8')
 
@@ -123,10 +124,18 @@ def init():
         for n, en, tn in [(u'吨', u'ton', u'噸'), (u'千克', u'kg', u'千克'), (u'克', u'g', u'克'), ]:
             DBSession.add(WeightUnit(name = n, english_name = en, tradition_name = tn))
 
-        location1 = InventoryLocation(name = u"深圳仓库", address = u"仓库地址 1", manager = "MANAGER 1", full_path = u"深圳仓库")
-        location2 = InventoryLocation(name = u"东莞仓库", address = u"仓库地址 2", manager = "MANAGER 2", full_path = u"东莞仓库")
-        DBSession.add(location1)
-        DBSession.add(location2)
+        location1 = InventoryLocation(name = u"深圳仓库", address = u"仓库地址 1", manager = "李先生", full_path = u"深圳仓库")
+        location1_A = InventoryLocation(name = u"A区", address = u"仓库地址 1", manager = "李先生", full_path = u"A区", parent = location1)
+        location1_B = InventoryLocation(name = u"B区", address = u"仓库地址 1", manager = "李先生", full_path = u"B区", parent = location1)
+        location1_C = InventoryLocation(name = u"C区", address = u"仓库地址 1", manager = "李先生", full_path = u"C区", parent = location1)
+        location2 = InventoryLocation(name = u"东莞仓库", address = u"仓库地址 2", manager = "林先生", full_path = u"东莞仓库")
+        location2_A = InventoryLocation(name = u"A区", address = u"仓库地址 2", manager = "林先生", full_path = u"A区", parent = location2)
+        location2_B = InventoryLocation(name = u"B区", address = u"仓库地址 2", manager = "林先生", full_path = u"B区", parent = location2)
+        location2_C = InventoryLocation(name = u"C区", address = u"仓库地址 2", manager = "林先生", full_path = u"C区", parent = location2)
+
+        DBSession.add_all([location1, location1_A, location1_B, location1_C,
+                           location2, location2_A, location2_B, location2_C,
+                           ])
 
         DBSession.flush()
         location1.full_path_ids = location1.id
@@ -155,6 +164,14 @@ def init():
         DBSession.add(PackType(name = u"袋装"))
         DBSession.add(PackType(name = u"桶装"))
         DBSession.add(PackType(name = u"林架"))
+
+        DBSession.add(Item(name = u"五金"))
+        DBSession.add(Item(name = u"食品"))
+        DBSession.add(Item(name = u"器材"))
+        DBSession.add(Item(name = u"木料"))
+        DBSession.add(Item(name = u"器具"))
+        DBSession.add(Item(name = u"家具"))
+
 
         kinlong = Customer(name = u"广东坚朗五金制品股份有限公司", address = u"广东省东莞市塘厦镇大坪村工业区卢地坑路3号", phone = "0769-82166666", contact_person = u'陈先生', mobile = '12800138999', payment = payment1)
         kinlong_profile = CustomerProfile(name = "KINLONG_PROFILE", customer = kinlong, group = gKinlongGroup)

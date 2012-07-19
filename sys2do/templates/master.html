@@ -16,8 +16,8 @@
 	
 	<style type="text/css"> 
 	.ui-timepicker-div .ui-widget-header { margin-bottom: 8px; }
-	.ui-timepicker-div dl { text-align: left; }
-	.ui-timepicker-div dl dt { height: 25px; margin-bottom: -25px; }
+	.ui-timepicker-div dl { text-align: left; padding:10px; background:#eee; }
+	.ui-timepicker-div dl dt { height: 31px; margin-bottom: -25px; line-height: 31px; }
 	.ui-timepicker-div dl dd { margin: 0 10px 10px 65px; }
 	.ui-timepicker-div td { font-size: 90%; }
 	.ui-tpicker-grid-label { background: none; border: none; margin: 0; padding: 0; }
@@ -88,24 +88,17 @@
 			  <table width="100%" border="0" cellpadding="0" cellspacing="0">
 			    <tr>
 			      
-			      <td class="{{ 'bt_highlight_fix' if session.get('tab-highlight','') == 'TAB_HOME' else 'bt_normal'}}" onmouseover="menu_move_over(this)" onmouseout="menu_move_out(this)" onclick="redirect('{{url_for('bpRoot.view', action = 'index')}}')">{{_('Homepage')}}</td>
+			      <td class="{{ 'bt_highlight_fix' if session.get('tab-highlight','') == 'TAB_HOME' else 'bt_normal'}}" onmouseover="menu_move_over(this)" onmouseout="menu_move_out(this)" onclick="redirect('{{url_for('bpRoot.view', action = 'index')}}')">首页</td>
 			      <td class="gap2"></td>
-			      <td class="{{ 'bt_highlight_fix' if session.get('tab-highlight','') == 'TAB_MASTER' else 'bt_normal'}}" onmouseover="menu_move_over(this)" onmouseout="menu_move_out(this)" onclick="redirect('{{url_for('bpAdmin.view')}}')">{{_('Master Management')}}</td>
+			      <td class="{{ 'bt_highlight_fix' if session.get('tab-highlight','') == 'TAB_MAIN' else 'bt_normal'}}" onmouseover="menu_move_over(this)" onmouseout="menu_move_out(this)" onclick="redirect('{{url_for('bpRoot.view',action = 'main')}}')">控制台</td>
+			      <td class="gap2"></td>
+			      <td class="{{ 'bt_highlight_fix' if session.get('tab-highlight','') == 'TAB_MASTER' else 'bt_normal'}}" onmouseover="menu_move_over(this)" onmouseout="menu_move_out(this)" onclick="redirect('{{url_for('bpAdmin.view')}}')">系统设置</td>
 			      <td class="gap2"></td>
 
 			      {% if 'ADMIN' is in_group%}
-			      <td class="{{ 'bt_highlight_fix' if session.get('tab-highlight','') == 'TAB_USER' else 'bt_normal'}}" onmouseover="menu_move_over(this)" onmouseout="menu_move_out(this)" onclick="redirect('{{url_for('bpAdmin.view',action='user')}}')">{{_('User Management')}}</td>
-			      <td class="gap2"></td>
-			      <td class="{{ 'bt_highlight_fix' if session.get('tab-highlight','') == 'TAB_GROUP' else 'bt_normal'}}" onmouseover="menu_move_over(this)" onmouseout="menu_move_out(this)" onclick="redirect('{{url_for('bpAdmin.view',action='group')}}')">{{_('Group Management')}}</td>
-			      <td class="gap2"></td>
-			      <td class="{{ 'bt_highlight_fix' if session.get('tab-highlight','') == 'TAB_PERMISSION' else 'bt_normal'}}" onmouseover="menu_move_over(this)" onmouseout="menu_move_out(this)" onclick="redirect('{{url_for('bpAdmin.view',action='permission')}}')">{{_('Permission Management')}}</td>
+			      <td class="{{ 'bt_highlight_fix' if session.get('tab-highlight','') == 'TAB_DASHBOARD' else 'bt_normal'}}" onmouseover="menu_move_over(this)" onmouseout="menu_move_out(this)" onclick="redirect('{{url_for('bpRoot.view',action = 'dashboard')}}')">管理员控制台</td>
 			      <td class="gap2"></td>
 			      {% endif %}
-			      
-			      <!-- 
-			      <td class="bt_normal" onmouseover="menu_move_over(this)" onmouseout="menu_move_out(this)"><a href="{{url_for('bpOrder.view')}}">客户关系管理</a></td>
-			      <td class="gap2"></td>
-			      -->
 			      <td><table width="100%" border="0" cellpadding="0" cellspacing="0">
 			        <tr>
 			          <td style="padding:0px; margin:0px">&nbsp;</td>
@@ -137,7 +130,7 @@
 		{% block footer %}
 			<div id="footer">
 				<!-- footer Here -->
-				<table width="100%" border="0" cellspacing="0" cellpadding="0"><tr><td>&nbsp;</td></tr><tr><td bgcolor="#39565e" style="color:#FFF; font-family:Arial, Helvetica, sans-serif; padding:5px;">Copyright SFHL. All Rights Reserved. </td></tr></table>
+				<table width="100%" border="0" cellspacing="0" cellpadding="0"><tr><td bgcolor="#39565e" style="color:#FFF; font-family:Arial, Helvetica, sans-serif; padding:5px;">Copyright SFHL. All Rights Reserved. </td></tr></table>
 			</div>
 		{% endblock %}
 	</div>
