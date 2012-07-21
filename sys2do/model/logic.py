@@ -109,7 +109,11 @@ class OrderHeader(DeclarativeBase, SysMixin, CRUDMixin):
     inventory_location_id = Column(Integer, ForeignKey('master_inventory_location.id'))
     inventory_location = relation(InventoryLocation, backref = backref("items", order_by = id))
 
+    approve = Column(Integer, default = 0) # 0 is undone ,1 is approved ,2 is disapprove
+    paid = Column(Integer, default = 0) # 0 is not paid, 1 is paid
     remark = Column(Text)
+
+    deliver_header_ref = Column(Integer, default = None)
     status = Column(Integer, default = 0)
 
 
@@ -161,6 +165,17 @@ class OrderHeader(DeclarativeBase, SysMixin, CRUDMixin):
             return deliver.header
         except:
             return None
+
+
+    @property
+    def deliver_header(self):
+        try:
+            return DBSession.query(DeliverHeader).get(self.deliver_header_ref)
+        except:
+            return None
+
+
+
 
 
 class ItemDetail(DeclarativeBase, SysMixin):

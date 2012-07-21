@@ -76,6 +76,7 @@ function tosave(){
     }
     
     if(msg.length < 1){
+        show_hold('正在保存，请稍候。。。');
         $("form").submit();
     }else{
         var s = '<ul>';
@@ -83,8 +84,10 @@ function tosave(){
             s += '<li>' + msg[i] + '</li>';
         }
         s += '</ul>';
+
+        show_error(s);
         
-        $.modaldialog.error(s);
+        
         return false;
     }
     

@@ -126,6 +126,7 @@ class DeliverView(BasicView):
                                    expect_time = _g('expect_time'),
                                    remark = _g('remark'),
                                    )
+            DBSession.flush()
 
             line_no = 1
             for k, id in _gp('detail_'):
@@ -135,9 +136,8 @@ class DeliverView(BasicView):
                                             line_no = line_no))
 
                 order_header.update_status(SORTING[0])
-
+                order_header.deliver_header_ref = header.id
                 line_no += 1
-            DBSession.flush()
 
             DBSession.add(TransferLog(
                                       refer_id = header.id,

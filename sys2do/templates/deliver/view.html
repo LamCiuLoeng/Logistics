@@ -35,53 +35,65 @@
 	
 	<div class="order_add_div_body">
 	
-		<table border="1" cellpadding="5" cellspacing="5">
+		<table border="1" cellpadding="3" cellspacing="3">
 			<tr>
-				<td width="200">{{_('3rd Party Supplier')}}</td>
-				<td width="200">{{values.get('supplier','')|f}}</td>
+				<td width="100" height="30" align="right">{{_('3rd Party Supplier')}}</td>
+				<td width="12">&nbsp;</td>
+				<td width="300">{{values.get('supplier','')|f}}</td>
 			</tr>
 			<tr>
-				<td>{{_('Deliver Number')}}</td>
+				<td width="100" height="30" align="right">{{_('Deliver Number')}}</td>
+				<td width="12">&nbsp;</td>
 				<td>{{values.get('no','')|f}}</td>
 			</tr>
 			<tr>
-				<td>{{_('Destination')}}</td>
+				<td height="30" align="right">{{_('Destination')}}</td>
+				<td width="12">&nbsp;</td>
 				<td>{{values.get('destination_address','')|f}}</td>
 			</tr>
 			<tr>
-				<td>{{_('Supplier Contact')}}</td>
+				<td height="30" align="right">{{_('Supplier Contact')}}</td>
+				<td width="12">&nbsp;</td>
 				<td>{{values.get('supplier_contact','')|f}}</td>
 			</tr>
 			<tr>
-				<td>{{_('Supplier Tel')}}</td>
+				<td height="30" align="right">{{_('Supplier Tel')}}</td>
+				<td width="12">&nbsp;</td>
 				<td>{{values.get('supplier_tel','')|f}}</td>
 			</tr>
 			<tr>
-				<td>{{_('Expect Time')}}</td>
+				<td height="30" align="right">{{_('Expect Time')}}</td>
+				<td width="12">&nbsp;</td>
 				<td>{{values.get('expect_time','')|f}}</td>
 			</tr>
 			<tr>
-				<td>{{_('Remark')}}</td>
+				<td height="30" align="right">{{_('Remark')}}</td>
+				<td width="12">&nbsp;</td>
 				<td>{{values.get('remark','')|f}}</td>
 			</tr>
 			<tr>
-				<td>{{_('Create Time')}}</td>
+				<td height="30" align="right">{{_('Create Time')}}</td>
+				<td width="12">&nbsp;</td>
 				<td>{{values.get('create_time','')|ft}}</td>
 			</tr>
 			<tr>
-				<td>{{_('Creator')}}</td>
+				<td height="30" align="right">{{_('Creator')}}</td>
+				<td width="12">&nbsp;</td>
 				<td>{{values.get('create_by','')|f}}</td>
 			</tr>
 			<tr>
-				<td>{{_('Update Time')}}</td>
+				<td height="30" align="right">{{_('Update Time')}}</td>
+				<td width="12">&nbsp;</td>
 				<td>{{values.get('update_time','')|ft}}</td>
 			</tr>
 			<tr>
-				<td>{{_('Last Updator')}}</td>
+				<td height="30" align="right">{{_('Last Updator')}}</td>
+				<td width="12">&nbsp;</td>
 				<td>{{values.get('update_by','')|f}}</td>
 			</tr>
 			<tr>
-				<td>{{_('Status')}}</td>
+				<td height="30" align="right">{{_('Status')}}</td>
+				<td width="12">&nbsp;</td>
 				<td>{{values.get('status','')|showStatus}}</td>
 			</tr>
 		</table>
@@ -140,15 +152,17 @@
 			<!-- send out -->
 			<div class="order_add_info_tab_body" id="tabs-1">
 				{% if header.status < SEND_OUT[0]%}
+					<div id="send_out_table">
 					<table>
 						<tr>
 							<td valign="top" width="80px" align="center"><sup class="warn">*</sup>&nbsp;{{_('Time')}}</td>
-							<td valign="top"><input type="text" name="send_out_time" id="send_out_time" value="{{SYSTEM_NOW()|fd}}" class="datetimepicker must_input"/></td>
+							<td valign="top"><input type="text" name="send_out_time" id="send_out_time" value="{{SYSTEM_NOW()|ft}}" class="datetimepicker must_input"/></td>
 							<td valign="top" width="80px" align="center">{{_('Remark')}}</td>
 							<td valign="top"><textarea name="send_out_remark" id="send_out_remark" style="width:500px;">运货单 : {{header.no}} 货物已发货。</textarea></td>
 						</tr>
 					</table>
 					<p><input type="button" value="确认发货" onclick="save_sendout()"/></p>
+					</div>
 				{% else %}
 					<p>货物已发出。</p>
 				{% endif %}
@@ -159,7 +173,7 @@
 				<table>
 					<tr>
 						<td valign="top" width="80px" align="center"><sup class="warn">*</sup>&nbsp;{{_('Time')}}</td>
-						<td valign="top"><input type="text" name="transit_time" id="transit_time" value="{{SYSTEM_NOW()|fd}}" class="datetimepicker must_input"/></td>
+						<td valign="top"><input type="text" name="transit_time" id="transit_time" value="{{SYSTEM_NOW()|ft}}" class="datetimepicker must_input"/></td>
 						<td valign="top" width="80px" align="center">{{_('Remark')}}</td>
 						<td valign="top"><textarea name="transit_remark" id="transit_remark" style="width:500px;"></textarea></td>
 					</tr>
@@ -187,6 +201,7 @@
 			
 			<div class="order_add_info_tab_body" id="tabs-3">
 				{% if header.status < GOODS_ARRIVED[0]%}
+						<div id="arrived_table">
 						<table>
 							<tr>
 								<td valign="top" width="80px" align="center"><sup class="warn">*</sup>&nbsp;{{_('Time')}}</td>
@@ -197,6 +212,7 @@
 						</table>
 						
 						<p><input type="button" value="确认货物到达" onclick="save_arrived()"/></p>
+						</div>
 				{% else %}
 					<p>货物已到达。</p>
 				{% endif %}

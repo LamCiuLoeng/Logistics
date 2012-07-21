@@ -33,14 +33,78 @@
 		}
 	}
 	
-	function todeliver(){
-		if($("input[name='order_ids']:checked").length < 1){
-			show_error('请选择至少一条记录以创建送货单！');
-		}else{
-			$('#records').attr("action","{{url_for('bpDeliver.view',action='add_deliver')}}");
-			$('#records').submit();
+
+	function todo_approve(obj){	
+		var v = $(":selected",obj).val();
+		$(obj).val('');
+		if(v){
+			return todo('APPROVE',v,function(r){
+				if(r.code != 0 ){
+					show_error(r.msg);
+				}else{
+					$("input[name='order_ids']:checked").each(function(){
+						var tmp = $(this);
+						var tr = $(tmp.parents("tr")[0]);
+						if(v=='1'){
+							$(".approval_span",tr).text("{{_(ORDER_APPROVED[1])}}");
+						}else{
+							$(".approval_span",tr).text("{{_(ORDER_DISAPPROVED[1])}}");
+						}
+					});				
+					show_info(r.msg);
+				}	
+			});
 		}
 	}
+						
+	
+	function todo_paid(obj){
+		var v = $(":selected",obj).val();
+		$(obj).val('');
+		if(v){
+			return todo('PAID',v,function(r){
+				if(r.code != 0 ){
+					show_error(r.msg);
+				}else{
+					$("input[name='order_ids']:checked").each(function(){
+						var tmp = $(this);
+						var tr = $(tmp.parents("tr")[0]);
+						if(v=='0'){
+							$(".paid_span",tr).text("{{_(ORDER_NOT_PAID[1])}}");
+						}else{
+							$(".paid_span",tr).text("{{_(ORDER_PAID[1])}}");
+						}
+					});				
+					show_info(r.msg);
+				}	
+			});
+		}
+	}
+	
+	function todo(type,flag,handler){
+		var ids = new Array();
+		
+		$("input[name='order_ids']:checked").each(function(){
+			ids.push($(this).val());
+		});
+		if(ids.length < 1){
+			show_error('请先选择订单然后再进行操作！');
+			return false;
+		}
+		
+		$.getJSON("{{ url_for('.view',action='ajax_change_flag') }}",
+				 {
+				 	't' : nowstr(),
+				 	'order_ids' : ids.join('|'),
+				 	'type' : type,
+				 	'flag' : flag
+				 },
+				 handler
+		)
+		
+		
+	}
+	
 	
 //]]>
 </script>
@@ -48,12 +112,26 @@
 {% endblock %}
 
 
+        
+        
 {% block inner_menu %}
 <div class="inner_menu">
 	<ul>
-        <li><a href="{{url_for('.view',action='add')}}"><img src="/static/images/system/order_manage_31.jpg" width="77" height="21" id="Image2" onmouseover="MM_swapImage('Image2','','/static/images/system/order_manage_h_31.jpg',1)" onmouseout="MM_swapImgRestore()" /></a></li>
         <li><img src="/static/images/system/order_manage2_35.jpg" width="101" height="21" id="Image7" onmouseover="MM_swapImage('Image7','','/static/images/system/order_manage1_35.jpg',1)" onmouseout="MM_swapImgRestore()" onclick="return toexp();"/></li>
-        <li><img src="/static/images/system/order_manage1_new.jpg" width="101" height="21" id="Image8" onmouseover="MM_swapImage('Image8','','/static/images/system/order_manage_new.jpg',1)" onmouseout="MM_swapImgRestore()" onclick="return todeliver();"/></li>
+        <li>
+        	<select onchange="todo_approve(this);">
+        		<option></option>
+        		<option value="1">{{_(ORDER_APPROVED[1])}}</option>
+        		<option value="2">{{_(ORDER_DISAPPROVED[1])}}</option>
+        	</select/>
+        </li>
+        <li>
+        	<select onchange="todo_paid(this);">
+        		<option></option>
+        		<option value="0">{{_(ORDER_NOT_PAID[1])}}</option>
+        		<option value="1">{{_(ORDER_PAID[1])}}</option>
+        	</select/>
+        </li>
         <li style="padding:0px; margin:0px 55px 0px 0px; float:right"><a href="{{url_for('bpAuth.logout')}}"><img src="/static/images/system/order_manage_22.jpg" width="56" height="29" /></a></li>
     </ul>
 </div>
@@ -150,8 +228,8 @@
 			<td>{{r.create_time|ft}}</td>
 			<td>{{r.create_by|f}}</td>
 			<td>{{r.status|showStatus}}</td>
-			<td>{{r.approve|showApproval}}</td>
-			<td>{{r.paid|showPaid}}</td>
+			<td><span class="approval_span">{{r.approve|showApproval}}</span></td>
+			<td><span class="paid_span">{{r.paid|showPaid}}</span></td>
 		  </tr>
   {% endfor %}
       <tr class="data_table_tr">

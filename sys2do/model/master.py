@@ -240,9 +240,9 @@ class CustomerTarget(DeclarativeBase, SysMixin):
     customer = relation(Customer, backref = backref("targets", order_by = id), primaryjoin = "and_(Customer.id == CustomerTarget.customer_id, CustomerTarget.active == 0)")
     name = Column(Text)
     address = Column(Text)
-    contact_person = Column(Text)
-    mobile = Column(Text)
-    phone = Column(Text)
+#    contact_person = Column(Text)
+#    mobile = Column(Text)
+#    phone = Column(Text)
     remark = Column(Text)
 
     def __str__(self): return self.name
@@ -256,6 +256,35 @@ class CustomerTarget(DeclarativeBase, SysMixin):
                   'address', 'phone', 'contact_person', 'mobile']:
             params[k] = getattr(self, k)
         return params
+
+
+
+
+class CustomerTargetContact(DeclarativeBase, SysMixin):
+    __tablename__ = 'master_customer_target_contact'
+
+    id = Column(Integer, autoincrement = True, primary_key = True)
+    customer_target_id = Column(Integer, ForeignKey('master_customer_target.id'))
+    customer_target = relation(CustomerTarget, backref = backref("contacts", order_by = id), primaryjoin = "and_(CustomerTarget.id == CustomerTargetContact.customer_target_id, CustomerTargetContact.active == 0)")
+    name = Column(Text)
+    mobile = Column(Text)
+    phone = Column(Text)
+    email = Column(Text)
+    remark = Column(Text)
+
+    def __str__(self): return self.name
+    def __repr__(self): return self.name
+    def __unicode__(self): return self.name
+
+
+    def populate(self):
+        params = {}
+        for k in ['id', 'name', 'phone', 'email', 'mobile']:
+            params[k] = getattr(self, k)
+        return params
+
+
+
 
 
 class CustomerProfile(DeclarativeBase, SysMixin):

@@ -205,7 +205,7 @@ class OrderView(BasicView):
         except:
             _error(traceback.print_exc())
 
-        sorted(logs, cmp = lambda x, y: cmp(x.transfer_date, y.transfer_date))
+        logs = sorted(logs, cmp = lambda x, y: cmp(x.transfer_date, y.transfer_date))
 
         if header.source_company_id:
             targets = header.source_company.targets
@@ -535,7 +535,7 @@ class OrderView(BasicView):
                                   refer_id = header.id,
                                   transfer_date = dt.now().strftime(SYSTEM_DATETIME_FORMAT),
                                   type = 0,
-                                  remark = LOG_SEND_RECEIVER,
+                                  remark = LOG_SEND_RECEIVER + (u'收件人: %s , 收件人电话: %s , 收件人手机: %s, 备注:%s' % (header.receiver_contact, header.receiver_tel or '', header.receiver_mobile or '', header.receiver_remark or '')),
                                   ))
             try:
                 DBSession.commit()
@@ -585,7 +585,7 @@ class OrderView(BasicView):
                                   refer_id = header.id,
                                   transfer_date = _g('action_time'),
                                   type = 0,
-                                  remark = LOG_GOODS_IN_TRAVEL + (_g('remark') or ''),
+                                  remark = LOG_GOODS_IN_TRAVEL + (u'备注:%s' % (_g('remark') or '')),
                                   )
                 DBSession.add(obj)
                 try:
@@ -620,7 +620,7 @@ class OrderView(BasicView):
                                   refer_id = header.id,
                                   transfer_date = _g('action_time'),
                                   type = 0,
-                                  remark = LOG_GOODS_PICKUPED + (_g('remark') or ''),
+                                  remark = LOG_GOODS_PICKUPED + (u'提货人: %s, 提货数量: %s , 备注:%s' % (obj.contact, obj.qty, (_g('remark') or ''))),
                                   ))
                 try:
                     DBSession.commit()
@@ -649,7 +649,7 @@ class OrderView(BasicView):
                                   refer_id = header.id,
                                   transfer_date = _g('signed_time'),
                                   type = 0,
-                                  remark = LOG_GOODS_SIGNED + (_g('signed_remark') or ''),
+                                  remark = LOG_GOODS_SIGNED + (u'签收人:%s , 签收人电话:%s , 签收时间:%s' % (header.signed_contact, header.signed_tel or '', header.signed_time)),
                                   ))
             try:
                 DBSession.commit()
@@ -707,6 +707,11 @@ class OrderView(BasicView):
         except:
             pass
         return send_file(realFileName, as_attachment = True)
+
+
+
+
+
 
 
 

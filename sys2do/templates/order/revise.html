@@ -79,7 +79,7 @@
     	  <li style="width:180px;"><span><sup class="warn">*</sup>&nbsp;单号</span>
     	    <input name="ref_no" id="ref_no" type="text" style="width:100px" value="{{header.ref_no|f}}" class="must_input"/>
   	    </li>
-    	  <li style="width:300px;"><span>系统订单号</span>{{header.no|f}}</li>
+    	  <li style="width:300px;"><span>系统编号</span>{{header.no|f}}</li>
     	  <li style="width:459px;"><span><sup class="warn">*</sup>&nbsp;{{_('Source Company')}}</span>
     	      <select name="source_company_id" id="source_company_id" style="width:360px" class="must_input">
     	          {% for c in customers %}
@@ -344,7 +344,7 @@
 			<table>
 				<tr>
 					<td valign="top" width="80px" align="center"><sup class="warn">*</sup>{{_('Time')}}</td>
-					<td valign="top" width="150px"><input type="text" name="wh_time" id="wh_time" value="{{SYSTEM_NOW()|fd}}" class="datetimepicker must_input"/></td>
+					<td valign="top" width="150px"><input type="text" name="wh_time" id="wh_time" value="{{SYSTEM_NOW()|ft}}" class="datetimepicker must_input"/></td>
 					<td valign="top" width="80px" align="center">{{_('Remark')}}</td>
 					<td valign="top"><textarea name="wh_remark" id="wh_remark" style="width:500px;">订单: {{header.ref_no}} 确认入仓</textarea></td>
 				</tr>
@@ -372,6 +372,10 @@
 	<!-- transit info -->
 	<div class="order_add_info_tab_body" id="tabs-4">
 		<div>
+			{% if header.deliver_header_ref %}
+				<p>送货单 : <a href="{{url_for('bpDeliver.view',action='view',id=header.deliver_header_ref)}}">{{header.deliver_header}}</a></p>
+				<br />
+			{% endif %}
 			<table>
 				<tr>
 					<td valign="top" width="80px" align="center"><sup class="warn">*</sup>&nbsp;{{_('Time')}}</td>
@@ -387,7 +391,7 @@
 			<thead>
 				<tr class="field_head">
 					<th align="center">{{_('Time')}}</th>
-					<th align="center" style="width:600px">{{_('Remark')}}</th>
+					<th align="center" style="width:800px">{{_('Remark')}}</th>
 				</tr>
 			<thead>
 			<tbody id="transit_list">
@@ -468,7 +472,6 @@
 					<th align="center">{{_('Contact Tel')}}</th>
 					<th align="center">{{_('Pickup Qty')}}</th>
 					<th align="center">{{_('Remark')}}</th>
-					<th>&nbsp;</th>
 				</tr>
 			<thead>
 			<tbody id="pickup_list">

@@ -75,6 +75,23 @@ STATUS_LIST = [
 
 
 
+#validate status
+ORDER_NOT_MAKE_APPROVAL = (0, u'未审核')
+ORDER_APPROVED = (1, u'审核通过')
+ORDER_DISAPPROVED = (2, u'审核不通过')
+
+
+APPROVAL_STATUS_LIST = [ORDER_NOT_MAKE_APPROVAL, ORDER_APPROVED, ORDER_DISAPPROVED]
+
+
+#paid status
+ORDER_NOT_PAID = (0, u'未付款')
+ORDER_PAID = (1, u'已付款')
+
+PAID_STATUS_LIST = [ORDER_NOT_PAID, ORDER_PAID, ]
+
+
+
 #button label
 BTN_SAVE = T('Save')
 BTN_INPUT = T('Input')

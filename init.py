@@ -13,7 +13,7 @@ import sys
 from sys2do.model.master import CustomerProfile, Customer, \
     ItemUnit, InventoryLocation, WeightUnit, ShipmentType, Payment, Supplier, \
     SupplierProfile, Ratio, PickupType, PackType, Diqu, CustomerTarget, Receiver, \
-    Item
+    Item, CustomerTargetContact
 reload(sys)
 sys.setdefaultencoding('utf8')
 
@@ -124,22 +124,22 @@ def init():
         for n, en, tn in [(u'吨', u'ton', u'噸'), (u'千克', u'kg', u'千克'), (u'克', u'g', u'克'), ]:
             DBSession.add(WeightUnit(name = n, english_name = en, tradition_name = tn))
 
-        location1 = InventoryLocation(name = u"深圳仓库", address = u"仓库地址 1", manager = "李先生", full_path = u"深圳仓库")
-        location1_A = InventoryLocation(name = u"A区", address = u"仓库地址 1", manager = "李先生", full_path = u"A区", parent = location1)
-        location1_B = InventoryLocation(name = u"B区", address = u"仓库地址 1", manager = "李先生", full_path = u"B区", parent = location1)
-        location1_C = InventoryLocation(name = u"C区", address = u"仓库地址 1", manager = "李先生", full_path = u"C区", parent = location1)
-        location2 = InventoryLocation(name = u"东莞仓库", address = u"仓库地址 2", manager = "林先生", full_path = u"东莞仓库")
-        location2_A = InventoryLocation(name = u"A区", address = u"仓库地址 2", manager = "林先生", full_path = u"A区", parent = location2)
-        location2_B = InventoryLocation(name = u"B区", address = u"仓库地址 2", manager = "林先生", full_path = u"B区", parent = location2)
-        location2_C = InventoryLocation(name = u"C区", address = u"仓库地址 2", manager = "林先生", full_path = u"C区", parent = location2)
-
-        DBSession.add_all([location1, location1_A, location1_B, location1_C,
-                           location2, location2_A, location2_B, location2_C,
-                           ])
+#        location1 = InventoryLocation(name = u"深圳仓库", address = u"仓库地址 1", manager = "李先生", full_path = u"深圳仓库")
+#        location1_A = InventoryLocation(name = u"A区", address = u"仓库地址 1", manager = "李先生", full_path = u"A区", parent = location1)
+#        location1_B = InventoryLocation(name = u"B区", address = u"仓库地址 1", manager = "李先生", full_path = u"B区", parent = location1)
+#        location1_C = InventoryLocation(name = u"C区", address = u"仓库地址 1", manager = "李先生", full_path = u"C区", parent = location1)
+#        location2 = InventoryLocation(name = u"东莞仓库", address = u"仓库地址 2", manager = "林先生", full_path = u"东莞仓库")
+#        location2_A = InventoryLocation(name = u"A区", address = u"仓库地址 2", manager = "林先生", full_path = u"A区", parent = location2)
+#        location2_B = InventoryLocation(name = u"B区", address = u"仓库地址 2", manager = "林先生", full_path = u"B区", parent = location2)
+#        location2_C = InventoryLocation(name = u"C区", address = u"仓库地址 2", manager = "林先生", full_path = u"C区", parent = location2)
+#
+#        DBSession.add_all([location1, location1_A, location1_B, location1_C,
+#                           location2, location2_A, location2_B, location2_C,
+#                           ])
+#        location1.full_path_ids = location1.id
+#        location2.full_path_ids = location2.id
 
         DBSession.flush()
-        location1.full_path_ids = location1.id
-        location2.full_path_ids = location2.id
 
         DBSession.add(ShipmentType(name = u"陆运"))
 #        DBSession.add(ShipmentType(name = u"水运"))
@@ -176,23 +176,48 @@ def init():
         kinlong = Customer(name = u"广东坚朗五金制品股份有限公司", address = u"广东省东莞市塘厦镇大坪村工业区卢地坑路3号", phone = "0769-82166666", contact_person = u'陈先生', mobile = '12800138999', payment = payment1)
         kinlong_profile = CustomerProfile(name = "KINLONG_PROFILE", customer = kinlong, group = gKinlongGroup)
 
-        kinlong_target1 = CustomerTarget(customer = kinlong, name = u'收货公司一', address = u'福建省福州市', contact_person = u'李先生', mobile = u'13880138111', phone = u'123456')
-        kinlong_target2 = CustomerTarget(customer = kinlong, name = u'收货公司二', address = u'广东省深圳市', contact_person = u'张小姐', mobile = u'13800138222', phone = u'456789')
-        kinlong_target3 = CustomerTarget(customer = kinlong, name = u'收货公司三', address = u'湖南省长沙市', contact_person = u'林先生', mobile = u'13800138333', phone = u'369852')
+        kinlong_target1 = CustomerTarget(customer = kinlong, name = u'收货公司一', address = u'福建省福州市',)
+        kinlong_target1_c1 = CustomerTargetContact(customer_target = kinlong_target1, name = u'李一', mobile = u'13880138111', phone = u'1234561')
+        kinlong_target1_c2 = CustomerTargetContact(customer_target = kinlong_target1, name = u'张一', mobile = u'13880138112', phone = u'1234562')
+        kinlong_target1_c3 = CustomerTargetContact(customer_target = kinlong_target1, name = u'王一', mobile = u'13880138113', phone = u'1234563')
+
+        kinlong_target2 = CustomerTarget(customer = kinlong, name = u'收货公司二', address = u'广东省深圳市',)
+        kinlong_target2_c1 = CustomerTargetContact(customer_target = kinlong_target2, name = u'樊一', mobile = u'13800138221', phone = u'4578251')
+        kinlong_target2_c2 = CustomerTargetContact(customer_target = kinlong_target2, name = u'林一', mobile = u'13800138222', phone = u'4578252')
+        kinlong_target2_c3 = CustomerTargetContact(customer_target = kinlong_target2, name = u'余一', mobile = u'13800138223', phone = u'4578253')
+
+        kinlong_target3 = CustomerTarget(customer = kinlong, name = u'收货公司三', address = u'湖南省长沙市',)
+        kinlong_target3_c1 = CustomerTargetContact(customer_target = kinlong_target3, name = u'樊一', mobile = u'13800138331', phone = u'14587541')
+        kinlong_target3_c2 = CustomerTargetContact(customer_target = kinlong_target3, name = u'林一', mobile = u'13800138332', phone = u'14587542')
+        kinlong_target3_c3 = CustomerTargetContact(customer_target = kinlong_target3, name = u'余一', mobile = u'13800138333', phone = u'14587543')
 
         weiqian = Customer(name = u"味千（中国）控股有限公司", address = u"广东省深圳市福田区金田路3037号金中环商务大厦主楼23号", phone = "0755-8280 5333", contact_person = u'胡先生', mobile = '12800138999', payment = payment1)
         weiqian_profile = CustomerProfile(name = "WEIQIAN_PROFILE", customer = weiqian, group = gWeiqianGroup)
 
-        weiqian_target1 = CustomerTarget(customer = weiqian, name = u'味千收货公司一', address = u'福建省福清市', contact_person = u'张先生', mobile = u'1388013111', phone = u'123456')
-        weiqian_target2 = CustomerTarget(customer = weiqian, name = u'味千收货公司二', address = u'广东省珠海市', contact_person = u'郭先生', mobile = u'1388013111', phone = u'123456')
-        weiqian_target3 = CustomerTarget(customer = weiqian, name = u'味千收货公司三', address = u'湖北省武汉市', contact_person = u'赵先生', mobile = u'1388013111', phone = u'123456')
+        weiqian_target1 = CustomerTarget(customer = weiqian, name = u'味千收货公司一', address = u'福建省福清市',)
+        weiqian_target1_c1 = CustomerTargetContact(customer_target = weiqian_target1 , name = u'张二', mobile = u'1388013111', phone = u'123456')
+        weiqian_target1_c2 = CustomerTargetContact(customer_target = weiqian_target1 , name = u'李二', mobile = u'1388013111', phone = u'123456')
+
+        weiqian_target2 = CustomerTarget(customer = weiqian, name = u'味千收货公司二', address = u'广东省珠海市',)
+        weiqian_target2_c1 = CustomerTargetContact(customer_target = weiqian_target2 , name = u'林二', mobile = u'1388013111', phone = u'123456')
+        weiqian_target2_c2 = CustomerTargetContact(customer_target = weiqian_target2 , name = u'五二', mobile = u'1388013111', phone = u'123456')
+
+        weiqian_target3 = CustomerTarget(customer = weiqian, name = u'味千收货公司三', address = u'湖北省武汉市')
+        weiqian_target2_c1 = CustomerTargetContact(customer_target = weiqian_target3 , name = u'林三', mobile = u'1388013111', phone = u'123456')
+        weiqian_target2_c2 = CustomerTargetContact(customer_target = weiqian_target3 , name = u'五三', mobile = u'1388013111', phone = u'123456')
 
         supplier1 = Supplier(name = u"承运商一", address = u"广东省珠海市斗门区", phone = "0756-25361422", contact_person = u"林先生")
         supplier1_profile = SupplierProfile(name = "SUPPLIER1_PROFILE", supplier = supplier1, group = gSupplier1)
 
 
-        DBSession.add_all([kinlong, kinlong_profile, kinlong_target1, kinlong_target2, kinlong_target3,
-                           weiqian, weiqian_profile, weiqian_target1, weiqian_target2, weiqian_target3,
+        DBSession.add_all([kinlong, kinlong_profile,
+                           kinlong_target1, kinlong_target1_c1, kinlong_target1_c2, kinlong_target1_c3,
+                           kinlong_target2, kinlong_target2_c1, kinlong_target2_c2, kinlong_target2_c3,
+                           kinlong_target3, kinlong_target3_c1, kinlong_target3_c2, kinlong_target3_c3,
+                           weiqian, weiqian_profile,
+                           weiqian_target1, weiqian_target1_c1, weiqian_target1_c2,
+                           weiqian_target2, weiqian_target2_c1, weiqian_target2_c2,
+                           weiqian_target3, weiqian_target2_c1, weiqian_target2_c2,
                            supplier1, supplier1_profile])
 
 

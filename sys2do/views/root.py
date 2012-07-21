@@ -16,7 +16,7 @@ from sys2do.util.decorator import templated, login_required, tab_highlight
 from sys2do.util.common import _g, _gp, _gl
 from sys2do.constant import MESSAGE_ERROR, MESSAGE_INFO, MSG_NO_SUCH_ACTION, \
     MSG_SAVE_SUCC, GOODS_PICKUP, GOODS_SIGNED, OUT_WAREHOUSE, IN_WAREHOUSE, \
-    MSG_RECORD_NOT_EXIST
+    MSG_RECORD_NOT_EXIST, LOG_GOODS_PICKUPED, LOG_GOODS_SIGNED
 from sys2do.views import BasicView
 from sys2do.model.master import CustomerProfile, Customer, Supplier, \
     CustomerTarget, Receiver
@@ -109,6 +109,7 @@ class RootView(BasicView):
                           'source_company' : h.source_company,
                           'destination_station' : h.destination_station,
                           'destination_company' : h.destination_company,
+                          'status' : h.status,
                           }
             except:
                 params = {
@@ -117,6 +118,7 @@ class RootView(BasicView):
                           'source_company' : '',
                           'destination_station' : '',
                           'destination_company' : '',
+                          'status' : ''
                           }
 
             xml = []
@@ -127,6 +129,7 @@ class RootView(BasicView):
             xml.append('<SOURCE_COMPANY>%s</SOURCE_COMPANY>' % params['source_company'])
             xml.append('<DESTINATION_STATION>%s</DESTINATION_STATION>' % params['destination_station'])
             xml.append('<DESTINATION_COMPANY>%s</DESTINATION_COMPANY>' % params['destination_company'])
+            xml.append('<STATUS>%s</STATUS>' % params['status'])
             xml.append('</ORDER>')
             rv = app.make_response("".join(xml))
             rv.mimetype = 'text/xml'
@@ -139,22 +142,23 @@ class RootView(BasicView):
                 h.update_status(action_type)
 
                 if action_type == IN_WAREHOUSE[0]:
-                    remark = (u'订单: %s 确认入仓。' % h.ref_no) + (_g('remark') or '')
+                    remark = (u'订单: %s 确认入仓。备注：' % h.ref_no) + (_g('remark') or '')
                 elif action_type == OUT_WAREHOUSE[0]:
-                    remark = (u'订单: %s 确认出仓。' % h.ref_no) + (_g('remark') or '')
+                    remark = (u'订单: %s 确认出仓。备注：' % h.ref_no) + (_g('remark') or '')
                 elif action_type == GOODS_SIGNED[0]:
-                    remark = u'货物已签收。' + (_g('remark') or '')
+                    remark = LOG_GOODS_SIGNED + (u'签收人:%s , 签收人电话:%s , 签收时间:%s' % (_g('contact'), _g('tel') or '', _g('time'))),
                     h.signed_time = _g('time')
                     h.signed_remark = _g('remark')
                     h.signed_contact = _g('contact')
                     h.signed_tel = _g('tel')
                 elif action_type == GOODS_PICKUP[0]:
-                    remark = u'订单已被提货。' + (_g('remark') or '')
+                    remark = LOG_GOODS_PICKUPED + (u'提货人: %s, 提货数量: %s , 备注:%s' % (_g('contact'), _g('qty'), (_g('remark') or ''))),
                     params = {
                               'action_time' : _g('time'),
                               'contact' : _g('contact'),
                               'qty' : _g('qty'),
-                              'remark' : _g(remark),
+                              'tel' : _g('tel'),
+                              'remark' : _g('remark'),
                               }
                     obj = PickupDetail(header = h, **params)
                     DBSession.add(obj)

@@ -75,6 +75,11 @@ function redirect_alert(msg,url){
     }
 }
 
+function refresh(){
+    window.location.reload();
+}
+
+
 function bind_province_city_district(province_id,city_id,district_id){
 //    alert(province_id+city_id+district_id);
     //bind province and city

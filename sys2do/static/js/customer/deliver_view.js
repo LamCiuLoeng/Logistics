@@ -17,6 +17,7 @@ function save_sendout() {
     ajax_save(params, function(r){
         if(r.code == 0){
             alert(r.msg);
+            $('#send_out_table').replaceWith('<p>货物已发出。</p>');
         }else{
             alert(r.msg);
         }
@@ -60,6 +61,7 @@ function save_arrived(){
     ajax_save(params, function(r){
         if(r.code == 0){
             alert(r.msg);
+            $("#arrived_table").replaceWith('<p>货物已到达。</p>');
         }else{
             alert(r.msg);
         }
