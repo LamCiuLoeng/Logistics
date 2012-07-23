@@ -22,7 +22,7 @@ from sys2do.constant import MESSAGE_ERROR, MSG_NO_SUCH_ACTION, \
 from sys2do.util.common import _g, _gl, getMasterAll, _error, _gp
 from sys2do.model.master import Customer, CustomerProfile, \
     SupplierProfile, Supplier, Payment, Item, PickupType, PackType, Ratio, \
-    Receiver, InventoryLocation, CustomerTarget
+    Receiver, InventoryLocation, CustomerTarget, Note
 
 __all__ = ['bpAdmin']
 
@@ -596,6 +596,7 @@ class AdminView(BasicView):
                 DBSession.commit()
                 flash(MSG_UPDATE_SUCC, MESSAGE_INFO)
             except:
+                _error(traceback.print_exc())
                 DBSession.rollback()
                 flash(MSG_SERVER_ERROR, MESSAGE_ERROR)
             return redirect(url_for('.view', action = action))
@@ -645,6 +646,13 @@ class AdminView(BasicView):
                               new_page = 'admin/receiver_new.html',
                               update_page = 'admin/receiver_update.html',)
 
+
+    @tab_highlight('TAB_MASTER')
+    def note(self):
+        return self._template(Note, 'note',
+                              index_page = 'admin/note_index.html',
+                              new_page = 'admin/note_new.html',
+                              update_page = 'admin/note_update.html',)
 
 #    def warehouse(self, DBObj, action,
 #                  index_page = 'admin/template_index.html',

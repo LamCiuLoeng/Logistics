@@ -19,7 +19,7 @@ from sys2do.constant import MESSAGE_ERROR, MESSAGE_INFO, MSG_NO_SUCH_ACTION, \
     MSG_RECORD_NOT_EXIST, LOG_GOODS_PICKUPED, LOG_GOODS_SIGNED
 from sys2do.views import BasicView
 from sys2do.model.master import CustomerProfile, Customer, Supplier, \
-    CustomerTarget, Receiver
+    CustomerTarget, Receiver, CustomerTargetContact
 from sys2do.model.logic import OrderHeader, TransferLog, PickupDetail
 from sys2do.util.logic_helper import genSystemNo
 
@@ -78,7 +78,20 @@ class RootView(BasicView):
 
         if master == 'target_detail':
             t = DBSession.query(CustomerTarget).get(_g('id'))
-            return jsonify({'code' : 0 , 'msg' : '' , 'data' : t.populate()})
+            data = t.populate()
+            if t.contact: data['contact'] = t.contact.populate()
+            else : data['contact'] = {}
+            return jsonify({'code' : 0 , 'msg' : '' , 'data' : data})
+
+        if master == 'target_contact_detail':
+            try:
+                c = DBSession.query(CustomerTargetContact).filter(and_(CustomerTargetContact.active == 0,
+                                                               CustomerTargetContact.name == _g('name'),
+                                                               )).one()
+                return jsonify({'code' : 0 , 'data' : c.populate()})
+            except:
+                return jsonify({'code' : 0 , 'data' : {}})
+
 
         if master == 'supplier':
             cs = DBSession.query(Supplier).filter(Supplier.active == 0).order_by(Supplier.name).all()

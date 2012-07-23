@@ -14,7 +14,7 @@ from sys2do.model import DeclarativeBase, metadata, DBSession
 from auth import SysMixin
 from sys2do.model.master import Customer, Supplier, ItemUnit, ShipmentType, \
     WeightUnit, InventoryLocation, Payment, PickupType, PackType, CustomerTarget, \
-    Receiver, Item
+    Receiver, Item, Note
 from sys2do.model.auth import CRUDMixin
 from sys2do.model.system import UploadFile
 from sqlalchemy.sql.expression import and_
@@ -33,6 +33,10 @@ class OrderHeader(DeclarativeBase, SysMixin, CRUDMixin):
 
     no = Column(Text)
     ref_no = Column(Text)
+
+    note_id = Column(Integer, ForeignKey('master_note.id'))
+    note = relation(Note, backref = backref("orders", order_by = id), primaryjoin = "and_(Note.id == OrderHeader.note_id, OrderHeader.active == 0)")
+    note_no = Column(Text)
 
     source_company_id = Column(Integer, ForeignKey('master_customer.id'))
     source_company = relation(Customer, backref = backref("orders", order_by = id), primaryjoin = "and_(Customer.id == OrderHeader.source_company_id, OrderHeader.active == 0)")
@@ -90,6 +94,12 @@ class OrderHeader(DeclarativeBase, SysMixin, CRUDMixin):
     amount = Column(Float, default = 0)
     cost = Column(Float, default = 0)
 
+    insurance_charge = Column(Float, default = 0)
+    sendout_charge = Column(Float, default = 0)
+    receive_charge = Column(Float, default = 0)
+    package_charge = Column(Float, default = 0)
+    other_charge = Column(Float, default = 0)
+
     receiver_contact_id = Column(Integer, ForeignKey('master_receiver.id'))
     receiver_contact = relation(Receiver, backref = backref("orders", order_by = id), primaryjoin = "and_(Receiver.id == OrderHeader.receiver_contact_id, OrderHeader.active == 0)")
 #    receiver_contact = Column(Text)
@@ -111,9 +121,12 @@ class OrderHeader(DeclarativeBase, SysMixin, CRUDMixin):
 
     approve = Column(Integer, default = 0) # 0 is undone ,1 is approved ,2 is disapprove
     paid = Column(Integer, default = 0) # 0 is not paid, 1 is paid
+    is_exception = Column(Integer, default = 0) # 0 is normal ,1 is exception
+    is_less_qty = Column(Integer, default = 0) # 0 is normal ,1 is less than the order qty
     remark = Column(Text)
 
     deliver_header_ref = Column(Integer, default = None)
+    deliver_header_no = Column(Text)
     status = Column(Integer, default = 0)
 
 

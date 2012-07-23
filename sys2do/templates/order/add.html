@@ -62,7 +62,18 @@
     	 <li style="width:180px;"><span><sup class="warn">*</sup>&nbsp;单号</span>
     	    <input name="ref_no" id="ref_no" type="text" class="must_input" style="width:100px"/>
   	    </li>
-    	  <li style="width:280px;"><span>{{_('Create Time')}}</span>{{current}}</li>
+  	    <li style="width:180px;"><span><sup class="warn">*</sup>&nbsp;票据前缀</span>
+    	    <select name="note_id" id="note_id" class="must_input" style="width:100px">
+    	    	<option value=""></option>
+    	    	{% for n in notes %}
+    	    		<option value="{{n.id}}">{{n}}</option>
+    	    	{% endfor %}
+    	    </select>
+  	    </li>
+  	    <li style="width:180px;"><span><sup class="warn">*</sup>&nbsp;票据单号</span>
+    	    <input name="note_no" id="note_no" type="text" class="must_input" style="width:100px"/>
+  	    </li>
+    	  <!-- <li style="width:280px;"><span>{{_('Create Time')}}</span>{{current}}</li> -->
     	  <li style="width:459px;"><span><sup class="warn">*</sup>&nbsp;{{_('Source Company')}}</span>
     	      <select name="source_company_id" id="source_company_id" style="width:360px" class="must_input">
     	          <option></option>
@@ -135,28 +146,28 @@
     <td width="9%" align="center">{{_('Vol Ratio')}}</td>
     <td width="9%" align="center"><sup class="warn">*</sup>&nbsp;{{_('Amount')}}</td>
     <td width="9%" align="center">{{_('Payment')}}</td>
-    </tr>
+  </tr>
   <tr>
     <td height="30" align="center"><span style="width:180px;">
-      <input name="qty" id="qty" type="text" class="order_add_div_body_input numeric compute" style="width:70px"/>
+      <input name="qty" id="qty" type="text" class="order_add_div_body_input numeric compute number_input_right" style="width:70px"/>
     </span></td>
     <td align="center"><span style="width:180px;">
-      <input name="qty_ratio" id="qty_ratio" type="text" class="order_add_div_body_input numeric compute" style="width:70px" value="{{ratios.get('QTY',0)}}"/>
+      <input name="qty_ratio" id="qty_ratio" type="text" class="order_add_div_body_input numeric compute number_input_right" style="width:70px" value="{{ratios.get('QTY',0)}}"/>
     </span></td>
     <td align="center"><span style="width:180px;">
-      <input name="weight" id="weight" type="text" class="order_add_div_body_input numeric compute" style="width:70px"/>
+      <input name="weight" id="weight" type="text" class="order_add_div_body_input numeric compute number_input_right" style="width:70px"/>
     </span></td>
     <td align="center"><span style="width:180px;">
-      <input name="weight_ratio" id="weight_ratio" type="text" class="order_add_div_body_input numeric compute" style="width:70px" value="{{ratios.get('WEIGHT',0)}}"/>
+      <input name="weight_ratio" id="weight_ratio" type="text" class="order_add_div_body_input numeric compute number_input_right" style="width:70px" value="{{ratios.get('WEIGHT',0)}}"/>
     </span></td>
     <td align="center"><span style="width:180px;">
-      <input name="vol" id="vol" type="text" class="order_add_div_body_input numeric compute" style="width:70px"/>
+      <input name="vol" id="vol" type="text" class="order_add_div_body_input numeric compute number_input_right" style="width:70px"/>
     </span></td>
     <td align="center"><span style="width:180px;">
-      <input name="vol_ratio" id="vol_ratio" type="text" class="order_add_div_body_input numeric compute" style="width:70px" value="{{ratios.get('VOL',0)}}"/>
+      <input name="vol_ratio" id="vol_ratio" type="text" class="order_add_div_body_input numeric compute number_input_right" style="width:70px" value="{{ratios.get('VOL',0)}}"/>
     </span></td>
     <td align="center"><span style="width:180px;">
-      <input name="amount" id="amount" type="text" class="order_add_div_body_input numeric must_input" style="width:70px"/>
+      <input name="amount" id="amount" type="text" class="order_add_div_body_input numeric must_input number_input_right" style="width:70px"/>
     </span></td>
     <td align="center">
     	<span style="width:180px;">
@@ -169,6 +180,30 @@
     	</span>
     </td>
     </tr>
+    <tr>
+	    <td width="9%" align="center">送货费用</td>
+	    <td width="9%" align="center">上门接货费用</td>
+	    <td width="9%" align="center">包装费用</td>
+	    <td width="9%" align="center">保险费用</td>
+	    <td width="9%" align="center">其它费用</td>
+	</tr>
+	<tr>
+		<td align="center"><span style="width:180px;">
+	      <input name="sendout_charge" id="sendout_charge" type="text" class="order_add_div_body_input numeric compute number_input_right" style="width:70px" value="0"/>
+	    </span></td>
+	    <td align="center"><span style="width:180px;">
+	      <input name="receive_charge" id="receive_charge" type="text" class="order_add_div_body_input numeric compute number_input_right" style="width:70px" value="0"/>
+	    </span></td>
+	    <td align="center"><span style="width:180px;">
+	      <input name="package_charge" id="package_charge" type="text" class="order_add_div_body_input numeric compute number_input_right" style="width:70px" value="0"/>
+	    </span></td>
+	    <td align="center"><span style="width:180px;">
+	      <input name="insurance_charge" id="insurance_charge" type="text" class="order_add_div_body_input numeric compute number_input_right" style="width:70px" value="0"/>
+	    </span></td>
+	    <td align="center"><span style="width:180px;">
+	      <input name="other_charge" id="other_charge" type="text" class="order_add_div_body_input numeric compute number_input_right" style="width:70px" value="0"/>
+	    </span></td>
+	</tr>
 </table>
 
 

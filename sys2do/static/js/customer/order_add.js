@@ -56,6 +56,15 @@ function tosave(){
     if(!$('#ref_no').val()){
         msg.push('请填写单号！');
     }
+    
+    if(!$('#note_id').val()){
+        msg.push('请选择票据前缀！');
+    }
+    
+    if(!$('#note_no').val()){
+        msg.push('请填写票据单号！');
+    }
+    
     if(!$('#destination_station').val()){
         msg.push('请填写目的站！');
     }
@@ -76,8 +85,28 @@ function tosave(){
     }
     
     if(msg.length < 1){
-        show_hold('正在保存，请稍候。。。');
-        $("form").submit();
+        $.getJSON('/order/check_note',
+                  {
+                    't' : nowstr(),
+                    'note_id' : $('#note_id').val(),
+                    'note_no' : $('#note_no').val()
+                  },
+                  function(r){
+                      if(r.code!=0){
+                          alert(r.msg);
+                          return false;
+                      }else{
+                          if(r.result!=0){
+                              show_error('该票据不在可用范围内，请修改！');
+                              return false;
+                          }else{
+                              show_hold('正在保存，请稍候。。。');
+                              $("form").submit();
+                          }
+                          
+                      }
+                  }
+        )        
     }else{
         var s = '<ul>';
         for(var i=0;i<msg.length;i++){

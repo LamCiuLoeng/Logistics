@@ -1,0 +1,127 @@
+{% extends "master.html" %}
+
+{% block extCSS %}
+<style type="text/css"> 
+	.template{display:none};
+</style>
+{% endblock %}
+
+{% block extJS %}
+<script language="JavaScript" type="text/javascript">
+//<![CDATA[
+	function tosave(){
+		var msg = new Array();
+		if(!$("#name").val()){
+			msg.push('请填写票据前缀！');
+		}
+		
+		var correct = true;
+		var count = 0
+		$(".range").each(function(){
+			var tmp = $(this);
+			var b = $("input[name^='begin_']",tmp).val();
+			var e = $("input[name^='end_']",tmp).val();
+			if(!b&&e || b&&!e){ correct = false; }
+			else if(b&&e){ count ++; }
+		});
+		
+		if(!correct){
+			msg.push('请正确填写票据范围，必须填写起始和结束数值！');
+		}
+		
+		if(count<1){
+			msg.push('请填写至少一个可用的票据范围！');
+		}
+		
+		if(msg.length>0){
+			alert(msg.join("\n"));
+		}else{
+			$('form').submit();
+		}
+	}
+	
+	function todelete() {
+    	if(confirm('{{_(MSG_CONFIRM_DELETE)}}')){
+    		var url = "{{url_for('.view', action = action,m = 'DELETE',id=v['id'])|safe}}";
+    		redirect(url);
+    	}else{
+    		return false;
+    	}
+	}
+	
+	function add_line(obj){
+		var tmp = $(".template").clone().removeClass("template");
+		$("input[type='text']",tmp).each(function(){
+			var t = $(this);
+			var n = t.attr('name').replace("_x","_"+index);
+			t.attr("name",n);
+		})
+		
+		$($(obj).parents("li")[0]).after(tmp);
+		index ++ ;
+	}
+	
+	
+	function del_line(obj){
+		$($(obj).parents("li")[0]).remove();
+	}	
+//]]>
+</script>
+{% endblock %}
+
+
+{% block inner_menu %}
+<div class="inner_menu">
+	<ul>
+    	<li><img src="/static/images/system/order_manage_25.jpg" width="71" height="21" id="Image1" onmouseover="MM_swapImage('Image1','','/static/images/system/order_manage_h_25.jpg',1)" onmouseout="MM_swapImgRestore()" onclick="redirect('{{url_for('bpAdmin.view',action=action)}}')"/></li>
+        <li><input type="image" src="/static/images/system/order_manage_33.jpg" width="77" height="21" id="Image3" onmouseover="MM_swapImage('Image3','','/static/images/system/order_manage_h_33.jpg',1)" onmouseout="MM_swapImgRestore()" onclick="return tosave()"/></li>
+        <li><input type="image" src="/static/images/system/order_manage_29.jpg" width="77" height="21" id="Image4" onmouseover="MM_swapImage('Image4','','/static/images/system/order_manage_h_29.jpg',1)" onmouseout="MM_swapImgRestore()" onclick="return todelete()"/></li>
+        <li style="padding:0px; margin:0px 55px 0px 0px; float:right"><a href="{{url_for('bpAuth.logout')}}"><img src="/static/images/system/order_manage_22.jpg" width="56" height="29" /></a></li>
+    </ul>
+</div>
+{% endblock %}
+{% block content %}
+	<form action="{{url_for('.view', action = action,m='SAVE_UPDATE')}}" method="post">
+		<input type="hidden" name="id" value="{{v['id']}}"/>
+		<table>
+			<tr>
+				<td>票据前缀</td>
+				<td><input type="text" id="name" name="name" value="{{v['name']|f}}"/></td>
+			</tr>
+			<tr>
+				<td>可用范围</td>
+				<td valign="top">
+					<ul id="range_list">						
+						{% for b,e in v['range']%}
+						<li class="range">
+							<input type="text" name="begin_{{loop.index0}}" value="{{b}}" class="numeric"/>&nbsp;~&nbsp;<input type="text" name="end_{{loop.index0}}" value="{{e}}" class="numeric"/>
+							&nbsp;<input type="button" value="+" onclick="add_line(this)" class="numeric"/>
+							&nbsp;<input type="button" value="-" onclick="del_line(this)" class="numeric"/>
+						</li>
+							{% if loop.last%}
+								<script language="JavaScript" type="text/javascript">
+								//<![CDATA[
+									var index = {{loop.length}};
+								//]]>
+								</script>
+							{% endif %}
+						{% endfor %}
+						
+						<li class="template range">
+							<input type="text" name="begin_x" class="numeric"/>&nbsp;~&nbsp;<input type="text" name="end_x" class="numeric"/>
+							&nbsp;<input type="button" value="+" onclick="add_line(this)" class="numeric"/>
+							&nbsp;<input type="button" value="-" onclick="del_line(this)" class="numeric"/>
+						</li>
+					</ul>
+					
+					
+				</td>
+			</tr>
+			<tr>
+				<td>{{_('Remark')}}</td>
+				<td><textarea name="remark">{{v['remark']|f}}</textarea></td>
+			</tr>
+		</table>
+	</form>
+	
+{% endblock %}

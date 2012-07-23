@@ -180,6 +180,54 @@
           		    {% endfor %}
           		</select>
           </li>
+          <li><span>审核</span>
+              <select name="approve" id="approve">
+                  <option value=""></option>
+                  {% for v,n in [('1','审核通过'),('2','审核不通过')] %}
+                      {% if v == values.get('approve',None) %}
+                          <option value="{{v}}" selected="selected">{{n}}</option>
+                      {% else %}
+                          <option value="{{v}}">{{n}}</option>
+                      {% endif %}
+                  {% endfor %}
+              </select>
+          </li>
+          <li style="width:500px"><span>付款</span>
+              <select name="paid" id="paid">
+                  <option value=""></option>
+                  {% for v,n in [('1','已付款'),('0','未付款')]%}
+                      {% if v == values.get('paid',None)%}
+                          <option value="{{v}}" selected="selected">{{n}}</option>
+                      {% else %}
+                          <option value="{{v}}">{{n}}</option>
+                      {% endif %}
+                  {% endfor %}
+              </select>
+          </li>
+          <li><span>异常</span>
+              <select name="is_exception" id="is_exception">
+                  <option value=""></option>
+                  {% for v,n in [('1','有异常'),('0','正常')]%}
+                      {% if v == values.get('is_exception',None)%}
+                          <option value="{{v}}" selected="selected">{{n}}</option>
+                      {% else %}
+                          <option value="{{v}}">{{n}}</option>
+                      {% endif %}
+                  {% endfor %}
+              </select>
+          </li>
+          <li><span>少货</span>
+              <select name="is_less_qty" id="is_less_qty">
+                  <option value=""></option>
+                  {% for v,n in [('1','少货'),('0','正常')]%}
+                      {% if v == values.get('is_less_qty',None)%}
+                          <option value="{{v}}" selected="selected">{{n}}</option>
+                      {% else %}
+                          <option value="{{v}}">{{n}}</option>
+                      {% endif %}
+                  {% endfor %}
+              </select>
+          </li>
         </ul>
         <div class="button_div"><input type="submit" value="{{_('Search')}}"/></div>
     	</form>
@@ -206,11 +254,14 @@
     <td align="center" style="width:50px;">{{_('Qty')}}</td>
     <td align="center" style="width:50px;">{{_('Weight')}}</td>
     <td align="center" style="width:50px;">{{_('Amount')}}</td>
+    <td align="center" style="width:50px;">送货单</td>
     <td align="center" style="width:200px;">{{_('Create Time')}}</td>
     <td align="center" style="width:100px;">{{_('Creator')}}</td>
     <td align="center" style="width:150px;">{{_('Status')}}</td>
     <td align="center" style="width:80px;">审核</td>
     <td align="center" style="width:80px;">付款</td>
+    <td align="center" style="width:80px;">异常</td>
+    <td align="center" style="width:80px;">少货</td>
   </tr>
   
   {% for r in result %}
@@ -225,11 +276,19 @@
 			<td>{{r.qty|f}}</td>
 			<td>{{r.weight|f}}</td>
 			<td>{{r.amount|ft}}</td>
+			<td>
+				&nbsp;
+				{% if r.deliver_header_ref %}
+					<a href="{{url_for('bpDeliver.view',action='view',id=r.deliver_header_ref)}}">{{r.deliver_header_no}}</a>
+				{%endif%}
+			</td>
 			<td>{{r.create_time|ft}}</td>
 			<td>{{r.create_by|f}}</td>
 			<td>{{r.status|showStatus}}</td>
 			<td><span class="approval_span">{{r.approve|showApproval}}</span></td>
 			<td><span class="paid_span">{{r.paid|showPaid}}</span></td>
+			<td>{{'是' if r.is_exception else '&nbsp;'|safe}}</td>
+			<td>{{'是' if r.is_less_qty else '&nbsp;'|safe}}</td>
 		  </tr>
   {% endfor %}
       <tr class="data_table_tr">

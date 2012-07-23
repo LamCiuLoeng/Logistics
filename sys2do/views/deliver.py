@@ -101,9 +101,6 @@ class DeliverView(BasicView):
     @templated('deliver/add_deliver.html')
     def add_deliver(self):
         ids = _gl('order_ids')
-
-        _info(ids)
-
         order_headers = DBSession.query(OrderHeader).filter(OrderHeader.id.in_(ids))
 
         total_qty = total_vol = total_weight = 0
@@ -137,7 +134,9 @@ class DeliverView(BasicView):
 
                 order_header.update_status(SORTING[0])
                 order_header.deliver_header_ref = header.id
+                order_header.deliver_header_no = header.no
                 line_no += 1
+
 
             DBSession.add(TransferLog(
                                       refer_id = header.id,

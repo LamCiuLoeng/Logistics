@@ -53,13 +53,28 @@
     	<li style="width:180px;"><span><sup class="warn">*</sup>&nbsp;{{_('Source Station')}}</span>
     	  <input name="source_station" id="source_station" type="text" style="width:100px" class="must_input" value="{{header.source_station|f}}"/>
     	</li>
-    	 <li style="width:180px;"><span><sup class="warn">*</sup>&nbsp;单号</span>
-    	    <input name="ref_no" id="ref_no" type="text" class="must_input" style="width:100px" value="{{header.ref_no|f}}"/>
-  	    </li>
     	  <li style="width:180px;"><span><sup class="warn">*</sup>&nbsp;{{_('Destination Station')}}</span>
     	    <input name="destination_station" id="destination_station" type="text" style="width:100px" class="must_input" value="{{header.destination_station|f}}"/>
    	      </li>
-    	  <li style="width:280px;"><span>{{_('Create Time')}}</span>{{current}}</li>
+    	 <li style="width:180px;"><span><sup class="warn">*</sup>&nbsp;单号</span>
+    	    <input name="ref_no" id="ref_no" type="text" class="must_input" style="width:100px" value="{{header.ref_no|f}}"/>
+  	    </li>
+  	    <li style="width:180px;"><span><sup class="warn">*</sup>&nbsp;票据前缀</span>
+    	    <select name="note_id" id="note_id" class="must_input" style="width:100px">
+    	    	<option value=""></option>
+    	    	{% for n in notes %}
+    	    		{% if n.id == header.note_id %}
+    	    			<option value="{{n.id}}" selected="selected">{{n}}</option>
+    	    		{% else %}
+    	    			<option value="{{n.id}}">{{n}}</option>
+    	    		{% endif %}
+    	    	{% endfor %}
+    	    </select>
+  	    </li>
+  	    <li style="width:180px;"><span><sup class="warn">*</sup>&nbsp;票据单号</span>
+    	    <input name="note_no" id="note_no" type="text" class="must_input" style="width:100px" value="{{header.note_no|f}}"/>
+  	    </li>
+    	  <!-- <li style="width:280px;"><span>{{_('Create Time')}}</span>{{current}}</li> -->
     	  <li style="width:459px;"><span><sup class="warn">*</sup>&nbsp;{{_('Source Company')}}</span>
     	      <select name="source_company_id" id="source_company_id" style="width:360px" class="must_input">
     	          {% for c in customers %}
@@ -187,6 +202,30 @@
     	</span>
     </td>
     </tr>
+    <tr>
+	    <td width="9%" align="center">送货费用</td>
+	    <td width="9%" align="center">上门接货费用</td>
+	    <td width="9%" align="center">包装费用</td>
+	    <td width="9%" align="center">保险费用</td>
+	    <td width="9%" align="center">其它费用</td>
+	</tr>
+	<tr>
+		<td align="center"><span style="width:180px;">
+	      <input name="sendout_charge" id="sendout_charge" type="text" class="order_add_div_body_input numeric compute" style="width:70px" value="{{header.sendout_charge|f}}"/>
+	    </span></td>
+	    <td align="center"><span style="width:180px;">
+	      <input name="receive_charge" id="receive_charge" type="text" class="order_add_div_body_input numeric compute" style="width:70px" value="{{header.receive_charge|f}}"/>
+	    </span></td>
+	    <td align="center"><span style="width:180px;">
+	      <input name="package_charge" id="package_charge" type="text" class="order_add_div_body_input numeric compute" style="width:70px" value="{{header.package_charge|f}}"/>
+	    </span></td>
+	    <td align="center"><span style="width:180px;">
+	      <input name="insurance_charge" id="insurance_charge" type="text" class="order_add_div_body_input numeric compute" style="width:70px" value="{{header.insurance_charge|f}}"/>
+	    </span></td>
+	    <td align="center"><span style="width:180px;">
+	      <input name="other_charge" id="other_charge" type="text" class="order_add_div_body_input numeric compute" style="width:70px" value="{{header.other_charge|f}}"/>
+	    </span></td>
+	</tr>
 </table>
 
 

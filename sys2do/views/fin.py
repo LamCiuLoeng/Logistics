@@ -37,7 +37,8 @@ class FinView(BasicView):
     def index(self):
         values = {}
         for f in ['no', 'create_time_from', 'create_time_to', 'ref_no', 'source_station',
-                  'source_company_id', 'destination_station', 'destination_company_id'] :
+                  'source_company_id', 'destination_station', 'destination_company_id',
+                  'approve', 'paid', 'is_exception', 'is_less_qty'] :
             values[f] = _g(f)
 
         if not values['create_time_from'] and not values['create_time_to']:
@@ -66,6 +67,14 @@ class FinView(BasicView):
             conditions.append(OrderHeader.destination_station.op('like')('%%%s%%' % values['destination_station']))
         if values['destination_company_id']:
             conditions.append(OrderHeader.destination_company_id == values['destination_company_id'])
+        if values['approve']:
+            conditions.append(OrderHeader.approve == values['approve'])
+        if values['paid']:
+            conditions.append(OrderHeader.paid == values['paid'])
+        if values['is_exception']:
+            conditions.append(OrderHeader.is_exception == values['is_exception'])
+        if values['is_less_qty']:
+            conditions.append(OrderHeader.is_less_qty == values['is_less_qty'])
 
         result = DBSession.query(OrderHeader).filter(and_(*conditions)).order_by(OrderHeader.create_time.desc())
 

@@ -17,6 +17,15 @@ function save_header() {
     if(!$('#ref_no').val()){
         msg.push('请填写单号！');
     }
+    
+    if(!$('#note_id').val()){
+        msg.push('请选择票据前缀！');
+    }
+    
+    if(!$('#note_no').val()){
+        msg.push('请填写票据单号！');
+    }
+    
     if(!$('#destination_station').val()){
         msg.push('请填写目的站！');
     }
@@ -38,24 +47,44 @@ function save_header() {
     
     
     if(msg.length < 1){
-        var params = {
-                'form_type' : 'order_header'
-        };
-        $("input[type=text],input[type=hidden],select,textarea","#order_header").each(function(){
-           var t = $(this);
-           var name = t.attr("name");
-           var value = t.val();
-           params[name] = value;
-        });
-        
-        ajax_save(params, function(r){
-            if(r.code == 0){
-                alert(r.msg);
-                header_have_update = 0;
-            }else{
-                alert(r.msg);
-            }
-        })
+        $.getJSON('/order/check_note',
+                {
+                  't' : nowstr(),
+                  'note_id' : $('#note_id').val(),
+                  'note_no' : $('#note_no').val()
+                },
+                function(r){
+                    if(r.code!=0){
+                        alert(r.msg);
+                        return false;
+                    }else{
+                        if(r.result!=0){
+                            show_error('该票据不在可用范围内，请修改！');
+                            return false;
+                        }else{
+                            var params = {
+                                    'form_type' : 'order_header'
+                            };
+                            $("input[type=text],input[type=hidden],select,textarea","#order_header").each(function(){
+                               var t = $(this);
+                               var name = t.attr("name");
+                               var value = t.val();
+                               params[name] = value;
+                            });
+                            
+                            ajax_save(params, function(r){
+                                if(r.code == 0){
+                                    alert(r.msg);
+                                    header_have_update = 0;
+                                }else{
+                                    alert(r.msg);
+                                }
+                            })
+                        }
+                        
+                    }
+                }
+      )       
     }else{
         var s = '';
         for(var i=0;i<msg.length;i++){

@@ -8,11 +8,13 @@
 '''
 from sqlalchemy import Table, Column, ForeignKey
 from sqlalchemy.types import Unicode, Integer, DateTime, Float, Text
-from sqlalchemy.orm import relation, backref
+from sqlalchemy.orm import relation, backref, synonym
 from sys2do.model import DeclarativeBase, metadata, DBSession
-from auth import SysMixin
 from sqlalchemy.sql.expression import and_
+
+from auth import SysMixin
 from sys2do.model.auth import CRUDMixin, Group
+from sys2do.util.common import _gl, _gp, _info
 
 #__all__ = ['']
 
@@ -240,9 +242,6 @@ class CustomerTarget(DeclarativeBase, SysMixin):
     customer = relation(Customer, backref = backref("targets", order_by = id), primaryjoin = "and_(Customer.id == CustomerTarget.customer_id, CustomerTarget.active == 0)")
     name = Column(Text)
     address = Column(Text)
-#    contact_person = Column(Text)
-#    mobile = Column(Text)
-#    phone = Column(Text)
     remark = Column(Text)
 
     def __str__(self): return self.name
@@ -252,10 +251,20 @@ class CustomerTarget(DeclarativeBase, SysMixin):
 
     def populate(self):
         params = {}
-        for k in ['id', 'name', 'customer_id',
-                  'address', 'phone', 'contact_person', 'mobile']:
+        for k in ['id', 'name', 'customer_id', 'address', ]:
             params[k] = getattr(self, k)
         return params
+
+    @property
+    def contact(self):
+        try:
+            c = DBSession.query(CustomerTargetContact).filter(and_(CustomerTargetContact.active == 0,
+                                                           CustomerTargetContact.customer_target_id == self.id ,
+                                                           CustomerTargetContact.is_default == 1
+                                                           )).one()
+            return c
+        except:
+            return None
 
 
 
@@ -271,6 +280,7 @@ class CustomerTargetContact(DeclarativeBase, SysMixin):
     phone = Column(Text)
     email = Column(Text)
     remark = Column(Text)
+    is_default = Column(Integer, default = 0) # 1 is default , 0 is normal 
 
     def __str__(self): return self.name
     def __repr__(self): return self.name
@@ -454,3 +464,67 @@ class InventoryItem(DeclarativeBase, SysMixin):
 #        return DBSession.query(OrderDetail).get(self.refer_order_detail_id)
 
 
+class Note(DeclarativeBase, SysMixin, CRUDMixin):
+    __tablename__ = 'master_note'
+
+    id = Column(Integer, autoincrement = True, primary_key = True)
+    name = Column(Text)
+    _range = Column('range', Text)
+    remark = Column(Text)
+
+    def __str__(self): return self.name
+    def __repr__(self): return self.name
+    def __unicode__(self): return self.name
+
+    @classmethod
+    def _get_fields(clz):
+        return ['name', 'range', 'remark']
+
+    def _get_range(self):
+        if not self._range : return []
+        return map(lambda v: v.split("~"), self._range.split("|"))
+
+    def _set_range(self, ranges):
+        if not ranges: self._range = None
+        self._range = ("|").join([("~").join(r) for r in ranges])
+
+    range = synonym('_range', descriptor = property(_get_range, _set_range))
+
+
+    def populate(self):
+        _info(self.range)
+        result = {
+                  'id' : self.id,
+                  'range' : self.range,
+                  }
+        for f in ['name', 'remark']:
+            result[f] = unicode(getattr(self, f) or '')
+        return result
+
+
+    @classmethod
+    def saveAsNew(clz, v):
+
+        begins = _gp('begin_')
+        ends = _gp('end_')
+        range = map(lambda (vv1, vv2) : (vv1[1], vv2[1]), filter(lambda (v1, v2) : v1[1] and v2[1], zip(begins, ends)))
+
+        params = {
+                  'name' : v.get('name', None) or None,
+                  'range' : range,
+                  'remark' : v.get('remark', None) or None,
+                  }
+
+        obj = clz(**params)
+        DBSession.add(obj)
+        return obj
+
+
+    def saveAsUpdate(self, v):
+        begins = _gp('begin_')
+        ends = _gp('end_')
+        self.range = map(lambda (vv1, vv2) : (vv1[1], vv2[1]), filter(lambda (v1, v2) : v1[1] and v2[1], zip(begins, ends)))
+
+        for f in ['name', 'remark']:
+            setattr(self, f, v.get(f, None) or None)
+        return self

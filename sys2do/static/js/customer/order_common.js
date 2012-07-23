@@ -14,14 +14,36 @@ function mysum(prefix){
 }
 
 function compute(){
+    var amount = 0;
+
     var qty = $("#qty").val();
     var qty_ratio = $("#qty_ratio").val();
     var vol = $("#vol").val();
     var vol_ratio = $("#vol_ratio").val();
     var weight = $("#weight").val();
     var weight_ratio = $("#weight_ratio").val();
-    var amount = qty * qty_ratio + vol * vol_ratio + weight * weight_ratio;
-    $("#amount").val(amount);
+    
+    if(qty && !isNaN(qty) && qty_ratio && !isNaN(qty_ratio)){
+        amount += parseInt(qty) * parseFloat(qty_ratio); 
+    }
+    
+    if(vol && !isNaN(vol) && vol_ratio && !isNaN(vol_ratio)){
+        amount += parseFloat(vol) * parseFloat(vol_ratio); 
+    }
+    
+    if(weight && !isNaN(weight) && weight_ratio && !isNaN(weight_ratio)){
+        amount += parseFloat(weight) * parseFloat(weight_ratio); 
+    }
+    
+    var charge = ['insurance_charge','sendout_charge','receive_charge','package_charge','other_charge'];
+    for(var i=0;i<charge.length;i++){
+        var t = charge[i];
+        var v = $("#"+t).val();
+        if(v && !isNaN(v)){
+            amount += parseFloat(v);
+        }
+    }
+    $("#amount").val(amount);    
 }
 
 function clear_source(){
@@ -107,10 +129,16 @@ $(document).ready(function(){
                 },
                 function(r){
                     if(r.code==0){
-                        $('#destination_contact').val(r.data.contact_person);
                         $('#destination_address').val(r.data.address);
-                        $('#destination_tel').val(r.data.phone);
-                        $('#destination_mobile').val(r.data.mobile);                        
+                        if(r.data.contact.name){
+                            $('#destination_contact').val(r.data.contact.name);
+                        }
+                        if(r.data.contact.phone){
+                            $('#destination_tel').val(r.data.contact.phone);
+                        }
+                        if(r.data.contact.mobile){
+                            $('#destination_mobile').val(r.data.contact.mobile);                        
+                        }  
                     }else{
                         alert(r.msg)  
                     }

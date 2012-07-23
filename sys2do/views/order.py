@@ -31,7 +31,7 @@ from sys2do.model.logic import OrderHeader, TransferLog, DeliverDetail, \
     ItemDetail, PickupDetail
 from sys2do.model.master import CustomerProfile, InventoryLocation, Customer, \
     ItemUnit, WeightUnit, ShipmentType, InventoryItem, Payment, Ratio, PickupType, \
-    PackType, CustomerTarget, Receiver, Item
+    PackType, CustomerTarget, Receiver, Item, Note
 from sys2do.setting import TMP_FOLDER, TEMPLATE_FOLDER
 from sys2do.util.barcode_helper import generate_barcode_file
 from sys2do.util.common import _g, getOr404, _gp, getMasterAll, _debug, _info, \
@@ -62,7 +62,8 @@ class OrderView(BasicView):
     def index(self):
         values = {}
         for f in ['no', 'create_time_from', 'create_time_to', 'ref_no', 'source_station',
-                  'source_company_id', 'destination_station', 'destination_company_id'] :
+                  'source_company_id', 'destination_station', 'destination_company_id',
+                  'approve', 'paid', 'is_exception', 'is_less_qty'] :
             values[f] = _g(f)
 
         if not values['create_time_from'] and not values['create_time_to']:
@@ -91,6 +92,14 @@ class OrderView(BasicView):
             conditions.append(OrderHeader.destination_station.op('like')('%%%s%%' % values['destination_station']))
         if values['destination_company_id']:
             conditions.append(OrderHeader.destination_company_id == values['destination_company_id'])
+        if values['approve']:
+            conditions.append(OrderHeader.approve == values['approve'])
+        if values['paid']:
+            conditions.append(OrderHeader.paid == values['paid'])
+        if values['is_exception']:
+            conditions.append(OrderHeader.is_exception == values['is_exception'])
+        if values['is_less_qty']:
+            conditions.append(OrderHeader.is_less_qty == values['is_less_qty'])
 
         result = DBSession.query(OrderHeader).filter(and_(*conditions)).order_by(OrderHeader.create_time.desc())
 
@@ -123,7 +132,8 @@ class OrderView(BasicView):
                 'pack_type' : getMasterAll(PackType, 'id'),
                 'ratios' : ratios,
                 'items'  : getMasterAll(Item),
-                'current' : dt.now().strftime("%Y-%m-%d %H:%M")
+                'current' : dt.now().strftime("%Y-%m-%d %H:%M"),
+                'notes' : getMasterAll(Note),
                 }
 
 
@@ -155,7 +165,8 @@ class OrderView(BasicView):
                   'destination_station', 'destination_company_id', 'destination_address', 'destination_contact', 'destination_tel', 'destination_mobile',
                   'ref_no', 'order_time', 'expect_time', 'actual_time', 'remark',
                  'payment_id', 'pickup_type_id', 'pack_type_id', 'qty', 'qty_ratio', 'vol', 'vol_ratio',
-                  'weight', 'weight_ratio', 'weight_ratio', 'amount',
+                  'weight', 'weight_ratio', 'weight_ratio', 'amount', 'insurance_charge', 'sendout_charge', 'receive_charge',
+                  'package_charge', 'other_charge', 'note_id', 'note_no'
                   ]:
             params[k] = _g(k)
         order = OrderHeader(**params)
@@ -221,6 +232,7 @@ class OrderView(BasicView):
                 'customers' : getMasterAll(Customer),
                 'receivers' : getMasterAll(Receiver),
                 'items' : getMasterAll(Item),
+                'notes' : getMasterAll(Note),
                 }
 
 
@@ -258,34 +270,35 @@ class OrderView(BasicView):
                 'targets' : targets,
                 'customers' : getMasterAll(Customer),
                 'receivers' : getMasterAll(Receiver),
-                'items' : getMasterAll(Item)
+                'items' : getMasterAll(Item),
+                'notes' : getMasterAll(Note),
                 }
 
 
-
-    def save_update(self):
-        id = _g('id') or None
-        if not id :
-            flash(MSG_NO_ID_SUPPLIED, MESSAGE_ERROR)
-            return redirect(self.default())
-
-        header = DBSession.query(OrderHeader).get(id)
-        try:
-            for k in ['source_station', 'source_company', 'source_address', 'source_contact', 'source_tel', 'source_mobile',
-                  'destination_station', 'destination_company', 'destination_address', 'destination_contact', 'destination_tel', 'destination_mobile',
-                  'no', 'order_time', 'item', 'expect_time', 'remark',
-                 'payment_id', 'qty', 'qty_ratio', 'vol', 'vol_ratio',
-                  'weight', 'weight_ratio', 'weight_ratio', 'amount',
-                  ]:
-                setattr(header, k, _g(k) or None)
-
-            DBSession.commit()
-        except:
-            flash(MSG_SERVER_ERROR, MESSAGE_ERROR)
-            DBSession.rollback()
-        else:
-            flash(MSG_UPDATE_SUCC, MESSAGE_INFO)
-            return redirect(url_for('.view', action = 'index'))
+#
+#    def save_update(self):
+#        id = _g('id') or None
+#        if not id :
+#            flash(MSG_NO_ID_SUPPLIED, MESSAGE_ERROR)
+#            return redirect(self.default())
+#
+#        header = DBSession.query(OrderHeader).get(id)
+#        try:
+#            for k in ['source_station', 'source_company', 'source_address', 'source_contact', 'source_tel', 'source_mobile',
+#                  'destination_station', 'destination_company', 'destination_address', 'destination_contact', 'destination_tel', 'destination_mobile',
+#                  'no', 'order_time', 'item', 'expect_time', 'remark',
+#                 'payment_id', 'qty', 'qty_ratio', 'vol', 'vol_ratio',
+#                  'weight', 'weight_ratio', 'weight_ratio', 'amount',
+#                  ]:
+#                setattr(header, k, _g(k) or None)
+#
+#            DBSession.commit()
+#        except:
+#            flash(MSG_SERVER_ERROR, MESSAGE_ERROR)
+#            DBSession.rollback()
+#        else:
+#            flash(MSG_UPDATE_SUCC, MESSAGE_INFO)
+#            return redirect(url_for('.view', action = 'index'))
 
 
 
@@ -368,17 +381,17 @@ class OrderView(BasicView):
     #===========================================================================
     # not very important
     #===========================================================================
-    @templated('order/add_by_customer.html')
-    def add_by_customer(self):
-
-        if not session.get('customer_profile', None) or not session['customer_profile'].get('id', None):
-            flash(MSG_NO_SUCH_ACTION, MESSAGE_ERROR)
-            return redirect(url_for('bpRoot.view', action = "index"))
-        return {
-                'units' : getMasterAll(ItemUnit),
-                'wunits' : getMasterAll(WeightUnit),
-                'shiptype' : getMasterAll(ShipmentType),
-                }
+#    @templated('order/add_by_customer.html')
+#    def add_by_customer(self):
+#
+#        if not session.get('customer_profile', None) or not session['customer_profile'].get('id', None):
+#            flash(MSG_NO_SUCH_ACTION, MESSAGE_ERROR)
+#            return redirect(url_for('bpRoot.view', action = "index"))
+#        return {
+#                'units' : getMasterAll(ItemUnit),
+#                'wunits' : getMasterAll(WeightUnit),
+#                'shiptype' : getMasterAll(ShipmentType),
+#                }
 
 
     #===========================================================================
@@ -488,6 +501,8 @@ class OrderView(BasicView):
                       'destination_station', 'destination_company_id', 'destination_address', 'destination_contact', 'destination_tel', 'destination_mobile',
                       'order_time', 'expect_time', 'actual_time', 'qty_ratio', 'weight_ratio', 'vol_ratio', 'amount', 'cost', 'remark',
                       'pickup_type_id', 'pack_type_id',
+                      'insurance_charge', 'sendout_charge', 'receive_charge', 'package_charge', 'other_charge',
+                      'note_id', 'note_no',
                       ]
             for f in fields:
                 setattr(header, f, _g(f))
@@ -710,9 +725,21 @@ class OrderView(BasicView):
 
 
 
-
-
-
+    def check_note(self):
+        try:
+            note_id = _g('note_id')
+            note_no = _g('note_no')
+            note = DBSession.query(Note).get(note_id)
+            for (b, e) in note.range:
+                _info(b)
+                _info(e)
+                _info(note_no)
+                if b <= note_no <= e:
+                    return jsonify({'code' : 0 , 'result' : 0})
+            return jsonify({'code' : 0 , 'result' : 1})
+        except:
+            _error(traceback.print_exc())
+            return jsonify({'code' : 1 , 'msg' : MSG_SERVER_ERROR})
 
 
 bpOrder.add_url_rule('/', view_func = OrderView.as_view('view'), defaults = {'action':'index'})
