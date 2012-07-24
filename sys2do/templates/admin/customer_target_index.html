@@ -8,7 +8,7 @@
 {% block inner_menu %}
 <div class="inner_menu">
 	<ul>
-        <li><a href="{{url_for('.view',action='customer',m='NEW')}}"><img src="/static/images/system/order_manage_31.jpg" width="77" height="21" id="Image2" onmouseover="MM_swapImage('Image2','','/static/images/system/order_manage_h_31.jpg',1)" onmouseout="MM_swapImgRestore()" /></a></li>
+        <li><a href="{{url_for('.view',action='customer_target',m='NEW')}}"><img src="/static/images/system/order_manage_31.jpg" width="77" height="21" id="Image2" onmouseover="MM_swapImage('Image2','','/static/images/system/order_manage_h_31.jpg',1)" onmouseout="MM_swapImgRestore()" /></a></li>
         <li style="padding:0px; margin:0px 55px 0px 0px; float:right"><a href="{{url_for('bpAuth.logout')}}"><img src="/static/images/system/order_manage_22.jpg" width="56" height="29" /></a></li>
     </ul>
 </div>
@@ -36,7 +36,7 @@
             <td>&nbsp;</td>
             <td><table width="100%" border="0" cellspacing="0" cellpadding="0">
               <tr>
-                <td class="title_fonts_display">客户管理</td>
+                <td class="title_fonts_display">客户收货公司管理</td>
               </tr>
               <tr>
                 <td>&nbsp;</td>
@@ -44,21 +44,21 @@
             </table>
               <table width="99%" border="0" cellspacing="0" cellpadding="0">
                 <tr class="field_head">
+                  <th align="center">收货公司</th>
                   <th align="center">{{_('Customer Name')}}</th>
-                  <th align="center">{{_('Address')}}</th>
-                  <th align="center">{{_('Contact Person')}}</th>
-                  <th align="center">{{_('Phone')}}</th>
-                  <th align="center">{{_('Mobile')}}</th>
-                  <th align="center">{{_('Payment')}}</th>
+                  <th align="center">{{_('Create Time')}}</th>
+                  <th align="center">{{_('Creator')}}</th>
+                  <th align="center">{{_('Update Time')}}</th>
+                  <th align="center">{{_('Last Updator')}}</th>
                 </tr>
 				{% for r in records %}
 					<tr class="data_table_tr">
-						<td><a href="{{url_for('.view', action = 'customer',m = 'UPDATE',id=r.id)}}">{{r}}</a></td>
-						<td>{{r.address}}</td>
-						<td>{{r.contact_person|ifFalse}}</td>
-						<td>{{r.phone|ifFalse}}</td>
-						<td>{{r.mobile|ifFalse}}</td>
-						<td>{{r.payment|f}}</td>
+						<td><a href="{{url_for('.view', action = 'customer_target',m = 'UPDATE',id=r.id)}}">{{r}}</a></td>
+						<td>{{r.customer}}</td>
+						<td>{{r.create_time|ft}}</td>
+						<td>{{r.create_by|f}}</td>
+						<td>{{r.update_time|ft}}</td>
+						<td>{{r.update_by|f}}</td>
 					</tr>
 				{% endfor %}
 				<tr class="data_table_tr">

@@ -83,6 +83,14 @@ class RootView(BasicView):
             else : data['contact'] = {}
             return jsonify({'code' : 0 , 'msg' : '' , 'data' : data})
 
+        if master == 'target_contact_search':
+            ts = DBSession.query(CustomerTargetContact).filter(and_(CustomerTargetContact.active == 0,
+                                                               CustomerTargetContact.customer_target_id == _g('customer_target_id'),
+                                                               CustomerTargetContact.name.op('like')("%%%s%%" % _g('customer_target_contact')),
+                                                               )).all()
+            data = [t.populate() for t in ts]
+            return jsonify({'code' : 0 , 'msg' : '' , 'data' : data})
+
         if master == 'target_contact_detail':
             try:
                 c = DBSession.query(CustomerTargetContact).filter(and_(CustomerTargetContact.active == 0,

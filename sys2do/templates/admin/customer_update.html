@@ -3,80 +3,18 @@
 {% block extJS %}
 <script language="JavaScript" type="text/javascript">
 //<![CDATA[
-	
-	function add_target(){
-		var target_name = $("#target_name").val();
-	    var target_contact_person = $("#target_contact_person").val();
-	    var target_address = $("#target_address").val();
-	    var target_phone = $("#target_phone").val();
-	    var target_mobile = $("#target_mobile").val();
-	    var target_remark = $("#target_remark").val();
-	    
-	    if(!target_name || !target_contact_person || !target_address){
-	    	alert('请填写必填项后再添加！');
-	    	return;
-	    }
-	    
-	    $.post(
-	            "{{url_for('.view', action = 'customer',m='ADD_TARGET')}}",
-	            {
-	                'id' : {{obj.id}},
-	            	'target_name' : target_name,
-	            	'target_contact_person' : target_contact_person,
-	            	'target_address' : target_address,
-	            	'target_phone' : target_phone,
-	            	'target_mobile' : target_mobile,
-	            	'target_remark' : target_remark,
-					't' : nowstr(),	            	
-	            },
-	            function(r){
-	            	if(r.code==0){
-	            		$("#target_name").val('');
-					    $("#target_contact_person").val('');
-					    $("#target_address").val('');
-					    $("#target_phone").val('');
-					    $("#target_mobile").val('');
-					    $("#target_remark").val('');
-					    
-					    var html = '<tr class="data_table_tr">';
-					    html += '<th>'+target_name+'</th>';
-					    html += '<td>'+target_contact_person+'</td>';
-					    html += '<td>'+target_address+'</td>';
-					    html += '<td>'+target_phone+'</td>';
-					    html += '<td>'+target_mobile+'</td>';
-					    html += '<td>'+target_remark+'</td>';
-					    html += '<td><input type="button" onclick="del_line('+r.data.id+',this)" value="删除"/></td>';
-					    html += '</tr>';
-					    $("#targets_list").append(html);
-	            	}else{
-	            	}
-            		alert(r.msg);
-	            }
-	    );
-
-	}
-	
-	
-	function del_line(id,obj){
-		if(!confirm('{{MSG_CONFIRM_DELETE}}')){
-			return;
-		}
-		$.post(
-	            "{{url_for('.view', action = 'customer',m='DELETE_TARGET')}}",
-	            {
-	                'id' : id,
-					't' : nowstr(),	            	
-	            },
-	            function(r){
-	            	if(r.code==0){
-						$($(obj).parents('tr')[0]).remove(); 
-	            	}
-	           	    alert(r.msg)       
-	            })         
-	}
-	
 	function tosave(){
-		$("form").submit();
+		var msg = new Array();
+		if(!$('#name').val()){
+			msg.push('请填写客户名称！');
+		}
+		
+		if(msg.length<1){
+			$("form").submit();
+		}else{
+			alert(msg.join("\n"));
+		}
+	
 	}
 
 //]]>
@@ -109,43 +47,44 @@
 
 <form action="{{url_for('.view', action = 'customer',m='SAVE_UPDATE')}}" method="post">
 
-<input type="hidden" name="id" value="{{obj.id}}"/>
+<input type="hidden" name="id" value="{{v['id']}}"/>
 
 <div class="order_add_div">
   <div class="order_add_div_header">客户详情</div>
     <div class="order_add_div_body">
   <ul>
         	<li style="width:450px;"><span><sup class="warn">*</sup>{{_('Customer Name')}}</span>
-        	  <input type="text" class="must_input" style="width:300px" name="name" value="{{obj.name|f}}"/>
+        	  <input type="text" class="must_input" style="width:300px" name="name" id="name" value="{{v['name']|f}}"/>
         	</li>
        	  <li style="width:180px;"><span>客户编号</span>
-    	    <input type="text" style="width:100px" name="no" value="{{obj.no|f}}"/>
+    	    <input type="text" style="width:100px" name="no" value="{{v['no']|f}}"/>
   	    </li>
     	  <li style="width:280px;"><span>创建日期</span>
-    	    {{obj.create_time|ft}}
+    	    {{v['create_time']|ft}}
   	    </li>
     	  <li style="width:859px;"><span>{{_('Address')}}</span>
-    	    <input type="text" style="width:760px" name="address" value="{{obj.address|f}}"/>
+    	    <input type="text" style="width:760px" name="address" value="{{v['address']|f}}"/>
     	  </li>
     	  <li style="width:459px;"><span>{{_('Contact Person')}}</span>
-    	    <input type="text" style="width:360px" name="contact_person"  value="{{obj.contact_person|f}}"/>
+    	    <input type="text" style="width:360px" name="contact_person"  value="{{v['contact_person']|f}}"/>
     	  </li>
     	  <li style="width:459px;"><span>{{_('Mobile')}}</span>
-    	    <input type="text" style="width:360px" name="mobile" value="{{obj.mobile|f}}"/>
+    	    <input type="text" style="width:360px" name="mobile" value="{{v['mobile']|f}}"/>
     	  </li>
     	  <li style="width:227px;"><span>{{_('Phone')}}</span>
-    	    <input type="text" style="width:140px" name="phone" value="{{obj.phone|f}}"/>
+    	    <input type="text" style="width:140px" name="phone" value="{{v['phone']|f}}"/>
   	    </li>
     	  <li style="width:260px;"><span>公司邮箱</span>
-    	    <input type="text" style="width:170px" name="email" value="{{obj.email|f}}"/>
+    	    <input type="text" style="width:170px" name="email" value="{{v['email']|f}}"/>
   	    </li>
     	  <li style="width:200px;"><span>创建人</span>
-    	    {{obj.create_by|f}}
+    	    {{v['create_by']|f}}
   	    </li>
     	  <li style="width:220px;">付款方式
     	  	<select name="payment_id">
-    	  		{% for p in payment %}
-    	  			{% if p.id == obj.payment_id %}
+    	  		<option value=""></option>
+    	  		{% for p in MASTER_ALL('Payment') %}
+    	  			{% if p.id == v['payment_id'] %}
     	  				<option value="{{p.id}}" selected="selected">{{p}}</option>
     	  			{% else %}
     	  				<option value="{{p.id}}">{{p}}</option>
@@ -154,75 +93,12 @@
     	  	</select>
   	    </li>
     	  <li style="width:925px;"><span>{{_('Remark')}}</span>
-    	    <textarea class="order_add_div_body_input" style="width:840px; height:100px" name="remark">{{obj.remark|f}}</textarea>
+    	    <textarea class="order_add_div_body_input" style="width:840px; height:100px" name="remark">{{v['remark']|f}}</textarea>
         </li>
       </ul>
   <div style="clear:both"></div>
   </div>
-  
-  
-<div class="order_add_div_header">收货公司</div>
-	<div class="order_add_div_body" style="padding:10px;">
-	<table border="0" cellpadding="0" cellspacing="0">
-		<tr>
-			<td valign="top" width="100px" align="center" height="30px"><sup class="warn">*</sup>{{_('Destination Company')}}</td>
-			<td valign="top"><input type="text" id="target_name" class="order_add_div_body_input must_input" style="width:150px;"/></td>
-			
-			<td valign="top" width="100px" align="center"><sup class="warn">*</sup>{{_('Destination Contact')}}</td>
-			<td valign="top"><input type="text" id="target_contact_person" value="" class="order_add_div_body_input must_input" style="width:150px;"/></td>
-			<td valign="top" width="100px" align="center">{{_('Destination Address')}}</td>
-			<td valign="top"><input type="text" id="target_address" value="" class="order_add_div_body_input must_input" style="width:250px;"/></td>
-		</tr>
-		<tr>
-			<td valign="top" align="center">{{_('Destination Phone')}}</td>
-			<td valign="top"><input type="text" id="target_phone" value="" class="order_add_div_body_input" style="width:150px;"/></td>
-			<td valign="top" align="center">{{_('Destination Mobile')}}</td>
-			<td valign="top"><input type="text" id="target_mobile" value="" class="order_add_div_body_input" style="width:150px;"/></td>
-		    <td valign="top" align="center">{{_('Remark')}}</td>
-		    <td valign="top"><textarea id="target_remark" style="width:250px;"></textarea></td>
-		</tr>
-	</table>
-			
-	<p><input type="button" value="{{_('Add')}}" onclick="add_target()"/></p>
-	
-	<br />
-  
-  <table width="99%" border="0" cellspacing="0" cellpadding="0">
-  	<thead>
-  	<tr class="field_head">
-      <th align="center">{{_('Destination Company')}}</th>
-      <th align="center">{{_('Destination Contact')}}</th>
-      <th align="center">{{_('Destination Address')}}</th>
-      <th align="center">{{_('Destination Phone')}}</th>
-      <th align="center">{{_('Destination Mobile')}}</th>
-      <th align="center">{{_('Remark')}}</th>
-      <th align="center">&nbsp;</th>
-    </tr>
-	</thead>
-	<tbody id="targets_list">
-		{% for r in obj.targets %}
-			<tr class="data_table_tr">
-				<th>{{r.name}}</th>
-				<td>{{r.contact_person|f}}</td>
-				<td>{{r.address|f}}</td>
-				<td>{{r.phone|f}}</td>
-				<td>{{r.mobile|f}}</td>
-				<td>{{r.remark|f}}</td>
-				<td><input type="button" value="删除" onclick="del_line({{r.id}},this)"/></td>
-			</tr>
-		{% endfor %}
-	</tbody>
-  </table>
-  
-  <div style="clear:both"><br /><br /></div>
-  
-  
-	</div>  
-  
-  
-</div>
-
-
+<br /></br />
 </form>
 
 {% endblock %}

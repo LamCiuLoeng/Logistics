@@ -152,6 +152,7 @@
           </li>
         </ul>
         <div class="button_div"><input type="submit" value="{{_('Search')}}"/></div>
+        <input type="hidden" name="SEARCH_SUBMIT" value="TRUE"/>
     	</form>
         <div style="clear:both"></div>
     </div>
@@ -165,6 +166,9 @@
 <form method="post" action="" id="records">
 
 <table border="0" cellpadding="0" cellspacing="0">
+  <tr class="data_table_tr">
+	    <td colspan="100" style="text-align:right">{{records.pager(**PAGINATE_PARAMS)}}</td>
+	</tr>
   <tr class="field_head">
     <th align="center" style="width:50px;"><input type="checkbox" onclick="allselect(this);"/></th>
     <td align="center" style="width:200px;">{{_('Order Number')}}</td>
@@ -186,43 +190,49 @@
     <td align="center" style="width:80px;">少货</td>
   </tr>
   
-  {% for r in result %}
-		  <tr class="data_table_tr {{ loop.cycle('data_table_tr_odd', 'data_table_tr_even') }}">
-		    <th><input type="checkbox" name="order_ids" value="{{r.id}}" /></th>
-		    <td><a href="{{url_for('.view', action = 'revise',id=r.id)}}">{{r.ref_no|f('没有订单号')}}</a></td>
-		    <td>{{r.no|f}}</td>
-			<td>{{r.source_station|f}}</td>
-			<td>{{r.destination_station|f}}</td>
-			<td>{{r.source_company|f}}</td>
-			<td>{{r.destination_company|f}}</td>
-			<td>{{r.qty|f}}</td>
-			<td>{{r.weight|f}}</td>
-			<td>{{r.amount|ft}}</td>
-			<td>
-				&nbsp;
-				{% if r.deliver_header_ref %}
-					<a href="{{url_for('bpDeliver.view',action='view',id=r.deliver_header_ref)}}">{{r.deliver_header_no}}</a>
-				{%endif%}
-			</td>
-			<td>{{r.create_time|ft}}</td>
-			<td>{{r.create_by|f}}</td>
-			<td>{{r.status|showStatus}}</td>
-			<td>{{r.approve|showApproval}}</td>
-			<td>{{r.paid|showPaid}}</td>
-			<td>{{'是' if r.is_exception else '&nbsp;'|safe}}</td>
-			<td>{{'是' if r.is_less_qty else '&nbsp;'|safe}}</td>
-		  </tr>
+  {% for r in records.items %}
+  	<tr class="data_table_tr {{ loop.cycle('data_table_tr_odd', 'data_table_tr_even') }}">
+	    <th><input type="checkbox" name="order_ids" value="{{r.id}}" /></th>
+	    <td><a href="{{url_for('.view', action = 'revise',id=r.id)}}">{{r.ref_no|f('没有订单号')}}</a></td>
+	    <td>{{r.no|f}}</td>
+		<td>{{r.source_station|f}}</td>
+		<td>{{r.destination_station|f}}</td>
+		<td>{{r.source_company|f}}</td>
+		<td>{{r.destination_company|f}}</td>
+		<td>{{r.qty|f}}</td>
+		<td>{{r.weight|f}}</td>
+		<td>{{r.amount|ft}}</td>
+		<td>
+			&nbsp;
+			{% if r.deliver_header_ref %}
+				<a href="{{url_for('bpDeliver.view',action='view',id=r.deliver_header_ref)}}">{{r.deliver_header_no}}</a>
+			{%endif%}
+		</td>
+		<td>{{r.create_time|ft}}</td>
+		<td>{{r.create_by|f}}</td>
+		<td>{{r.status|showStatus}}</td>
+		<td>{{r.approve|showApproval}}</td>
+		<td>{{r.paid|showPaid}}</td>
+		<td>{{'是' if r.is_exception else '&nbsp;'|safe}}</td>
+		<td>{{'是' if r.is_less_qty else '&nbsp;'|safe}}</td>
+	  </tr>
   {% endfor %}
-      <tr class="data_table_tr">
-      	<th></th>
-      	<td colspan="6" style="text-align:left">&nbsp;合计</td>
-      	<td>{{total_qty}}</td>
-      	<td>{{total_weight}}</td>
-      	<td>{{total_amount}}</td>
-      	<td colspan="100">&nbsp;</td>
-      </tr>
+  		<tr class="data_table_tr">
+	      	<th></th>
+	      	<td colspan="6" style="text-align:left">&nbsp;合计</td>
+	      	<td>{{records.items|sum_with_none(attribute='qty')}}</td>
+	      	<td>{{records.items|sum_with_none(attribute='weight')}}</td>
+	      	<td>{{records.items|sum(attribute='amount')}}</td>
+	      	<td colspan="100">&nbsp;</td>
+	      </tr>
+  <tfoot>
+  	<tr class="data_table_tr">
+	    <td colspan="100" style="text-align:right">{{records.pager(**PAGINATE_PARAMS)}}</td>
+	</tr>
+  </tfoot>
 </table>
-
+<br />
+<br />
 </form>
 
 

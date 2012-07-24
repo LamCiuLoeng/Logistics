@@ -16,13 +16,14 @@ from flask.views import View
 from flask.helpers import url_for, flash, jsonify
 from sqlalchemy.sql.expression import and_
 from werkzeug.utils import redirect
+from webhelpers import paginate
 
 from sys2do.constant import MESSAGE_ERROR, MSG_NO_SUCH_ACTION, MESSAGE_INFO, \
     MSG_SAVE_SUCC, IN_WAREHOUSE, MSG_UPDATE_SUCC, ORDER_NEW, \
     ORDER_CANCELLED, MSG_DELETE_SUCC, SORTING, MSG_RECORD_NOT_EXIST, SEND_OUT, \
     GOODS_ARRIVED, IN_TRAVEL, GOODS_SIGNED, MSG_SERVER_ERROR, LOG_GOODS_SORTED, \
     LOG_GOODS_SENT_OUT, LOG_GOODS_ARRIVAL, MSG_NO_ID_SUPPLIED, \
-    SYSTEM_DATETIME_FORMAT
+    SYSTEM_DATETIME_FORMAT, PAGINATE_PER_PAGE
 from sys2do.util.decorator import templated, login_required, tab_highlight
 from sys2do.model import DBSession
 from sys2do.views import BasicView
@@ -45,31 +46,43 @@ class DeliverView(BasicView):
 
     @templated('deliver/index.html')
     def index(self):
+        if _g('SEARCH_SUBMIT'):  # come from search
+            values = {'page' : 1}
+            for f in ['create_time_from', 'create_time_to', 'no', 'destination_address', 'supplier_id', ] :
+                values[f] = _g(f)
+        else: #come from paginate or return
+            values = session.get('deliver_values', {})
+            if _g('page') : values['page'] = int(_g('page'))
+            elif 'page' not in values : values['page'] = 1
 
-        values = {}
-        for f in ['create_time_from', 'create_time_to', 'no', 'destination_address', 'supplier_id',
-                  ] :
-            values[f] = _g(f)
 
-        if not values['create_time_from'] and not values['create_time_to']:
+        if not values.get('create_time_from', None) and not values.get('create_time_to', None):
             values['create_time_to'] = dt.now().strftime("%Y-%m-%d")
             values['create_time_from'] = (dt.now() - timedelta(days = 30)).strftime("%Y-%m-%d")
 
+        session['deliver_values'] = values
+
         conditions = [OrderHeader.active == 0]
-        if values['create_time_from']:
+        if values.get('create_time_from', None):
             conditions.append(DeliverHeader.create_time > values['create_time_from'])
-        if values['create_time_to']:
+        if values.get('create_time_to', None):
             conditions.append(DeliverHeader.create_time < '%s 23:59' % values['create_time_to'])
-        if values['no']:
+        if values.get('no', None):
             conditions.append(DeliverHeader.no.op('like')('%%%s%%' % values['no']))
-        if values['destination_address']:
+        if values.get('destination_address', None):
             conditions.append(DeliverHeader.destination_address.op('like')('%%%s%%' % values['destination_address']))
-        if values['supplier_id']:
+        if values.get('supplier_id', None):
             conditions.append(DeliverHeader.supplier_id == values['supplier_id'])
 
-
         result = DBSession.query(DeliverHeader).filter(and_(*conditions)).order_by(DeliverHeader.create_time.desc())
-        return {'result' : result, 'values' : values, 'suppliers' : getMasterAll(Supplier)}
+        def url_for_page(**params): return url_for('bpDeliver.view', action = "index", page = params['page'])
+        records = paginate.Page(result, values['page'], show_if_single_page = True, items_per_page = PAGINATE_PER_PAGE, url = url_for_page)
+
+        return {'records' : records,
+                'values' : values,
+                'suppliers' : getMasterAll(Supplier)
+
+                }
 
     @templated('deliver/select_orders.html')
     def select_orders(self):

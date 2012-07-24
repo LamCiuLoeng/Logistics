@@ -115,7 +115,7 @@
 			        <tr>
 			          <td style="padding:0px; margin:0px">&nbsp;</td>
 			          <td width="30" style="padding:0px; margin:0px"><img src="/static/images/system/order_manage_14.jpg" width="20" height="27" /></td>
-			          <td width="230" class="user_display">{{session['user_profile']['name']}}</td>
+			          <td width="230" class="user_display">{{session['user_profile']['name'] if session.get('user_profile',None) else ''}}</td>
 			        </tr>
 			      </table></td>
 			    </tr>

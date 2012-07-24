@@ -9,14 +9,6 @@
 <div class="inner_menu">
 	<ul>
         <li><a href="{{url_for('.view',action='select_orders')}}"><img src="/static/images/system/order_manage_11_31.jpg" width="77" height="21" id="Image2" onmouseover="MM_swapImage('Image2','','/static/images/system/order_manage_1_31.jpg',1)" onmouseout="MM_swapImgRestore()" /></a></li>
-        <!-- 
-        <li><img src="/static/images/system/order_manage_41.jpg" width="101" height="21" id="Image7" onmouseover="MM_swapImage('Image7','','/static/images/system/order_manage_h_41.jpg',1)" onmouseout="MM_swapImgRestore()" onclick="return toexp();"/></li>
-        <li><img src="/static/images/system/order_manage_37.jpg" width="77" height="21" id="Image5" onmouseover="MM_swapImage('Image5','','/static/images/system/order_manage_h_37.jpg',1)" onmouseout="MM_swapImgRestore()" onclick="toprint();"/></li>
-    	<li><img src="/static/images/system/order_manage_25.jpg" width="71" height="21" id="Image1" onmouseover="MM_swapImage('Image1','','/static/images/system/order_manage_h_25.jpg',1)" onmouseout="MM_swapImgRestore()" /></li>
-        <li><img src="/static/images/system/order_manage_35.jpg" width="94" height="21" id="Image4" onmouseover="MM_swapImage('Image4','','/static/images/system/order_manage_h_35.jpg',1)" onmouseout="MM_swapImgRestore()" /></li>
-        <li><img src="/static/images/system/order_manage_33.jpg" width="77" height="21" id="Image3" onmouseover="MM_swapImage('Image3','','/static/images/system/order_manage_h_33.jpg',1)" onmouseout="MM_swapImgRestore()" /></li>
-        <li><img src="/static/images/system/order_manage_39.jpg" width="101" height="21" id="Image6" onmouseover="MM_swapImage('Image6','','/static/images/system/order_manage_h_39.jpg',1)" onmouseout="MM_swapImgRestore()" /></li>
-        -->
         <li style="padding:0px; margin:0px 55px 0px 0px; float:right"><a href="{{url_for('bpAuth.logout')}}"><img src="/static/images/system/order_manage_22.jpg" width="56" height="29" /></a></li>
     </ul>
 </div>
@@ -53,6 +45,7 @@
     
         </ul>
         <div class="button_div"><input type="submit" value="{{_('Search')}}"/></div>
+        <input type="hidden" name="SEARCH_SUBMIT" value="TRUE"/>
     	</form>
         <div style="clear:both"></div>
     </div>
@@ -60,12 +53,10 @@
 
 <div class="point_div"><img src="/static/images/system/order_manage_54.jpg" width="22" height="28" /><span>{{_('Input the conditions and search.')}}</span></div>
 
-
-
-
-
 	<table border="1" cellpadding="3" cellspacing="3">
-		<thead>
+			<tr class="data_table_tr">
+			    <td colspan="100" style="text-align:right">{{records.pager(**PAGINATE_PARAMS)}}</td>
+			</tr>
 			<tr class="field_head">
 				<th style="width:200px">{{_('Deliver Number')}}</th>
 				<th style="width:80px">{{_('Destination')}}</th>
@@ -77,7 +68,7 @@
 				<th style="width:80px">{{_('Creator')}}</th>
 				<th style="width:80px">{{_('Order Status')}}</th>
 			</tr>
-			{% for r in result%}
+			{% for r in records.items %}
 			<tr class="data_table_tr {{ loop.cycle('data_table_tr_odd', 'data_table_tr_even') }}">
 				<td><a href="{{url_for('.view', action = 'view',id=r.id)}}">{{r.no}}</a></td>
 				<td>{{r.destination_address|ifFalse}}</td>
@@ -90,7 +81,9 @@
 				<td>{{r.status|showStatus}}</td>
 			</tr>
 			{% endfor %}
-		</thead>
+		  	<tr class="data_table_tr">
+			    <td colspan="100" style="text-align:right">{{records.pager(**PAGINATE_PARAMS)}}</td>
+			</tr>
 	</table>
 	<br /><br />
 {% endblock %}

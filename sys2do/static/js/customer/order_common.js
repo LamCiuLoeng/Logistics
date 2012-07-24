@@ -112,6 +112,7 @@ $(document).ready(function(){
     
     
     
+    
     $("#destination_company_id").change(function(){
         var tmp = $(this);
         
@@ -129,7 +130,9 @@ $(document).ready(function(){
                 },
                 function(r){
                     if(r.code==0){
-                        $('#destination_address').val(r.data.address);
+                        if(r.data.contact.address){
+                            $('#destination_address').val(r.data.contact.address);
+                        }
                         if(r.data.contact.name){
                             $('#destination_contact').val(r.data.contact.name);
                         }
@@ -145,4 +148,41 @@ $(document).ready(function(){
                 }
         );
     });
+    
+    
+    
+    $("#destination_contact").autocomplete({
+        source: function( request, response ) {
+            $.ajax({
+                url: "/ajax_master",
+                dataType: "json",
+                data: {
+                    't' : nowstr(),
+                    'm' : 'target_contact_search',
+                    'customer_target_id' : $('#destination_company_id').val(),
+                    'customer_target_contact' : $("#destination_contact").val()
+                },
+                success: function( data ) {
+                    response( $.map( data.data, function( item ) {
+                        return {
+                            label: item.name,
+                            value: item.name,
+                            phone : item.phone,
+                            mobile : item.mobile,
+                            address : item.address
+                        }
+                    }));
+                }
+            });
+        },
+        minLength: 1,
+        select: function( event, ui ) {            
+            $("#destination_tel").val(ui.item.phone);
+            $("#destination_mobile").val(ui.item.mobile);
+            $("#destination_address").val(ui.item.address);
+        },
+        
+    });
+    
+    
 })

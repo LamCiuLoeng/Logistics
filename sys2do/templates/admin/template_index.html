@@ -32,7 +32,7 @@
             <td>&nbsp;</td>
             <td><table width="100%" border="0" cellspacing="0" cellpadding="0">
               <tr>
-                <td class="title_fonts_display">{{_('Management')}}</td>
+                <td class="title_fonts_display">管理</td>
               </tr>
               <tr>
                 <td>&nbsp;</td>
@@ -40,13 +40,13 @@
             </table>
               <table border="0" cellspacing="0" cellpadding="0">
                 <tr class="field_head">
-                  <td align="center" style="width:200px;">{{_('Name')}}</td>
+                  <td align="center" style="width:200px;">名称</td>
                   <td align="center" style="width:200px;">{{_('Create Time')}}</td>
                   <td align="center" style="width:200px;">{{_('Creator')}}</td>
                   <td align="center" style="width:200px;">{{_('Update Time')}}</td>
                   <td align="center" style="width:200px;">{{_('Last Updator')}}</td>
                 </tr>
-				{% for r in records %}
+				{% for r in records.items %}
 					<tr class="data_table_tr {{ loop.cycle('data_table_tr_odd', 'data_table_tr_even') }}">
 						<td><a href="{{url_for('.view', action = action ,m = 'UPDATE',id=r.id)}}">{{r.name|f}}</a></td>
 						<td>{{r.create_time|ft}}</td>
@@ -55,6 +55,9 @@
 						<td>{{r.update_by|f}}</td>
 					</tr>
 				{% endfor %}
+					<tr class="data_table_tr">
+					    <td colspan="100" style="text-align:right">{{records.pager(**PAGINATE_PARAMS)}}</td>
+					</tr>
               </table></td>
             <td>&nbsp;</td>
           </tr>

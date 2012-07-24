@@ -9,6 +9,7 @@
 from datetime import datetime as dt
 from flaskext.babel import _
 
+
 SYSTEM_DATE_FORMAT = "%Y-%m-%d"
 SYSTEM_TIME_FORMAT = "%H:%M"
 SYSTEM_DATETIME_FORMAT = "%Y-%m-%d %H:%M"
@@ -104,3 +105,22 @@ BTN_RETURN = T('Return')
 
 
 SYSTEM_NOW = lambda : dt.now()
+
+PAGINATE_PARAMS = {
+                   'format' : '$link_first $link_previous ~3~ $link_next $link_last, 共计 $item_count 条记录',
+                   'show_if_single_page' : True,
+                   'symbol_first' : u'第一页',
+                   'symbol_last' : u'最后一页',
+                   'symbol_previous' : u'上一页',
+                   'symbol_next' : u'下一页',
+                   }
+
+PAGINATE_PER_PAGE = 20
+
+
+
+def _getMaster(v):
+    from sys2do.util.common import getMasterAll
+    return getMasterAll(v)
+
+MASTER_ALL = _getMaster

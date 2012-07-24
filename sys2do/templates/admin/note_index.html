@@ -63,6 +63,9 @@
 						<td>{{r.update_by|f}}</td>
 					</tr>
 				{% endfor %}
+				<tr class="data_table_tr">
+				    <td colspan="100" style="text-align:right">{{records.pager(**PAGINATE_PARAMS)}}</td>
+				</tr>
               </table></td>
             <td>&nbsp;</td>
           </tr>

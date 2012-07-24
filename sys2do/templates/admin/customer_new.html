@@ -3,50 +3,21 @@
 {% block extJS %}
 <script language="JavaScript" type="text/javascript">
 //<![CDATA[
-	function todave(){
-		$("form").submit();
+	function tosave(){
+		var msg = new Array();
+		if(!$('#name').val()){
+			msg.push('请填写客户名称！');
+		}
+		
+		if(msg.length<1){
+			$("form").submit();
+		}else{
+			alert(msg.join("\n"));
+		}
+	
 	}
 	
-	
-	
-	var index = 1;
-	function add_target(){
-		var target_name = $("#target_name").val();
-	    var target_contact_person = $("#target_contact_person").val();
-	    var target_address = $("#target_address").val();
-	    var target_phone = $("#target_phone").val();
-	    var target_mobile = $("#target_mobile").val();
-	    var target_remark = $("#target_remark").val();
-	    
-	    if(!target_name || !target_contact_person || !target_address){
-	    	alert('请填写必填项后再添加！');
-	    	return;
-	    }
-	    
-	    
-	    var html = '<tr class="data_table_tr">';
-	    html += '<th><input type="hidden" name="target_name_'+index+'" value="'+target_name+'"/>'+target_name+'</th>';
-	    html += '<td><input type="hidden" name="target_contact_person_'+index+'" value="'+target_contact_person+'"/>'+target_contact_person+'</td>';
-	    html += '<td><input type="hidden" name="target_address_'+index+'" value="'+target_address+'"/>'+target_address+'</td>';
-	    html += '<td><input type="hidden" name="target_phone_'+index+'" value="'+target_phone+'"/>'+target_phone+'</td>';
-	    html += '<td><input type="hidden" name="target_mobile_'+index+'" value="'+target_mobile+'"/>'+target_mobile+'</td>';
-	    html += '<td><input type="hidden" name="target_remark_'+index+'" value="'+target_remark+'"/>'+target_remark+'</td>';
-	    html += '<td><input type="button" onclick="del_item(this)" value="删除"/></td>';
-	    html += '</tr>';
-	    $("#targets_list").append(html);
-	    index++;
-	    
-	    $("#target_name").val('');
-	    $("#target_contact_person").val('');
-	    $("#target_address").val('');
-	    $("#target_phone").val('');
-	    $("#target_mobile").val('');
-	    $("#target_remark").val('');
-	}
-	
-	function del_item(obj){
-	    $($(obj).parents('tr')[0]).remove(); 
-	}	    
+    
 //]]>
 </script>
 {% endblock %}
@@ -55,7 +26,7 @@
 <div class="inner_menu">
 	<ul>
     	<li><a href="{{url_for('.view', action = 'customer')}}"><img width="71" height="21" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image1','','/static/images/system/order_manage_h_25.jpg',1)" id="Image1" src="/static/images/system/order_manage_25.jpg"/></a></li>
-        <li><img width="77" height="21" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image3','','images/order_manage_h_33.jpg',1)" id="Image3" src="/static/images/system/order_manage_33.jpg" onclick="return todave()"/></li>
+        <li><img width="77" height="21" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image3','','images/order_manage_h_33.jpg',1)" id="Image3" src="/static/images/system/order_manage_33.jpg" onclick="return tosave()"/></li>
         <li style="padding:0px; margin:0px 55px 0px 0px; float:right"><a href="{{url_for('bpAuth.logout')}}"><img src="/static/images/system/order_manage_22.jpg" width="56" height="29" /></a></li>
     </ul>
 </div>
@@ -76,13 +47,11 @@
 
 <div class="order_add_div">
   <div class="order_add_div_header">新建客户</div>
-  
-  
-  
+
     <div class="order_add_div_body">
   <ul>
         	<li style="width:450px;"><span><sup class="warn">*</sup>{{_('Customer Name')}}</span>
-        	  <input type="text" class="must_input" style="width:300px" name="name"/>
+        	  <input type="text" class="must_input" style="width:300px" name="name" id="name"/>
         	</li>
        	  <li style="width:180px;"><span>客户编号</span>
     	    <input type="text" style="width:100px" name="no"/>
@@ -104,7 +73,8 @@
   	    </li>
     	  <li style="width:220px;">付款方式
     	  	<select name="payment_id">
-    	  		{% for p in payment %}
+    	  		<option value=""></option>
+    	  		{% for p in MASTER_ALL('Payment') %}
     	  			<option value="{{p.id}}">{{p}}</option>
     	  		{% endfor %}
     	  	</select>
@@ -117,55 +87,9 @@
   
   </div>
 
-   <div class="order_add_div_header">收货公司</div>
-	<div class="order_add_div_body" style="padding:10px;">
-	<table border="0" cellpadding="0" cellspacing="0">
-		<tr>
-			<td valign="top" width="100px" align="center" height="30px;"><sup class="warn">*</sup>{{_('Destination Company')}}</td>
-			<td valign="top"><input type="text" id="target_name" class="order_add_div_body_input must_input" style="width:150px;"/></td>
-			
-			<td valign="top" width="100px" align="center"><sup class="warn">*</sup>{{_('Destination Contact')}}</td>
-			<td valign="top"><input type="text" id="target_contact_person" value="" class="order_add_div_body_input must_input" style="width:150px;"/></td>
-			<td valign="top" width="100px" align="center">{{_('Destination Address')}}</td>
-			<td valign="top"><input type="text" id="target_address" value="" class="order_add_div_body_input must_input" style="width:250px;"/></td>
-		</tr>
-		<tr>
-			<td valign="top" align="center">{{_('Destination Phone')}}</td>
-			<td valign="top"><input type="text" id="target_phone" value="" class="order_add_div_body_input" style="width:150px;"/></td>
-			<td valign="top" align="center">{{_('Destination Mobile')}}</td>
-			<td valign="top"><input type="text" id="target_mobile" value="" class="order_add_div_body_input" style="width:150px;"/></td>
-		    <td valign="top" align="center">{{_('Remark')}}</td>
-		    <td valign="top"><textarea id="target_remark" style="width:250px;"></textarea></td>
-		</tr>
-	</table>
-			
-	<p><input type="button" value="{{_('Add')}}" onclick="add_target()"/></p>
-	
-	<br />
-  
-  <table width="99%" border="0" cellspacing="0" cellpadding="0">
-  	<thead>
-  	<tr class="field_head">
-      <th align="center">{{_('Destination Company')}}</th>
-      <th align="center">{{_('Destination Contact')}}</th>
-      <th align="center">{{_('Destination Address')}}</th>
-      <th align="center">{{_('Destination Phone')}}</th>
-      <th align="center">{{_('Destination Mobile')}}</th>
-      <th align="center">{{_('Remark')}}</th>
-      <th align="center">&nbsp;</th>
-    </tr>
-	</thead>
-	<tbody id="targets_list">
 
-	</tbody>
-  </table>
-  
-  <div style="clear:both"><br /><br /></div>
-  
-  
-	</div>
 
 </div>
 </form>
-
+<br /><br />
 {% endblock %}

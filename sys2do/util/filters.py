@@ -7,13 +7,14 @@
 ###########################################
 '''
 import datetime
+from itertools import imap, ifilter
 from jinja2.filters import do_default
 from sys2do.constant import STATUS_LIST, SYSTEM_DATE_FORMAT, SYSTEM_DATETIME_FORMAT, \
     APPROVAL_STATUS_LIST, PAID_STATUS_LIST
 #from flask import current_app as app
 #from sys2do import app
 
-__all__ = ['ft', 'fd', 'ifFalse', 'f', 'showStatus', 'showApproval', 'showPaid']
+__all__ = ['ft', 'fd', 'ifFalse', 'f', 'showStatus', 'showApproval', 'showPaid', 'sum_with_none']
 
 
 def ft(t, f = SYSTEM_DATETIME_FORMAT):
@@ -53,3 +54,16 @@ def showPaid(s):
     for code, msg in PAID_STATUS_LIST:
         if s == code : return msg
     return ''
+
+
+def sum_with_none(iterable, attribute = None):
+    if attribute is not None:
+        iterable = imap(lambda item : getattr(item, attribute), iterable)
+
+    count = 0
+    for k in iterable:
+        try:
+            count += k
+        except:
+            pass
+    return count

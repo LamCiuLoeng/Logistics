@@ -15,6 +15,7 @@ from sqlalchemy.sql.expression import and_
 from auth import SysMixin
 from sys2do.model.auth import CRUDMixin, Group
 from sys2do.util.common import _gl, _gp, _info
+from sys2do.constant import SYSTEM_DATETIME_FORMAT
 
 #__all__ = ['']
 
@@ -220,17 +221,17 @@ class Customer(DeclarativeBase, SysMixin, CRUDMixin):
 
     def populate(self):
         params = {}
-        for k in ['id', 'name', 'no',
-                  'address', 'phone', 'mobile', 'contact_person', 'remark', 'payment_id']:
+        for k in ['id', 'name', 'no', 'address', 'phone', 'mobile', 'contact_person', 'remark', 'payment_id', 'email' ]:
             params[k] = getattr(self, k)
+
+        params['create_time'] = self.create_time.strftime(SYSTEM_DATETIME_FORMAT)
+        params['create_by'] = unicode(self.create_by) if self.create_by else ''
         return params
 
-    @classmethod
-    def saveAsNew(clz, v):
-        return None
 
-    def saveAsUpdate(self, v):
-        return None
+    @classmethod
+    def _get_fields(clz):
+        return ['name', 'no', 'address', 'phone', 'mobile', 'email', 'contact_person', 'remark', 'payment_id']
 
 
 
@@ -241,7 +242,7 @@ class CustomerTarget(DeclarativeBase, SysMixin):
     customer_id = Column(Integer, ForeignKey('master_customer.id'))
     customer = relation(Customer, backref = backref("targets", order_by = id), primaryjoin = "and_(Customer.id == CustomerTarget.customer_id, CustomerTarget.active == 0)")
     name = Column(Text)
-    address = Column(Text)
+#    address = Column(Text)
     remark = Column(Text)
 
     def __str__(self): return self.name
@@ -251,7 +252,9 @@ class CustomerTarget(DeclarativeBase, SysMixin):
 
     def populate(self):
         params = {}
-        for k in ['id', 'name', 'customer_id', 'address', ]:
+        for k in ['id', 'name', 'customer_id',
+#                  'address', 
+                  ]:
             params[k] = getattr(self, k)
         return params
 
@@ -276,6 +279,7 @@ class CustomerTargetContact(DeclarativeBase, SysMixin):
     customer_target_id = Column(Integer, ForeignKey('master_customer_target.id'))
     customer_target = relation(CustomerTarget, backref = backref("contacts", order_by = id), primaryjoin = "and_(CustomerTarget.id == CustomerTargetContact.customer_target_id, CustomerTargetContact.active == 0)")
     name = Column(Text)
+    address = Column(Text)
     mobile = Column(Text)
     phone = Column(Text)
     email = Column(Text)
@@ -289,7 +293,7 @@ class CustomerTargetContact(DeclarativeBase, SysMixin):
 
     def populate(self):
         params = {}
-        for k in ['id', 'name', 'phone', 'email', 'mobile']:
+        for k in ['id', 'name', 'phone', 'email', 'mobile', 'address']:
             params[k] = getattr(self, k)
         return params
 

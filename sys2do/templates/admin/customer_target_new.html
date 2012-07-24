@@ -1,0 +1,147 @@
+{% extends "master.html" %}
+
+{% block extJS %}
+<script language="JavaScript" type="text/javascript">
+//<![CDATA[
+	function todave(){
+		$("form").submit();
+	}
+	
+	
+	
+	var index = 1;
+	function add_contact(){
+		var contact_name = $("#contact_name").val();
+	    var contact_address = $("#contact_address").val();
+	    var contact_phone = $("#contact_phone").val();
+	    var contact_mobile = $("#contact_mobile").val();
+	    var contact_remark = $("#contact_remark").val();
+	    
+	    if(!contact_name || !contact_address || !contact_phone){
+	    	alert('请填写必填项后再添加！');
+	    	return;
+	    }
+	    
+	    var html = '<tr class="data_table_tr">';
+	    html += '<th><input type="hidden" name="contact_name_'+index+'" value="'+contact_name+'"/>'+contact_name+'</th>';
+		html += '<td><input type="hidden" name="contact_address_'+index+'" value="'+contact_address+'"/>'+contact_address+'</td>';
+		html += '<td><input type="hidden" name="contact_phone_'+index+'" value="'+contact_phone+'"/>'+contact_phone+'</td>';
+		html += '<td><input type="hidden" name="contact_mobile_'+index+'" value="'+contact_mobile+'"/>'+contact_mobile+'</td>';
+		html += '<td><input type="hidden" name="contact_remark_'+index+'" value="'+contact_remark+'"/>'+contact_remark+'</td>';
+		html += '<td><input type="button" onclick="del_item(this)" value="删除"/></td>';
+		html += '</tr>';
+		$("#contact_list").append(html);
+		index++;
+		
+		$("#contact_name").val('');
+		$("#contact_address").val('');
+		$("#contact_phone").val('');
+		$("#contact_mobile").val('');
+		$("#contact_remark").val('');
+	}
+	
+	function del_item(obj){
+	    $($(obj).parents('tr')[0]).remove(); 
+	}	    
+//]]>
+</script>
+{% endblock %}
+
+{% block inner_menu %}
+<div class="inner_menu">
+	<ul>
+    	<li><a href="{{url_for('.view', action = 'customer_target')}}"><img width="71" height="21" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image1','','/static/images/system/order_manage_h_25.jpg',1)" id="Image1" src="/static/images/system/order_manage_25.jpg"/></a></li>
+        <li><img width="77" height="21" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image3','','images/order_manage_h_33.jpg',1)" id="Image3" src="/static/images/system/order_manage_33.jpg" onclick="return todave()"/></li>
+        <li style="padding:0px; margin:0px 55px 0px 0px; float:right"><a href="{{url_for('bpAuth.logout')}}"><img src="/static/images/system/order_manage_22.jpg" width="56" height="29" /></a></li>
+    </ul>
+</div>
+{% endblock %}
+
+{% block content %}
+<table width="100%" cellspacing="0" cellpadding="0" border="0">
+<tbody>
+<tr>
+    <td class="title_fonts_display">· 客户收货公司管理</td>
+</tr>
+</tbody>
+</table>
+
+
+
+<form action="{{url_for('.view', action = 'customer_target',m='SAVE_NEW')}}" method="post">
+
+<div class="order_add_div">
+  <div class="order_add_div_header">新建客户收货公司</div>
+  
+  
+  
+    <div class="order_add_div_body">
+  <ul>
+        	<li style="width:450px;"><span><sup class="warn">*</sup>{{_('Customer Name')}}</span>
+        	  <select name="customer_id" id="customer_id" class="must_input" style="width:300px">
+        	      <option value=""></option>
+        	      {% for c in MASTER_ALL('Customer') %}
+        	          <option value="{{c.id}}">{{c}}</option>
+        	      {% endfor %}
+        	  </select>
+        	</li>
+       	  <li style="width:480px;"><span>收货公司</span>
+    	    <input type="text"  name="name" id="name" style="width:300px" class="must_input"/>
+  	    </li>
+    	  
+    	  <li style="width:925px;"><span>{{_('Remark')}}</span>
+    	    <textarea class="order_add_div_body_input" style="width:840px; height:100px" name="remark"></textarea>
+        </li>
+      </ul>
+  <div style="clear:both"></div>
+  
+  </div>
+
+   <div class="order_add_div_header">收货联系人</div>
+	<div class="order_add_div_body" style="padding:10px;">
+	<table border="0" cellpadding="0" cellspacing="0">
+		<tr>
+			<td valign="top" width="100px" align="center" height="30px"><sup class="warn">*</sup>{{_('Destination Contact')}}</td>
+			<td valign="top"><input type="text" id="contact_name" value="" class="order_add_div_body_input must_input" style="width:150px;"/></td>
+			<td valign="top" width="100px" align="center">{{_('Destination Address')}}</td>
+			<td valign="top"><input type="text" id="contact_address" value="" class="order_add_div_body_input must_input" style="width:250px;"/></td>
+			<td valign="top" width="100px" align="center">{{_('Phone')}}</td>
+			<td valign="top"><input type="text" id="contact_phone" value="" class="order_add_div_body_input must_input" style="width:150px;"/></td>
+		</tr>
+		<tr>
+			<td valign="top" align="center">{{_('Mobile')}}</td>
+			<td valign="top"><input type="text" id="contact_mobile" value="" class="order_add_div_body_input" style="width:150px;"/></td>
+		    <td valign="top" align="center">{{_('Remark')}}</td>
+		    <td valign="top"><textarea id="contact_remark" style="width:250px;"></textarea></td>
+		</tr>
+	</table>
+			
+	<p><input type="button" value="{{_('Add')}}" onclick="add_contact()"/></p>
+	
+	<br />
+  
+  <table width="99%" border="0" cellspacing="0" cellpadding="0">
+  	<thead>
+  	<tr class="field_head">
+      <th align="center">{{_('Destination Contact')}}</th>
+      <th align="center">{{_('Destination Address')}}</th>
+      <th align="center">{{_('Destination Phone')}}</th>
+      <th align="center">{{_('Destination Mobile')}}</th>
+      <th align="center">{{_('Remark')}}</th>
+      <th align="center">操作</th>
+    </tr>
+	</thead>
+	<tbody id="contact_list">
+
+	</tbody>
+  </table>
+  
+  <div style="clear:both"><br /><br /></div>
+  
+  
+	</div>
+
+</div>
+</form>
+
+{% endblock %}

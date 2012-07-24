@@ -7,6 +7,7 @@
 ###########################################
 '''
 import os
+import traceback
 from datetime import datetime as dt
 from flask import g, render_template, flash, session, redirect, url_for, request
 from werkzeug import secure_filename
@@ -15,9 +16,9 @@ from flaskext import babel
 
 from sys2do.setting import UPLOAD_FOLDER, ALLOWED_EXTENSIONS, UPLOAD_FOLDER_URL
 from sys2do.model import DBSession, UploadFile
-import traceback
 from sys2do.constant import MSG_RECORD_NOT_EXIST, MSG_NO_FILE_UPLOADED, \
     MSG_INVALID_FILE_TO_UPLOAD
+
 
 __all__ = ['_g', '_gl', '_gp', '_debug', '_info', '_error', 'getOr404', 'upload', 'makeException', 'number2alphabet']
 
@@ -45,6 +46,9 @@ _error = lambda msg : app.logger.debug(msg)
 
 
 def getMasterAll(obj, order_by = 'name'):
+    if isinstance(obj, basestring) :
+        import sys2do.model as mymodel
+        obj = getattr(mymodel, obj)
     return DBSession.query(obj).filter(obj.active == 0).order_by(getattr(obj, order_by)).all()
 
 
@@ -112,3 +116,4 @@ def number2alphabet(n):
     if result[-1] <= 0 : result = result[:-1]
     result.reverse()
     return "".join(map(lambda v:chr(v + 64), result))
+

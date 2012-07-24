@@ -11,7 +11,9 @@ import traceback
 from werkzeug.utils import redirect
 from sqlalchemy.sql.expression import and_
 from flask.blueprints import Blueprint
-from flask.helpers import flash, jsonify
+from flask.helpers import flash, jsonify, url_for
+from flask import session
+from webhelpers import paginate
 
 from sys2do.views import BasicView
 from sys2do.util.decorator import templated, login_required
@@ -19,7 +21,7 @@ from sys2do.model.master import Customer, CustomerTarget
 from sys2do.model import DBSession
 from sys2do.util.common import _g, getMasterAll, _error
 from sys2do.constant import MESSAGE_INFO, MSG_SAVE_SUCC, MSG_UPDATE_SUCC, \
-    MSG_SERVER_ERROR
+    MSG_SERVER_ERROR, PAGINATE_PER_PAGE
 from sys2do.model.logic import OrderHeader
 
 
@@ -35,64 +37,65 @@ class FinView(BasicView):
 
     @templated('fin/index.html')
     def index(self):
-        values = {}
-        for f in ['no', 'create_time_from', 'create_time_to', 'ref_no', 'source_station',
+        if _g('SEARCH_SUBMIT'):  # come from search
+            values = {'page' : 1}
+            for f in ['no', 'create_time_from', 'create_time_to', 'ref_no', 'source_station',
                   'source_company_id', 'destination_station', 'destination_company_id',
                   'approve', 'paid', 'is_exception', 'is_less_qty'] :
-            values[f] = _g(f)
+                values[f] = _g(f)
+        else: #come from paginate or return
+            values = session.get('fin_values', {})
+            if _g('page') : values['page'] = int(_g('page'))
+            elif 'page' not in values : values['page'] = 1
 
-        if not values['create_time_from'] and not values['create_time_to']:
+
+        if not values.get('create_time_from', None) and not values.get('create_time_to', None):
             values['create_time_to'] = dt.now().strftime("%Y-%m-%d")
             values['create_time_from'] = (dt.now() - timedelta(days = 30)).strftime("%Y-%m-%d")
 
+        session['fin_values'] = values
+
 
         conditions = [OrderHeader.active == 0]
-        if values['create_time_from']:
+        if values.get('create_time_from', None):
             conditions.append(OrderHeader.create_time > values['create_time_from'])
-        if values['create_time_to']:
+        if values.get('create_time_to', None):
             conditions.append(OrderHeader.create_time < '%s 23:59' % values['create_time_to'])
-        if values['ref_no']:
+        if values.get('ref_no', None):
             conditions.append(OrderHeader.ref_no.op('like')('%%%s%%' % values['ref_no']))
-        if values['no']:
+        if values.get('no', None):
             conditions.append(OrderHeader.no.op('like')('%%%s%%' % values['no']))
-        if values['source_station']:
+        if values.get('source_station', None):
             conditions.append(OrderHeader.source_station.op('like')('%%%s%%' % values['source_station']))
-        if values['source_company_id']:
+        if values.get('source_company_id', None):
             conditions.append(OrderHeader.source_company_id == values['source_company_id'])
             targets = DBSession.query(CustomerTarget).filter(and_(CustomerTarget.active == 0, CustomerTarget.customer_id == values['source_company_id']))
         else:
             targets = []
 
-        if values['destination_station']:
+        if values.get('destination_station', None):
             conditions.append(OrderHeader.destination_station.op('like')('%%%s%%' % values['destination_station']))
-        if values['destination_company_id']:
+        if values.get('destination_company_id', None):
             conditions.append(OrderHeader.destination_company_id == values['destination_company_id'])
-        if values['approve']:
+        if values.get('approve', None):
             conditions.append(OrderHeader.approve == values['approve'])
-        if values['paid']:
+        if values.get('paid', None):
             conditions.append(OrderHeader.paid == values['paid'])
-        if values['is_exception']:
+        if values.get('is_exception', None):
             conditions.append(OrderHeader.is_exception == values['is_exception'])
-        if values['is_less_qty']:
+        if values.get('is_less_qty', None):
             conditions.append(OrderHeader.is_less_qty == values['is_less_qty'])
 
         result = DBSession.query(OrderHeader).filter(and_(*conditions)).order_by(OrderHeader.create_time.desc())
 
-        total_qty = total_vol = total_weight = total_amount = 0
-        for r in result:
-            if r.qty : total_qty += r.qty
-            if r.vol : total_vol += r.vol
-            if r.weight : total_weight += r.weight
-            if r.amount : total_amount += r.amount
+        def url_for_page(**params): return url_for('bpOrder.view', action = "index", page = params['page'])
+        records = paginate.Page(result, values['page'], show_if_single_page = True, items_per_page = PAGINATE_PER_PAGE, url = url_for_page)
 
-        return {'result' : result ,
+        return {
                 'values' : values ,
-                'total_qty' : total_qty ,
-                'total_vol' : total_vol,
-                'total_weight' : total_weight,
-                'total_amount' : total_amount,
                 'customers' : getMasterAll(Customer),
                 'targets' : targets,
+                'records' : records,
                 }
 
 

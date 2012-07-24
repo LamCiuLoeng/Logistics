@@ -18,11 +18,12 @@ from sys2do.model import DBSession
 from sys2do.model.auth import User, Group, Permission
 from sys2do.constant import MESSAGE_ERROR, MSG_NO_SUCH_ACTION, \
     MSG_NO_ID_SUPPLIED, MSG_RECORD_NOT_EXIST, MESSAGE_INFO, MSG_SAVE_SUCC, \
-    MSG_UPDATE_SUCC, MSG_DELETE_SUCC, MSG_SERVER_ERROR
+    MSG_UPDATE_SUCC, MSG_DELETE_SUCC, MSG_SERVER_ERROR, PAGINATE_PER_PAGE
 from sys2do.util.common import _g, _gl, getMasterAll, _error, _gp
 from sys2do.model.master import Customer, CustomerProfile, \
     SupplierProfile, Supplier, Payment, Item, PickupType, PackType, Ratio, \
-    Receiver, InventoryLocation, CustomerTarget, Note
+    Receiver, InventoryLocation, CustomerTarget, Note, CustomerTargetContact
+from webhelpers import paginate
 
 __all__ = ['bpAdmin']
 
@@ -30,7 +31,7 @@ bpAdmin = Blueprint('bpAdmin', __name__)
 
 class AdminView(BasicView):
 
-    decorators = [login_required, ]
+#    decorators = [login_required, ]
 
     @tab_highlight('TAB_MASTER')
     @templated('admin/index.html')
@@ -44,8 +45,11 @@ class AdminView(BasicView):
             flash(MSG_NO_SUCH_ACTION, MESSAGE_ERROR);
             return redirect(url_for('.view', action = 'index'))
         if method == 'LIST':
-            users = DBSession.query(User).filter(User.active == 0).order_by(User.name).all()
-            return render_template('admin/user_index.html', records = users)
+            page = _g('page') or 1
+            objs = DBSession.query(User).filter(User.active == 0).order_by(User.name).all()
+            def url_for_page(**params): return url_for('bpAdmin.view', action = 'user', m = 'LIST', page = params['page'])
+            records = paginate.Page(objs, page, show_if_single_page = True, items_per_page = PAGINATE_PER_PAGE, url = url_for_page)
+            return render_template('admin/user_index.html', records = records)
         elif method == 'NEW':
             groups = Group.all()
             return render_template('admin/user_new.html', groups = groups)
@@ -105,8 +109,12 @@ class AdminView(BasicView):
             flash(MSG_NO_SUCH_ACTION, MESSAGE_ERROR);
             return redirect(url_for('.view', action = 'index'))
         if method == 'LIST':
-            groups = DBSession.query(Group).filter(Group.active == 0).order_by(Group.name).all()
-            return render_template('admin/group_index.html', records = groups)
+            page = _g('page') or 1
+            objs = DBSession.query(Group).filter(Group.active == 0).order_by(Group.name).all()
+            def url_for_page(**params): return url_for('bpAdmin.view', action = 'group', m = 'LIST', page = params['page'])
+            records = paginate.Page(objs, page, show_if_single_page = True, items_per_page = PAGINATE_PER_PAGE, url = url_for_page)
+            return render_template('admin/group_index.html', records = records)
+
         elif method == 'NEW':
             return render_template('admin/group_new.html', users = User.all(), permissions = Permission.all())
         elif method == 'UPDATE':
@@ -171,8 +179,11 @@ class AdminView(BasicView):
             flash(MSG_NO_SUCH_ACTION, MESSAGE_ERROR);
             return redirect(url_for('.view', action = 'index'))
         if method == 'LIST':
-            permissions = DBSession.query(Permission).filter(Permission.active == 0).order_by(Permission.name).all()
-            return render_template('admin/permission_index.html', records = permissions)
+            page = _g('page') or 1
+            objs = DBSession.query(Permission).filter(Permission.active == 0).order_by(Permission.name).all()
+            def url_for_page(**params): return url_for('bpAdmin.view', action = 'permission', m = 'LIST', page = params['page'])
+            records = paginate.Page(objs, page, show_if_single_page = True, items_per_page = PAGINATE_PER_PAGE, url = url_for_page)
+            return render_template('admin/permission_index.html', records = records)
         elif method == 'NEW':
             groups = Group.all()
             return render_template('admin/permission_new.html', groups = groups)
@@ -225,106 +236,103 @@ class AdminView(BasicView):
 
 
     @tab_highlight('TAB_MASTER')
-    def customer(self):
+    def customer_target(self):
         method = _g('m', 'LIST')
-        if method not in ['LIST', 'NEW', 'UPDATE', 'DELETE', 'SAVE_NEW', 'SAVE_UPDATE', 'ADD_TARGET', 'DELETE_TARGET']:
+        if method not in ['LIST', 'NEW', 'UPDATE', 'DELETE', 'SAVE_NEW', 'SAVE_UPDATE', 'ADD_CONTACT', 'DELETE_CONTACT']:
             flash(MSG_NO_SUCH_ACTION, MESSAGE_ERROR);
             return redirect(url_for('.view', action = 'index'))
         if method == 'LIST':
-            customers = DBSession.query(Customer).filter(Customer.active == 0).order_by(Customer.name).all()
-            return render_template('admin/customer_index.html', records = customers)
+            page = _g('page') or 1
+            objs = DBSession.query(CustomerTarget).filter(CustomerTarget.active == 0).order_by(CustomerTarget.customer_id).all()
+            def url_for_page(**params): return url_for('bpAdmin.view', action = 'customer_target', m = 'LIST', page = params['page'])
+            records = paginate.Page(objs, page, show_if_single_page = True, items_per_page = PAGINATE_PER_PAGE, url = url_for_page)
+            return render_template('admin/customer_target_index.html', records = records)
         elif method == 'NEW':
-            return render_template('admin/customer_new.html', payment = getMasterAll(Payment))
+            return render_template('admin/customer_target_new.html')
+
         elif method == 'UPDATE':
             id = _g('id', None)
             if not id :
                 flash(MSG_NO_ID_SUPPLIED, MESSAGE_ERROR)
                 return redirect(url_for('.view', action = 'customer'))
-            obj = DBSession.query(Customer).get(id)
+            obj = DBSession.query(CustomerTarget).get(id)
             if not obj :
                 flash(MSG_RECORD_NOT_EXIST, MESSAGE_ERROR)
-                return redirect(url_for('.view', action = 'customer'))
-            return render_template('admin/customer_update.html', obj = obj , payment = getMasterAll(Payment))
+                return redirect(url_for('.view', action = 'customer_target'))
+            return render_template('admin/customer_target_update.html', obj = obj)
         elif method == 'DELETE':
             id = _g('id', None)
             if not id :
                 flash(MSG_NO_ID_SUPPLIED, MESSAGE_ERROR)
-                return redirect(url_for('.view', action = 'customer'))
+                return redirect(url_for('.view', action = 'customer_target'))
             obj = DBSession.query(Customer).get(id)
             if not obj :
                 flash(MSG_RECORD_NOT_EXIST, MESSAGE_ERROR)
-                return redirect(url_for('.view', action = 'customer'))
+                return redirect(url_for('.view', action = 'customer_target'))
             obj.active = 1
             DBSession.commit()
             flash(MSG_DELETE_SUCC, MESSAGE_INFO)
-            return redirect(url_for('.view', action = 'customer'))
+            return redirect(url_for('.view', action = 'customer_target'))
         elif method == 'SAVE_NEW':
-            obj = Customer(
-                                no = _g('no'),
+            obj = CustomerTarget(
+                                customer_id = _g('customer_id'),
                                 name = _g('name'),
-                                address = _g('address'),
-                                phone = _g('phone'),
-                                mobile = _g('mobile'),
-                                contact_person = _g('contact_person'),
-                                email = _g('email'),
-                                payment_id = _g('payment_id'),
                                 remark = _g('remark')
                                 )
             DBSession.add(obj)
 
-            for nk, nv in _gp('target_name_'):
+            for nk, nv in _gp('contact_name_'):
                 id = nk.split("_")[2]
                 if not nv : continue
-                DBSession.add(CustomerTarget(
-                                             customer = obj, name = nv,
-                                             address = _g("target_address_%s" % id),
-                                             contact_person = _g("target_contact_person_%s" % id),
-                                             phone = _g("item_qty_%s" % id),
-                                             mobile = _g("target_phone_%s" % id),
-                                             remark = _g("target_remark_%s" % id),
+                DBSession.add(CustomerTargetContact(
+                                             customer_target = obj, name = nv,
+                                             address = _g("contact_address_%s" % id),
+                                             phone = _g("contact_phone_%s" % id),
+                                             mobile = _g("contact_mobile_%s" % id),
+                                             remark = _g("contact_remark_%s" % id),
                                              ))
             DBSession.commit()
             flash(MSG_SAVE_SUCC, MESSAGE_INFO)
-            return redirect(url_for('.view', action = 'customer'))
+            return redirect(url_for('.view', action = 'customer_target'))
 
         elif method == 'SAVE_UPDATE':
             id = _g('id', None)
             if not id :
                 flash(MSG_NO_ID_SUPPLIED, MESSAGE_ERROR)
-                return redirect(url_for('.view', action = 'customer'))
-            obj = DBSession.query(Customer).get(id)
+                return redirect(url_for('.view', action = 'customer_target'))
+            obj = DBSession.query(CustomerTarget).get(id)
             if not obj :
                 flash(MSG_RECORD_NOT_EXIST, MESSAGE_ERROR)
-                return redirect(url_for('.view', action = 'customer'))
-            for f in ['no', 'name', 'address', 'phone', 'contact_person', 'remark', 'email', 'payment_id', 'mobile', ]:
+                return redirect(url_for('.view', action = 'customer_target'))
+            for f in ['customer_id', 'name', 'remark', ]:
                 setattr(obj, f, _g(f))
             DBSession.commit()
             flash(MSG_UPDATE_SUCC, MESSAGE_INFO)
-            return redirect(url_for('.view', action = 'customer'))
-        elif method == 'ADD_TARGET':
+            return redirect(url_for('.view', action = 'customer_target'))
+        elif method == 'ADD_CONTACT':
             id = _g('id', None)
             if not id : return jsonify({'code' : 1, 'msg' : MSG_NO_ID_SUPPLIED})
             try:
-                target = CustomerTarget(customer_id = id,
-                                        name = _g('target_name'),
-                                        address = _g('target_address'),
-                                        contact_person = _g('target_contact_person'),
-                                        mobile = _g('target_mobile'),
-                                        phone = _g('target_phone'),
-                                        remark = _g('target_remark'),
+                contact = CustomerTargetContact(customer_target_id = id,
+                                        name = _g('contact_name'),
+                                        address = _g('contact_address'),
+                                        phone = _g('contact_phone'),
+                                        mobile = _g('contact_mobile'),
+                                        email = _g('contact_email'),
+                                        remark = _g('contact_remark'),
                                         )
-                DBSession.add(target)
+                DBSession.add(contact)
                 DBSession.commit()
-                return jsonify({'code' : 0 , 'msg' : MSG_SAVE_SUCC , 'data' : target.populate()})
+                return jsonify({'code' : 0 , 'msg' : MSG_SAVE_SUCC , 'data' : contact.populate()})
             except:
                 _error(traceback.print_exc())
                 DBSession.rollback()
                 return jsonify({'code' : 1, 'msg' : MSG_SERVER_ERROR})
-        elif method == 'DELETE_TARGET':
+        elif method == 'DELETE_CONTACT':
             id = _g('id', None)
             if not id : return jsonify({'code' : 1, 'msg' : MSG_NO_ID_SUPPLIED})
             try:
-                obj = DBSession.query(CustomerTarget).get(id)
+                obj = DBSession.query(CustomerTargetContact).get(id)
                 obj.active = 1
                 DBSession.commit()
                 return jsonify({'code' : 0 , 'msg' : MSG_DELETE_SUCC})
@@ -332,6 +340,9 @@ class AdminView(BasicView):
                 _error(traceback.print_exc())
                 DBSession.rollback()
                 return jsonify({'code' : 1, 'msg' : MSG_SERVER_ERROR})
+
+
+
 
     def cprofile(self):
         method = _g('m', 'LIST')
@@ -404,8 +415,13 @@ class AdminView(BasicView):
             flash(MSG_NO_SUCH_ACTION, MESSAGE_ERROR);
             return redirect(url_for('.view', action = 'index'))
         if method == 'LIST':
-            suppliers = DBSession.query(Supplier).filter(Supplier.active == 0).order_by(Supplier.name).all()
-            return render_template('admin/supplier_index.html', records = suppliers)
+
+            page = _g('page') or 1
+            objs = DBSession.query(Supplier).filter(Supplier.active == 0).order_by(Supplier.name).all()
+            def url_for_page(**params): return url_for('bpAdmin.view', action = 'supplier', m = 'LIST', page = params['page'])
+            records = paginate.Page(objs, page, show_if_single_page = True, items_per_page = PAGINATE_PER_PAGE, url = url_for_page)
+            return render_template('admin/supplier_index.html', records = records)
+
         elif method == 'NEW':
             return render_template('admin/supplier_new.html', payment = getMasterAll(Payment))
 
@@ -544,8 +560,11 @@ class AdminView(BasicView):
             flash(MSG_NO_SUCH_ACTION, MESSAGE_ERROR);
             return redirect(url_for('.view', action = 'index'))
         if method == 'LIST':
-            objs = DBSession.query(DBObj).filter(DBObj.active == 0).order_by(DBObj.name).all()
-            return render_template(index_page, records = objs, action = action)
+            page = _g('page') or 1
+            objs = DBSession.query(DBObj).filter(DBObj.active == 0).order_by(DBObj.name)
+            def url_for_page(**params): return url_for('bpAdmin.view', action = action, m = 'LIST', page = params['page'])
+            records = paginate.Page(objs, page, show_if_single_page = True, items_per_page = PAGINATE_PER_PAGE, url = url_for_page)
+            return render_template(index_page, records = records, action = action)
         elif method == 'NEW':
             return render_template(new_page, action = action)
         elif method == 'UPDATE':
@@ -653,6 +672,14 @@ class AdminView(BasicView):
                               index_page = 'admin/note_index.html',
                               new_page = 'admin/note_new.html',
                               update_page = 'admin/note_update.html',)
+
+
+    @tab_highlight('TAB_MASTER')
+    def customer(self):
+        return self._template(Customer, 'customer',
+                              index_page = 'admin/customer_index.html',
+                              new_page = 'admin/customer_new.html',
+                              update_page = 'admin/customer_update.html',)
 
 #    def warehouse(self, DBObj, action,
 #                  index_page = 'admin/template_index.html',
