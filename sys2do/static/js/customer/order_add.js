@@ -49,7 +49,7 @@ function del_item(obj){
 function tosave(){
     var msg = Array();
     
-    if(!$('#source_station').val()){
+    if(!$('#source_province_id').val()){
         msg.push('请填写始发站！');
     }
     
@@ -65,7 +65,7 @@ function tosave(){
         msg.push('请填写票据单号！');
     }
     
-    if(!$('#destination_station').val()){
+    if(!$('#destination_province_id').val()){
         msg.push('请填写目的站！');
     }
     if(!$('#source_company_id').val()){

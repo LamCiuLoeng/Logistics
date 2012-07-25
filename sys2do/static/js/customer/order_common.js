@@ -62,12 +62,21 @@ function clear_destination(){
 }
 
 
+
 $(document).ready(function(){
     $(".order_add_info_tab_div").tabs();
     
     $(".compute").each(function(){
         var t = $(this);
         t.change(compute);
+    });
+    
+    $("#source_province_id").change(function(){
+        province_change(this,'#source_city_id');
+    });
+    
+    $("#destination_province_id").change(function(){
+        province_change(this,'#destination_city_id');
     });
     
     $("#source_company_id").change(function(){

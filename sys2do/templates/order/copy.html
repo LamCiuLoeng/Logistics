@@ -50,11 +50,47 @@
   <div class="order_add_div_header">{{_('Now Order')}}</div>
     <div class="order_add_div_body">
   <ul>
-    	<li style="width:180px;"><span><sup class="warn">*</sup>&nbsp;{{_('Source Station')}}</span>
-    	  <input name="source_station" id="source_station" type="text" style="width:100px" class="must_input" value="{{header.source_station|f}}"/>
+    	<li style="width:450px;"><span><sup class="warn">*</sup>&nbsp;{{_('Source Station')}}</span>
+    		<select name="source_province_id" id="source_province_id" style="width:150px" class="must_input">
+    	      <option value=""></option>
+    	      {% for p in MASTER_ALL('Province') %}
+    	          {% if p.id == header.source_province_id %}
+    	          	<option value="{{p.id}}" selected="selected">{{p}}</option>
+    	          {% else %}
+    	          	<option value="{{p.id}}">{{p}}</option>
+    	          {% endif %}
+    	      {% endfor %}
+    	  </select>
+    	  	<select name="source_city_id" id="source_city_id" style="width:150px">
+    	  		{% for c in source_cites %}
+    	          {% if c.id == header.source_city_id %}
+    	          	<option value="{{c.id}}" selected="selected">{{c}}</option>
+    	          {% else %}
+    	          	<option value="{{c.id}}">{{c}}</option>
+    	          {% endif %}
+    	        {% endfor %}
+    	  	</select>
     	</li>
-    	  <li style="width:180px;"><span><sup class="warn">*</sup>&nbsp;{{_('Destination Station')}}</span>
-    	    <input name="destination_station" id="destination_station" type="text" style="width:100px" class="must_input" value="{{header.destination_station|f}}"/>
+    	<li style="width:450px;"><span><sup class="warn">*</sup>&nbsp;{{_('Destination Station')}}</span>
+		      <select name="destination_province_id" id="destination_province_id" style="width:150px" class="must_input">
+	    	      <option value=""></option>
+	    	      {% for p in MASTER_ALL('Province') %}
+	    	          {% if p.id == header.destination_province_id %}
+	    	          	<option value="{{p.id}}" selected="selected">{{p}}</option>
+	    	          {% else %}
+	    	          	<option value="{{p.id}}">{{p}}</option>
+	    	          {% endif %}
+	    	      {% endfor %}
+	    	  </select> 
+	    	  <select name="destination_city_id" id="destination_city_id" style="width:150px">
+	    	      {% for c in destination_cites %}
+	    	          {% if c.id == header.destination_city_id %}
+	    	          	<option value="{{c.id}}" selected="selected">{{c}}</option>
+	    	          {% else %}
+	    	          	<option value="{{c.id}}">{{c}}</option>
+	    	          {% endif %}
+	    	        {% endfor %}
+	    	  </select>  	      
    	      </li>
     	 <li style="width:180px;"><span><sup class="warn">*</sup>&nbsp;单号</span>
     	    <input name="ref_no" id="ref_no" type="text" class="must_input" style="width:100px" value="{{header.ref_no|f}}"/>
@@ -62,7 +98,7 @@
   	    <li style="width:180px;"><span><sup class="warn">*</sup>&nbsp;票据前缀</span>
     	    <select name="note_id" id="note_id" class="must_input" style="width:100px">
     	    	<option value=""></option>
-    	    	{% for n in notes %}
+    	    	{% for n in MASTER_ALL('Note') %}
     	    		{% if n.id == header.note_id %}
     	    			<option value="{{n.id}}" selected="selected">{{n}}</option>
     	    		{% else %}
@@ -77,7 +113,7 @@
     	  <!-- <li style="width:280px;"><span>{{_('Create Time')}}</span>{{current}}</li> -->
     	  <li style="width:459px;"><span><sup class="warn">*</sup>&nbsp;{{_('Source Company')}}</span>
     	      <select name="source_company_id" id="source_company_id" style="width:360px" class="must_input">
-    	          {% for c in customers %}
+    	          {% for c in MASTER_ALL('Customer') %}
     	              {% if c.id == header.source_company_id %}
     	              <option value="{{c.id}}" selected="selected">{{c}}</option>
     	              {% else %}
@@ -125,7 +161,7 @@
   	    </li>
     	  <li style="width:226px;"><span>{{_('Pickup Type')}}</span>
     	  	<select name="pickup_type_id" id="pickup_type_id">
-    	  		{% for p in pickup_type %}
+    	  		{% for p in MASTER_ALL('PickupType') %}
     	  			{% if p.id == header.pickup_type_id %}
     	  				<option value="{{p.id}}" checked="checked">{{p}}</option>
     	  			{% else %}
@@ -136,7 +172,7 @@
   	    </li>
     	  <li style="width:227px;"><span>{{_('Package Type')}}</span>
     	    <select name="pack_type_id" id="pack_type_id">
-    	  		{% for p in pack_type%}
+    	  		{% for p in MASTER_ALL('PackType') %}
     	  			{% if p.id == header.pack_type_id %}
     	  				<option value="{{p.id}}" checked="checked">{{p}}</option>
     	  			{% else %}
@@ -191,7 +227,7 @@
     	<span style="width:180px;">
 	      <select name="payment_id" id="payment_id" class="order_add_div_body_input" style="width:70px">
 				<option value=''></option>
-				{% for p in payment %}
+				{% for p in MASTER_ALL('Payment') %}
 					{% if p.id == header.payment_id %}
 						<option value="{{p.id}}" selected="selected">{{p}}</option>
 					{% else %}
@@ -256,7 +292,7 @@
 					<td valign="top" width="70px" align="center"><sup class="warn">*</sup>&nbsp;{{_('Item Name')}}</td><td valign="top">
 						<select name="item_id" id="item_id"  class="must_input" style="width:140px;">
 							<option value=""></option>
-							{% for k in items %}
+							{% for k in MASTER_ALL('Item') %}
 								<option value="{{k.id}}">{{k}}</option>
 							{% endfor %}
 						</select>	

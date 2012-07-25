@@ -23,7 +23,7 @@ from sys2do.constant import MESSAGE_ERROR, MSG_NO_SUCH_ACTION, MESSAGE_INFO, \
     ORDER_CANCELLED, MSG_DELETE_SUCC, SORTING, MSG_RECORD_NOT_EXIST, SEND_OUT, \
     GOODS_ARRIVED, IN_TRAVEL, GOODS_SIGNED, MSG_SERVER_ERROR, LOG_GOODS_SORTED, \
     LOG_GOODS_SENT_OUT, LOG_GOODS_ARRIVAL, MSG_NO_ID_SUPPLIED, \
-    SYSTEM_DATETIME_FORMAT, PAGINATE_PER_PAGE
+    SYSTEM_DATETIME_FORMAT
 from sys2do.util.decorator import templated, login_required, tab_highlight
 from sys2do.model import DBSession
 from sys2do.views import BasicView
@@ -33,6 +33,7 @@ from sys2do.util.common import _gl, _g, _gp, getOr404, getMasterAll, _debug, \
     _error, _info
 #from sys2do.util.logic_helper import updateDeliverHeaderStatus
 from sys2do.model.master import Supplier, InventoryItem
+from sys2do.setting import PAGINATE_PER_PAGE
 
 
 __all__ = ['bpDeliver']

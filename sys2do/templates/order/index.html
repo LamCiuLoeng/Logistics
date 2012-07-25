@@ -10,7 +10,13 @@
 <script language="JavaScript" type="text/javascript">
 //<![CDATA[
 	$(document).ready(function(){
-
+		$("#source_province_id").change(function(){
+	        province_change(this,'#source_city_id');
+	    });
+	    
+	    $("#destination_province_id").change(function(){
+	        province_change(this,'#destination_city_id');
+	    });
 	});
 	
 	
@@ -76,8 +82,51 @@
           <li><span>{{_('Order Number')}}</span><input type="text" name="ref_no" value="{{values.get('ref_no','')|f}}"/></li>
           <li style="width:500px"><span>系统编号</span><input type="text" name="no" value="{{values.get('no','')|f}}"/></li>
                  
-          <li><span>{{_('Source Station')}}</span><input type="text" name="source_station" value="{{values.get('source_station','')|f}}"/></li>
-          <li style="width:500px"><span>{{_('Destination Station')}}</span><input type="text" name="destination_station" value="{{values.get('destination_station','')|f}}"/></li>
+          <li style="width:755px"><span>{{_('Source Station')}}</span>
+	          	<select name="source_province_id" id="source_province_id" style="width:150px">
+	    	      <option value=""></option>
+	    	      {% for p in MASTER_ALL('Province') %}
+	    	          {% if '%s' %p.id == values.get('source_province_id',None) %}
+	    	          	<option value="{{p.id}}" selected="selected">{{p}}</option>
+	    	          {% else %}
+	    	          	<option value="{{p.id}}">{{p}}</option>
+	    	          {% endif %}
+	    	      {% endfor %}
+	    	  </select>
+	    	  	<select name="source_city_id" id="source_city_id" style="width:150px">
+	    	  	    <option value=""></option>
+	    	  		{% for c in source_cites %}
+	    	          {% if '%s' %c.id == values.get('source_city_id',None) %}
+	    	          	<option value="{{c.id}}" selected="selected">{{c}}</option>
+	    	          {% else %}
+	    	          	<option value="{{c.id}}">{{c}}</option>
+	    	          {% endif %}
+	    	        {% endfor %}
+	    	  	</select>
+          </li>
+
+          <li style="width:755px"><span>{{_('Destination Station')}}</span>
+	          	<select name="destination_province_id" id="destination_province_id" style="width:150px">
+		    	      <option value=""></option>
+		    	      {% for p in MASTER_ALL('Province') %}
+		    	          {% if '%s' %p.id == values.get('destination_province_id',None) %}
+		    	          	<option value="{{p.id}}" selected="selected">{{p}}</option>
+		    	          {% else %}
+		    	          	<option value="{{p.id}}">{{p}}</option>
+		    	          {% endif %}
+		    	      {% endfor %}
+		    	  </select> 
+		    	  <select name="destination_city_id" id="destination_city_id" style="width:150px">
+		    	      <option value=""></option>
+		    	      {% for c in destination_cites %}
+		    	          {% if '%s' %c.id == values.get('destination_city_id',None) %}
+		    	          	<option value="{{c.id}}" selected="selected">{{c}}</option>
+		    	          {% else %}
+		    	          	<option value="{{c.id}}">{{c}}</option>
+		    	          {% endif %}
+		    	        {% endfor %}
+		    	  </select>
+          </li>
           <li style="width:755px"><span>{{_('Source Company')}}</span>
               <select name="source_company_id" id="source_company_id" style="width:400px">
                   <option value=""></option>
@@ -173,8 +222,8 @@
     <th align="center" style="width:50px;"><input type="checkbox" onclick="allselect(this);"/></th>
     <td align="center" style="width:200px;">{{_('Order Number')}}</td>
     <td align="center" style="width:200px;">系统编号</td>
-    <td align="center" style="width:100px;">{{_('Source Station')}}</td>
-    <td align="center" style="width:100px;">{{_('Destination Station')}}</td>
+    <td align="center" style="width:150px;">{{_('Source Station')}}</td>
+    <td align="center" style="width:150px;">{{_('Destination Station')}}</td>
     <td align="center" style="width:300px;">{{_('Source Company')}}</td>
     <td align="center" style="width:300px;">{{_('Destination Company')}}</td>
     <td align="center" style="width:50px;">{{_('Qty')}}</td>
@@ -195,8 +244,8 @@
 	    <th><input type="checkbox" name="order_ids" value="{{r.id}}" /></th>
 	    <td><a href="{{url_for('.view', action = 'revise',id=r.id)}}">{{r.ref_no|f('没有订单号')}}</a></td>
 	    <td>{{r.no|f}}</td>
-		<td>{{r.source_station|f}}</td>
-		<td>{{r.destination_station|f}}</td>
+		<td>{{r.source_province}}{{r.source_city}}</td>
+		<td>{{r.destination_province}}{{r.destination_city}}</td>
 		<td>{{r.source_company|f}}</td>
 		<td>{{r.destination_company|f}}</td>
 		<td>{{r.qty|f}}</td>

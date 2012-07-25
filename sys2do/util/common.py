@@ -9,12 +9,17 @@
 import os
 import traceback
 from datetime import datetime as dt
+import urllib2
+import json
+
+
 from flask import g, render_template, flash, session, redirect, url_for, request
 from werkzeug import secure_filename
 from flask import current_app as app
 from flaskext import babel
 
-from sys2do.setting import UPLOAD_FOLDER, ALLOWED_EXTENSIONS, UPLOAD_FOLDER_URL
+from sys2do.setting import UPLOAD_FOLDER, ALLOWED_EXTENSIONS, UPLOAD_FOLDER_URL, \
+    SMS_KEY, SMS_FORMAT
 from sys2do.model import DBSession, UploadFile
 from sys2do.constant import MSG_RECORD_NOT_EXIST, MSG_NO_FILE_UPLOADED, \
     MSG_INVALID_FILE_TO_UPLOAD
@@ -117,3 +122,40 @@ def number2alphabet(n):
     result.reverse()
     return "".join(map(lambda v:chr(v + 64), result))
 
+
+
+def check_mobile(no):
+    if not no or not isinstance(no, basestring): return False
+    if not no.isdigit() : return False
+    if len(no) != 11 : return False #china mobile is 11 length
+    if  no[:2] not in ['13', '15'] : return False
+    return True
+
+
+def send_sms(no, content):
+    if not no or not content:
+        return (2, "no NUMBER or no content is supplied!")
+
+    try:
+        if type(no) == str : no = [no, ]
+        no = filter(lambda v : check_mobile(v) , no)
+        if not no : return (2, "no NUMBER or no content is supplied!")
+
+        sms_content = SMS_FORMAT % content
+        url = "http://www.tui3.com/api/send/?k=%s&r=json&p=1&t=%s&c=%s" % (SMS_KEY, ",".join(no), sms_content)
+        f = urllib2.urlopen(url)
+        result = json.loads(f.read())
+        print result
+
+        if result['err_code'] == 0: return (0, 'success')
+        else : return (1, result['err_msg'])
+
+    except:
+        _error(traceback.print_exc())
+        return (1, 'error')
+
+
+
+
+if __name__ == "__main__":
+    print send_sms(['13686488857', '15019200499'], '锐哥,我是阿良，下班了大家一齐去快乐的地方吧。')

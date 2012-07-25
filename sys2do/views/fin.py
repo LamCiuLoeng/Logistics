@@ -17,12 +17,13 @@ from webhelpers import paginate
 
 from sys2do.views import BasicView
 from sys2do.util.decorator import templated, login_required
-from sys2do.model.master import Customer, CustomerTarget
+from sys2do.model.master import Customer, CustomerTarget, Province
 from sys2do.model import DBSession
 from sys2do.util.common import _g, getMasterAll, _error
 from sys2do.constant import MESSAGE_INFO, MSG_SAVE_SUCC, MSG_UPDATE_SUCC, \
-    MSG_SERVER_ERROR, PAGINATE_PER_PAGE
+    MSG_SERVER_ERROR
 from sys2do.model.logic import OrderHeader
+from sys2do.setting import PAGINATE_PER_PAGE
 
 
 
@@ -39,9 +40,10 @@ class FinView(BasicView):
     def index(self):
         if _g('SEARCH_SUBMIT'):  # come from search
             values = {'page' : 1}
-            for f in ['no', 'create_time_from', 'create_time_to', 'ref_no', 'source_station',
-                  'source_company_id', 'destination_station', 'destination_company_id',
-                  'approve', 'paid', 'is_exception', 'is_less_qty'] :
+            for f in ['no', 'create_time_from', 'create_time_to', 'ref_no',
+                      'source_province_id', 'source_city_id', 'destination_province_id', 'destination_city_id',
+                      'source_company_id', 'destination_company_id',
+                      'approve', 'paid', 'is_exception', 'is_less_qty'] :
                 values[f] = _g(f)
         else: #come from paginate or return
             values = session.get('fin_values', {})
@@ -65,16 +67,26 @@ class FinView(BasicView):
             conditions.append(OrderHeader.ref_no.op('like')('%%%s%%' % values['ref_no']))
         if values.get('no', None):
             conditions.append(OrderHeader.no.op('like')('%%%s%%' % values['no']))
-        if values.get('source_station', None):
-            conditions.append(OrderHeader.source_station.op('like')('%%%s%%' % values['source_station']))
+        if values.get('source_province_id', None):
+            conditions.append(OrderHeader.source_province_id == values['source_province_id'])
+            sp = DBSession.query(Province).get(values['source_province_id'])
+            source_cites = sp.children()
+        else: source_cites = []
+        if values.get('source_city_id', None):
+            conditions.append(OrderHeader.source_city_id == values['source_city_id'])
+        if values.get('destination_province_id', None):
+            conditions.append(OrderHeader.destination_province_id == values['destination_province_id'])
+            dp = DBSession.query(Province).get(values['destination_province_id'])
+            destination_cites = dp.children()
+        else: destination_cites = []
+        if values.get('destination_city_id', None):
+            conditions.append(OrderHeader.destination_city_id == values['destination_city_id'])
+
         if values.get('source_company_id', None):
             conditions.append(OrderHeader.source_company_id == values['source_company_id'])
             targets = DBSession.query(CustomerTarget).filter(and_(CustomerTarget.active == 0, CustomerTarget.customer_id == values['source_company_id']))
         else:
             targets = []
-
-        if values.get('destination_station', None):
-            conditions.append(OrderHeader.destination_station.op('like')('%%%s%%' % values['destination_station']))
         if values.get('destination_company_id', None):
             conditions.append(OrderHeader.destination_company_id == values['destination_company_id'])
         if values.get('approve', None):
@@ -96,6 +108,8 @@ class FinView(BasicView):
                 'customers' : getMasterAll(Customer),
                 'targets' : targets,
                 'records' : records,
+                'source_cites' : source_cites,
+                'destination_cites' : destination_cites,
                 }
 
 

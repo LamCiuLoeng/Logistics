@@ -50,3 +50,13 @@ BABEL_DEFAULT_TIMEZONE = 'UTC'
 #SQLALCHEMY_DATABASE_URI = 'mysql://root:admin@192.168.21.157:3306/logistics'
 #postgresql
 SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:admin@192.168.21.157:5432/logistics'
+
+
+
+#setting for paginate ,every page is 20 recore
+PAGINATE_PER_PAGE = 20
+
+
+#sessing for SMS
+SMS_KEY = 'af60848fc19ee0866e376eb60c55e969'
+SMS_FORMAT = u'温馨提示:%s[深福合力]'

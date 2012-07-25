@@ -165,7 +165,8 @@ class Province(DeclarativeBase, SysMixin):
     def __str__(self): return self.name
     def __repr__(self): return self.name
     def __unicode__(self): return self.name
-    def children(self): return DBSession.query(City).filter(and_(City.parent_code == self.code)).all()
+    def children(self):
+        return DBSession.query(City).filter(and_(City.parent_code == self.code)).order_by(City.name).all()
 
 
 class City(DeclarativeBase, SysMixin):
@@ -181,21 +182,21 @@ class City(DeclarativeBase, SysMixin):
     def __unicode__(self): return self.name
 
     def parent(self):  return DBSession.query(Province).filter(Province.code == self.parent_code).one()
-    def children(self): return DBSession.query(District).filter(and_(District.parent_code == self.code)).all()
+#    def children(self): return DBSession.query(District).filter(and_(District.parent_code == self.code)).all()
 
 
-class District(DeclarativeBase, SysMixin):
-    __tablename__ = 'master_district'
-    id = Column(Integer, autoincrement = True, primary_key = True)
-    name = Column(Text)
-    code = Column(Text)
-    parent_code = Column(Text)
-
-
-    def __str__(self): return self.name
-    def __repr__(self): return self.name
-    def __unicode__(self): return self.name
-    def parent(self):  return DBSession.query(City).filter(City.code == self.parent_code).one()
+#class District(DeclarativeBase, SysMixin):
+#    __tablename__ = 'master_district'
+#    id = Column(Integer, autoincrement = True, primary_key = True)
+#    name = Column(Text)
+#    code = Column(Text)
+#    parent_code = Column(Text)
+#
+#
+#    def __str__(self): return self.name
+#    def __repr__(self): return self.name
+#    def __unicode__(self): return self.name
+#    def parent(self):  return DBSession.query(City).filter(City.code == self.parent_code).one()
 
 
 
@@ -532,3 +533,13 @@ class Note(DeclarativeBase, SysMixin, CRUDMixin):
         for f in ['name', 'remark']:
             setattr(self, f, v.get(f, None) or None)
         return self
+
+
+
+class Barcode(DeclarativeBase, SysMixin, CRUDMixin):
+    __tablename__ = 'master_barcode'
+
+    id = Column(Integer, autoincrement = True, primary_key = True)
+    value = Column(Text)
+
+    status = Column(Integer, default = 0)  #0 is used ,1 is reserved ,2 is cancelled 

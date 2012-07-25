@@ -10,7 +10,7 @@ function ajax_save(params,handler){
 function save_header() {
     var msg = Array();
     
-    if(!$('#source_station').val()){
+    if(!$('#source_province_id').val()){
         msg.push('请填写始发站！');
     }
     
@@ -26,7 +26,7 @@ function save_header() {
         msg.push('请填写票据单号！');
     }
     
-    if(!$('#destination_station').val()){
+    if(!$('#destination_province_id').val()){
         msg.push('请填写目的站！');
     }
     if(!$('#source_company_id').val()){

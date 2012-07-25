@@ -13,6 +13,7 @@ import shutil
 import traceback
 
 from webhelpers import paginate
+from werkzeug.utils import redirect
 from flask import Blueprint, render_template, url_for, session, Response
 from flask.globals import request
 from flask.helpers import flash, jsonify, send_file
@@ -25,14 +26,14 @@ from sys2do.constant import MESSAGE_ERROR, MESSAGE_INFO, MSG_UPDATE_SUCC, \
     IN_WAREHOUSE, LOG_CREATE_ORDER, LOG_GOODS_IN_WAREHOUSE, ORDER_NEW, \
     ASSIGN_RECEIVER, LOG_SEND_RECEIVER, OUT_WAREHOUSE, GOODS_PICKUP, GOODS_SIGNED, \
     LOG_GOODS_SIGNED, LOG_GOODS_PICKUPED, LOG_GOODS_IN_TRAVEL, SORTING, \
-    SYSTEM_DATETIME_FORMAT, PAGINATE_PER_PAGE
+    SYSTEM_DATETIME_FORMAT
 from sys2do.model import DBSession
 from sys2do.model.logic import OrderHeader, TransferLog, DeliverDetail, \
     ItemDetail, PickupDetail
 from sys2do.model.master import CustomerProfile, InventoryLocation, Customer, \
     ItemUnit, WeightUnit, ShipmentType, InventoryItem, Payment, Ratio, PickupType, \
-    PackType, CustomerTarget, Receiver, Item, Note
-from sys2do.setting import TMP_FOLDER, TEMPLATE_FOLDER
+    PackType, CustomerTarget, Receiver, Item, Note, City, Province
+from sys2do.setting import TMP_FOLDER, TEMPLATE_FOLDER, PAGINATE_PER_PAGE
 from sys2do.util.barcode_helper import generate_barcode_file
 from sys2do.util.common import _g, getOr404, _gp, getMasterAll, _debug, _info, \
     _gl, _error
@@ -40,12 +41,6 @@ from sys2do.util.decorator import templated, login_required, tab_highlight
 from sys2do.util.excel_helper import SummaryReport
 from sys2do.util.logic_helper import genSystemNo
 from sys2do.views import BasicView
-from werkzeug.utils import redirect
-
-
-
-
-
 
 
 
@@ -55,16 +50,17 @@ bpOrder = Blueprint('bpOrder', __name__)
 
 class OrderView(BasicView):
 
-    decorators = [login_required, tab_highlight('TAB_MAIN'), ]
+#    decorators = [login_required, tab_highlight('TAB_MAIN'), ]
 
     @templated('order/index.html')
 #    @login_required
     def index(self):
         if _g('SEARCH_SUBMIT'):  # come from search
             values = {'page' : 1}
-            for f in ['no', 'create_time_from', 'create_time_to', 'ref_no', 'source_station',
-                  'source_company_id', 'destination_station', 'destination_company_id',
-                  'approve', 'paid', 'is_exception', 'is_less_qty'] :
+            for f in ['no', 'create_time_from', 'create_time_to', 'ref_no',
+                      'source_province_id', 'source_city_id', 'destination_province_id', 'destination_city_id',
+                      'source_company_id', 'destination_company_id',
+                      'approve', 'paid', 'is_exception', 'is_less_qty'] :
                 values[f] = _g(f)
         else: #come from paginate or return
             values = session.get('order_values', {})
@@ -87,16 +83,27 @@ class OrderView(BasicView):
             conditions.append(OrderHeader.ref_no.op('like')('%%%s%%' % values['ref_no']))
         if values.get('no', None):
             conditions.append(OrderHeader.no.op('like')('%%%s%%' % values['no']))
-        if values.get('source_station', None):
-            conditions.append(OrderHeader.source_station.op('like')('%%%s%%' % values['source_station']))
+        if values.get('source_province_id', None):
+            conditions.append(OrderHeader.source_province_id == values['source_province_id'])
+            sp = DBSession.query(Province).get(values['source_province_id'])
+            source_cites = sp.children()
+        else: source_cites = []
+        if values.get('source_city_id', None):
+            conditions.append(OrderHeader.source_city_id == values['source_city_id'])
+        if values.get('destination_province_id', None):
+            conditions.append(OrderHeader.destination_province_id == values['destination_province_id'])
+            dp = DBSession.query(Province).get(values['destination_province_id'])
+            destination_cites = dp.children()
+        else: destination_cites = []
+        if values.get('destination_city_id', None):
+            conditions.append(OrderHeader.destination_city_id == values['destination_city_id'])
+
         if values.get('source_company_id', None):
             conditions.append(OrderHeader.source_company_id == values['source_company_id'])
             targets = DBSession.query(CustomerTarget).filter(and_(CustomerTarget.active == 0, CustomerTarget.customer_id == values['source_company_id']))
         else:
             targets = []
 
-        if values.get('destination_station', None):
-            conditions.append(OrderHeader.destination_station.op('like')('%%%s%%' % values['destination_station']))
         if values.get('destination_company_id', None):
             conditions.append(OrderHeader.destination_company_id == values['destination_company_id'])
         if values.get('approve', None):
@@ -118,6 +125,8 @@ class OrderView(BasicView):
                 'customers' : getMasterAll(Customer),
                 'targets' : targets,
                 'records' : records,
+                'source_cites' : source_cites,
+                'destination_cites' : destination_cites,
                 }
 
 
@@ -126,14 +135,8 @@ class OrderView(BasicView):
         ratios = {}
         for r in DBSession.query(Ratio).filter(Ratio.active == 0):
             ratios[r.type] = r.value
-        return {'customers' :getMasterAll(Customer),
-                'payment' : getMasterAll(Payment, 'id'),
-                'pickup_type' : getMasterAll(PickupType, 'id'),
-                'pack_type' : getMasterAll(PackType, 'id'),
+        return {
                 'ratios' : ratios,
-                'items'  : getMasterAll(Item),
-                'current' : dt.now().strftime("%Y-%m-%d %H:%M"),
-                'notes' : getMasterAll(Note),
                 }
 
 
@@ -161,12 +164,16 @@ class OrderView(BasicView):
 
     def _save_new_process(self):
         params = {}
-        for k in ['source_station', 'source_company_id', 'source_address', 'source_contact', 'source_tel', 'source_mobile',
-                  'destination_station', 'destination_company_id', 'destination_address', 'destination_contact', 'destination_tel', 'destination_mobile',
+        for k in [
+#                  'source_station', 'destination_station',
+                  'source_province_id', 'source_city_id', 'destination_province_id', 'destination_city_id',
+                  'source_company_id', 'source_address', 'source_contact', 'source_tel', 'source_mobile',
+                  'destination_company_id', 'destination_address', 'destination_contact', 'destination_tel', 'destination_mobile',
                   'ref_no', 'order_time', 'expect_time', 'actual_time', 'remark',
                  'payment_id', 'pickup_type_id', 'pack_type_id', 'qty', 'qty_ratio', 'vol', 'vol_ratio',
                   'weight', 'weight_ratio', 'weight_ratio', 'amount', 'insurance_charge', 'sendout_charge', 'receive_charge',
-                  'package_charge', 'other_charge', 'note_id', 'note_no'
+                  'package_charge', 'other_charge', 'note_id', 'note_no',
+
                   ]:
             params[k] = _g(k)
         order = OrderHeader(**params)
@@ -222,17 +229,21 @@ class OrderView(BasicView):
             targets = header.source_company.targets
         else:
             targets = {}
+
+        if header.source_province_id:
+            source_cites = header.source_province.children()
+        else: source_cites = []
+
+        if header.destination_province_id:
+            destination_cites = header.destination_province.children()
+        else: destination_cites = []
+
         return {
                 'header' : header ,
-                'payment' : getMasterAll(Payment),
-                'pickup_type' : getMasterAll(PickupType, 'id'),
-                'pack_type' : getMasterAll(PackType, 'id'),
                 'transit_logs' : logs,
                 'targets' : targets,
-                'customers' : getMasterAll(Customer),
-                'receivers' : getMasterAll(Receiver),
-                'items' : getMasterAll(Item),
-                'notes' : getMasterAll(Note),
+                'source_cites' : source_cites,
+                'destination_cites' : destination_cites,
                 }
 
 
@@ -261,17 +272,21 @@ class OrderView(BasicView):
             targets = header.source_company.targets
         else:
             targets = {}
+
+        if header.source_province_id:
+            source_cites = header.source_province.children()
+        else: source_cites = []
+
+        if header.destination_province_id:
+            destination_cites = header.destination_province.children()
+        else: destination_cites = []
+
         return {
                 'header' : header ,
-                'payment' : getMasterAll(Payment),
-                'pickup_type' : getMasterAll(PickupType, 'id'),
-                'pack_type' : getMasterAll(PackType, 'id'),
                 'transit_logs' : logs,
                 'targets' : targets,
-                'customers' : getMasterAll(Customer),
-                'receivers' : getMasterAll(Receiver),
-                'items' : getMasterAll(Item),
-                'notes' : getMasterAll(Note),
+                'source_cites' : source_cites,
+                'destination_cites' : destination_cites,
                 }
 
 
@@ -496,9 +511,12 @@ class OrderView(BasicView):
         header = DBSession.query(OrderHeader).get(id)
 
         if type == 'order_header':
-            fields = ['ref_no', 'source_station', 'source_company_id', 'source_address', 'source_contact', 'source_tel', 'source_mobile',
+            fields = [
+#                      'source_station', 'destination_station',
+                      'source_province_id', 'source_city_id', 'destination_province_id', 'destination_city_id',
+                      'ref_no', 'source_company_id', 'source_address', 'source_contact', 'source_tel', 'source_mobile',
                       'payment_id', 'qty', 'weight', 'vol', 'shipment_type_id',
-                      'destination_station', 'destination_company_id', 'destination_address', 'destination_contact', 'destination_tel', 'destination_mobile',
+                       'destination_company_id', 'destination_address', 'destination_contact', 'destination_tel', 'destination_mobile',
                       'order_time', 'expect_time', 'actual_time', 'qty_ratio', 'weight_ratio', 'vol_ratio', 'amount', 'cost', 'remark',
                       'pickup_type_id', 'pack_type_id',
                       'insurance_charge', 'sendout_charge', 'receive_charge', 'package_charge', 'other_charge',

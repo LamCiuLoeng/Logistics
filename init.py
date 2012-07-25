@@ -13,7 +13,7 @@ import sys
 from sys2do.model.master import CustomerProfile, Customer, \
     ItemUnit, InventoryLocation, WeightUnit, ShipmentType, Payment, Supplier, \
     SupplierProfile, Ratio, PickupType, PackType, Diqu, CustomerTarget, Receiver, \
-    Item, CustomerTargetContact
+    Item, CustomerTargetContact, Note
 reload(sys)
 sys.setdefaultencoding('utf8')
 
@@ -226,6 +226,12 @@ def init():
         receiver3 = Receiver(code = 'C003', name = '黄司机', tel = '0755-12345673', mobile = '13800138333',)
         receiver4 = Receiver(code = 'C004', name = '王司机', tel = '0755-12345674', mobile = '13800138444',)
         DBSession.add_all([receiver1, receiver2, receiver3, receiver4])
+
+
+        DBSession.add_all([
+                           Note(name = u'坚朗', range = [('1001', '2000'), ('3001', '4000')]),
+                           Note(name = u'味千', range = [('2001', '3000'), ('4001', '5000')]),
+                           ])
         DBSession.commit()
         print "finish init!"
     except:

@@ -11,19 +11,21 @@ from flask import Blueprint, render_template, url_for, request
 from flask.views import View
 from flask.helpers import flash, jsonify
 from werkzeug.utils import redirect
+from webhelpers import paginate
 
+
+from sys2do.setting import PAGINATE_PER_PAGE
 from sys2do.util.decorator import templated, login_required, tab_highlight
 from sys2do.views import BasicView
 from sys2do.model import DBSession
 from sys2do.model.auth import User, Group, Permission
 from sys2do.constant import MESSAGE_ERROR, MSG_NO_SUCH_ACTION, \
     MSG_NO_ID_SUPPLIED, MSG_RECORD_NOT_EXIST, MESSAGE_INFO, MSG_SAVE_SUCC, \
-    MSG_UPDATE_SUCC, MSG_DELETE_SUCC, MSG_SERVER_ERROR, PAGINATE_PER_PAGE
+    MSG_UPDATE_SUCC, MSG_DELETE_SUCC, MSG_SERVER_ERROR
 from sys2do.util.common import _g, _gl, getMasterAll, _error, _gp
 from sys2do.model.master import Customer, CustomerProfile, \
     SupplierProfile, Supplier, Payment, Item, PickupType, PackType, Ratio, \
     Receiver, InventoryLocation, CustomerTarget, Note, CustomerTargetContact
-from webhelpers import paginate
 
 __all__ = ['bpAdmin']
 

@@ -14,7 +14,7 @@ from sys2do.model import DeclarativeBase, metadata, DBSession
 from auth import SysMixin
 from sys2do.model.master import Customer, Supplier, ItemUnit, ShipmentType, \
     WeightUnit, InventoryLocation, Payment, PickupType, PackType, CustomerTarget, \
-    Receiver, Item, Note
+    Receiver, Item, Note, Province, City
 from sys2do.model.auth import CRUDMixin
 from sys2do.model.system import UploadFile
 from sqlalchemy.sql.expression import and_
@@ -38,15 +38,20 @@ class OrderHeader(DeclarativeBase, SysMixin, CRUDMixin):
     note = relation(Note, backref = backref("orders", order_by = id), primaryjoin = "and_(Note.id == OrderHeader.note_id, OrderHeader.active == 0)")
     note_no = Column(Text)
 
+    source_province_id = Column(Integer, ForeignKey('master_province.id'))
+    source_province = relation(Province, backref = backref("source_orders", order_by = id), primaryjoin = "and_(Province.id == OrderHeader.source_province_id, OrderHeader.active == 0)")
+    source_city_id = Column(Integer, ForeignKey('master_city.id'))
+    source_city = relation(City, backref = backref("source_orders", order_by = id), primaryjoin = "and_(City.id == OrderHeader.source_city_id, OrderHeader.active == 0)")
+
+
     source_company_id = Column(Integer, ForeignKey('master_customer.id'))
     source_company = relation(Customer, backref = backref("orders", order_by = id), primaryjoin = "and_(Customer.id == OrderHeader.source_company_id, OrderHeader.active == 0)")
-
-    source_station = Column(Text)
-#    source_company = Column(Text)
+#    source_station = Column(Text)
     source_address = Column(Text)
     source_contact = Column(Text)
     source_tel = Column(Text)
     source_mobile = Column(Text)
+    source_sms = Column(Integer, default = 0) # 0 is no sms, 1 is send sms when the order status changed
 
     payment_id = Column(Integer, ForeignKey('master_payment.id'))
     payment = relation(Payment)
@@ -72,17 +77,22 @@ class OrderHeader(DeclarativeBase, SysMixin, CRUDMixin):
     pack_type_id = Column(Integer, ForeignKey('master_pack_type.id'))
     pack_type = relation(PackType)
 
-    destination_station = Column(Text)
+
+    destination_province_id = Column(Integer, ForeignKey('master_province.id'))
+    destination_province = relation(Province, backref = backref("destination_orders", order_by = id), primaryjoin = "and_(Province.id == OrderHeader.destination_province_id, OrderHeader.active == 0)")
+    destination_city_id = Column(Integer, ForeignKey('master_city.id'))
+    destination_city = relation(City, backref = backref("destination_orders", order_by = id), primaryjoin = "and_(City.id == OrderHeader.destination_city_id, OrderHeader.active == 0)")
 
 
-
-#    destination_company = Column(Text)
+#    destination_station = Column(Text)
     destination_company_id = Column(Integer, ForeignKey('master_customer_target.id'))
     destination_company = relation(CustomerTarget, backref = backref("orders", order_by = id), primaryjoin = "and_(CustomerTarget.id == OrderHeader.destination_company_id, OrderHeader.active == 0)")
     destination_address = Column(Text)
     destination_contact = Column(Text)
     destination_tel = Column(Text)
     destination_mobile = Column(Text)
+    destination_sms = Column(Integer, default = 0) # 0 is no sms, 1 is send sms when the order arrive
+
 
     order_time = Column(Text)
     expect_time = Column(Text)

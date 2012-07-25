@@ -115,7 +115,7 @@ PAGINATE_PARAMS = {
                    'symbol_next' : u'下一页',
                    }
 
-PAGINATE_PER_PAGE = 20
+
 
 
 

@@ -19,7 +19,7 @@ from sys2do.constant import MESSAGE_ERROR, MESSAGE_INFO, MSG_NO_SUCH_ACTION, \
     MSG_RECORD_NOT_EXIST, LOG_GOODS_PICKUPED, LOG_GOODS_SIGNED
 from sys2do.views import BasicView
 from sys2do.model.master import CustomerProfile, Customer, Supplier, \
-    CustomerTarget, Receiver, CustomerTargetContact
+    CustomerTarget, Receiver, CustomerTargetContact, Province, City
 from sys2do.model.logic import OrderHeader, TransferLog, PickupDetail
 from sys2do.util.logic_helper import genSystemNo
 
@@ -113,6 +113,16 @@ class RootView(BasicView):
             t = DBSession.query(Receiver).get(_g('id'))
             return jsonify({'code' : 0 , 'msg' : '' , 'data' : t.populate()})
 
+        if master == 'province':
+            ps = DBSession.query(Province).filter(and_(Province.active == 0)).order_by(Province.name)
+            data = [{'id' : p.id, 'name' : p.name } for p in ps]
+            return jsonify({'code' : 0 , 'msg' : '' , 'data' : data})
+
+        if master == 'province_city':
+            cs = DBSession.query(City).filter(and_(City.active == 0, City.parent_code == Province.code, Province.id == _g('pid'))).order_by(City.name)
+            data = [{'id' : c.id, 'name' : c.name } for c in cs]
+            return jsonify({'code' : 0 , 'msg' : '' , 'data' : data})
+
         return jsonify({'code' : 1, 'msg' : 'Error', })
 
 
@@ -123,15 +133,25 @@ class RootView(BasicView):
 
         if type == 'search':
             try:
-                h = DBSession.query(OrderHeader).filter(OrderHeader.no == barcode).one()
-                params = {
-                          'no' : h.ref_no,
-                          'source_station' : h.source_station,
-                          'source_company' : h.source_company,
-                          'destination_station' : h.destination_station,
-                          'destination_company' : h.destination_company,
-                          'status' : h.status,
+                if barcode == '123456789':
+                    params = {
+                          'no' : 'BARCODE_AVAILABLE',
+                          'source_station' : '',
+                          'source_company' : '',
+                          'destination_station' : '',
+                          'destination_company' : '',
+                          'status' : ''
                           }
+                else:
+                    h = DBSession.query(OrderHeader).filter(OrderHeader.no == barcode).one()
+                    params = {
+                              'no' : h.ref_no,
+                              'source_station' : h.source_station,
+                              'source_company' : h.source_company,
+                              'destination_station' : h.destination_station,
+                              'destination_company' : h.destination_company,
+                              'status' : h.status,
+                              }
             except:
                 params = {
                           'no' : unicode(MSG_RECORD_NOT_EXIST),
