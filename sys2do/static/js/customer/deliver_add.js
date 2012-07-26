@@ -4,6 +4,10 @@ function clear_supplier(){
 }
 
 $(document).ready(function(){
+    $("#destination_province_id").change(function(){
+        province_change(this,'#destination_city_id');
+    });
+    
     $("#supplier_id").change(function(){
         var tmp = $(this);
         

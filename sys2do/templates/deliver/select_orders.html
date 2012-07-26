@@ -17,7 +17,7 @@
 	
 	function tosubmit(){
 		if($("input[name='order_ids']:checked").length < 1){
-			alert('请选择至少一条记录以创建送货单！');
+			alert('{{MSG_ATLEAST_ONE_ORDER_TO_CREATE_DELIVER}}');
 		}else{
 			$("form").submit();
 		}
@@ -37,8 +37,7 @@
 <div class="inner_menu">
 	<ul>
 		<li><img src="/static/images/system/order_manage_25.jpg" width="71" height="21" id="Image1" onmouseover="MM_swapImage('Image1','','/static/images/system/order_manage_h_25.jpg',1)" onmouseout="MM_swapImgRestore()" onclick="toreturn()"/></li>
-        <li><img src="/static/images/system/order_manage_31.jpg" width="77" height="21" id="Image2" onmouseover="MM_swapImage('Image2','','/static/images/system/order_manage_h_31.jpg',1)" onmouseout="MM_swapImgRestore()" onclick="tosubmit()"/></li>
-        <li style="padding:0px; margin:0px 55px 0px 0px; float:right"><a href="{{url_for('bpAuth.logout')}}"><img src="/static/images/system/order_manage_22.jpg" width="56" height="29" /></a></li>
+        <li><img src="/static/images/system/order_manage1_new.jpg" width="101" height="21" id="Image8" onmouseover="MM_swapImage('Image8','','/static/images/system/order_manage_new.jpg',1)" onmouseout="MM_swapImgRestore()" onclick="tosubmit();"/></li>
     </ul>
 </div>
 {% endblock %}
@@ -49,19 +48,19 @@
 		
 	<form method="post" action="{{url_for('.view',action='add_deliver')}}">
 
-	<table border="1" cellpadding="3" cellspacing="3">
+	<table border="1" cellpadding="3" cellspacing="3" style="width:1200px">
 		<thead>
 			<tr class="field_head">
 				<th style="text-align:center;width:50px"><input type="checkbox" onclick="allselect(this);"/></th>
-				<th style="width:100px">{{_('Order Number')}}</th>
+				<th style="width:200px">{{_('Order Number')}}</th>
 				<th style="width:200px">{{_('Customer')}}</th>
-				<th style="width:50px">{{_('Source Station')}}</th>
-				<th style="width:50px">{{_('Destination Station')}}</th>
+				<th style="width:150px">{{_('Source Station')}}</th>
+				<th style="width:150px">{{_('Destination Station')}}</th>
 				<th style="width:50px">{{_('Qty')}}</th>
 				<th style="width:50px">{{_('Vol')}}</th>
 				<th style="width:50px">{{_('Weight')}}</th>
-				<th style="width:80px">{{_('Expect Time')}}</th>
-				<th style="width:80px">{{_('Destination Contact')}}</th>
+				<th style="width:100px">{{_('Expect Time')}}</th>
+				<th style="width:100px">{{_('Destination Contact')}}</th>
 				<th style="width:100px">{{_('Destination Tel')}}</th>
 			</tr>
 			{% for r in result%}
@@ -74,9 +73,9 @@
 					{% endif %}
 				</th>
 				<td><a href="{{url_for('bpOrder.view',action='revise',id=r.id)}}">{{r.ref_no|f}}</a></td>
-				<td>{{r.source_company|f}}</td>
-				<td>{{r.source_station|f}}</td>
-				<td>{{r.destination_station|f}}</td>
+				<td>{{r.source_company.display_name|f}}</td>
+				<td>{{r.source_province}}{{r.source_city}}</td>
+				<td>{{r.destination_province}}{{r.destination_city}}</td>
 				<td>{{r.qty|f}}</td>
 				<td>{{r.vol|f}}</td>
 				<td>{{r.weight|f}}</td>

@@ -273,11 +273,12 @@ class DeliverHeader(DeclarativeBase, SysMixin, CRUDMixin):
     id = Column(Integer, autoincrement = True, primary_key = True)
     no = Column(Text)
 
-#    destination_province_id = Column(Integer, ForeignKey('master_province.id'))
-#    destination_provice = relation(Province)
-#    destination_city_id = Column(Integer, ForeignKey('master_city.id'))
-#    destination_city = relation(City)
-    destination_address = Column(Text)
+    destination_province_id = Column(Integer, ForeignKey('master_province.id'))
+    destination_provice = relation(Province)
+    destination_city_id = Column(Integer, ForeignKey('master_city.id'))
+    destination_city = relation(City)
+
+#    destination_address = Column(Text)
     supplier_id = Column(Integer, ForeignKey('master_supplier.id'))
     supplier = relation(Supplier)
 
@@ -310,7 +311,9 @@ class DeliverHeader(DeclarativeBase, SysMixin, CRUDMixin):
         return {
                 'id' : self.id,
                 'no' : self.no,
-                'destination_address' : self.destination_address,
+#                'destination_address' : self.destination_address,
+                'destination_provice' : self.destination_provice,
+                'destination_city' : self.destination_city,
                 'supplier_id' : self.supplier_id,
                 'supplier' : self.supplier,
                 'supplier_contact' : self.supplier_contact,

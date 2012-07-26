@@ -1,6 +1,24 @@
 {% extends "master.html" %}
+{% import 'macros.html' as mymacros %}
 
 {% block extJS %}
+<script language="JavaScript" type="text/javascript">
+//<![CDATA[
+	$(document).ready(function(){
+	    $("#destination_province_id").change(function(){
+	        province_change(this,'#destination_city_id');
+	    });
+	});
+
+	
+	function toSort(f,d){
+		$("#field").val(f);
+		$("#direction").val(d);
+		$("#search_form").submit();
+	}
+	
+//]]>
+</script>
 
 {% endblock %}
 
@@ -9,7 +27,7 @@
 <div class="inner_menu">
 	<ul>
         <li><a href="{{url_for('.view',action='select_orders')}}"><img src="/static/images/system/order_manage_11_31.jpg" width="77" height="21" id="Image2" onmouseover="MM_swapImage('Image2','','/static/images/system/order_manage_1_31.jpg',1)" onmouseout="MM_swapImgRestore()" /></a></li>
-        <li style="padding:0px; margin:0px 55px 0px 0px; float:right"><a href="{{url_for('bpAuth.logout')}}"><img src="/static/images/system/order_manage_22.jpg" width="56" height="29" /></a></li>
+        
     </ul>
 </div>
 {% endblock %}
@@ -23,17 +41,16 @@
 <div class="search_div">
 	<div class="search_div_header">送货单搜索</div>
     <div class="search_div_body">
-    	<form action="{{url_for('.view')}}" method="post">
+    	<form action="{{url_for('.view')}}" method="post" id="search_form">
     	<ul>
           <li style="width:100%; border-right:#E2FEFE 1px solid;"><span>起始日期</span>
         	  <input type="text" class="datepicker" name="create_time_from" value="{{values.get('create_time_from','')|f}}"/>&nbsp;&nbsp;-&nbsp;&nbsp;<input type="text" class="datepicker" name="create_time_to" value="{{values.get('create_time_to','')|f}}"/>
           </li>
           <li><span>{{_('Deliver Number')}}</span><input type="text" name="no" value="{{values.get('no','')|f}}"/></li>
-          <li><span>{{_('Destination')}}</span><input type="text" name="destination_address" value="{{values.get('destination_address','')|f}}"/></li>
           <li><span>{{_('Supplier')}}</span>
           	  <select name="supplier_id" id="supplier_id">
           	      <option value=""></option>
-          	      {% for s in suppliers %}
+          	      {% for s in MASTER_ALL('Supplier') %}
           	          {% if '%s' %s.id == values.get('supplier_id',None) %}
           	              <option value="{{s.id}}" selected="selected">{{s}}</option>
           	          {% else %}
@@ -42,10 +59,33 @@
           	      {% endfor %}
           	  </select>    
           </li>
-    
+    	  <li style="width:755px"><span>{{_('Destination Station')}}</span>
+	          	<select name="destination_province_id" id="destination_province_id" style="width:150px">
+		    	      <option value=""></option>
+		    	      {% for p in MASTER_ALL('Province') %}
+		    	          {% if '%s' %p.id == values.get('destination_province_id',None) %}
+		    	          	<option value="{{p.id}}" selected="selected">{{p}}</option>
+		    	          {% else %}
+		    	          	<option value="{{p.id}}">{{p}}</option>
+		    	          {% endif %}
+		    	      {% endfor %}
+		    	  </select> 
+		    	  <select name="destination_city_id" id="destination_city_id" style="width:150px">
+		    	      <option value=""></option>
+		    	      {% for c in destination_cites %}
+		    	          {% if '%s' %c.id == values.get('destination_city_id',None) %}
+		    	          	<option value="{{c.id}}" selected="selected">{{c}}</option>
+		    	          {% else %}
+		    	          	<option value="{{c.id}}">{{c}}</option>
+		    	          {% endif %}
+		    	        {% endfor %}
+		    	  </select>
+          </li>
         </ul>
         <div class="button_div"><input type="submit" value="{{_('Search')}}"/></div>
         <input type="hidden" name="SEARCH_SUBMIT" value="TRUE"/>
+        <input type="hidden" name="field" id="field" value=""/>
+        <input type="hidden" name="direction" id="direction" value=""/>
     	</form>
         <div style="clear:both"></div>
     </div>
@@ -53,25 +93,25 @@
 
 <div class="point_div"><img src="/static/images/system/order_manage_54.jpg" width="22" height="28" /><span>{{_('Input the conditions and search.')}}</span></div>
 
-	<table border="1" cellpadding="3" cellspacing="3">
+	<table border="1" cellpadding="3" cellspacing="3" style="width:1200px">
 			<tr class="data_table_tr">
 			    <td colspan="100" style="text-align:right">{{records.pager(**PAGINATE_PARAMS)}}</td>
 			</tr>
 			<tr class="field_head">
-				<th style="width:200px">{{_('Deliver Number')}}</th>
-				<th style="width:80px">{{_('Destination')}}</th>
-				<th style="width:100px">{{_('3rd Party Supplier')}}</th>
+				<th style="width:150px">{{mymacros.show_direction(values,'no')}}{{_('Deliver Number')}}</th>
+				<th style="width:200px">{{mymacros.show_direction(values,'destination_province_id')}}{{_('Destination')}}</th>
+				<th style="width:150px">{{mymacros.show_direction(values,'supplier_id')}}{{_('3rd Party Supplier')}}</th>
 				<th style="width:80px">{{_('Supplier Contact')}}</th>
-				<th style="width:100px">{{_('Supplier Tel')}}</th>
-				<th style="width:100px">{{_('Expect Time')}}</th>
-				<th style="width:100px">{{_('Create Time')}}</th>
-				<th style="width:80px">{{_('Creator')}}</th>
+				<th style="width:80px">{{_('Supplier Tel')}}</th>
+				<th style="width:100px">{{mymacros.show_direction(values,'expect_time')}}{{_('Expect Time')}}</th>
+				<th style="width:100px">{{mymacros.show_direction(values,'create_time')}}{{_('Create Time')}}</th>
+				<th style="width:80px">{{mymacros.show_direction(values,'create_by_id')}}{{_('Creator')}}</th>
 				<th style="width:80px">{{_('Order Status')}}</th>
 			</tr>
 			{% for r in records.items %}
 			<tr class="data_table_tr {{ loop.cycle('data_table_tr_odd', 'data_table_tr_even') }}">
 				<td><a href="{{url_for('.view', action = 'view',id=r.id)}}">{{r.no}}</a></td>
-				<td>{{r.destination_address|ifFalse}}</td>
+				<td>{{r.destination_provice|f}}{{r.destination_city|f}}</td>
 				<td>{{r.supplier}}</td>
 				<td>{{r.supplier_contact}}</td>
 				<td>{{r.supplier_tel}}</td>

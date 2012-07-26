@@ -1,0 +1,11 @@
+{% macro show_direction(values,f) -%}
+    {%if values.get('field',None) == f: %}
+		{%if values.get('direction',None) == 'desc' %}
+			<a href="#" onclick="toSort('{{f}}','asc')"><img src="/static/images/system/down.png"/></a>
+		{%else %}
+			<a href="#" onclick="toSort('{{f}}','desc')"><img src="/static/images/system/up.png"/></a>
+		{%endif%}
+	{% else %}
+		<a href="#" onclick="toSort('{{f}}','desc')"><img src="/static/images/system/updown.gif"/></a>
+	{% endif %}
+{%- endmacro %}

@@ -13,7 +13,7 @@ from sys2do import app
 from sys2do.model import DBSession, User
 from flask.helpers import jsonify, send_file
 from sys2do.util.decorator import templated, login_required, tab_highlight
-from sys2do.util.common import _g, _gp, _gl
+from sys2do.util.common import _g, _gp, _gl, _info, _error
 from sys2do.constant import MESSAGE_ERROR, MESSAGE_INFO, MSG_NO_SUCH_ACTION, \
     MSG_SAVE_SUCC, GOODS_PICKUP, GOODS_SIGNED, OUT_WAREHOUSE, IN_WAREHOUSE, \
     MSG_RECORD_NOT_EXIST, LOG_GOODS_PICKUPED, LOG_GOODS_SIGNED
@@ -127,6 +127,30 @@ class RootView(BasicView):
 
 
 
+    def _compose_xml_result(self, params):
+        xml = []
+        xml.append('<?xml version="1.0" encoding="UTF-8" ?>')
+        xml.append('<ORDER>')
+        xml.append('<NO>%s</NO>' % params['no'])
+        xml.append('<SOURCE_STATION>%s</SOURCE_STATION>' % params['source_station'])
+        xml.append('<SOURCE_COMPANY>%s</SOURCE_COMPANY>' % params['source_company'])
+        xml.append('<DESTINATION_STATION>%s</DESTINATION_STATION>' % params['destination_station'])
+        xml.append('<DESTINATION_COMPANY>%s</DESTINATION_COMPANY>' % params['destination_company'])
+        xml.append('<STATUS>%s</STATUS>' % params['status'])
+        xml.append('</ORDER>')
+        rv = app.make_response("".join(xml))
+        rv.mimetype = 'text/xml'
+        return rv
+
+    def _compose_xml_response(self, code):
+        xml = []
+        xml.append('<?xml version="1.0" encoding="UTF-8" ?>')
+        xml.append('<RESULT>%s</RESULT>' % code)
+        rv = app.make_response("".join(xml))
+        rv.mimetype = 'text/xml'
+        return rv
+
+
     def hh(self):
         type = _g('type')
         barcode = _g('barcode')
@@ -161,24 +185,25 @@ class RootView(BasicView):
                           'destination_company' : '',
                           'status' : ''
                           }
-
-            xml = []
-            xml.append('<?xml version="1.0" encoding="UTF-8" ?>')
-            xml.append('<ORDER>')
-            xml.append('<NO>%s</NO>' % params['no'])
-            xml.append('<SOURCE_STATION>%s</SOURCE_STATION>' % params['source_station'])
-            xml.append('<SOURCE_COMPANY>%s</SOURCE_COMPANY>' % params['source_company'])
-            xml.append('<DESTINATION_STATION>%s</DESTINATION_STATION>' % params['destination_station'])
-            xml.append('<DESTINATION_COMPANY>%s</DESTINATION_COMPANY>' % params['destination_company'])
-            xml.append('<STATUS>%s</STATUS>' % params['status'])
-            xml.append('</ORDER>')
-            rv = app.make_response("".join(xml))
-            rv.mimetype = 'text/xml'
-            return rv
+            return self._compose_xml_result(params)
         elif type == 'submit':
             try:
                 action_type = _g('action_type')
                 action_type = int(action_type)
+
+                #create a draft order by the handheld
+                if action_type == 0:
+                    no = _g('')
+                    ref_no = _g('')
+                    try:
+                        DBSession.add(OrderHeader(no = no, ref_no = ref_no))
+                        DBSession.commit()
+                        return self._compose_xml_response(0)
+                    except:
+                        DBSession.rollback()
+                        _error(traceback.print_exc())
+                        return self._compose_xml_response(1)
+
                 h = DBSession.query(OrderHeader).filter(OrderHeader.no == barcode).one()
                 h.update_status(action_type)
 
@@ -211,31 +236,16 @@ class RootView(BasicView):
                                   remark = remark,
                                   ))
                 DBSession.commit()
-                xml = []
-                xml.append('<?xml version="1.0" encoding="UTF-8" ?>')
-                xml.append('<RESULT>0</RESULT>')
-                rv = app.make_response("".join(xml))
-                rv.mimetype = 'text/xml'
-                return rv
+                return self._compose_xml_response(0)
             except:
-                xml = []
-                xml.append('<?xml version="1.0" encoding="UTF-8" ?>')
-                xml.append('<RESULT>1</RESULT>')
-                rv = app.make_response("".join(xml))
-                rv.mimetype = 'text/xml'
-                return rv
+                return self._compose_xml_response(1)
         else:
-            xml = []
-            xml.append('<?xml version="1.0" encoding="UTF-8" ?>')
-            xml.append('<RESULT>%s</RESULT>' % MSG_NO_SUCH_ACTION)
-            rv = app.make_response("".join(xml))
-            rv.mimetype = 'text/xml'
-            return rv
+            return self._compose_xml_response(MSG_NO_SUCH_ACTION)
 
-    @templated("index.html")
-    def test(self):
-        flash(GOODS_PICKUP[1], MESSAGE_ERROR)
-        return {}
+
+    def sms(self):
+        _info(request.values)
+        return 'OK'
 
 bpRoot.add_url_rule('/', view_func = RootView.as_view('view'), defaults = {'action':'index'})
 bpRoot.add_url_rule('/<action>', view_func = RootView.as_view('view'))

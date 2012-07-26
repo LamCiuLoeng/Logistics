@@ -61,7 +61,10 @@ function clear_destination(){
     $('#destination_mobile').val('');
 }
 
-
+function check_mobile(v){
+    var pattern = /^1\d{10}$/;
+    return pattern.test(v);
+}
 
 $(document).ready(function(){
     $(".order_add_info_tab_div").tabs();

@@ -14,11 +14,14 @@ body{
 	width: 431px;
 }
 .top_system_right {
-	background-image: url(/static/images/system/order_manage_04.jpg);
+	background: url(/static/images/system/order_manage_04.jpg) no-repeat;
 	float: right;
-	height: 55px;
+	height: 155px;
 	width: 96px;
 	margin-right: 50px;
+	position: absolute;
+	right: 30px;
+	z-index: 1;
 }
 .main_menu {
 	background-image: url(/static/images/system/order_manage_10.jpg);

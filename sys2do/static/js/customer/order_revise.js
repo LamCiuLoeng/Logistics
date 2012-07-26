@@ -35,12 +35,22 @@ function save_header() {
     if(!$('#source_contact').val()){
         msg.push('请填写发货人！');
     }
+    var source_mobile = $("#source_mobile").val();
+    if(source_mobile && !check_mobile(source_mobile)){
+        msg.push('请正确填写发货人手机号码！');
+    }
+    
     if(!$('#destination_company_id').val()){
         msg.push('请填写收货公司！');
     }
     if(!$('#destination_contact').val()){
         msg.push('请填写收货人！');
     }
+    var destination_mobile = $("#destination_mobile").val();
+    if(destination_mobile && !check_mobile(destination_mobile)){
+        msg.push('请正确填写收货人手机号码！');
+    }
+    
     if(!$('#amount').val()){
         msg.push('请填写金额！');
     }
@@ -475,4 +485,57 @@ function change_receiver(obj){
               }
     );
     
+}
+
+
+
+function todo_approve(obj){ 
+    var v = $(":selected",obj).val();
+    $(obj).val('');
+    if(v){
+        return todo('APPROVE',v,function(r){
+            if(r.code != 0 ){
+                show_error(r.msg);
+            }else{
+                if(v=='1'){
+                    $(".approval_span").text("审核通过");
+                }else{
+                    $(".approval_span").text("审核不通过");
+                }           
+                show_info(r.msg);
+            }   
+        });
+    }
+}
+                    
+
+function todo_paid(obj){
+    var v = $(":selected",obj).val();
+    $(obj).val('');
+    if(v){
+        return todo('PAID',v,function(r){
+            if(r.code != 0 ){
+                show_error(r.msg);
+            }else{
+                if(v=='0'){
+                    $(".paid_span").text("未付款");
+                }else{
+                    $(".paid_span").text("已付款");
+                }           
+                show_info(r.msg);
+            }   
+        });
+    }
+}
+
+function todo(type,flag,handler){   
+    $.getJSON("/order/ajax_change_flag",
+             {
+                't' : nowstr(),
+                'id' : $("#id").val(),
+                'type' : type,
+                'flag' : flag
+             },
+             handler
+    )
 }

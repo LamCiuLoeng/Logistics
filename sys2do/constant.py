@@ -39,7 +39,10 @@ MSG_INVALID_FILE_TO_UPLOAD = u'上传非法文件！'
 MSG_USER_NOT_EXIST = u'该用户不存在！'
 MSG_WRONG_PASSWORD = u'密码错误!'
 MSG_CONFIRM_DELETE = u'你确认删除该记录吗？'
-
+MSG_ORDER_NOT_FIT_FOR_DELIVER = u'所选择的订单中有状态不能创建送货单的记录，请注意订单状态再重新创建！'
+MSG_ATLEAST_ONE_ORDER_TO_CREATE_DELIVER = u'请选择至少一条记录以创建送货单！'
+MSG_ATLEAST_ONE_ORDER_TO_EXPORT = u'请先选择订单然后再导出！'
+MSG_LEAVE_WITHOUT_SAVING = u'确认不保存而离开这个页面吗？'
 
 
 

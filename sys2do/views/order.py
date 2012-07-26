@@ -18,7 +18,7 @@ from flask import Blueprint, render_template, url_for, session, Response
 from flask.globals import request
 from flask.helpers import flash, jsonify, send_file
 from flask.views import View
-from sqlalchemy.sql.expression import and_
+from sqlalchemy.sql.expression import and_, desc
 from sys2do import app
 from sys2do.constant import MESSAGE_ERROR, MESSAGE_INFO, MSG_UPDATE_SUCC, \
     MSG_DELETE_SUCC, MSG_NO_ID_SUPPLIED, MSG_SERVER_ERROR, MSG_NO_SUCH_ACTION, \
@@ -50,7 +50,7 @@ bpOrder = Blueprint('bpOrder', __name__)
 
 class OrderView(BasicView):
 
-#    decorators = [login_required, tab_highlight('TAB_MAIN'), ]
+    decorators = [login_required, tab_highlight('TAB_MAIN'), ]
 
     @templated('order/index.html')
 #    @login_required
@@ -62,11 +62,13 @@ class OrderView(BasicView):
                       'source_company_id', 'destination_company_id',
                       'approve', 'paid', 'is_exception', 'is_less_qty'] :
                 values[f] = _g(f)
+            values['field'] = _g('field', None) or 'create_time'
+            values['direction'] = _g('direction', None) or 'desc'
+
         else: #come from paginate or return
             values = session.get('order_values', {})
             if _g('page') : values['page'] = int(_g('page'))
             elif 'page' not in values : values['page'] = 1
-
 
         if not values.get('create_time_from', None) and not values.get('create_time_to', None):
             values['create_time_to'] = dt.now().strftime("%Y-%m-%d")
@@ -115,14 +117,19 @@ class OrderView(BasicView):
         if values.get('is_less_qty', None):
             conditions.append(OrderHeader.is_less_qty == values['is_less_qty'])
 
-        result = DBSession.query(OrderHeader).filter(and_(*conditions)).order_by(OrderHeader.create_time.desc())
+
+        # for the sort function
+        field = values.get('field', 'create_time')
+        if values.get('direction', 'desc') == 'desc':
+            result = DBSession.query(OrderHeader).filter(and_(*conditions)).order_by(desc(getattr(OrderHeader, field)))
+        else:
+            result = DBSession.query(OrderHeader).filter(and_(*conditions)).order_by(getattr(OrderHeader, field))
 
         def url_for_page(**params): return url_for('bpOrder.view', action = "index", page = params['page'])
         records = paginate.Page(result, values['page'], show_if_single_page = True, items_per_page = PAGINATE_PER_PAGE, url = url_for_page)
 
         return {
                 'values' : values ,
-                'customers' : getMasterAll(Customer),
                 'targets' : targets,
                 'records' : records,
                 'source_cites' : source_cites,
@@ -173,7 +180,7 @@ class OrderView(BasicView):
                  'payment_id', 'pickup_type_id', 'pack_type_id', 'qty', 'qty_ratio', 'vol', 'vol_ratio',
                   'weight', 'weight_ratio', 'weight_ratio', 'amount', 'insurance_charge', 'sendout_charge', 'receive_charge',
                   'package_charge', 'other_charge', 'note_id', 'note_no',
-
+                  'source_sms', 'destination_sms',
                   ]:
             params[k] = _g(k)
         order = OrderHeader(**params)
@@ -221,8 +228,8 @@ class OrderView(BasicView):
             for f in deliver_heaer.get_logs() : _info(f.remark)
             logs.extend(deliver_heaer.get_logs())
         except:
-            _error(traceback.print_exc())
-
+#            _error(traceback.print_exc())
+            pass
         logs = sorted(logs, cmp = lambda x, y: cmp(x.transfer_date, y.transfer_date))
 
         if header.source_company_id:
@@ -521,6 +528,7 @@ class OrderView(BasicView):
                       'pickup_type_id', 'pack_type_id',
                       'insurance_charge', 'sendout_charge', 'receive_charge', 'package_charge', 'other_charge',
                       'note_id', 'note_no',
+                      'source_sms', 'destination_sms',
                       ]
             for f in fields:
                 setattr(header, f, _g(f))
@@ -758,6 +766,27 @@ class OrderView(BasicView):
         except:
             _error(traceback.print_exc())
             return jsonify({'code' : 1 , 'msg' : MSG_SERVER_ERROR})
+
+
+
+    def ajax_change_flag(self):
+        try:
+            id = _g('id')
+            flag = _g('flag')
+            type = _g('type')
+            r = DBSession.query(OrderHeader).get(id)
+            if type == 'APPROVE':
+                r.approve = flag
+            elif type == 'PAID':
+                r.paid = flag
+            DBSession.commit()
+            return jsonify({'code' : 0 , 'msg' : MSG_UPDATE_SUCC})
+        except:
+            _error(traceback.print_exc())
+            DBSession.rollback()
+            return jsonify({'code' : 1, 'msg' : MSG_SERVER_ERROR})
+
+
 
 
 bpOrder.add_url_rule('/', view_func = OrderView.as_view('view'), defaults = {'action':'index'})

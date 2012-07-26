@@ -19,9 +19,9 @@
 	
 	function toreturn(){
 		if(header_have_update){
-			return redirect_alert("确认不保存而离开这个页面吗？","{{url_for('.view')}}");
+			return redirect_alert("{{MSG_LEAVE_WITHOUT_SAVING}}","{{request.referrer}}");
 		}else{
-			redirect("{{url_for('.view')}}");
+			redirect("{{request.referrer}}");
 		}
 	}	
 
@@ -37,7 +37,7 @@
 	<ul>
     	<li><img src="/static/images/system/order_manage_25.jpg" width="71" height="21" id="Image1" onmouseover="MM_swapImage('Image1','','/static/images/system/order_manage_h_25.jpg',1)" onmouseout="MM_swapImgRestore()" onclick="return toreturn();"/></li>
         <li><input type="image" src="/static/images/system/order_manage_33.jpg" width="77" height="21" id="Image3" onmouseover="MM_swapImage('Image3','','/static/images/system/order_manage_h_33.jpg',1)" onmouseout="MM_swapImgRestore()" onclick="tosave()"/></li>
-        <li style="padding:0px; margin:0px 55px 0px 0px; float:right"><a href="{{url_for('bpAuth.logout')}}"><img src="/static/images/system/order_manage_22.jpg" width="56" height="29" /></a></li>
+        
     </ul>
 </div>
 {% endblock %}
@@ -110,7 +110,6 @@
   	    <li style="width:180px;"><span><sup class="warn">*</sup>&nbsp;票据单号</span>
     	    <input name="note_no" id="note_no" type="text" class="must_input" style="width:100px" value="{{header.note_no|f}}"/>
   	    </li>
-    	  <!-- <li style="width:280px;"><span>{{_('Create Time')}}</span>{{current}}</li> -->
     	  <li style="width:459px;"><span><sup class="warn">*</sup>&nbsp;{{_('Source Company')}}</span>
     	      <select name="source_company_id" id="source_company_id" style="width:360px" class="must_input">
     	          {% for c in MASTER_ALL('Customer') %}
@@ -147,17 +146,29 @@
     	  <li style="width:459px;"><span>{{_('Destination Address')}}</span>
     	    <input name="destination_address" id="destination_address" type="text" style="width:360px" value="{{header.destination_address|f}}"/>
     	  </li>
-    	  <li style="width:227px;"><span>{{_('Source Phone')}}</span>
-    	    <input name="source_tel" id="source_tel" type="text" style="width:140px" value="{{header.source_tel|f}}"/>
+    	  <li style="width:187px;"><span>{{_('Source Phone')}}</span>
+    	    <input name="source_tel" id="source_tel" type="text" style="width:90px" value="{{header.source_tel|f}}"/>
   	    </li>
-    	  <li style="width:226px;"><span>{{_('Source Mobile')}}</span>
-    	    <input name="source_mobile" id="source_mobile" type="text" style="width:140px" value="{{header.source_mobile|f}}"/>
+    	  <li style="width:266px;"><span>{{_('Source Mobile')}}</span>
+    	    <input name="source_mobile" id="source_mobile" type="text" style="width:80px" value="{{header.source_mobile|f}}"/>
+  	    	 {% if header.source_sms %}
+    	    	<input type="checkbox" name="source_sms" value="1" style="width:20px" checked="checked"/>
+    	    {% else %}
+    	    	<input type="checkbox" name="source_sms" value="1" style="width:20px"/>
+    	    {% endif %}
+    	    短信通知
   	    </li>
-        <li style="width:227px;"><span>{{_('Destination Phone')}}</span>
-    	    <input name="destination_tel" id="destination_tel" type="text" style="width:140px" value="{{header.destination_tel|f}}"/>
+        <li style="width:187px;"><span>{{_('Destination Phone')}}</span>
+    	    <input name="destination_tel" id="destination_tel" type="text" style="width:90px" value="{{header.destination_tel|f}}"/>
   	    </li>
-    	  <li style="width:226px;"><span>{{_('Destination Mobile')}}</span>
-    	    <input name="destination_mobile" id="destination_mobile" type="text" style="width:140px" value="{{header.destination_mobile|f}}"/>
+    	  <li style="width:266px;"><span>{{_('Destination Mobile')}}</span>
+    	    <input name="destination_mobile" id="destination_mobile" type="text" style="width:80px" value="{{header.destination_mobile|f}}"/>
+  	    	{% if header.destination_sms %}
+    	    	<input type="checkbox" name="destination_sms" value="1" style="width:20px" checked="checked"/>
+    	    {% else %}
+    	    	<input type="checkbox" name="destination_sms" value="1" style="width:20px"/>
+    	    {% endif %}
+    	    短信通知
   	    </li>
     	  <li style="width:226px;"><span>{{_('Pickup Type')}}</span>
     	  	<select name="pickup_type_id" id="pickup_type_id">

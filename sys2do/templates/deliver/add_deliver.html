@@ -23,8 +23,14 @@
 		if(!$("#no").val()){
 			msg.push('请填写送货单号码！');
 		}
-		if(!$("#destination_address").val()){
+		if(!$("#destination_province_id").val()){
 			msg.push('请填写目的地！');
+		}
+		if(!$("#supplier_contact").val()){
+			msg.push('请填写承运商联系人！');
+		}
+		if(!$("#supplier_tel").val()){
+			msg.push('请填写承运商电话！');
 		}
 		if(!$("#expect_time").val()){
 			msg.push('请填写到达预期！');
@@ -43,9 +49,9 @@
 	
 	function toreturn(){
 		if(header_have_update){
-			return redirect_alert("确认不保存而离开这个页面吗？","{{url_for('.view')}}");
+			return redirect_alert("{{MSG_LEAVE_WITHOUT_SAVING}}","{{request.referrer}}");
 		}else{
-			redirect("{{url_for('.view')}}");
+			redirect("{{request.referrer}}");
 		}
 	}	
 	
@@ -59,7 +65,7 @@
 	<ul>
     	<li><img src="/static/images/system/order_manage_25.jpg" width="71" height="21" id="Image1" onmouseover="MM_swapImage('Image1','','/static/images/system/order_manage_h_25.jpg',1)" onmouseout="MM_swapImgRestore()" onclick="return toreturn();"/></li>
         <li><input type="image" src="/static/images/system/order_manage_33.jpg" width="77" height="21" id="Image3" onmouseover="MM_swapImage('Image3','','/static/images/system/order_manage_h_33.jpg',1)" onmouseout="MM_swapImgRestore()" onclick="tosave()"/></li>
-        <li style="padding:0px; margin:0px 55px 0px 0px; float:right"><a href="{{url_for('bpAuth.logout')}}"><img src="/static/images/system/order_manage_22.jpg" width="56" height="29" /></a></li>
+        
     </ul>
 </div>
 {% endblock %}
@@ -75,43 +81,51 @@
 				<tr>
 					<td width="100" height="30" align="right">{{_('3rd Party Supplier')}}</td>
 					<td width="12">&nbsp;</td>
-					<td width="300">
-					  <select name="supplier_id" id="supplier_id" class="field order_add_div_body_input" style="width: 200px">
+					<td width="600">
+					  <select name="supplier_id" id="supplier_id" class="field order_add_div_body_input must_input" style="width: 200px">
 							<option value=""></option>
 							{% for s in suppliers %}
 								<option value="{{s.id}}">{{s}}</option>
 							{% endfor %}
 						</select>
 					</td>
-					<tr>
-						<td height="30" align="right">{{_('Deliver Number')}}</td>
-						<td>&nbsp;</td>
-					  <td><input type="text" name="no" id="no" class="field order_add_div_body_input" style="width: 200px"/></td>
-					</tr>
 				<tr>
 					<td height="30" align="right">{{_('Destination')}}</td>
 					<td>&nbsp;</td>
-				  <td><input type="text" name="destination_address" id="destination_address" class="field order_add_div_body_input" style="width: 200px"/></td>
+				  <td>
+					<select name="destination_province_id" id="destination_province_id" style="width:150px" class="field order_add_div_body_input must_input" style="width: 150px">
+		    	      <option value=""></option>
+		    	      {% for p in MASTER_ALL('Province') %}
+		    	          <option value="{{p.id}}">{{p}}</option>
+		    	      {% endfor %}
+		    	  </select>
+		    	  <select name="destination_city_id" id="destination_city_id" class="field order_add_div_body_input " style="width: 150px"></select>				  
+				  </td>
 				</tr>
+					<tr>
+						<td height="30" align="right">{{_('Deliver Number')}}</td>
+						<td>&nbsp;</td>
+					  <td><input type="text" name="no" id="no" class="field order_add_div_body_input must_input" style="width: 200px"/></td>
+					</tr>
 				<tr>
 					<td height="30" align="right">{{_('Supplier Contact')}}</td>
 					<td>&nbsp;</td>
-				  <td><input type="text" name="supplier_contact" id="supplier_contact" class="field order_add_div_body_input" style="width: 200px"/></td>
+				  <td><input type="text" name="supplier_contact" id="supplier_contact" class="field order_add_div_body_input must_input" style="width: 200px"/></td>
 				</tr>
 				<tr>
 					<td height="30" align="right">{{_('Supplier Tel')}}</td>
 					<td>&nbsp;</td>
-				  <td><input type="text" name="supplier_tel" id="supplier_tel" class="field order_add_div_body_input" style="width: 200px"/></td>
+				  <td><input type="text" name="supplier_tel" id="supplier_tel" class="field order_add_div_body_input must_input" style="width: 200px"/></td>
 				</tr>
 				<tr>
 					<td height="30" align="right">{{_('Expect Time')}}</td>
 					<td>&nbsp;</td>
-				  <td><input type="text" name="expect_time" id="expect_time" class="datepicker order_add_div_body_input" style="width: 200px"/></td>
+				  <td><input type="text" name="expect_time" id="expect_time" class="datepicker order_add_div_body_input must_input" style="width: 200px"/></td>
 				</tr>
 				<tr>
 					<td height="30" align="right">{{_('Charge')}}</td>
 					<td>&nbsp;</td>
-				  <td><input type="text" name="amount" id="amount" class="numeric order_add_div_body_input" style="width: 200px"/></td>
+				  <td><input type="text" name="amount" id="amount" class="numeric order_add_div_body_input must_input" style="width: 200px"/></td>
 				</tr>
 				<tr>
 					<td height="30" align="right">{{_('Remark')}}</td>
@@ -123,26 +137,26 @@
   <br />
 		<br />
 		
-		<table border="1" cellpadding="3" cellspacing="3">
+		<table border="1" cellpadding="3" cellspacing="3" style="width:1200px">
 			<thead>
 				<tr class="field_head">
 					<th style="width:200px">{{_('Order Number')}}</th>
-					<th style="width:100px">{{_('Source Station')}}</th>
-					<th style="width:100px">{{_('Destination Station')}}</th>
+					<th style="width:200px">{{_('Source Station')}}</th>
+					<th style="width:200px">{{_('Destination Station')}}</th>
 					<th style="width:50px">{{_('Qty')}}</th>
 					<th style="width:50px">{{_('Vol')}}</th>
 					<th style="width:50px">{{_('Weight')}}</th>
 					<th style="width:100px">{{_('Destination Contact')}}</th>
 					<th style="width:100px">{{_('Destination Tel')}}</th>
-					<th>{{_('Update Time')}}</th>
-					<th>{{_('Last Updator')}}</th>
+					<th style="width:150px">{{_('Update Time')}}</th>
+					<th style="width:150px">{{_('Last Updator')}}</th>
 				</tr>
 			</thead>
 			{% for d in result %}		
 				<tr class="data_table_tr {{ loop.cycle('data_table_tr_odd', 'data_table_tr_even') }}">
 					<th>{{d.ref_no|f}}<input type="hidden" name="detail_{{d.id}}" value="{{d.id}}"/></th>
-					<td>{{d.source_station}}</td>
-					<td>{{d.destination_station|f}}</td>
+					<td>{{d.source_province}}{{d.source_city}}</td>
+					<td>{{d.destination_province}}{{d.destination_city}}</td>
 					<td>{{d.qty|f}}</td>
 					<td>{{d.vol|f}}</td>
 					<td>{{d.weight|f}}</td>
@@ -154,9 +168,9 @@
 			{% endfor %}
 				<tr class="data_table_tr">
 					<td colspan="3" style="text-align:left">合计</td>
-					<td>{{total_qty}}</td>
-					<td>{{total_vol}}</td>
-					<td>{{total_weight}}</td>
+					<td>{{result|sum_with_none(attribute='qty')}}</td>
+					<td>{{result|sum_with_none(attribute='vol')}}</td>
+					<td>{{result|sum_with_none(attribute='weight')}}</td>
 					<td colspan="4">&nbsp;</td>
 				</tr>
 		</table>

@@ -59,4 +59,4 @@ PAGINATE_PER_PAGE = 20
 
 #sessing for SMS
 SMS_KEY = 'af60848fc19ee0866e376eb60c55e969'
-SMS_FORMAT = u'温馨提示:%s[深福合力]'
+SMS_FORMAT = u'%s[深福合力]'

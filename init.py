@@ -70,6 +70,11 @@ def init():
         pDeleteDriver = Permission(name = 'DELETE_DRIVER')
         pSearchDriver = Permission(name = 'SEARCH_DRIVER')
 
+        pFinSearch = Permission(name = 'FIN_SEARCH')
+        pFinApprove = Permission(name = 'FIN_APPROVE')
+        pFinPaid = Permission(name = 'FIN_PAID')
+
+
         gAdmin = Group(name = 'ADMIN', display_name = 'Administrator', type = 0)
         gAdmin.permissions = [pCreateUser, pUpdateUser, pDeleteUser, pSearchUser,
                               pCreateOrder, pUpdateOrder, pDeleteOrder, pSearchOrder, pSearchAllOrder, pManageOrder,
@@ -77,7 +82,9 @@ def init():
                               pCreateCustomer, pUpdateCustomer, pDeleteCustomer, pSearchCustomer,
                               pCreateSupplier, pUpdateSupplier, pDeleteSupplier, pSearchSupplier,
                               pCreateWarehouse, pUpdateWarehouse, pDeleteWarehouse, pSearchWarehouse,
-                              pCreateDriver, pUpdateDriver, pDeleteDriver, pSearchDriver]
+                              pCreateDriver, pUpdateDriver, pDeleteDriver, pSearchDriver,
+                              pFinSearch, pFinApprove, pFinPaid,
+                              ]
         gAdmin.users = [uAdmin, ]
         gCustomer = Group(name = 'CUSTOMER', display_name = 'Customer', type = 0)
         gCustomer.permissions = [pCreateOrder, pUpdateOrder, pDeleteOrder, pSearchOrder, ]
@@ -173,7 +180,7 @@ def init():
         DBSession.add(Item(name = u"家具"))
 
 
-        kinlong = Customer(name = u"广东坚朗五金制品股份有限公司", address = u"广东省东莞市塘厦镇大坪村工业区卢地坑路3号", phone = "0769-82166666", contact_person = u'陈先生', mobile = '12800138999', payment = payment1)
+        kinlong = Customer(name = u"广东坚朗五金制品股份有限公司", display_name = u'坚朗', address = u"广东省东莞市塘厦镇大坪村工业区卢地坑路3号", phone = "0769-82166666", contact_person = u'陈先生', mobile = '12800138999', payment = payment1)
         kinlong_profile = CustomerProfile(name = "KINLONG_PROFILE", customer = kinlong, group = gKinlongGroup)
 
         kinlong_target1 = CustomerTarget(customer = kinlong, name = u'收货公司一')
@@ -191,7 +198,7 @@ def init():
         kinlong_target3_c2 = CustomerTargetContact(customer_target = kinlong_target3, name = u'林一', mobile = u'13800138332', phone = u'14587542', address = u'湖南省长沙市BB区')
         kinlong_target3_c3 = CustomerTargetContact(customer_target = kinlong_target3, name = u'余一', mobile = u'13800138333', phone = u'14587543', address = u'湖南省长沙市CC区')
 
-        weiqian = Customer(name = u"味千（中国）控股有限公司", address = u"广东省深圳市福田区金田路3037号金中环商务大厦主楼23号", phone = "0755-8280 5333", contact_person = u'胡先生', mobile = '12800138999', payment = payment1)
+        weiqian = Customer(name = u"味千（中国）控股有限公司", display_name = u'味千', address = u"广东省深圳市福田区金田路3037号金中环商务大厦主楼23号", phone = "0755-8280 5333", contact_person = u'胡先生', mobile = '12800138999', payment = payment1)
         weiqian_profile = CustomerProfile(name = "WEIQIAN_PROFILE", customer = weiqian, group = gWeiqianGroup)
 
         weiqian_target1 = CustomerTarget(customer = weiqian, name = u'味千收货公司一')
@@ -206,7 +213,7 @@ def init():
         weiqian_target2_c1 = CustomerTargetContact(customer_target = weiqian_target3 , name = u'林三', mobile = u'1388013111', phone = u'123456', address = u'湖北省武汉市AA区', is_default = 1)
         weiqian_target2_c2 = CustomerTargetContact(customer_target = weiqian_target3 , name = u'五三', mobile = u'1388013111', phone = u'123456', address = u'湖北省武汉市BB区')
 
-        supplier1 = Supplier(name = u"承运商一", address = u"广东省珠海市斗门区", phone = "0756-25361422", contact_person = u"林先生")
+        supplier1 = Supplier(name = u"承运商一", display_name = u'承运商一', address = u"广东省珠海市吉大区", phone = "0756-25361422", contact_person = u"林先生")
         supplier1_profile = SupplierProfile(name = "SUPPLIER1_PROFILE", supplier = supplier1, group = gSupplier1)
 
 

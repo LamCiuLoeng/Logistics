@@ -11,10 +11,11 @@ from datetime import datetime as dt, timedelta
 
 
 from flask import session
+from flask import request
 from flask.blueprints import Blueprint
 from flask.views import View
 from flask.helpers import url_for, flash, jsonify
-from sqlalchemy.sql.expression import and_
+from sqlalchemy.sql.expression import and_, desc
 from werkzeug.utils import redirect
 from webhelpers import paginate
 
@@ -23,16 +24,15 @@ from sys2do.constant import MESSAGE_ERROR, MSG_NO_SUCH_ACTION, MESSAGE_INFO, \
     ORDER_CANCELLED, MSG_DELETE_SUCC, SORTING, MSG_RECORD_NOT_EXIST, SEND_OUT, \
     GOODS_ARRIVED, IN_TRAVEL, GOODS_SIGNED, MSG_SERVER_ERROR, LOG_GOODS_SORTED, \
     LOG_GOODS_SENT_OUT, LOG_GOODS_ARRIVAL, MSG_NO_ID_SUPPLIED, \
-    SYSTEM_DATETIME_FORMAT
+    SYSTEM_DATETIME_FORMAT, MSG_ORDER_NOT_FIT_FOR_DELIVER
 from sys2do.util.decorator import templated, login_required, tab_highlight
 from sys2do.model import DBSession
 from sys2do.views import BasicView
 from sys2do.model.logic import DeliverHeader, OrderHeader, \
     DeliverDetail, TransferLog
 from sys2do.util.common import _gl, _g, _gp, getOr404, getMasterAll, _debug, \
-    _error, _info
-#from sys2do.util.logic_helper import updateDeliverHeaderStatus
-from sys2do.model.master import Supplier, InventoryItem
+    _error, _info, send_sms
+from sys2do.model.master import Supplier, InventoryItem, Province
 from sys2do.setting import PAGINATE_PER_PAGE
 
 
@@ -49,8 +49,11 @@ class DeliverView(BasicView):
     def index(self):
         if _g('SEARCH_SUBMIT'):  # come from search
             values = {'page' : 1}
-            for f in ['create_time_from', 'create_time_to', 'no', 'destination_address', 'supplier_id', ] :
+            for f in ['create_time_from', 'create_time_to', 'no', 'destination_province_id', 'destination_city_id', 'supplier_id', ] :
                 values[f] = _g(f)
+            values['field'] = _g('field', None) or 'create_time'
+            values['direction'] = _g('direction', None) or 'desc'
+
         else: #come from paginate or return
             values = session.get('deliver_values', {})
             if _g('page') : values['page'] = int(_g('page'))
@@ -63,27 +66,42 @@ class DeliverView(BasicView):
 
         session['deliver_values'] = values
 
-        conditions = [OrderHeader.active == 0]
+        conditions = [DeliverHeader.active == 0]
         if values.get('create_time_from', None):
             conditions.append(DeliverHeader.create_time > values['create_time_from'])
         if values.get('create_time_to', None):
             conditions.append(DeliverHeader.create_time < '%s 23:59' % values['create_time_to'])
         if values.get('no', None):
             conditions.append(DeliverHeader.no.op('like')('%%%s%%' % values['no']))
-        if values.get('destination_address', None):
-            conditions.append(DeliverHeader.destination_address.op('like')('%%%s%%' % values['destination_address']))
+        if values.get('destination_province_id', None):
+            conditions.append(DeliverHeader.destination_province_id == values['destination_province_id'])
+            dp = DBSession.query(Province).get(values['destination_province_id'])
+            destination_cites = dp.children()
+        else: destination_cites = []
+        if values.get('destination_city_id', None):
+            conditions.append(DeliverHeader.destination_city_id == values['destination_city_id'])
         if values.get('supplier_id', None):
             conditions.append(DeliverHeader.supplier_id == values['supplier_id'])
 
-        result = DBSession.query(DeliverHeader).filter(and_(*conditions)).order_by(DeliverHeader.create_time.desc())
+        # for the sort function
+        field = values.get('field', 'create_time')
+        if values.get('direction', 'desc') == 'desc':
+            result = DBSession.query(DeliverHeader).filter(and_(*conditions)).order_by(desc(getattr(DeliverHeader, field)))
+        else:
+            result = DBSession.query(DeliverHeader).filter(and_(*conditions)).order_by(getattr(DeliverHeader, field))
+
+
         def url_for_page(**params): return url_for('bpDeliver.view', action = "index", page = params['page'])
         records = paginate.Page(result, values['page'], show_if_single_page = True, items_per_page = PAGINATE_PER_PAGE, url = url_for_page)
 
-        return {'records' : records,
+        return {
+                'records' : records,
                 'values' : values,
-                'suppliers' : getMasterAll(Supplier)
-
+                'destination_cites' : destination_cites,
                 }
+
+
+
 
     @templated('deliver/select_orders.html')
     def select_orders(self):
@@ -115,22 +133,30 @@ class DeliverView(BasicView):
     @templated('deliver/add_deliver.html')
     def add_deliver(self):
         ids = _gl('order_ids')
+
+        if not ids:
+            ids = [_g('order_ids'), ]
+
         order_headers = DBSession.query(OrderHeader).filter(OrderHeader.id.in_(ids))
 
-        total_qty = total_vol = total_weight = 0
         for h in order_headers:
-            total_qty += h.qty or 0
-            total_vol += h.vol or 0
-            total_weight += h.weight or 0
+            if h.status >= SORTING[0]:
+                flash(MSG_ORDER_NOT_FIT_FOR_DELIVER, MESSAGE_ERROR)
+                if request.referrer:
+                    return redirect(request.referrer)
+                else:
+                    return redirect(self.default())
 
         suppliers = getMasterAll(Supplier)
-        return {'result' : order_headers, 'suppliers' : suppliers, 'total_qty' : total_qty, 'total_vol' : total_vol, 'total_weight' : total_weight}
+        return {'result' : order_headers, 'suppliers' : suppliers, }
 
 
     def deliver_save_new(self):
         try:
             header = DeliverHeader(no = _g('no'),
-                                   destination_address = _g('destination_address'),
+#                                   destination_address = _g('destination_address'),
+                                   destination_province_id = _g('destination_province_id'),
+                                   destination_city_id = _g('destination_city_id'),
                                    supplier_id = _g('supplier_id'),
                                    supplier_contact = _g('supplier_contact'),
                                    supplier_tel = _g('supplier_tel'),
@@ -151,7 +177,7 @@ class DeliverView(BasicView):
                 order_header.deliver_header_no = header.no
                 line_no += 1
 
-
+            DBSession.flush()
             DBSession.add(TransferLog(
                                       refer_id = header.id,
                                       transfer_date = dt.now().strftime(SYSTEM_DATETIME_FORMAT),
@@ -175,6 +201,17 @@ class DeliverView(BasicView):
         return {'header' : h, 'values' : h.populate() , 'details' : h.details}
 
 
+    @templated('deliver/view.html')
+    def view_by_no(self):
+        no = _g('no')
+        try:
+            h = DBSession.query(DeliverHeader).filter(and_(DeliverHeader.active == 0, DeliverHeader.no == no)).one()
+            return {'header' : h, 'values' : h.populate() , 'details' : h.details}
+        except:
+            flash(MSG_RECORD_NOT_EXIST, MESSAGE_ERROR)
+            return redirect(self.default())
+
+
     @templated('deliver/revise_deliver.html')
     def revise(self):
         header = getOr404(DeliverHeader, _g('id'), redirect_url = self.default())
@@ -187,6 +224,12 @@ class DeliverView(BasicView):
     def delete(self):
         header = getOr404(DeliverHeader, _g('id'), redirect_url = self.default())
         header.active = 1
+
+        for d in header.details:
+            d.active = 1
+            d.order_header.deliver_header_no = None
+            d.order_header.deliver_header_ref = None
+            d.order_header.status = ORDER_NEW[0]
         DBSession.commit()
         flash(MSG_DELETE_SUCC, MESSAGE_INFO)
         return redirect(url_for('.view', action = 'index'))
@@ -353,6 +396,25 @@ class DeliverView(BasicView):
 
 
 
+    def _sms(self, header, suffix):
+        try:
+            for detail in header.details:
+                order_header = detail.order_header
+                users = []
+                if order_header.source_sms and order_header.source_mobile:
+                    users.append(order_header.source_mobile)
+                if order_header.destination_sms and order_header.destination_mobile:
+                    users.append(order_header.destination_mobile)
+                if users:
+                    content = u'订单:%s[目的站:%s，发货人:%s，收货人:%s，数量:%s]%s' % (order_header.ref_no,
+                                                                       order_header.destination_province, order_header.source_contact, order_header.destination_contact,
+                                                                       order_header.qty, suffix)
+                    send_sms(users, content)
+        except:
+            _error(traceback.print_exc())
+            pass
+
+
 
     def ajax_save(self):
         id = _g("id")
@@ -371,6 +433,7 @@ class DeliverView(BasicView):
                                       ))
             header.sendout_time = _g('send_out_time')
             DBSession.commit()
+            self._sms(header, u'已发货。')
             return jsonify({'code' : 0 , 'msg' : unicode(MSG_SAVE_SUCC)})
 
         if type == 'transit':
@@ -396,8 +459,8 @@ class DeliverView(BasicView):
             for d in header.details:
                 order_header = d.order_header
                 order_header.actual_time = _g('arrived_time')
-
             DBSession.commit()
+            self._sms(header, u'已到达。')
             return jsonify({'code' : 0 , 'msg' : unicode(MSG_SAVE_SUCC)})
 
 

@@ -9,7 +9,7 @@
 from datetime import datetime as dt, timedelta
 import traceback
 from werkzeug.utils import redirect
-from sqlalchemy.sql.expression import and_
+from sqlalchemy.sql.expression import and_, desc
 from flask.blueprints import Blueprint
 from flask.helpers import flash, jsonify, url_for
 from flask import session
@@ -45,6 +45,8 @@ class FinView(BasicView):
                       'source_company_id', 'destination_company_id',
                       'approve', 'paid', 'is_exception', 'is_less_qty'] :
                 values[f] = _g(f)
+                values['field'] = _g('field', None) or 'create_time'
+                values['direction'] = _g('direction', None) or 'desc'
         else: #come from paginate or return
             values = session.get('fin_values', {})
             if _g('page') : values['page'] = int(_g('page'))
@@ -98,7 +100,12 @@ class FinView(BasicView):
         if values.get('is_less_qty', None):
             conditions.append(OrderHeader.is_less_qty == values['is_less_qty'])
 
-        result = DBSession.query(OrderHeader).filter(and_(*conditions)).order_by(OrderHeader.create_time.desc())
+        # for the sort function
+        field = values.get('field', 'create_time')
+        if values.get('direction', 'desc') == 'desc':
+            result = DBSession.query(OrderHeader).filter(and_(*conditions)).order_by(desc(getattr(OrderHeader, field)))
+        else:
+            result = DBSession.query(OrderHeader).filter(and_(*conditions)).order_by(getattr(OrderHeader, field))
 
         def url_for_page(**params): return url_for('bpOrder.view', action = "index", page = params['page'])
         records = paginate.Page(result, values['page'], show_if_single_page = True, items_per_page = PAGINATE_PER_PAGE, url = url_for_page)

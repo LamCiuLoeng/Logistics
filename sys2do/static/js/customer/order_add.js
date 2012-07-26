@@ -74,12 +74,24 @@ function tosave(){
     if(!$('#source_contact').val()){
         msg.push('请填写发货人！');
     }
+    
+    var source_mobile = $("#source_mobile").val();
+    if(source_mobile && !check_mobile(source_mobile)){
+        msg.push('请正确填写发货人手机号码！');
+    }
+    
     if(!$('#destination_company_id').val()){
         msg.push('请填写收货公司！');
     }
     if(!$('#destination_contact').val()){
         msg.push('请填写收货人！');
     }
+    
+    var destination_mobile = $("#destination_mobile").val();
+    if(destination_mobile && !check_mobile(destination_mobile)){
+        msg.push('请正确填写收货人手机号码！');
+    }
+    
     if(!$('#amount').val()){
         msg.push('请填写金额！');
     }

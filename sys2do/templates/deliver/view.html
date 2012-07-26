@@ -9,8 +9,17 @@
 	});	
 	
 	function toreturn(){
-		redirect("{{url_for('.view')}}");
-	}		
+		redirect("{{request.referrer}}");
+	}
+	
+	function todelete() {
+    	if(confirm('{{MSG_CONFIRM_DELETE}}')){
+    		var url = "{{url_for('.view', action = 'delete',id=header.id)|safe}}";
+    		redirect(url);
+    	}else{
+    		return false;
+    	}
+	}	
 //]]>
 </script>
 {% endblock %}
@@ -21,7 +30,7 @@
 <div class="inner_menu">
 	<ul>
 		<li><img src="/static/images/system/order_manage_25.jpg" width="71" height="21" id="Image1" onmouseover="MM_swapImage('Image1','','/static/images/system/order_manage_h_25.jpg',1)" onmouseout="MM_swapImgRestore()" onclick="toreturn()"/></li>
-        <li style="padding:0px; margin:0px 55px 0px 0px; float:right"><a href="{{url_for('bpAuth.logout')}}"><img src="/static/images/system/order_manage_22.jpg" width="56" height="29" /></a></li>
+        <li><img src="/static/images/system/order_manage_29.jpg" width="77" height="21" id="Image6" onmouseover="MM_swapImage('Image6','','/static/images/system/order_manage_h_29.jpg',1)" onmouseout="MM_swapImgRestore()" onclick="return todelete()"/></li>
     </ul>
 </div>
 {% endblock %}
@@ -49,7 +58,7 @@
 			<tr>
 				<td height="30" align="right">{{_('Destination')}}</td>
 				<td width="12">&nbsp;</td>
-				<td>{{values.get('destination_address','')|f}}</td>
+				<td>{{values.get('destination_provice','')|f}}{{values.get('destination_city','')|f}}</td>
 			</tr>
 			<tr>
 				<td height="30" align="right">{{_('Supplier Contact')}}</td>
@@ -116,8 +125,8 @@
 			{% for d in details %}
 				<tr class="data_table_tr {{ loop.cycle('data_table_tr_odd', 'data_table_tr_even') }}">
 					<th><a href="{{url_for('bpOrder.view',action='revise',id=d.order_header_id)}}">{{d.order_header.ref_no}}</a></th>
-					<td>{{d.order_header.source_station}}</td>
-					<td>{{d.order_header.destination_station|f}}</td>
+					<td>{{d.order_header.source_province}}{{d.order_header.source_city}}</td>
+					<td>{{d.order_header.destination_province}}{{d.order_header.destination_city}}</td>
 					<td>{{d.order_header.qty|f}}</td>
 					<td>{{d.order_header.vol|f}}</td>
 					<td>{{d.order_header.weight|f}}</td>
