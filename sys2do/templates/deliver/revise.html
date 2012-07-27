@@ -8,14 +8,11 @@
 //<![CDATA[
 	var header_have_update = 0
 	
-	
 	$(document).ready(function(){
 		$("input,select,remark",'form').change(function(){
 			header_have_update = 1;
 		});
 	});
-
-
 
 	function tosave(){
 		var msg = new Array();
@@ -40,16 +37,6 @@
 		}
 		if(!$("#amount").val()){
 			msg.push('请填写费用！');
-		}
-		
-		var all_cost = true;
-		$(".compute").each(function(){
-			var tmp = $(this).val();
-			if(!tmp || isNaN(tmp)){ all_cost = false; }
-		});
-		
-		if(!all_cost){
-			msg.push('请正确填写所有子项目的费用！');
 		}
 		
 		if(msg.length>0){
@@ -88,7 +75,8 @@
 {% block content %}
 	<div style="background-color: #fff;padding: 10px;">
 		
-	<form method="post" action="{{url_for('.view',action='deliver_save_new')}}">
+	<form method="post" action="{{url_for('.view',action='deliver_save_revise')}}">
+		<input type="hidden" name="id" value="{{header.id}}"/>
 		<table border="1" cellpadding="3" cellspacing="3">
 			<tbody>
 				<tr>
@@ -97,8 +85,12 @@
 					<td width="600">
 					  <select name="supplier_id" id="supplier_id" class="field order_add_div_body_input must_input" style="width: 200px">
 							<option value=""></option>
-							{% for s in suppliers %}
-								<option value="{{s.id}}">{{s}}</option>
+							{% for s in MASTER_ALL('Supplier') %}
+								{% if s.id == header.supplier_id %}
+									<option value="{{s.id}}" selected>{{s}}</option>
+								{% else %}
+									<option value="{{s.id}}">{{s}}</option>
+								{% endif %}
 							{% endfor %}
 						</select>
 					</td>
@@ -109,41 +101,53 @@
 					<select name="destination_province_id" id="destination_province_id" style="width:150px" class="field order_add_div_body_input must_input" style="width: 150px">
 		    	      <option value=""></option>
 		    	      {% for p in MASTER_ALL('Province') %}
-		    	          <option value="{{p.id}}">{{p}}</option>
+		    	          {% if p.id == header.destination_province_id %}
+		    	              <option value="{{p.id}}" selected="selected">{{p}}</option>
+		    	          {% else %}
+		    	              <option value="{{p.id}}">{{p}}</option>
+		    	          {% endif %}
 		    	      {% endfor %}
 		    	  </select>
-		    	  <select name="destination_city_id" id="destination_city_id" class="field order_add_div_body_input " style="width: 150px"></select>				  
+		    	      <select name="destination_city_id" id="destination_city_id" class="field order_add_div_body_input " style="width: 150px">
+		    	      {% for c in destination_cites %}
+		    	          {% if c.id == header.destination_city_id %}
+		    	          	<option value="{{c.id}}" selected="selected">{{c}}</option>
+		    	          {% else %}
+		    	          	<option value="{{c.id}}">{{c}}</option>
+		    	          {% endif %}
+		    	        {% endfor %}
+		    	      </select>				  
 				  </td>
 				</tr>
 					<tr>
 						<td height="30" align="right">{{_('Deliver Number')}}</td>
 						<td>&nbsp;</td>
-					  <td><input type="text" name="no" id="no" class="field order_add_div_body_input must_input" style="width: 200px"/></td>
+					  <td><input type="text" name="no" id="no" class="field order_add_div_body_input must_input" style="width: 200px" value="{{header.no|f}}"/></td>
 					</tr>
 				<tr>
 					<td height="30" align="right">{{_('Supplier Contact')}}</td>
 					<td>&nbsp;</td>
-				  <td><input type="text" name="supplier_contact" id="supplier_contact" class="field order_add_div_body_input must_input" style="width: 200px"/></td>
+				  <td><input type="text" name="supplier_contact" id="supplier_contact" class="field order_add_div_body_input must_input" style="width: 200px" value="{{header.supplier_contact|f}}"/></td>
 				</tr>
 				<tr>
 					<td height="30" align="right">{{_('Supplier Tel')}}</td>
 					<td>&nbsp;</td>
-				  <td><input type="text" name="supplier_tel" id="supplier_tel" class="field order_add_div_body_input must_input" style="width: 200px"/></td>
+				  <td><input type="text" name="supplier_tel" id="supplier_tel" class="field order_add_div_body_input must_input" style="width: 200px" value="{{header.supplier_tel|f}}"/></td>
 				</tr>
 				<tr>
 					<td height="30" align="right">{{_('Expect Time')}}</td>
 					<td>&nbsp;</td>
-				  <td><input type="text" name="expect_time" id="expect_time" class="datepicker order_add_div_body_input must_input" style="width: 200px"/></td>
+				  <td><input type="text" name="expect_time" id="expect_time" class="datepicker order_add_div_body_input must_input" style="width: 200px" value="{{header.expect_time|f}}"/></td>
 				</tr>
 				<tr>
-					<td height="30" align="right">总费用</td>
+					<td height="30" align="right">{{_('Charge')}}</td>
 					<td>&nbsp;</td>
-				  <td><input type="text" name="amount" id="amount" class="numeric order_add_div_body_input must_input" style="width: 200px"/></td>
+				  <td><input type="text" name="amount" id="amount" class="numeric order_add_div_body_input must_input" style="width: 200px" value="{{header.amount|f}}"/></td>
 				</tr>
 				<tr>
 					<td height="30" align="right">{{_('Remark')}}</td>
 					<td>&nbsp;</td>
-				  <td><textarea name="remark" id="remark" class="field" style="width: 200px"></textarea></td>
+				  <td><textarea name="remark" id="remark" class="field" style="width: 200px">{{header.remark|f}}</textarea></td>
 				</tr>
 			</tbody>
 		</table>
@@ -166,28 +170,29 @@
 					<th style="width:150px">{{_('Creator')}}</th>
 				</tr>
 			</thead>
-			{% for d in result %}		
+			{% for d in header.details %}		
 				<tr class="data_table_tr {{ loop.cycle('data_table_tr_odd', 'data_table_tr_even') }}">
-					<th>{{d.ref_no|f}}<input type="hidden" name="detail_{{d.id}}" value="{{d.id}}"/></th>
-					<td>{{d.source_province}}{{d.source_city}}</td>
-					<td>{{d.destination_province}}{{d.destination_city}}</td>
-					<td>{{d.qty|f}}</td>
-					<td>{{d.vol|f}}</td>
-					<td>{{d.weight|f}}</td>
-					<td>{{d.destination_contact|f}}</td>
-					<td>{{d.destination_tel|f}}</td>
-					<td><input type="text" name="cost_{{d.id}}" value="" class="numeric compute must_input" style="width:80px;text-align:right;"/></td>
-					<td>{{d.create_time|ft}}</td>
-					<td>{{d.create_by|ifFalse}}</td>
+					<th>{{d.order_header.ref_no|f}}<input type="hidden" name="detail_{{d.id}}" value="{{d.id}}"/></th>
+					<td>{{d.order_header.source_province}}{{d.source_city}}</td>
+					<td>{{d.order_header.destination_province}}{{d.destination_city}}</td>
+					<td>{{d.order_header.qty|f}}</td>
+					<td>{{d.order_header.vol|f}}</td>
+					<td>{{d.order_header.weight|f}}</td>
+					<td>{{d.order_header.destination_contact|f}}</td>
+					<td>{{d.order_header.destination_tel|f}}</td>
+					<td><input type="text" name="cost_{{d.id}}" value="{{d.cost}}" class="numeric compute must_input" style="width:80px;text-align:right;"/></td>
+					<td>{{d.order_header.create_time|ft}}</td>
+					<td>{{d.order_header.create_by|ifFalse}}</td>
 				</tr>
 			{% endfor %}
 				<tr class="data_table_tr">
-					<td colspan="3" style="text-align:left">合计</td>
-					<td>{{result|sum_with_none(attribute='qty')}}</td>
-					<td>{{result|sum_with_none(attribute='vol')}}</td>
-					<td>{{result|sum_with_none(attribute='weight')}}</td>
+					<td>&nbsp;</td>
+					<td colspan="2" style="text-align:left">合计</td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
 					<td colspan="2">&nbsp;</td>
-					<td><span id="amount_span">0</span></td>
+					<td><span id="amount_span">{{header.details|sum_with_none(attribute='cost')}}</span></td>
 					<td colspan="2">&nbsp;</td>
 				</tr>
 		</table>

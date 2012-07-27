@@ -25,12 +25,23 @@
 {% endblock %}
 
 
-
 {% block inner_menu %}
 <div class="inner_menu">
 	<ul>
 		<li><img src="/static/images/system/order_manage_25.jpg" width="71" height="21" id="Image1" onmouseover="MM_swapImage('Image1','','/static/images/system/order_manage_h_25.jpg',1)" onmouseout="MM_swapImgRestore()" onclick="toreturn()"/></li>
-        <li><img src="/static/images/system/order_manage_29.jpg" width="77" height="21" id="Image6" onmouseover="MM_swapImage('Image6','','/static/images/system/order_manage_h_29.jpg',1)" onmouseout="MM_swapImgRestore()" onclick="return todelete()"/></li>
+		<li><a href="{{url_for('.view', action = 'revise',id=header.id)}}"><img src="/static/images/system/edit.jpg" width="71" height="21" id="Image2" onmouseover="MM_swapImage('Image2','','/static/images/system/edit_h.jpg',1)" onmouseout="MM_swapImgRestore()"/></a></li>
+        {% if 'FIN_SUPPLIER_PAID' is get_permission %}
+	        <li>
+	        	<select onchange="todo_supplier_paid(this);">
+	        		<option></option>
+	        		<option value="0">{{_(DELIVER_NOT_PAID[1])}}</option>
+	        		<option value="1">{{_(DELIVER_PAID[1])}}</option>
+	        	</select/>
+	        </li>
+        {% endif %}
+        {% if header.status < SEND_OUT[0] and 'DELETE_DELIVER' is get_permission %}
+        	<li class="delete_li"><img src="/static/images/system/order_manage_29.jpg" width="77" height="21" id="Image6" onmouseover="MM_swapImage('Image6','','/static/images/system/order_manage_h_29.jpg',1)" onmouseout="MM_swapImgRestore()" onclick="return todelete()"/></li>
+    	{% endif %}
     </ul>
 </div>
 {% endblock %}
@@ -49,62 +60,61 @@
 				<td width="100" height="30" align="right">{{_('3rd Party Supplier')}}</td>
 				<td width="12">&nbsp;</td>
 				<td width="300">{{values.get('supplier','')|f}}</td>
+				<td height="30" align="right">{{_('Create Time')}}</td>
+				<td width="12">&nbsp;</td>
+				<td width="300">{{values.get('create_time','')|ft}}</td>
 			</tr>
 			<tr>
 				<td width="100" height="30" align="right">{{_('Deliver Number')}}</td>
 				<td width="12">&nbsp;</td>
 				<td>{{values.get('no','')|f}}</td>
+				<td height="30" align="right">{{_('Creator')}}</td>
+				<td width="12">&nbsp;</td>
+				<td>{{values.get('create_by','')|f}}</td>
 			</tr>
 			<tr>
 				<td height="30" align="right">{{_('Destination')}}</td>
 				<td width="12">&nbsp;</td>
 				<td>{{values.get('destination_provice','')|f}}{{values.get('destination_city','')|f}}</td>
+				<td height="30" align="right">{{_('Update Time')}}</td>
+				<td width="12">&nbsp;</td>
+				<td>{{values.get('update_time','')|ft}}</td>
 			</tr>
 			<tr>
 				<td height="30" align="right">{{_('Supplier Contact')}}</td>
 				<td width="12">&nbsp;</td>
 				<td>{{values.get('supplier_contact','')|f}}</td>
+				<td height="30" align="right">{{_('Last Updator')}}</td>
+				<td width="12">&nbsp;</td>
+				<td>{{values.get('update_by','')|f}}</td>
 			</tr>
 			<tr>
 				<td height="30" align="right">{{_('Supplier Tel')}}</td>
 				<td width="12">&nbsp;</td>
 				<td>{{values.get('supplier_tel','')|f}}</td>
+				<td height="30" align="right">运输状态</td>
+				<td width="12">&nbsp;</td>
+				<td>{{values.get('status','')|showStatus}}</td>
 			</tr>
 			<tr>
 				<td height="30" align="right">{{_('Expect Time')}}</td>
 				<td width="12">&nbsp;</td>
 				<td>{{values.get('expect_time','')|f}}</td>
+				<td height="30" align="right">付款予承运商</td>
+				<td width="12">&nbsp;</td>
+				<td>{{values.get('supplier_paid','')|showSupplierPaid}}</td>
+			</tr>
+			<tr>
+				<td height="30" align="right">{{_('Amount')}}</td>
+				<td width="12">&nbsp;</td>
+				<td>{{values.get('amount','')|f}}</td>
 			</tr>
 			<tr>
 				<td height="30" align="right">{{_('Remark')}}</td>
 				<td width="12">&nbsp;</td>
 				<td>{{values.get('remark','')|f}}</td>
 			</tr>
-			<tr>
-				<td height="30" align="right">{{_('Create Time')}}</td>
-				<td width="12">&nbsp;</td>
-				<td>{{values.get('create_time','')|ft}}</td>
-			</tr>
-			<tr>
-				<td height="30" align="right">{{_('Creator')}}</td>
-				<td width="12">&nbsp;</td>
-				<td>{{values.get('create_by','')|f}}</td>
-			</tr>
-			<tr>
-				<td height="30" align="right">{{_('Update Time')}}</td>
-				<td width="12">&nbsp;</td>
-				<td>{{values.get('update_time','')|ft}}</td>
-			</tr>
-			<tr>
-				<td height="30" align="right">{{_('Last Updator')}}</td>
-				<td width="12">&nbsp;</td>
-				<td>{{values.get('update_by','')|f}}</td>
-			</tr>
-			<tr>
-				<td height="30" align="right">{{_('Status')}}</td>
-				<td width="12">&nbsp;</td>
-				<td>{{values.get('status','')|showStatus}}</td>
-			</tr>
+
 		</table>
 		<br />
 		<table border="1" cellpadding="5" cellspacing="5">
@@ -118,6 +128,7 @@
 					<th style="width:30px">{{_('Weight')}}</th>
 					<th style="width:80px">{{_('Destination Contact')}}</th>
 					<th>{{_('Destination Tel')}}</th>
+					<th style="width:50px">费用</th>
 					<th style="width:100px">{{_('Create Time')}}</th>
 					<th style="width:80px">{{_('Creator')}}</th>
 				</tr>
@@ -132,10 +143,17 @@
 					<td>{{d.order_header.weight|f}}</td>
 					<td>{{d.order_header.destination_contact|f}}</td>
 					<td>{{d.order_header.destination_tel|f}}</td>
+					<td>{{d.cost|f}}</td>
 					<td>{{d.order_header.create_time|ft}}</td>
 					<td>{{d.order_header.create_by|f}}</td>
 				</tr>
 			{% endfor %}
+				<tr class="data_table_tr">
+					<td>&nbsp;</td>
+					<td colspan="7" style="text-align:left">合计</td>
+					<td>{{details|sum_with_none(attribute='cost')}}</td>
+					<td colspan="2">&nbsp;</td>
+				</tr>
 		</table>
 		
 		<br />
@@ -230,7 +248,39 @@
 			
 			<!-- history -->
 			<div class="order_add_info_tab_body" id="tabs-5">
-			
+				<table>
+					<tr>
+						<td width="100">{{_('Creator')}}</td>
+						<td width="100">{{header.create_by|f}}</td>
+						<td width="10">&nbsp;</td>
+						<td width="100">{{_('Create Time')}}</td>
+						<td width="150">{{header.create_time|ft}}</td>
+					</tr>
+					<tr>
+						<td>{{_('Last Updator')}}</td>
+						<td>{{header.update_by|f}}</td>
+						<td>&nbsp;</td>
+						<td>{{_('Update Time')}}</td>
+						<td>{{header.update_time|ft}}</td>
+					</tr>
+				</table>
+				<br />
+				<table>
+					<thead>
+						<tr class="field_head">
+							<th align="center">{{_('Time')}}</th>
+							<th align="center" style="width:800px">{{_('Remark')}}</th>
+						</tr>
+					<thead>
+					<tbody id="transit_list">
+						{% for t in header.system_logs %}
+							<tr class="data_table_tr">
+								<td>{{t.create_time|ft}}</td>
+								<td>{{t.remark|f}}</td>
+							</tr>
+						{% endfor %}
+					</tbody>
+				</table>
 			</div>
 		</div>
 	</div>

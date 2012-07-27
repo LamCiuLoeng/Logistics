@@ -41,6 +41,7 @@ from sys2do.util.decorator import templated, login_required, tab_highlight
 from sys2do.util.excel_helper import SummaryReport
 from sys2do.util.logic_helper import genSystemNo
 from sys2do.views import BasicView
+from sys2do.model.system import SystemLog
 
 
 
@@ -177,7 +178,7 @@ class OrderView(BasicView):
                   'source_company_id', 'source_address', 'source_contact', 'source_tel', 'source_mobile',
                   'destination_company_id', 'destination_address', 'destination_contact', 'destination_tel', 'destination_mobile',
                   'ref_no', 'order_time', 'expect_time', 'actual_time', 'remark',
-                 'payment_id', 'pickup_type_id', 'pack_type_id', 'qty', 'qty_ratio', 'vol', 'vol_ratio',
+                  'payment_id', 'pickup_type_id', 'pack_type_id', 'qty', 'qty_ratio', 'vol', 'vol_ratio',
                   'weight', 'weight_ratio', 'weight_ratio', 'amount', 'insurance_charge', 'sendout_charge', 'receive_charge',
                   'package_charge', 'other_charge', 'note_id', 'note_no',
                   'source_sms', 'destination_sms',
@@ -187,7 +188,7 @@ class OrderView(BasicView):
         DBSession.add(order)
         DBSession.flush()
 
-        order.no = genSystemNo(order.id)
+        order.no = genSystemNo()
         order.barcode = generate_barcode_file(order.no)
 
         DBSession.add(TransferLog(
@@ -327,7 +328,13 @@ class OrderView(BasicView):
     def delete(self):
         header = getOr404(OrderHeader, _g('id'), redirect_url = self.default())
 #        header.status = ORDER_CANCELLED[0]
+
         header.active = 1
+        DBSession.add(SystemLog(
+                                type == header.__class__.__name__,
+                                ref_id = header.id,
+                                remark = u"%s 删除该记录。" % (session['user_profile']['name']),
+                                ))
         DBSession.commit()
         flash(MSG_DELETE_SUCC, MESSAGE_INFO)
         return redirect(url_for('.view', action = 'index'))
@@ -530,9 +537,19 @@ class OrderView(BasicView):
                       'note_id', 'note_no',
                       'source_sms', 'destination_sms',
                       ]
+            _remark = []
             for f in fields:
+                old_v = getattr(header, f)
+                new_v = _g(f)
+                if unicode(old_v) != unicode(new_v):
+                    _remark.append(u"[%s]'%s' 修改为 '%s'" % (f, old_v, new_v))
                 setattr(header, f, _g(f))
             try:
+                DBSession.add(SystemLog(
+                                        type = header.__class__.__name__,
+                                        ref_id = header.id,
+                                        remark = u"%s 修改该记录。修改内容为:%s" % (session['user_profile']['name'], ";".join(_remark))
+                                        ))
                 DBSession.commit()
                 return jsonify({'code' : 0 , 'msg' : unicode(MSG_SAVE_SUCC)})
             except:
@@ -560,6 +577,11 @@ class OrderView(BasicView):
                 line = DBSession.query(ItemDetail).get(_g('item_id'))
                 line.active = 1
                 try:
+                    DBSession.add(SystemLog(
+                                        type = header.__class__.__name__,
+                                        ref_id = header.id,
+                                        remark = u'%s 删除货物记录[id : %s]。' % (session['user_profile']['name'], line.id)
+                                        ))
                     DBSession.commit()
                     return jsonify({'code' : 0 , 'msg' : unicode(MSG_DELETE_SUCC)})
                 except:
@@ -567,9 +589,17 @@ class OrderView(BasicView):
                     return jsonify({'code' : 1 , 'msg' : unicode(MSG_SERVER_ERROR)})
 
         elif type == 'receiver' :
+            _remark = []
             for f in ['receiver_contact_id', 'receiver_tel', 'receiver_mobile', 'receiver_remark', ]:
+                old_v = getattr(header, f)
+                new_v = _g(f)
+                if unicode(old_v) != unicode(new_v):  _remark.append(u"[%s]'%s' 修改为 '%s'" % (f, old_v, new_v))
                 setattr(header, f, _g(f))
-
+            DBSession.add(SystemLog(
+                                    type = header.__class__.__name__,
+                                    ref_id = header.id,
+                                    remark = u"%s 修改该记录。修改内容为:%s" % (session['user_profile']['name'], ";".join(_remark))
+                                    ))
             if header.status < ASSIGN_RECEIVER[0]:
                 header.update_status(ASSIGN_RECEIVER[0])
                 DBSession.add(TransferLog(
@@ -578,6 +608,11 @@ class OrderView(BasicView):
                                   type = 0,
                                   remark = LOG_SEND_RECEIVER + (u'收件人: %s , 收件人电话: %s , 收件人手机: %s, 备注:%s' % (header.receiver_contact, header.receiver_tel or '', header.receiver_mobile or '', header.receiver_remark or '')),
                                   ))
+                DBSession.add(SystemLog(
+                                        type = header.__class__.__name__,
+                                        ref_id = header.id,
+                                        remark = u'%s 确认该记录状态为已指派收件人。' % session['user_profile']['name']
+                                        ))
             try:
                 DBSession.commit()
                 return jsonify({'code' : 0 , 'msg' : unicode(MSG_SAVE_SUCC)})
@@ -596,6 +631,11 @@ class OrderView(BasicView):
                                   type = 0,
                                   remark = _g('wh_remark'),
                                   ))
+                DBSession.add(SystemLog(
+                                        type = header.__class__.__name__,
+                                        ref_id = header.id,
+                                        remark = u'%s 确认该记录的状态为已入仓。' % session['user_profile']['name']
+                                        ))
                 try:
                     DBSession.commit()
                     return jsonify({'code' : 0 , 'msg' : unicode(MSG_SAVE_SUCC)})
@@ -611,6 +651,11 @@ class OrderView(BasicView):
                                   type = 0,
                                   remark = _g('wh_remark'),
                                   ))
+                DBSession.add(SystemLog(
+                                        type = header.__class__.__name__,
+                                        ref_id = header.id,
+                                        remark = u'%s 确认该记录的状态为已出仓。' % session['user_profile']['name']
+                                        ))
                 try:
                     DBSession.commit()
                     return jsonify({'code' : 0 , 'msg' : unicode(MSG_SAVE_SUCC)})
@@ -641,6 +686,11 @@ class OrderView(BasicView):
                 obj = DBSession.query(TransferLog).get(transit_id)
                 obj.active = 1
                 try:
+                    DBSession.add(SystemLog(
+                                            type = obj.__class__.__name__,
+                                            ref_id = header.id,
+                                            remark = u'%s 删除该运输记录[id : %s]。' % (session['user_profile']['name'], obj.id)
+                                            ))
                     DBSession.commit()
                     return jsonify({'code' : 0 , 'msg' : unicode(MSG_DELETE_SUCC)})
                 except:
@@ -674,6 +724,11 @@ class OrderView(BasicView):
                 obj = DBSession.query(PickupDetail).get(pickup_id)
                 obj.active = 1
                 try:
+                    DBSession.add(SystemLog(
+                                            type = obj.__class__.__name__,
+                                            ref_id = header.id,
+                                            remark = u'%s 删除该提货记录[id : %s]。' % (session['user_profile']['name'], obj.id)
+                                            ))
                     DBSession.commit()
                     return jsonify({'code' : 0 , 'msg' : unicode(MSG_DELETE_SUCC)})
                 except:
@@ -692,12 +747,17 @@ class OrderView(BasicView):
                                   type = 0,
                                   remark = LOG_GOODS_SIGNED + (u'签收人:%s , 签收人电话:%s , 签收时间:%s' % (header.signed_contact, header.signed_tel or '', header.signed_time)),
                                   ))
+                DBSession.add(SystemLog(
+                                        type = header.__class__.__name__,
+                                        ref_id = header.id,
+                                        remark = u'%s 确认该记录状态为已签收。' % session['user_profile']['name']
+                                        ))
             try:
                 DBSession.commit()
                 return jsonify({'code' : 0 , 'msg' : unicode(MSG_SAVE_SUCC)})
             except:
-                    DBSession.rollback()
-                    return jsonify({'code' : 1 , 'msg' : unicode(MSG_SERVER_ERROR)})
+                DBSession.rollback()
+                return jsonify({'code' : 1 , 'msg' : unicode(MSG_SERVER_ERROR)})
 
 
     def export(self):
@@ -774,11 +834,39 @@ class OrderView(BasicView):
             id = _g('id')
             flag = _g('flag')
             type = _g('type')
+            remark = None
             r = DBSession.query(OrderHeader).get(id)
+
             if type == 'APPROVE':
                 r.approve = flag
+                if flag == '1':  #approve
+                    remark = u'%s 审核通过该订单。' % session['user_profile']['name']
+                else: #disapprove
+                    remark = u'%s 审核不通过该订单。' % session['user_profile']['name']
             elif type == 'PAID':
                 r.paid = flag
+                if flag == '1':
+                    remark = u'%s 确认该订单为客户已付款。' % session['user_profile']['name']
+                else:
+                    remark = u'%s 确认该订单为客户未付款。' % session['user_profile']['name']
+            elif type == 'SUPLLIER_PAID':
+                r.supplier_paid = flag
+                if flag == '1':
+                    remark = u'%s 确认该订单为已付款予承运商。' % session['user_profile']['name']
+                else:
+                    remark = u'%s 确认该订单为未付款予承运商。' % session['user_profile']['name']
+            elif type == 'ORDER_RETURN':
+                r.is_return_note = flag
+                if flag == '1':
+                    remark = u'%s 确认该订单为客户已返回单。' % session['user_profile']['name']
+                else:
+                    remark = u'%s 确认该订单为客户未返回单。' % session['user_profile']['name']
+
+            DBSession.add(SystemLog(
+                                    type = r.__class__.__name__,
+                                    ref_id = r.id,
+                                    remark = remark
+                                    ))
             DBSession.commit()
             return jsonify({'code' : 0 , 'msg' : MSG_UPDATE_SUCC})
         except:

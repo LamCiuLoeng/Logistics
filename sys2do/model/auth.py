@@ -10,6 +10,8 @@
 from datetime import datetime as dt
 import os
 import sys
+from sqlalchemy.sql.expression import desc, and_
+
 
 try:
     from hashlib import sha1
@@ -53,6 +55,11 @@ class SysMixin(object):
             return DBSession.query(User).get(self.update_by_id)
         except:
             return None
+
+    @property
+    def system_logs(self):
+        from sys2do.model.system import SystemLog
+        return DBSession.query(SystemLog).filter(and_(SystemLog.type == self.__class__.__name__, SystemLog.ref_id == self.id)).order_by(desc(SystemLog.create_time))
 
 
 
@@ -184,14 +191,10 @@ class User(DeclarativeBase, SysMixin, CRUDMixin):
     image_url = Column(Text)
     last_login = Column(DateTime, default = dt.now)
 
-#    customer_profile_id = Column(Integer, ForeignKey('order_detail.id'))
-#    customer_profile = relation(CustomerProfile, backref = backref("users", order_by = id), primaryjoin = "and_(CustomerProfile.id == User.customer_profile_id, User.active == 0)")
-
     def __repr__(self): return self.name
-
     def __str__(self): return self.name
-
     def __unicode__(self): return self.name
+
 
     @property
     def permissions(self):

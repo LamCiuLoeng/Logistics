@@ -16,12 +16,12 @@ from sys2do.util.decorator import templated, login_required, tab_highlight
 from sys2do.util.common import _g, _gp, _gl, _info, _error
 from sys2do.constant import MESSAGE_ERROR, MESSAGE_INFO, MSG_NO_SUCH_ACTION, \
     MSG_SAVE_SUCC, GOODS_PICKUP, GOODS_SIGNED, OUT_WAREHOUSE, IN_WAREHOUSE, \
-    MSG_RECORD_NOT_EXIST, LOG_GOODS_PICKUPED, LOG_GOODS_SIGNED
+    MSG_RECORD_NOT_EXIST, LOG_GOODS_PICKUPED, LOG_GOODS_SIGNED, MSG_SERVER_ERROR
 from sys2do.views import BasicView
 from sys2do.model.master import CustomerProfile, Customer, Supplier, \
-    CustomerTarget, Receiver, CustomerTargetContact, Province, City
+    CustomerTarget, Receiver, CustomerTargetContact, Province, City, Barcode
 from sys2do.model.logic import OrderHeader, TransferLog, PickupDetail
-from sys2do.util.logic_helper import genSystemNo
+from sys2do.util.logic_helper import genSystemNo, check_barcode
 
 
 __all__ = ['bpRoot']
@@ -246,6 +246,15 @@ class RootView(BasicView):
     def sms(self):
         _info(request.values)
         return 'OK'
+
+
+    def ajax_check_barcode(self):
+        value = _g('value')
+        (code, status) = check_barcode(value)
+
+        return jsonify({'code' : code, 'status' : status})
+
+
 
 bpRoot.add_url_rule('/', view_func = RootView.as_view('view'), defaults = {'action':'index'})
 bpRoot.add_url_rule('/<action>', view_func = RootView.as_view('view'))

@@ -104,9 +104,10 @@
 				<th style="width:80px">{{_('Supplier Contact')}}</th>
 				<th style="width:80px">{{_('Supplier Tel')}}</th>
 				<th style="width:100px">{{mymacros.show_direction(values,'expect_time')}}{{_('Expect Time')}}</th>
+				<th style="width:100px">{{mymacros.show_direction(values,'amount')}}费用</th>
 				<th style="width:100px">{{mymacros.show_direction(values,'create_time')}}{{_('Create Time')}}</th>
 				<th style="width:80px">{{mymacros.show_direction(values,'create_by_id')}}{{_('Creator')}}</th>
-				<th style="width:80px">{{_('Order Status')}}</th>
+				<th style="width:80px">状态</th>
 			</tr>
 			{% for r in records.items %}
 			<tr class="data_table_tr {{ loop.cycle('data_table_tr_odd', 'data_table_tr_even') }}">
@@ -116,11 +117,18 @@
 				<td>{{r.supplier_contact}}</td>
 				<td>{{r.supplier_tel}}</td>
 				<td>{{r.expect_time}}</td>
+				<td>{{r.amount}}</td>
 				<td>{{r.create_time|ft}}</td>
 				<td>{{r.create_by|ifFalse}}</td>
 				<td>{{r.status|showStatus}}</td>
 			</tr>
 			{% endfor %}
+			<tr class="data_table_tr">
+					<td>&nbsp;</td>
+					<td colspan="5" style="text-align:left">合计</td>
+					<td>{{records.items|sum(attribute='amount')}}</td>
+					<td colspan="3">&nbsp;</td>
+				</tr>
 		  	<tr class="data_table_tr">
 			    <td colspan="100" style="text-align:right">{{records.pager(**PAGINATE_PARAMS)}}</td>
 			</tr>

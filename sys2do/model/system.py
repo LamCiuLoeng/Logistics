@@ -33,6 +33,7 @@ class SystemLog(DeclarativeBase, SysMixin):
 
     id = Column(Integer, autoincrement = True, primary_key = True)
     type = Column(Text)
+    ref_id = Column(Integer)
     remark = Column(Text)
 
 

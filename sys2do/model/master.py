@@ -545,3 +545,8 @@ class Barcode(DeclarativeBase, SysMixin, CRUDMixin):
     value = Column(Text)
 
     status = Column(Integer, default = 0)  #0 is used ,1 is reserved ,2 is cancelled 
+
+    def __str__(self): return self.value
+    def __repr__(self): return self.value
+    def __unicode__(self): return self.value
+

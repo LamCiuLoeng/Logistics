@@ -24,6 +24,7 @@ from sys2do.constant import MESSAGE_INFO, MSG_SAVE_SUCC, MSG_UPDATE_SUCC, \
     MSG_SERVER_ERROR
 from sys2do.model.logic import OrderHeader
 from sys2do.setting import PAGINATE_PER_PAGE
+from sys2do.model.system import SystemLog
 
 
 
@@ -129,8 +130,34 @@ class FinView(BasicView):
             for r in DBSession.query(OrderHeader).filter(OrderHeader.id.in_(ids)).order_by(OrderHeader.create_time):
                 if type == 'APPROVE':
                     r.approve = flag
+                    if flag == '1':  #approve
+                        remark = u'%s 审核通过该订单。' % session['user_profile']['name']
+                    else: #disapprove
+                        remark = u'%s 审核不通过该订单。' % session['user_profile']['name']
                 elif type == 'PAID':
                     r.paid = flag
+                    if flag == '1':
+                        remark = u'%s 确认该订单为客户已付款。' % session['user_profile']['name']
+                    else:
+                        remark = u'%s 确认该订单为客户未付款。' % session['user_profile']['name']
+                elif type == 'SUPLLIER_PAID':
+                    r.supplier_paid = flag
+                    if flag == '1':
+                        remark = u'%s 确认该订单为已付款予承运商。' % session['user_profile']['name']
+                    else:
+                        remark = u'%s 确认该订单为未付款予承运商。' % session['user_profile']['name']
+                elif type == 'ORDER_RETURN':
+                    r.is_return_note = flag
+                    if flag == '1':
+                        remark = u'%s 确认该订单为客户已返回单。' % session['user_profile']['name']
+                    else:
+                        remark = u'%s 确认该订单为客户未返回单。' % session['user_profile']['name']
+
+            DBSession.add(SystemLog(
+                                    type = r.__class__.__name__,
+                                    ref_id = r.id,
+                                    remark = remark
+                                    ))
             DBSession.commit()
             return jsonify({'code' : 0 , 'msg' : MSG_UPDATE_SUCC})
         except:

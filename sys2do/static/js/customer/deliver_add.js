@@ -3,10 +3,25 @@ function clear_supplier(){
     $('#supplier_tel').val('');
 }
 
+
+function compute(){
+    var amount = 0;
+    $(".compute").each(function(){
+        var tmp = $(this).val();
+        if(tmp && !isNaN(tmp)){
+            amount += parseFloat(tmp);
+        }
+    });
+    $("#amount").val(amount);
+    $("#amount_span").text(amount);
+}
+
 $(document).ready(function(){
     $("#destination_province_id").change(function(){
         province_change(this,'#destination_city_id');
     });
+    
+    $(".compute").change(compute);
     
     $("#supplier_id").change(function(){
         var tmp = $(this);

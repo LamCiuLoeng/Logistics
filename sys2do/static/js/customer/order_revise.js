@@ -518,15 +518,56 @@ function todo_paid(obj){
                 show_error(r.msg);
             }else{
                 if(v=='0'){
-                    $(".paid_span").text("未付款");
+                    $(".paid_span").text("客户未付款");
                 }else{
-                    $(".paid_span").text("已付款");
+                    $(".paid_span").text("客户已付款");
                 }           
                 show_info(r.msg);
             }   
         });
     }
 }
+
+
+function todo_supplier_paid(obj){
+    var v = $(":selected",obj).val();
+    $(obj).val('');
+    if(v){
+        return todo('SUPLLIER_PAID',v,function(r){
+            if(r.code != 0 ){
+                show_error(r.msg);
+            }else{
+                if(v=='0'){
+                    $(".supplier_paid_span").text("未付款予承运商");
+                }else{
+                    $(".supplier_paid_span").text("已付款予承运商");
+                }           
+                show_info(r.msg);
+            }   
+        });
+    }
+}
+
+
+function todo_order_return(obj){
+    var v = $(":selected",obj).val();
+    $(obj).val('');
+    if(v){
+        return todo('ORDER_RETURN',v,function(r){
+            if(r.code != 0 ){
+                show_error(r.msg);
+            }else{
+                if(v=='0'){
+                    $(".order_return_span").text("客户未返回单");
+                }else{
+                    $(".order_return_span").text("客户已返回单");
+                }           
+                show_info(r.msg);
+            }   
+        });
+    }
+}
+
 
 function todo(type,flag,handler){   
     $.getJSON("/order/ajax_change_flag",

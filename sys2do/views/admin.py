@@ -607,11 +607,11 @@ class AdminView(BasicView):
             id = _g('id', None)
             if not id :
                 flash(MSG_NO_ID_SUPPLIED, MESSAGE_ERROR)
-                return redirect(url_for('.view', action = 'user'))
+                return redirect(url_for('.view', action = action))
             obj = DBSession.query(DBObj).get(id)
             if not obj :
                 flash(MSG_RECORD_NOT_EXIST, MESSAGE_ERROR)
-                return redirect(url_for('.view', action = 'user'))
+                return redirect(url_for('.view', action = action))
             try:
                 obj.saveAsUpdate(request.values)
                 DBSession.commit()

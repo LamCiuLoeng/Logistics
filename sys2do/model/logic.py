@@ -131,8 +131,10 @@ class OrderHeader(DeclarativeBase, SysMixin, CRUDMixin):
 
     approve = Column(Integer, default = 0) # 0 is undone ,1 is approved ,2 is disapprove
     paid = Column(Integer, default = 0) # 0 is not paid, 1 is paid
+    supplier_paid = Column(Integer, default = 0) # 0 is not paid to supplier, 1 is paid to supplier
     is_exception = Column(Integer, default = 0) # 0 is normal ,1 is exception
     is_less_qty = Column(Integer, default = 0) # 0 is normal ,1 is less than the order qty
+    is_return_note = Column(Integer, default = 0) # 0 is not return note ,1 is return note
     remark = Column(Text)
 
     deliver_header_ref = Column(Integer, default = None)
@@ -295,6 +297,7 @@ class DeliverHeader(DeclarativeBase, SysMixin, CRUDMixin):
     actual_time = Column(Text)
 
     amount = Column(Float, default = 0)
+    supplier_paid = Column(Integer, default = 0) # 0 is not paid to supplier, 1 is paid to supplier
 
     remark = Column(Text)
     _status = Column('status', Integer, default = 0)
@@ -319,6 +322,8 @@ class DeliverHeader(DeclarativeBase, SysMixin, CRUDMixin):
                 'supplier_contact' : self.supplier_contact,
                 'supplier_tel' : self.supplier_tel,
                 'expect_time' : self.expect_time,
+                'amount' : self.amount,
+                'supplier_paid' : self.supplier_paid,
                 'remark' : self.remark,
                 'status' : self.status,
                 'create_time' : self.create_time,
@@ -367,6 +372,7 @@ class DeliverDetail(DeclarativeBase, SysMixin):
 
     remark = Column(Text)
     cost = Column(Float, default = 0)
+    supplier_paid = Column(Integer, default = 0) # 0 is not paid to supplier, 1 is paid to supplier
     _status = Column('status', Integer, default = 0)
 
 

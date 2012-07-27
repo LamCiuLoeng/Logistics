@@ -10,11 +10,14 @@ import datetime
 from itertools import imap, ifilter
 from jinja2.filters import do_default
 from sys2do.constant import STATUS_LIST, SYSTEM_DATE_FORMAT, SYSTEM_DATETIME_FORMAT, \
-    APPROVAL_STATUS_LIST, PAID_STATUS_LIST
+    APPROVAL_STATUS_LIST, ORDER_PAID_STATUS_LIST, DELIVER_PAID_STATUS_LIST, \
+    ORDER_RETURN_STATUS_LIST
 #from flask import current_app as app
 #from sys2do import app
 
-__all__ = ['ft', 'fd', 'ifFalse', 'f', 'showStatus', 'showApproval', 'showPaid', 'sum_with_none']
+__all__ = ['ft', 'fd', 'ifFalse', 'f', 'showStatus',
+           'showApproval', 'showPaid', 'showSupplierPaid',
+           'showReturnNote', 'sum_with_none']
 
 
 def ft(t, f = SYSTEM_DATETIME_FORMAT):
@@ -51,9 +54,23 @@ def showApproval(s):
 
 
 def showPaid(s):
-    for code, msg in PAID_STATUS_LIST:
+    for code, msg in ORDER_PAID_STATUS_LIST:
         if s == code : return msg
     return ''
+
+
+def showSupplierPaid(s):
+    for code, msg in DELIVER_PAID_STATUS_LIST:
+        if s == code : return msg
+    return ''
+
+
+def showReturnNote(s):
+    for code, msg in ORDER_RETURN_STATUS_LIST:
+        if s == code : return msg
+    return ''
+
+
 
 
 def sum_with_none(iterable, attribute = None):

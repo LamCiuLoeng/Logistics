@@ -73,6 +73,7 @@ def init():
         pFinSearch = Permission(name = 'FIN_SEARCH')
         pFinApprove = Permission(name = 'FIN_APPROVE')
         pFinPaid = Permission(name = 'FIN_PAID')
+        pFinSupplierPaid = Permission(name = 'FIN_SUPPLIER_PAID')
 
 
         gAdmin = Group(name = 'ADMIN', display_name = 'Administrator', type = 0)
@@ -83,7 +84,7 @@ def init():
                               pCreateSupplier, pUpdateSupplier, pDeleteSupplier, pSearchSupplier,
                               pCreateWarehouse, pUpdateWarehouse, pDeleteWarehouse, pSearchWarehouse,
                               pCreateDriver, pUpdateDriver, pDeleteDriver, pSearchDriver,
-                              pFinSearch, pFinApprove, pFinPaid,
+                              pFinSearch, pFinApprove, pFinPaid, pFinSupplierPaid
                               ]
         gAdmin.users = [uAdmin, ]
         gCustomer = Group(name = 'CUSTOMER', display_name = 'Customer', type = 0)

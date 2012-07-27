@@ -34,6 +34,7 @@ from sys2do.util.common import _gl, _g, _gp, getOr404, getMasterAll, _debug, \
     _error, _info, send_sms
 from sys2do.model.master import Supplier, InventoryItem, Province
 from sys2do.setting import PAGINATE_PER_PAGE
+from sys2do.model.system import SystemLog
 
 
 __all__ = ['bpDeliver']
@@ -161,23 +162,26 @@ class DeliverView(BasicView):
                                    supplier_contact = _g('supplier_contact'),
                                    supplier_tel = _g('supplier_tel'),
                                    expect_time = _g('expect_time'),
+                                   amount = _g('amount'),
                                    remark = _g('remark'),
                                    )
             DBSession.flush()
-
             line_no = 1
             for k, id in _gp('detail_'):
                 order_header = DBSession.query(OrderHeader).get(id)
                 DBSession.add(DeliverDetail(header = header,
                                             order_header = order_header,
-                                            line_no = line_no))
+                                            line_no = line_no,
+                                            cost = _g('cost_%s' % id)
+                                            ))
 
                 order_header.update_status(SORTING[0])
+                order_header.cost = _g('cost_%s' % id)
                 order_header.deliver_header_ref = header.id
                 order_header.deliver_header_no = header.no
                 line_no += 1
 
-            DBSession.flush()
+
             DBSession.add(TransferLog(
                                       refer_id = header.id,
                                       transfer_date = dt.now().strftime(SYSTEM_DATETIME_FORMAT),
@@ -212,14 +216,54 @@ class DeliverView(BasicView):
             return redirect(self.default())
 
 
-    @templated('deliver/revise_deliver.html')
+    @templated('deliver/revise.html')
     def revise(self):
         header = getOr404(DeliverHeader, _g('id'), redirect_url = self.default())
-        return {'values' : header.populate(), 'details' : header.details, 'suppliers' : getMasterAll(Supplier)}
+
+        if header.destination_province_id:
+            destination_cites = header.destination_provice.children()
+        else: destination_cites = []
+        return {'header' : header, 'destination_cites' : destination_cites}
 
 
     def deliver_save_revise(self):
-        pass
+        id = _g('id')
+        if not id :
+            flash(MSG_NO_ID_SUPPLIED, MESSAGE_ERROR)
+            return redirect(self.default())
+        try:
+            header = DBSession.query(DeliverHeader).get(id)
+            _remark = []
+            for f in [
+                      'no', 'destination_province_id', 'destination_city_id', 'supplier_id', 'supplier_contact', 'supplier_tel',
+                      'need_transfer', 'amount', 'remark', 'expect_time',
+                      ]:
+
+                old_v = getattr(header, f)
+                new_v = _g(f)
+                if unicode(old_v) != unicode(new_v) : _remark.append(_remark.append(u"[%s]'%s' 修改为 '%s'" % (f, old_v, new_v)))
+                setattr(header, f, _g(f))
+
+            for d in header.details:
+                c = _g('cost_%s' % d.id)
+                d.cost = c
+                d.order_header.cost = c
+
+            DBSession.add(SystemLog(
+                                    type == header.__class__.__name__,
+                                    ref_id = header.id,
+                                    remark = u"%s 修改该记录。修改内容为:%s" % (session['user_profile']['name'], ";".join(_remark))
+                                    ))
+
+            flash(MSG_SAVE_SUCC, MESSAGE_INFO)
+            DBSession.commit()
+        except:
+            _error(traceback.print_exc())
+            DBSession.rollback()
+            flash(MSG_SERVER_ERROR, MESSAGE_ERROR)
+        return redirect(self.default())
+
+
 
     def delete(self):
         header = getOr404(DeliverHeader, _g('id'), redirect_url = self.default())
@@ -230,6 +274,13 @@ class DeliverView(BasicView):
             d.order_header.deliver_header_no = None
             d.order_header.deliver_header_ref = None
             d.order_header.status = ORDER_NEW[0]
+
+        DBSession.add(SystemLog(
+                                type = header.__class__.__name__,
+                                ref_id = header.id,
+                                remark = u'%s 删除送货该送货单。' % session['user_profile']['name']
+                                ))
+
         DBSession.commit()
         flash(MSG_DELETE_SUCC, MESSAGE_INFO)
         return redirect(url_for('.view', action = 'index'))
@@ -432,6 +483,14 @@ class DeliverView(BasicView):
                                       remark = _g('send_out_remark')
                                       ))
             header.sendout_time = _g('send_out_time')
+
+            DBSession.add(SystemLog(
+                                    type = header.__class__.__name__,
+                                    ref_id = header.id,
+                                    remark = u'%s 确认该记录状态为已发货。' % session['user_profile']['name']
+                                    ))
+
+
             DBSession.commit()
             self._sms(header, u'已发货。')
             return jsonify({'code' : 0 , 'msg' : unicode(MSG_SAVE_SUCC)})
@@ -455,6 +514,11 @@ class DeliverView(BasicView):
                                       type = 1,
                                       remark = _g('arrived_remark')
                                       ))
+            DBSession.add(SystemLog(
+                                    type = header.__class__.__name__,
+                                    ref_id = header.id,
+                                    remark = u'%s 确认记录状态为货物已到达目的站。' % session['user_profile']['name']
+                                    ))
 
             for d in header.details:
                 order_header = d.order_header
@@ -465,6 +529,44 @@ class DeliverView(BasicView):
 
 
 
+    def ajax_change_flag(self):
+        try:
+            id = _g('id')
+            flag = _g('flag')
+            type = _g('type')
+            remark = None
+            header = DBSession.query(DeliverHeader).get(id)
+
+            if type == 'SUPLLIER_PAID':
+                header.supplier_paid = flag
+                if flag == '1':
+                    remark = u'%s 确认该记录为已付款予承运商。' % session['user_profile']['name']
+                else:
+                    remark = u'%s 确认该记录为未付款予承运商。' % session['user_profile']['name']
+
+                for d in header.details:
+                    d.supplier_paid = flag
+                    d.order_header.supplier_paid = flag
+                    DBSession.add(SystemLog(
+                                    type = d.order_header.__class__.__name__,
+                                    ref_id = d.order_header_id,
+                                    remark = remark
+                                    ))
+
+            DBSession.add(SystemLog(
+                                    type = header.__class__.__name__,
+                                    ref_id = header.id,
+                                    remark = remark
+                                    ))
+
+
+
+            DBSession.commit()
+            return jsonify({'code' : 0 , 'msg' : MSG_UPDATE_SUCC})
+        except:
+            _error(traceback.print_exc())
+            DBSession.rollback()
+            return jsonify({'code' : 1, 'msg' : MSG_SERVER_ERROR})
 
 bpDeliver.add_url_rule('/', view_func = DeliverView.as_view('view'), defaults = {'action':'index'})
 bpDeliver.add_url_rule('/<action>', view_func = DeliverView.as_view('view'))

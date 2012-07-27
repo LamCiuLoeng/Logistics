@@ -18,6 +18,7 @@ function save_sendout() {
         if(r.code == 0){
             alert(r.msg);
             $('#send_out_table').replaceWith('<p>货物已发出。</p>');
+            $(".delete_li").remove();
         }else{
             alert(r.msg);
         }
@@ -66,4 +67,36 @@ function save_arrived(){
             alert(r.msg);
         }
     })
+}
+
+
+function todo_supplier_paid(obj){
+    var v = $(":selected",obj).val();
+    $(obj).val('');
+    if(v){
+        return todo('SUPLLIER_PAID',v,function(r){
+            if(r.code != 0 ){
+                show_error(r.msg);
+            }else{
+                if(v=='0'){
+                    $(".supplier_paid_span").text("未付款予承运商");
+                }else{
+                    $(".supplier_paid_span").text("已付款予承运商");
+                }           
+                show_info(r.msg);
+            }   
+        });
+    }
+}
+
+function todo(type,flag,handler){   
+    $.getJSON("/deliver/ajax_change_flag",
+             {
+                't' : nowstr(),
+                'id' : $("#id").val(),
+                'type' : type,
+                'flag' : flag
+             },
+             handler
+    )
 }

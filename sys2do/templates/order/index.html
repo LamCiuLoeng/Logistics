@@ -80,8 +80,7 @@
 	<ul>
         <li><a href="{{url_for('.view',action='add')}}"><img src="/static/images/system/order_manage_31.jpg" width="77" height="21" id="Image2" onmouseover="MM_swapImage('Image2','','/static/images/system/order_manage_h_31.jpg',1)" onmouseout="MM_swapImgRestore()" /></a></li>
         <li><img src="/static/images/system/order_manage2_35.jpg" width="101" height="21" id="Image7" onmouseover="MM_swapImage('Image7','','/static/images/system/order_manage1_35.jpg',1)" onmouseout="MM_swapImgRestore()" onclick="return toexp();"/></li>
-        <li><img src="/static/images/system/order_manage1_new.jpg" width="101" height="21" id="Image8" onmouseover="MM_swapImage('Image8','','/static/images/system/order_manage_new.jpg',1)" onmouseout="MM_swapImgRestore()" onclick="return todeliver();"/></li>
-        
+        <li><img src="/static/images/system/order_manage1_new.jpg" width="101" height="21" id="Image8" onmouseover="MM_swapImage('Image8','','/static/images/system/order_manage_new.jpg',1)" onmouseout="MM_swapImgRestore()" onclick="return todeliver();"/></li>     
     </ul>
 </div>
 {% endblock %}
@@ -172,10 +171,10 @@
                   {% endfor %}
               </select>
           </li>
-          <li style="width:500px"><span>付款</span>
+          <li style="width:500px"><span>客户付款</span>
               <select name="paid" id="paid">
                   <option value=""></option>
-                  {% for v,n in [('1','已付款'),('0','未付款')]%}
+                  {% for v,n in [('1','客户已付款'),('0','客户未付款')]%}
                       {% if v == values.get('paid',None)%}
                           <option value="{{v}}" selected="selected">{{n}}</option>
                       {% else %}
@@ -225,7 +224,7 @@
 
 <form method="post" action="" id="records">
 
-<table border="0" cellpadding="0" cellspacing="0" style="width:1500px">
+<table border="0" cellpadding="0" cellspacing="0" style="width:1650px">
   <tr class="data_table_tr">
 	    <td colspan="100" style="text-align:right">{{records.pager(**PAGINATE_PARAMS)}}</td>
 	</tr>
@@ -245,9 +244,10 @@
     <td align="center" style="width:120px;">{{mymacros.show_direction(values,'create_by_id')}}{{_('Creator')}}</td>
     <td align="center" style="width:150px;">{{_('Status')}}</td>
     <td align="center" style="width:50px;">审核</td>
-    <td align="center" style="width:50px;">付款</td>
+    <td align="center" style="width:50px;">客户付款</td>
     <td align="center" style="width:50px;">异常</td>
     <td align="center" style="width:50px;">少货</td>
+    <td align="center" style="width:150px;">客户回单</td>
   </tr>
   
   {% for r in records.items %}
@@ -275,6 +275,7 @@
 		<td>{{r.paid|showPaid}}</td>
 		<td>{{'是' if r.is_exception else '&nbsp;'|safe}}</td>
 		<td>{{'是' if r.is_less_qty else '&nbsp;'|safe}}</td>
+		<td><span class="order_return_span">{{r.is_return_note|showReturnNote}}</span></td>
 	  </tr>
   {% endfor %}
   		<tr class="data_table_tr">

@@ -61,8 +61,8 @@
         <li>
         	<select onchange="todo_approve(this);">
         		<option></option>
-        		<option value="1">{{_(ORDER_APPROVED[1])}}</option>
-        		<option value="2">{{_(ORDER_DISAPPROVED[1])}}</option>
+        		<option value="{{ORDER_APPROVED[0]}}">{{_(ORDER_APPROVED[1])}}</option>
+        		<option value="{{ORDER_DISAPPROVED[0]}}">{{_(ORDER_DISAPPROVED[1])}}</option>
         	</select/>
         </li>
         {% endif %}
@@ -70,11 +70,27 @@
         <li>
         	<select onchange="todo_paid(this);">
         		<option></option>
-        		<option value="0">{{_(ORDER_NOT_PAID[1])}}</option>
-        		<option value="1">{{_(ORDER_PAID[1])}}</option>
+        		<option value="{{ORDER_NOT_PAID[0]}}">{{_(ORDER_NOT_PAID[1])}}</option>
+        		<option value="{{ORDER_PAID[0]}}">{{_(ORDER_PAID[1])}}</option>
         	</select/>
         </li>
         {% endif %}
+        {% if 'FIN_SUPPLIER_PAID' is get_permission %}
+        <li>
+        	<select onchange="todo_supplier_paid(this);">
+        		<option></option>
+        		<option value="{{DELIVER_NOT_PAID[0]}}">{{_(DELIVER_NOT_PAID[1])}}</option>
+        		<option value="{{DELIVER_PAID[0]}}">{{_(DELIVER_PAID[1])}}</option>
+        	</select/>
+        </li>
+        {% endif %}
+        <li>
+        	<select onchange="todo_order_return(this);">
+        		<option></option>
+        		<option value="{{ORDER_NOT_RETURN_NOTE[0]}}">{{_(ORDER_NOT_RETURN_NOTE[1])}}</option>
+        		<option value="{{ORDER_RETURN_NOTE[0]}}">{{_(ORDER_RETURN_NOTE[1])}}</option>
+        	</select/>
+        </li>
         <li><img src="/static/images/system/order_manage_29.jpg" width="77" height="21" id="Image6" onmouseover="MM_swapImage('Image6','','/static/images/system/order_manage_h_29.jpg',1)" onmouseout="MM_swapImgRestore()" onclick="return todelete()"/></li>
     </ul>
 </div>
@@ -226,7 +242,7 @@
     	  	<select name="pickup_type_id" id="pickup_type_id">
     	  		{% for p in MASTER_ALL('PickupType') %}
     	  			{% if p.id == header.pickup_type_id %}
-    	  				<option value="{{p.id}}" checked="checked">{{p}}</option>
+    	  				<option value="{{p.id}}" selected="selected">{{p}}</option>
     	  			{% else %}
     	  				<option value="{{p.id}}">{{p}}</option>
     	  			{% endif %}
@@ -237,7 +253,7 @@
     	    <select name="pack_type_id" id="pack_type_id">
     	  		{% for p in MASTER_ALL('PackType') %}
     	  			{% if p.id == header.pack_type_id %}
-    	  				<option value="{{p.id}}" checked="checked">{{p}}</option>
+    	  				<option value="{{p.id}}" selected="selected">{{p}}</option>
     	  			{% else %}
     	  				<option value="{{p.id}}">{{p}}</option>
     	  			{% endif %}
@@ -638,6 +654,23 @@
 				<td>{{_('Update Time')}}</td>
 				<td>{{header.update_time|ft}}</td>
 			</tr>
+		</table>
+		<br />
+		<table>
+			<thead>
+				<tr class="field_head">
+					<th align="center">{{_('Time')}}</th>
+					<th align="center" style="width:800px">{{_('Remark')}}</th>
+				</tr>
+			<thead>
+			<tbody id="transit_list">
+				{% for t in header.system_logs %}
+					<tr class="data_table_tr">
+						<td>{{t.create_time|ft}}</td>
+						<td>{{t.remark|f}}</td>
+					</tr>
+				{% endfor %}
+			</tbody>
 		</table>
 	</div>
 </div>

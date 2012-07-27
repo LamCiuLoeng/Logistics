@@ -89,7 +89,7 @@ $(document).ready(function(){
             clear_source();
             clear_destination();
             $('#destination_company_id').html('');
-            return
+            return;
         }
         
         $.getJSON(
@@ -155,7 +155,7 @@ $(document).ready(function(){
                             $('#destination_mobile').val(r.data.contact.mobile);                        
                         }  
                     }else{
-                        alert(r.msg)  
+                        alert(r.msg);
                     }
                 }
         );
@@ -192,8 +192,7 @@ $(document).ready(function(){
             $("#destination_tel").val(ui.item.phone);
             $("#destination_mobile").val(ui.item.mobile);
             $("#destination_address").val(ui.item.address);
-        },
-        
+        }
     });
     
     
