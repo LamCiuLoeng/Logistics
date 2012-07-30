@@ -1,5 +1,5 @@
 {% extends "master.html" %}
-{% import 'macros.html' as mymacros %}
+
 
 {% block extCSS %}
 
@@ -226,7 +226,7 @@
 
 <table border="0" cellpadding="0" cellspacing="0" style="width:1650px">
   <tr class="data_table_tr">
-	    <td colspan="100" style="text-align:right">{{records.pager(**PAGINATE_PARAMS)}}</td>
+	    <td colspan="100" style="text-align:right">{{mymacros.mypaginate(records)}}</td>
 	</tr>
   <tr class="field_head">
     <th align="center" style="width:50px;"><input type="checkbox" onclick="allselect(this);"/></th>
@@ -244,7 +244,7 @@
     <td align="center" style="width:120px;">{{mymacros.show_direction(values,'create_by_id')}}{{_('Creator')}}</td>
     <td align="center" style="width:150px;">{{_('Status')}}</td>
     <td align="center" style="width:50px;">审核</td>
-    <td align="center" style="width:50px;">客户付款</td>
+    <td align="center" style="width:150px;">客户付款</td>
     <td align="center" style="width:50px;">异常</td>
     <td align="center" style="width:50px;">少货</td>
     <td align="center" style="width:150px;">客户回单</td>
@@ -255,9 +255,9 @@
 	    <th><input type="checkbox" name="order_ids" value="{{r.id}}" order_status="{{r.status}}"/></th>
 	    <td><a href="{{url_for('.view', action = 'revise',id=r.id)}}">{{r.ref_no|f('没有订单号')}}</a></td>
 	    <td>{{r.no|f}}</td>
-		<td>{{r.source_province}}{{r.source_city}}</td>
+		<td>{{r.source_province|f}}{{r.source_city|f}}</td>
 		<td>{{r.source_company.display_name|f}}</td>
-		<td>{{r.destination_province}}{{r.destination_city}}</td>
+		<td>{{r.destination_province|f}}{{r.destination_city|f}}</td>
 		<td>{{r.destination_company|f}}</td>
 		<td>{{r.qty|f}}</td>
 		<td>{{r.weight|f}}</td>
@@ -271,11 +271,11 @@
 		<td>{{r.create_time|ft}}</td>
 		<td>{{r.create_by|f}}</td>
 		<td>{{r.status|showStatus}}</td>
-		<td>{{r.approve|showApproval}}</td>
-		<td>{{r.paid|showPaid}}</td>
-		<td>{{'是' if r.is_exception else '&nbsp;'|safe}}</td>
-		<td>{{'是' if r.is_less_qty else '&nbsp;'|safe}}</td>
-		<td><span class="order_return_span">{{r.is_return_note|showReturnNote}}</span></td>
+		<td>{{mymacros.show_approve(r.approve)}}</td>
+		<td>{{mymacros.show_paid(r.paid)}}</td>
+		<td>{{mymacros.show_exception(r.is_exception)}}</td>
+		<td>{{mymacros.show_less_qty(r.is_less_qty)}}</td>
+		<td><span class="order_return_span">{{mymacros.show_return(r.is_return_note)}}</span></td>
 	  </tr>
   {% endfor %}
   		<tr class="data_table_tr">
@@ -288,7 +288,7 @@
 	      </tr>
   <tfoot>
   	<tr class="data_table_tr">
-	    <td colspan="100" style="text-align:right">{{records.pager(**PAGINATE_PARAMS)}}</td>
+	    <td colspan="100" style="text-align:right">{{mymacros.mypaginate(records)}}</td>
 	</tr>
   </tfoot>
 </table>

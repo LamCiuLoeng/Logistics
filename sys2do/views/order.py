@@ -19,6 +19,10 @@ from flask.globals import request
 from flask.helpers import flash, jsonify, send_file
 from flask.views import View
 from sqlalchemy.sql.expression import and_, desc
+from sqlalchemy.orm.exc import NoResultFound
+
+
+
 from sys2do import app
 from sys2do.constant import MESSAGE_ERROR, MESSAGE_INFO, MSG_UPDATE_SUCC, \
     MSG_DELETE_SUCC, MSG_NO_ID_SUPPLIED, MSG_SERVER_ERROR, MSG_NO_SUCH_ACTION, \
@@ -26,13 +30,13 @@ from sys2do.constant import MESSAGE_ERROR, MESSAGE_INFO, MSG_UPDATE_SUCC, \
     IN_WAREHOUSE, LOG_CREATE_ORDER, LOG_GOODS_IN_WAREHOUSE, ORDER_NEW, \
     ASSIGN_RECEIVER, LOG_SEND_RECEIVER, OUT_WAREHOUSE, GOODS_PICKUP, GOODS_SIGNED, \
     LOG_GOODS_SIGNED, LOG_GOODS_PICKUPED, LOG_GOODS_IN_TRAVEL, SORTING, \
-    SYSTEM_DATETIME_FORMAT
+    SYSTEM_DATETIME_FORMAT, ORDER_DRAFT
 from sys2do.model import DBSession
 from sys2do.model.logic import OrderHeader, TransferLog, DeliverDetail, \
     ItemDetail, PickupDetail
 from sys2do.model.master import CustomerProfile, InventoryLocation, Customer, \
     ItemUnit, WeightUnit, ShipmentType, InventoryItem, Payment, Ratio, PickupType, \
-    PackType, CustomerTarget, Receiver, Item, Note, City, Province
+    PackType, CustomerTarget, Receiver, Item, Note, City, Province, Barcode
 from sys2do.setting import TMP_FOLDER, TEMPLATE_FOLDER, PAGINATE_PER_PAGE
 from sys2do.util.barcode_helper import generate_barcode_file
 from sys2do.util.common import _g, getOr404, _gp, getMasterAll, _debug, _info, \
@@ -188,7 +192,18 @@ class OrderView(BasicView):
         DBSession.add(order)
         DBSession.flush()
 
-        order.no = genSystemNo()
+
+        no = _g('no')
+        if not no: #if not barcode, create a new one for this
+            order.no = genSystemNo()
+        else:
+            try:
+                b = DBSession.query(Barcode).filter(and_(Barcode.active == 0, Barcode.value == no)).one()
+                b.status = 0 #mark the barcode is used
+            except:
+                _error(traceback.print_exc())
+                b = Barcode(value = no)
+            order.no = b.value
         order.barcode = generate_barcode_file(order.no)
 
         DBSession.add(TransferLog(
@@ -491,6 +506,7 @@ class OrderView(BasicView):
 
         try:
             data = {
+                "order_draft" : f(ORDER_DRAFT[0]),
                 "orders_new" : f(ORDER_NEW[0]),
                 "order_receiver" : f(ASSIGN_RECEIVER[0]),
                 "order_inhouse" : f(IN_WAREHOUSE[0]),
@@ -538,18 +554,43 @@ class OrderView(BasicView):
                       'source_sms', 'destination_sms',
                       ]
             _remark = []
-            for f in fields:
-                old_v = getattr(header, f)
-                new_v = _g(f)
-                if unicode(old_v) != unicode(new_v):
-                    _remark.append(u"[%s]'%s' 修改为 '%s'" % (f, old_v, new_v))
-                setattr(header, f, _g(f))
+
+            checkbox_fields = ['source_sms', 'destination_sms', ]
             try:
+                for f in fields:
+                    old_v = getattr(header, f)
+                    new_v = _g(f)
+                    if unicode(old_v) != unicode(new_v):
+                        _remark.append(u"[%s]'%s' 修改为 '%s'" % (f, old_v, new_v))
+                    setattr(header, f, _g(f))
+
+                for f in checkbox_fields:
+                    vs = _gl(f)
+                    if vs : setattr(header, f, vs[0])
+                    else : setattr(header, f, None)
+
+                no = _g('no')
+                if no != header.no:
+                    try:
+                        old_barcode = DBSession.query(Barcode).filter(Barcode.value == header.no).one()
+                        old_barcode.status = 1 # mark the old barcode to be reserved
+                    except:
+                        pass
+                    try:
+                        new_barcode = DBSession.query(Barcode).filter(Barcode.value == no).one()
+                        new_barcode.status = 0 #mark the new barcode to be used
+                    except NoResultFound :
+                        DBSession.add(Barcode(value = no))
+                    except:
+                        pass
+                    header.no = no
+                    header.barcode = generate_barcode_file(header.no)
                 DBSession.add(SystemLog(
                                         type = header.__class__.__name__,
                                         ref_id = header.id,
                                         remark = u"%s 修改该记录。修改内容为:%s" % (session['user_profile']['name'], ";".join(_remark))
                                         ))
+                if header.status == -2 : header.status = 0
                 DBSession.commit()
                 return jsonify({'code' : 0 , 'msg' : unicode(MSG_SAVE_SUCC)})
             except:

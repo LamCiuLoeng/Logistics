@@ -16,6 +16,7 @@ from auth import SysMixin
 from sys2do.model.auth import CRUDMixin, Group
 from sys2do.util.common import _gl, _gp, _info
 from sys2do.constant import SYSTEM_DATETIME_FORMAT
+from sys2do.model.system import UploadFile
 
 #__all__ = ['']
 
@@ -543,8 +544,9 @@ class Barcode(DeclarativeBase, SysMixin, CRUDMixin):
 
     id = Column(Integer, autoincrement = True, primary_key = True)
     value = Column(Text)
-
     status = Column(Integer, default = 0)  #0 is used ,1 is reserved ,2 is cancelled 
+    img_id = Column(Integer, ForeignKey('system_upload_file.id'))
+    img = relation(UploadFile)
 
     def __str__(self): return self.value
     def __repr__(self): return self.value

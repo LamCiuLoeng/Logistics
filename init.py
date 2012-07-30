@@ -32,6 +32,7 @@ def init():
         uWeiqian = User(name = u'weiqian', email = 'customer@test.com', password = '123')
         uKefu1 = User(name = u'kefu1', email = 'kefu1@sfhlwl.com', password = '123')
         uKefu2 = User(name = u'kefu2', email = 'kefu2@sfhlwl.com', password = '123')
+        uFin1 = User(name = u'fin1', email = 'fin1@sfhlwl.com', password = '123')
         uSupplier = User(name = 'supplier', email = 'supplier@test.com', password = '123')
         uWarehouse = User(name = 'warehouse', email = 'warehouse@sfhlwl.com', password = '123')
 
@@ -99,6 +100,14 @@ def init():
                                 pCreateDeliver, pUpdateDeliver, pDeleteDeliver, pSearchDeliver, pManageDeliver, pSearchAllDeliver,
                                 ]
         gOfficer.users = [uKefu1, uKefu2]
+
+        gFin = Group(name = 'FIN', display_name = 'Fin', type = 0)
+        gFin.permissions = [pCreateOrder, pUpdateOrder, pDeleteOrder, pSearchOrder, pSearchAllOrder,
+                            pCreateDeliver, pUpdateDeliver, pDeleteDeliver, pSearchDeliver, pManageDeliver, pSearchAllDeliver,
+                            pFinSearch, pFinApprove, pFinPaid, pFinSupplierPaid
+                            ]
+        gFin.users = [uFin1, ]
+
         gSupplier = Group(name = 'SUPPLIER', display_name = 'Supplier', type = 0)
         gSupplier.permissions = [pUpdateDeliver, pSearchDeliver ]
         gSupplier.users = [uSupplier]
@@ -240,6 +249,21 @@ def init():
                            Note(name = u'坚朗', range = [('1001', '2000'), ('3001', '4000')]),
                            Note(name = u'味千', range = [('2001', '3000'), ('4001', '5000')]),
                            ])
+
+
+        print 'insert diqu'
+        province_f = open('sys2do/sql/master_province.sql')
+        province_sql = "".join(province_f.readlines())
+        province_f.close()
+
+        city_f = open('sys2do/sql/master_city.sql')
+        city_sql = "".join(city_f.readlines())
+        city_f.close()
+
+        conn = DBSession.connection()
+        conn.execute(province_sql)
+        conn.execute(city_sql)
+
         DBSession.commit()
         print "finish init!"
     except:
@@ -250,3 +274,4 @@ def init():
 
 if __name__ == '__main__':
     init()
+#    insert_diqu()

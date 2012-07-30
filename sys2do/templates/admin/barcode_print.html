@@ -1,0 +1,47 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<style type="text/css" media="print,screen">
+body, table, tr, td{
+	font-family: "微软雅黑";
+	font-size: 14px;
+	color: #000;
+	text-decoration: none;
+	font-weight:bold;
+}
+.print_big_td{
+	font-size:18px;
+}
+.table_border{
+	border:#000 3px solid;
+}
+</style>
+<script src="{{url_for('static', filename='js/jquery-1.7.1.min.js')}}" type="text/javascript"></script>
+<script language="JavaScript" type="text/javascript">
+//<![CDATA[
+	$(document).ready(function(){
+		window.print();
+		window.close();
+	});
+//]]>
+</script>
+   
+   
+</head>
+
+<body>
+<table>
+		{% for r in records %}
+			<tr>
+				<td>
+					<img src="{{r.img.url}}"/>
+				</td>
+			</tr>
+			<tr><td>&nbsp;</td></tr>
+			<tr><td>&nbsp;</td></tr>
+		{% endfor %}
+	</table>
+</body>
+</html>
+

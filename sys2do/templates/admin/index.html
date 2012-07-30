@@ -23,8 +23,8 @@
 				  {'t' : nowstr()},
 				  function(r){
 				      if(r.result != 0){ return; }
-				      
 				      $('.item_line').remove();
+				      append('#order_draft',r.data.order_draft);
 				      append('#orders_new',r.data.orders_new);
 				      append('#order_receiver',r.data.order_receiver);
 				      append('#order_inhouse',r.data.order_inhouse);
@@ -50,6 +50,11 @@
     <div class="todo_list_header">
     <img width="220" height="31" src="/static/images/system/main_page_03.jpg"></div>
       <div class="todo_list_div">
+        <div>
+        	<ul>
+           	  <li class="level_one" id="order_draft">需要补全完整信息(<span id="order_draft_count">0</span>)</li> 
+            </ul>
+        </div>
         <div>
         	<ul>
            	  <li class="level_one" id="orders_new">需要指派收件人(<span id="orders_new_count">0</span>)</li>               
@@ -133,15 +138,24 @@
           <p>关于订单管理的一些说明。说明订单管理功能的用法与注意事项。</p>
         </div>
       </div>
+      <!-- 
       <div class="nav_tab" onclick="redirect('{{url_for('bpAdmin.view',action='warehouse')}}')">
         <div class="header_div"></div>
         <div class="body_div"><img width="80" height="80" src="/static/images/system/img_warehouse.jpg"><span>仓库管理</span>
           <p>关于订单管理的一些说明。说明订单管理功能的用法与注意事项。</p>
         </div>
       </div>     
+      -->
+      
       <div class="nav_tab" onclick="redirect('{{url_for('bpAdmin.view',action='note')}}')">
         <div class="header_div"></div>
         <div class="body_div"><img width="80" height="80" src="/static/images/system/img_warehouse.jpg"><span>票据管理</span>
+          <p>关于订单管理的一些说明。说明订单管理功能的用法与注意事项。</p>
+        </div>
+      </div>
+      <div class="nav_tab" onclick="redirect('{{url_for('bpAdmin.view',action='barcode')}}')">
+        <div class="header_div"></div>
+        <div class="body_div"><img width="80" height="80" src="/static/images/system/img_warehouse.jpg"><span>条码管理</span>
           <p>关于订单管理的一些说明。说明订单管理功能的用法与注意事项。</p>
         </div>
       </div>

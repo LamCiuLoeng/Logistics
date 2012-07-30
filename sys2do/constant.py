@@ -57,6 +57,7 @@ LOG_GOODS_SIGNED = u'货物已签收。'
 LOG_GOODS_PICKUPED = u'货物已提货。'
 
 #order status
+ORDER_DRAFT = (-2, u'草稿')
 ORDER_CANCELLED = (-1, u'已取消')
 ORDER_NEW = (0, u'新建')
 ORDER_CONFIRMED = (1, u'已确认')
@@ -73,7 +74,7 @@ GOODS_PICKUP = (95, u'货物已提货')
 
 
 STATUS_LIST = [
-               ORDER_CANCELLED, ORDER_NEW, ORDER_CONFIRMED, ASSIGN_RECEIVER, IN_WAREHOUSE, SORTING, OUT_WAREHOUSE, SEND_OUT, IN_TRAVEL,
+               ORDER_DRAFT, ORDER_CANCELLED, ORDER_NEW, ORDER_CONFIRMED, ASSIGN_RECEIVER, IN_WAREHOUSE, SORTING, OUT_WAREHOUSE, SEND_OUT, IN_TRAVEL,
                GOODS_ARRIVED, GOODS_SIGNED, GOODS_PICKUP
                ]
 
@@ -117,18 +118,6 @@ BTN_RETURN = T('Return')
 
 
 SYSTEM_NOW = lambda : dt.now()
-
-PAGINATE_PARAMS = {
-                   'format' : '$link_first $link_previous ~3~ $link_next $link_last, 共计 $item_count 条记录',
-                   'show_if_single_page' : True,
-                   'symbol_first' : u'第一页',
-                   'symbol_last' : u'最后一页',
-                   'symbol_previous' : u'上一页',
-                   'symbol_next' : u'下一页',
-                   }
-
-
-
 
 
 def _getMaster(v):

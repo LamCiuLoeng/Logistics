@@ -9,3 +9,85 @@
 		<a href="#" onclick="toSort('{{f}}','desc')"><img src="/static/images/system/updown.gif"/></a>
 	{% endif %}
 {%- endmacro %}
+
+
+
+{% macro show_approve(value) -%}
+	{% if value == 0 %}
+		未审核
+	{% elif value == 1 %}
+		通过
+	{% elif value == 2 %}
+		不通过
+	{% endif %}
+{%- endmacro %}
+
+
+{% macro show_paid(value) -%}
+	{% if value == 0 %}
+		未付
+	{% elif value == 1 %}
+		已付
+	{% endif %}
+{%- endmacro %}
+
+
+{% macro show_supplier_paid(value) -%}
+	{% if value == 0 %}
+		未付
+	{% elif value == 1 %}
+		已付
+	{% endif %}
+{%- endmacro %}
+
+
+{% macro show_exception(value) -%}
+	{% if value %}
+		是
+	{% endif %}
+{%- endmacro %}
+
+
+
+{% macro show_less_qty(value) -%}
+	{% if value %}
+		是
+	{% endif %}
+{%- endmacro %}
+
+
+
+
+{% macro show_return(value) -%}
+	{% if value == 0 %}
+		未返
+	{% else %}
+		已返
+	{% endif %}
+{%- endmacro %}
+
+
+{% macro mypaginate(records) -%}
+	{{records.pager(format='$link_first $link_previous ~3~ $link_next $link_last, 共计 $item_count 条记录',
+					show_if_single_page=True,
+					symbol_first='第一页',
+					symbol_last='最后一页',
+					symbol_previous='上一页',
+					symbol_next='下一页')}}
+{%- endmacro %}
+
+
+{% macro select(id,list,value,class='',style='',blank_option=true) -%}
+	<select name="{{id}}" id="{{id}}" class="{{class}}" style="{{style}}">
+		{% if blank_option %}
+          <option value=""></option>
+        {% endif %}
+          {% for o in list%}
+              {% if o.id == value%}
+                  <option value="{{o.id}}" selected="selected">{{o}}</option>
+              {% else %}
+                  <option value="{{o.id}}">{{o}}</option>
+              {% endif %}
+          {% endfor %}
+      </select>
+{%- endmacro %}

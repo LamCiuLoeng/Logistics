@@ -108,68 +108,24 @@
   <ul>
     	  
     	<li style="width:450px;"><span><sup class="warn">*</sup>&nbsp;{{_('Source Station')}}</span>
-    		<select name="source_province_id" id="source_province_id" style="width:150px" class="must_input">
-    	      <option value=""></option>
-    	      {% for p in MASTER_ALL('Province') %}
-    	          {% if p.id == header.source_province_id %}
-    	          	<option value="{{p.id}}" selected="selected">{{p}}</option>
-    	          {% else %}
-    	          	<option value="{{p.id}}">{{p}}</option>
-    	          {% endif %}
-    	      {% endfor %}
-    	  </select>
-    	  	<select name="source_city_id" id="source_city_id" style="width:150px">
-    	  		{% for c in source_cites %}
-    	          {% if c.id == header.source_city_id %}
-    	          	<option value="{{c.id}}" selected="selected">{{c}}</option>
-    	          {% else %}
-    	          	<option value="{{c.id}}">{{c}}</option>
-    	          {% endif %}
-    	        {% endfor %}
-    	  	</select>
-    	
+    	  {{mymacros.select(id='source_province_id',list=MASTER_ALL('Province'),value=header.source_province_id,class="must_input",style="width:150px")}}
+    	  {{mymacros.select(id='source_city_id',list=source_cites,value=header.source_city_id,class="",style="width:150px")}}
     	</li>    	
     	    
     	  <li style="width:450px;"><span><sup class="warn">*</sup>&nbsp;{{_('Destination Station')}}</span>
-		      <select name="destination_province_id" id="destination_province_id" style="width:150px" class="must_input">
-	    	      <option value=""></option>
-	    	      {% for p in MASTER_ALL('Province') %}
-	    	          {% if p.id == header.destination_province_id %}
-	    	          	<option value="{{p.id}}" selected="selected">{{p}}</option>
-	    	          {% else %}
-	    	          	<option value="{{p.id}}">{{p}}</option>
-	    	          {% endif %}
-	    	      {% endfor %}
-	    	  </select> 
-	    	  <select name="destination_city_id" id="destination_city_id" style="width:150px">
-	    	      {% for c in destination_cites %}
-	    	          {% if c.id == header.destination_city_id %}
-	    	          	<option value="{{c.id}}" selected="selected">{{c}}</option>
-	    	          {% else %}
-	    	          	<option value="{{c.id}}">{{c}}</option>
-	    	          {% endif %}
-	    	        {% endfor %}
-	    	  </select>  	      
+	    	  {{mymacros.select(id='destination_province_id',list=MASTER_ALL('Province'),value=header.destination_province_id,class="must_input",style="width:150px")}}
+	    	  {{mymacros.select(id='destination_city_id',list=destination_cites,value=header.destination_city_id,class="",style="width:150px")}}	      
    	      </li>
     	  <li style="width:180px;"><span><sup class="warn">*</sup>&nbsp;单号</span>
     	    <input name="ref_no" id="ref_no" type="text" style="width:100px" value="{{header.ref_no|f}}" class="must_input"/>
   	    </li>
-  	     <li style="width:180px;"><span><sup class="warn">*</sup>&nbsp;票据前缀</span>
-    	    <select name="note_id" id="note_id" class="must_input" style="width:100px">
-    	    	<option value=""></option>
-    	    	{% for n in MASTER_ALL('Note') %}
-    	    		{% if n.id == header.note_id %}
-    	    			<option value="{{n.id}}" selected="selected">{{n}}</option>
-    	    		{% else %}
-    	    			<option value="{{n.id}}">{{n}}</option>
-    	    		{% endif %}
-    	    	{% endfor %}
-    	    </select>
+  	     <li style="width:180px;"><span><sup class="warn">*</sup>&nbsp;票据前缀</span>    	    
+    	    {{mymacros.select(id='note_id',list=MASTER_ALL('Note'),value=header.note_id,class="must_input",style="width:100px")}}
   	    </li>
-  	    <li style="width:500px;"><span><sup class="warn">*</sup>&nbsp;票据单号</span>
+  	    <li style="width:200px;"><span><sup class="warn">*</sup>&nbsp;票据单号</span>
     	    <input name="note_no" id="note_no" type="text" class="must_input" style="width:100px" value="{{header.note_no|f}}"/>
   	    </li>
-    	  <li style="width:200px;"><span>系统编号</span>{{header.no|f}}</li>
+    	  <li style="width:200px;"><span>系统编号</span><input type="text" name="no" id="no" value="{{header.no|f}}" class="numeric" style="width:100px"/></li>
     	  <li style="width:200px;"><span>{{_('Create Time')}}</span>{{header.create_time|ft}}</li>
     	  <li style="width:200px;"><span>{{_('Creator')}}</span>{{header.create_by|f}}</li>
     	  <li style="width:300px;"><span>送货单号</span>
@@ -179,27 +135,10 @@
     	  	{% endif %}
     	  </li>
     	  <li style="width:459px;"><span><sup class="warn">*</sup>&nbsp;{{_('Source Company')}}</span>
-    	      <select name="source_company_id" id="source_company_id" style="width:360px" class="must_input">
-    	          {% for c in MASTER_ALL('Customer') %}
-    	              {% if c.id == header.source_company_id %}
-    	              <option value="{{c.id}}" selected="selected">{{c}}</option>
-    	              {% else %}
-    	              <option value="{{c.id}}">{{c}}</option>
-    	              {% endif %}
-    	          {% endfor %}
-    	      </select>
+    	      {{mymacros.select(id='source_company_id',list=MASTER_ALL('Customer'),value=header.source_company_id,class="must_input",style="width:360px")}}
     	  </li>
     	  <li style="width:459px;"><span><sup class="warn">*</sup>&nbsp;{{_('Destination Company')}}</span>
-    	      <select name="destination_company_id" id="destination_company_id" style="width:360px" class="must_input">
-    	          <option value=""></option>
-    	          {% for t in targets %}
-    	        	{% if t.id == header.destination_company_id %}
-    	        	    <option value="{{t.id}}" selected="selected">{{t}}</option>
-    	        	{% else %}
-    	        	    <option value="{{t.id}}">{{t}}</option>
-    	        	{% endif %}
-    	        {% endfor %}
-    	      </select>
+    	      {{mymacros.select(id='destination_company_id',list=targets,value=header.destination_company_id,class="must_input",style="width:360px")}}
     	  </li>
     	  <li style="width:459px;"><span><sup class="warn">*</sup>&nbsp;{{_('Source Contact')}}</span>
     	    <input name="source_contact" id="source_contact" type="text" style="width:360px" value="{{header.source_contact|f}}" class="must_input"/>
@@ -239,26 +178,10 @@
     	    短信通知
   	    </li>
     	  <li style="width:227px;"><span>{{_('Pickup Type')}}</span>
-    	  	<select name="pickup_type_id" id="pickup_type_id">
-    	  		{% for p in MASTER_ALL('PickupType') %}
-    	  			{% if p.id == header.pickup_type_id %}
-    	  				<option value="{{p.id}}" selected="selected">{{p}}</option>
-    	  			{% else %}
-    	  				<option value="{{p.id}}">{{p}}</option>
-    	  			{% endif %}
-    	  		{% endfor %}
-    	    </select>
+    	    {{mymacros.select(id='pickup_type_id',list=MASTER_ALL('PickupType'),value=header.pickup_type_id,class="",style="")}}
   	    </li>
     	  <li style="width:227px;"><span>{{_('Package Type')}}</span>
-    	    <select name="pack_type_id" id="pack_type_id">
-    	  		{% for p in MASTER_ALL('PackType') %}
-    	  			{% if p.id == header.pack_type_id %}
-    	  				<option value="{{p.id}}" selected="selected">{{p}}</option>
-    	  			{% else %}
-    	  				<option value="{{p.id}}">{{p}}</option>
-    	  			{% endif %}
-    	  		{% endfor %}
-    	    </select>
+    	    {{mymacros.select(id='pack_type_id',list=MASTER_ALL('PackType'),value=header.pack_type_id,class="",style="")}}
   	    </li>
   	    <li style="width:226px;"><span>{{_('Expect Time')}}</span>
     	    <input type="text" style="width:140px" id="expect_time" name="expect_time" class="datepicker" value="{{header.expect_time|fd}}"/>
@@ -307,16 +230,7 @@
     </span></td>
     <td align="center">
     	<span style="width:180px;">
-	      <select name="payment_id" id="payment_id" class="order_add_div_body_input" style="width:70px">
-	      		<option value=''></option>
-				{% for p in MASTER_ALL('Payment') %}
-					{% if p.id == header.payment_id %}
-						<option value="{{p.id}}" selected="selected">{{p}}</optino>
-					{% else %}
-						<option value="{{p.id}}">{{p}}</optino>
-					{% endif %}
-				{% endfor %}
-			</select>
+			{{mymacros.select(id='payment_id',list=MASTER_ALL('Payment'),value=header.payment_id,class="order_add_div_body_input",style="width:70px")}}
     	</span>
     </td>
     </tr>
@@ -347,8 +261,8 @@
 	      <input name="other_charge" id="other_charge" type="text" class="order_add_div_body_input numeric compute" style="width:70px" value="{{header.other_charge|f}}"/>
 	    </span></td>
 	    <td>&nbsp;</td>
-	    <td style="text-align:center" class="approval_span">{{header.approve|showApproval}}</td>
-		<td style="text-align:center" class="paid_span">{{header.paid|showPaid}}</td>
+	    <td style="text-align:center" class="approval_span">{{mymacros.show_approve(header.approve)}}</td>
+		<td style="text-align:center" class="paid_span">{{mymacros.show_paid(header.paid)}}</td>
 	</tr>
 </table>
 	</div>

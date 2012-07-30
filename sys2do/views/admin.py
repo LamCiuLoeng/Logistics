@@ -7,11 +7,13 @@
 ###########################################
 '''
 import traceback
+from datetime import datetime as dt
 from flask import Blueprint, render_template, url_for, request
 from flask.views import View
 from flask.helpers import flash, jsonify
 from werkzeug.utils import redirect
 from webhelpers import paginate
+from sqlalchemy.sql.expression import desc
 
 
 from sys2do.setting import PAGINATE_PER_PAGE
@@ -25,7 +27,9 @@ from sys2do.constant import MESSAGE_ERROR, MSG_NO_SUCH_ACTION, \
 from sys2do.util.common import _g, _gl, getMasterAll, _error, _gp
 from sys2do.model.master import Customer, CustomerProfile, \
     SupplierProfile, Supplier, Payment, Item, PickupType, PackType, Ratio, \
-    Receiver, InventoryLocation, CustomerTarget, Note, CustomerTargetContact
+    Receiver, InventoryLocation, CustomerTarget, Note, CustomerTargetContact, \
+    Barcode
+from sys2do.util.barcode_helper import generate_barcode_file
 
 __all__ = ['bpAdmin']
 
@@ -683,6 +687,45 @@ class AdminView(BasicView):
                               new_page = 'admin/customer_new.html',
                               update_page = 'admin/customer_update.html',)
 
+    @tab_highlight('TAB_MASTER')
+    def barcode(self):
+        method = _g('m', 'LIST')
+        if method not in ['LIST', 'NEW', 'PRINT', 'SAVE_NEW']:
+            flash(MSG_NO_SUCH_ACTION, MESSAGE_ERROR);
+            return redirect(url_for('.view', action = 'index'))
+
+        DBObj = Barcode
+        index_page = 'admin/barcode_index.html'
+        new_page = 'admin/barcode_new.html'
+        print_page = 'admin/barcode_print.html'
+        action = 'barcode'
+
+        if method == 'LIST':
+            page = _g('page') or 1
+            objs = DBSession.query(DBObj).filter(DBObj.active == 0).order_by(desc(DBObj.value))
+            def url_for_page(**params): return url_for('bpAdmin.view', action = action, m = 'LIST', page = params['page'])
+            records = paginate.Page(objs, page, show_if_single_page = True, items_per_page = 100, url = url_for_page)
+            return render_template(index_page, records = records, action = action)
+        elif method == 'NEW':
+            return render_template(new_page, action = action)
+        elif method == 'PRINT':
+            ids = _gl('ids')
+            records = DBSession.query(DBObj).filter(DBObj.id.in_(ids)).order_by(desc(DBObj.create_time))
+            return render_template(print_page, records = records)
+        elif method == 'SAVE_NEW':
+            qty = _g('qty')
+            records = [DBObj(status = 1) for i in range(int(qty))]
+            DBSession.add_all(records)
+            DBSession.flush()
+            for b in  records:
+                b.value = '%s%06d' % (dt.now().strftime('%y%m%d'), (b.id % 1000000))
+                b.img = generate_barcode_file(b.value)
+            DBSession.commit()
+            if _g('type') == 'CREATE':
+                flash(MSG_SAVE_SUCC, MESSAGE_INFO)
+                return redirect(url_for('.view', action = action))
+            else:
+                return render_template(print_page, records = records)
 #    def warehouse(self, DBObj, action,
 #                  index_page = 'admin/template_index.html',
 #                  new_page = 'admin/template_new.html',

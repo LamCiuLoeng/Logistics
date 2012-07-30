@@ -102,7 +102,7 @@
 				<td>{{values.get('expect_time','')|f}}</td>
 				<td height="30" align="right">付款予承运商</td>
 				<td width="12">&nbsp;</td>
-				<td>{{values.get('supplier_paid','')|showSupplierPaid}}</td>
+				<td>{{mymacros.show_supplier_paid(values.get('supplier_paid',''))}}</td>
 			</tr>
 			<tr>
 				<td height="30" align="right">{{_('Amount')}}</td>

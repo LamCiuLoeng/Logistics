@@ -157,26 +157,50 @@ class RootView(BasicView):
 
         if type == 'search':
             try:
-                if barcode == '123456789':
-                    params = {
-                          'no' : 'BARCODE_AVAILABLE',
+                b = DBSession.query(Barcode).filter(and_(Barcode.active == 0, Barcode.value == barcode)).one()
+
+                if b.status == 0 : # the barcode is used in a order
+                    try:
+                        h = DBSession.query(OrderHeader).filter(OrderHeader.no == barcode).one()
+                        params = {
+                                  'no' : h.ref_no,
+                                  'source_station' : h.source_province,
+                                  'source_company' : h.source_company,
+                                  'destination_station' : h.destination_province,
+                                  'destination_company' : h.destination_company,
+                                  'status' : h.status,
+                                  }
+                    except:
+                        _error(traceback.print_exc())
+                        params = {
+                          'no' : unicode(MSG_RECORD_NOT_EXIST),
                           'source_station' : '',
                           'source_company' : '',
                           'destination_station' : '',
                           'destination_company' : '',
                           'status' : ''
                           }
-                else:
-                    h = DBSession.query(OrderHeader).filter(OrderHeader.no == barcode).one()
+                elif b.status == 1 : # the barcode is reserved ,could be created a new order
                     params = {
-                              'no' : h.ref_no,
-                              'source_station' : h.source_station,
-                              'source_company' : h.source_company,
-                              'destination_station' : h.destination_station,
-                              'destination_company' : h.destination_company,
-                              'status' : h.status,
-                              }
+                          'no' : 'BARCODE_AVAILABLE',
+                          'source_station' : '',
+                          'source_company' : '',
+                          'destination_station' : '',
+                          'destination_company' : '',
+                          'status' : '-2'
+                          }
+                else: # the barcode is cancel ,equal not existed
+                    params = {
+                          'no' : unicode(MSG_RECORD_NOT_EXIST),
+                          'source_station' : '',
+                          'source_company' : '',
+                          'destination_station' : '',
+                          'destination_company' : '',
+                          'status' : ''
+                          }
+
             except:
+                _error(traceback.print_exc())
                 params = {
                           'no' : unicode(MSG_RECORD_NOT_EXIST),
                           'source_station' : '',
@@ -185,6 +209,7 @@ class RootView(BasicView):
                           'destination_company' : '',
                           'status' : ''
                           }
+
             return self._compose_xml_result(params)
         elif type == 'submit':
             try:
@@ -192,11 +217,19 @@ class RootView(BasicView):
                 action_type = int(action_type)
 
                 #create a draft order by the handheld
-                if action_type == 0:
-                    no = _g('')
-                    ref_no = _g('')
+                if action_type == -2:
+                    no = _g('barcode')
+                    ref_no = _g('orderno')
                     try:
-                        DBSession.add(OrderHeader(no = no, ref_no = ref_no))
+                        b = DBSession.query(Barcode).filter(Barcode.value == no).one()
+                        if b.status != 1 :
+                            return self._compose_xml_response(1)
+                    except:
+                        return self._compose_xml_response(1)
+
+                    try:
+                        DBSession.add(OrderHeader(no = no, ref_no = ref_no, status = -2))
+                        b.status = 0
                         DBSession.commit()
                         return self._compose_xml_response(0)
                     except:

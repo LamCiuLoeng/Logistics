@@ -16,8 +16,9 @@ from sys2do.constant import STATUS_LIST, SYSTEM_DATE_FORMAT, SYSTEM_DATETIME_FOR
 #from sys2do import app
 
 __all__ = ['ft', 'fd', 'ifFalse', 'f', 'showStatus',
-           'showApproval', 'showPaid', 'showSupplierPaid',
-           'showReturnNote', 'sum_with_none']
+#           'showApproval', 'showPaid', 'showSupplierPaid',
+#           'showReturnNote', 
+           'sum_with_none']
 
 
 def ft(t, f = SYSTEM_DATETIME_FORMAT):
@@ -46,7 +47,7 @@ def showStatus(s):
     return ''
 
 
-
+'''
 def showApproval(s):
     for code, msg in APPROVAL_STATUS_LIST:
         if s == code : return msg
@@ -69,7 +70,7 @@ def showReturnNote(s):
     for code, msg in ORDER_RETURN_STATUS_LIST:
         if s == code : return msg
     return ''
-
+'''
 
 
 

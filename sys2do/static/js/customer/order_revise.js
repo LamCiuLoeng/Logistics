@@ -82,6 +82,17 @@ function save_header() {
                                params[name] = value;
                             });
                             
+                            $("input[type=checkbox]:checked").each(function(){
+                                var tmp = $(this);
+                                var n = tmp.attr('name');
+                                
+                                if(n in params){
+                                    params[n] += ',' + tmp.val();
+                                }else{
+                                    params[n] = tmp.val();
+                                }
+                            });
+                            
                             ajax_save(params, function(r){
                                 if(r.code == 0){
                                     alert(r.msg);
@@ -498,9 +509,9 @@ function todo_approve(obj){
                 show_error(r.msg);
             }else{
                 if(v=='1'){
-                    $(".approval_span").text("审核通过");
+                    $(".approval_span").text("通过");
                 }else{
-                    $(".approval_span").text("审核不通过");
+                    $(".approval_span").text("不通过");
                 }           
                 show_info(r.msg);
             }   
@@ -518,9 +529,9 @@ function todo_paid(obj){
                 show_error(r.msg);
             }else{
                 if(v=='0'){
-                    $(".paid_span").text("客户未付款");
+                    $(".paid_span").text("未付");
                 }else{
-                    $(".paid_span").text("客户已付款");
+                    $(".paid_span").text("已付");
                 }           
                 show_info(r.msg);
             }   
@@ -538,9 +549,9 @@ function todo_supplier_paid(obj){
                 show_error(r.msg);
             }else{
                 if(v=='0'){
-                    $(".supplier_paid_span").text("未付款予承运商");
+                    $(".supplier_paid_span").text("未付");
                 }else{
-                    $(".supplier_paid_span").text("已付款予承运商");
+                    $(".supplier_paid_span").text("已付");
                 }           
                 show_info(r.msg);
             }   
@@ -558,9 +569,9 @@ function todo_order_return(obj){
                 show_error(r.msg);
             }else{
                 if(v=='0'){
-                    $(".order_return_span").text("客户未返回单");
+                    $(".order_return_span").text("未返");
                 }else{
-                    $(".order_return_span").text("客户已返回单");
+                    $(".order_return_span").text("已返");
                 }           
                 show_info(r.msg);
             }   

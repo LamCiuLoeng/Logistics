@@ -1,14 +1,33 @@
 {% extends "master.html" %}
 
 {% block extJS %}
-
+<script language="JavaScript" type="text/javascript">
+//<![CDATA[
+	function allselect(obj){
+		var t = $(obj);
+		if(t.attr('checked')){
+			$("input[type='checkbox'][name='ids']").attr('checked','checked');
+		}else{
+		    $("input[type='checkbox'][name='ids']").removeAttr('checked');
+		}
+	}
+	
+	function toprint(){
+		if($("input[type='checkbox'][name='ids']:checked").length < 1){
+			alert('请选择至少一条记录以进行操作！');
+			return false;
+		}
+		$("#records_form").submit();
+	}
+//]]>
+</script>
 {% endblock %}
 
 {% block inner_menu %}
 <div class="inner_menu">
 	<ul>
         <li><a href="{{url_for('.view', action = action,m = 'NEW')}}"><img src="/static/images/system/order_manage_31.jpg" width="77" height="21" id="Image2" onmouseover="MM_swapImage('Image2','','/static/images/system/order_manage_h_31.jpg',1)" onmouseout="MM_swapImgRestore()" /></a></li>
-        
+        <li><img src="/static/images/system/order_manage_11_35.jpg" width="77" height="21" id="Image5" onmouseover="MM_swapImage('Image5','','/static/images/system/order_manage_1_35.jpg',1)" onmouseout="MM_swapImgRestore()" onclick="return toprint()"/></li>
     </ul>
 </div>
 {% endblock %}
@@ -32,39 +51,44 @@
             <td>&nbsp;</td>
             <td><table width="100%" border="0" cellspacing="0" cellpadding="0">
               <tr>
-                <td class="title_fonts_display">{{_('Receiver Management')}}</td>
+                <td class="title_fonts_display">条码管理</td>
               </tr>
               <tr>
                 <td>&nbsp;</td>
               </tr>
             </table>
-              <table border="0" cellspacing="0" cellpadding="0">
+            <form action="{{url_for('.view', action = 'barcode',m='PRINT')}}" method="post" id="records_form">
+              <table border="0" cellspacing="0" cellpadding="0" style="width:600px;">
                 <tr class="field_head">
-                  <td align="center" style="width:200px;">{{_('Code')}}</td>
-                  <td align="center" style="width:200px;">{{_('Name')}}</td>
-                  <td align="center" style="width:200px;">{{_('Tel')}}</td>
-                  <td align="center" style="width:200px;">{{_('Mobile')}}</td>
-                  <td align="center" style="width:200px;">{{_('Create Time')}}</td>
-                  <td align="center" style="width:200px;">{{_('Creator')}}</td>
-                  <td align="center" style="width:200px;">{{_('Update Time')}}</td>
-                  <td align="center" style="width:200px;">{{_('Last Updator')}}</td>
+                  <td align="center" style="width:50px;"><input type="checkbox" onclick="allselect(this);"/></td>
+                  <td align="center" style="width:200px;">号码</td>
+                  <td align="center" style="width:100px;">状态</td>
+                  <td align="center" style="width:150px;">{{_('Create Time')}}</td>
+                  <td align="center" style="width:100px;">{{_('Creator')}}</td>
                 </tr>
 				{% for r in records %}
 					<tr class="data_table_tr {{ loop.cycle('data_table_tr_odd', 'data_table_tr_even') }}">
-						<td><a href="{{url_for('.view', action = action ,m = 'UPDATE',id=r.id)}}">{{r.code|f}}</a></td>
-						<td>{{r.name}}</td>
-						<td>{{r.tel|f}}</td>
-						<td>{{r.mobile|ft}}</td>
+						<td><input type="checkbox" name="ids" value="{{r.id}}"/></td>
+						<td>{{r.value}}</td>
+						<td>{%- if r.status == 0%}
+								已用
+							{% elif r.status == 1%}
+								预留
+							{% else %}
+								作废
+							{% endif -%}
+						</td>
 						<td>{{r.create_time|ft}}</td>
 						<td>{{r.create_by|f}}</td>
-						<td>{{r.update_time|ft}}</td>
-						<td>{{r.update_by|f}}</td>
 					</tr>
 				{% endfor %}
 					<tr class="data_table_tr">
 					    <td colspan="100" style="text-align:right">{{mymacros.mypaginate(records)}}</td>
 					</tr>
-              </table></td>
+              </table>
+              </form>
+              
+              </td>
             <td>&nbsp;</td>
           </tr>
          <tr>

@@ -5,7 +5,7 @@
 	{% block keyword %}
 		<meta content="" name="Keywords" /> 
 	{% endblock %}
-	
+	{% import 'macros.html' as mymacros %}
 	<title>{% block title %}{{_("Logistics Management")}}{% block subtitle %}{% endblock %}{% endblock %}</title>
 	
 	<link rel="icon" type="image/ico" href="{{url_for('static', filename='favicon.ico')}}"></link> 

@@ -54,45 +54,27 @@
     <div class="order_add_div_body">
   <ul>
     	<li style="width:450px;"><span><sup class="warn">*</sup>&nbsp;{{_('Source Station')}}</span>
-    	  <select name="source_province_id" id="source_province_id" style="width:150px" class="must_input">
-    	      <option value=""></option>
-    	      {% for p in MASTER_ALL('Province') %}
-    	          <option value="{{p.id}}">{{p}}</option>
-    	      {% endfor %}
-    	  </select>
+    	  {{mymacros.select(id='source_province_id',list=MASTER_ALL('Province'),value=None,class="must_input",style="width:150px")}}
     	  <select name="source_city_id" id="source_city_id" style="width:150px"></select>
     	</li>
     	  <li style="width:450px;"><span><sup class="warn">*</sup>&nbsp;{{_('Destination Station')}}</span>
-    	    <select name="destination_province_id" id="destination_province_id" style="width:150px" class="must_input">
-    	      <option value=""></option>
-    	      {% for p in MASTER_ALL('Province') %}
-    	          <option value="{{p.id}}">{{p}}</option>
-    	      {% endfor %}
-    	  </select>
+    	  {{mymacros.select(id='destination_province_id',list=MASTER_ALL('Province'),value=None,class="must_input",style="width:150px")}}
     	  <select name="destination_city_id" id="destination_city_id" style="width:150px"></select>
    	      </li>
     	 <li style="width:180px;"><span><sup class="warn">*</sup>&nbsp;单号</span>
     	    <input name="ref_no" id="ref_no" type="text" class="must_input" style="width:100px"/>
   	    </li>
   	    <li style="width:180px;"><span><sup class="warn">*</sup>&nbsp;票据前缀</span>
-    	    <select name="note_id" id="note_id" class="must_input" style="width:100px">
-    	    	<option value=""></option>
-    	    	{% for n in MASTER_ALL('Note') %}
-    	    		<option value="{{n.id}}">{{n}}</option>
-    	    	{% endfor %}
-    	    </select>
+    	    {{mymacros.select(id='note_id',list=MASTER_ALL('Note'),value=None,class="must_input",style="width:100px")}}
   	    </li>
   	    <li style="width:180px;"><span><sup class="warn">*</sup>&nbsp;票据单号</span>
     	    <input name="note_no" id="note_no" type="text" class="must_input" style="width:100px"/>
   	    </li>
-    	  <!-- <li style="width:280px;"><span>{{_('Create Time')}}</span>{{current}}</li> -->
+  	    <li style="width:350px;"><span>&nbsp;系统编号</span>
+    	    <input name="no" id="no" type="text" class="numeric" style="width:150px"/>
+  	    </li>
     	  <li style="width:459px;"><span><sup class="warn">*</sup>&nbsp;{{_('Source Company')}}</span>
-    	      <select name="source_company_id" id="source_company_id" style="width:360px" class="must_input">
-    	          <option></option>
-    	          {% for c in MASTER_ALL('Customer') %}
-    	              <option value="{{c.id}}">{{c}}</option>
-    	          {% endfor %}
-    	  	  </select>
+    	  	  {{mymacros.select(id='source_company_id',list=MASTER_ALL('Customer'),value=None,class="must_input",style="width:360px")}}
     	  </li>
     	  <li style="width:459px;"><span><sup class="warn">*</sup>&nbsp;{{_('Destination Company')}}</span>
     	  	<select name="destination_company_id" id="destination_company_id"style="width:360px" class="must_input">
@@ -127,18 +109,10 @@
     	    <input type="checkbox" name="destination_sms" value="1" style="width:20px"/>短信通知
   	    </li>
     	  <li style="width:226px;"><span>{{_('Pickup Type')}}</span>
-    	  	<select name="pickup_type_id" id="pickup_type_id">
-    	  		{% for p in MASTER_ALL('PickupType') %}
-    	  			<option value="{{p.id}}">{{p}}</option>
-    	  		{% endfor %}
-    	    </select>
+    	    {{mymacros.select(id='pickup_type_id',list=MASTER_ALL('PickupType'),value=None,class="",style="")}}
   	    </li>
     	  <li style="width:227px;"><span>{{_('Package Type')}}</span>
-    	    <select name="pack_type_id" id="pack_type_id">
-    	  		{% for p in MASTER_ALL('PackType') %}
-    	  			<option value="{{p.id}}">{{p}}</option>
-    	  		{% endfor %}
-    	    </select>
+    	    {{mymacros.select(id='pack_type_id',list=MASTER_ALL('PackType'),value=None,class="",style="")}}
   	    </li>
   	    <li style="width:226px;"><span>{{_('Expect Time')}}</span>
     	    <input type="text" style="width:140px" id="expect_time" name="expect_time" class="datepicker"/>
@@ -185,12 +159,7 @@
     </span></td>
     <td align="center">
     	<span style="width:180px;">
-	      <select name="payment_id" id="payment_id" class="order_add_div_body_input" style="width:70px">
-				<option value=''></option>
-				{% for p in MASTER_ALL('Payment') %}
-						<option value="{{p.id}}">{{p}}</option>
-				{% endfor %}
-			</select>
+			{{mymacros.select(id='payment_id',list=MASTER_ALL('Payment'),value=None,class="order_add_div_body_input",style="width:70px")}}
     	</span>
     </td>
     </tr>

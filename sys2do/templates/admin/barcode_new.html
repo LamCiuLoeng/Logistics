@@ -1,0 +1,57 @@
+{% extends "master.html" %}
+
+{% block extJS %}
+<script language="JavaScript" type="text/javascript">
+//<![CDATA[
+	function tosave(){
+		var qty = $("#qty").val();
+		if(!qty){
+			alert('请填写数量然后创建！');
+			return ;
+		}else if(parseInt(qty) > 1000000){
+			alert('请每天不要打印超过数量1000000的条码，会引起条码重复！');
+			return;
+		}
+		
+		$('form').submit();
+	}
+	
+	function tocreate(){
+		$("#type").val('CREATE');
+		tosave();
+	}
+	
+	function tocreate_print(){
+		$("#type").val('CREATE_PRINT');
+		tosave();
+	}
+//]]>
+</script>
+{% endblock %}
+
+{% block inner_menu %}
+<div class="inner_menu">
+	<ul>
+    	<li><img src="/static/images/system/order_manage_25.jpg" width="71" height="21" id="Image1" onmouseover="MM_swapImage('Image1','','/static/images/system/order_manage_h_25.jpg',1)" onmouseout="MM_swapImgRestore()" onclick="redirect('{{url_for('bpAdmin.view',action='user')}}')"/></li>       
+    </ul>
+</div>
+{% endblock %}
+
+
+{% block content %}
+	<form action="{{url_for('.view', action = 'barcode',m='SAVE_NEW')}}" method="post">
+		<input type="hidden" name="type" id="type" value=""/>
+		<table>
+			<tr>
+				<td>数量</td>
+				<td><input type="text" name="qty" id="qty" class="numeric"/></td>
+			</tr>
+			<tr>
+				<td colspan="2"><input type="button" value="创建" onclick="tocreate();"/>&nbsp;
+				<input type="button" value="创建并打印" onclick="tocreate_print();"/></td>
+			</tr>
+
+		</table>
+	</form>
+	<br /><br />
+{% endblock %}
