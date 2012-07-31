@@ -106,12 +106,18 @@
 			      
 			      <td class="{{ 'bt_highlight_fix' if session.get('tab-highlight','') == 'TAB_HOME' else 'bt_normal'}}" onmouseover="menu_move_over(this)" onmouseout="menu_move_out(this)" onclick="redirect('{{url_for('bpRoot.view', action = 'index')}}')">首页</td>
 			      <td class="gap2"></td>
+			      
+			      {% if ['MANAGE_ORDER','MANAGE_DELIVER','MANAGE_FIN'] is get_any_permissions %}
 			      <td class="{{ 'bt_highlight_fix' if session.get('tab-highlight','') == 'TAB_MAIN' else 'bt_normal'}}" onmouseover="menu_move_over(this)" onmouseout="menu_move_out(this)" onclick="redirect('{{url_for('bpRoot.view',action = 'main')}}')">控制台</td>
 			      <td class="gap2"></td>
+			      {% endif %}
+			      
+			      {% if 'MANAGE_MASTER' is get_permission%}
 			      <td class="{{ 'bt_highlight_fix' if session.get('tab-highlight','') == 'TAB_MASTER' else 'bt_normal'}}" onmouseover="menu_move_over(this)" onmouseout="menu_move_out(this)" onclick="redirect('{{url_for('bpAdmin.view')}}')">系统设置</td>
 			      <td class="gap2"></td>
-
-			      {% if 'ADMIN' is in_group%}
+				  {% endif %}
+					
+			      {% if 'AMIN_MANAGE' is get_permission %}
 			      <td class="{{ 'bt_highlight_fix' if session.get('tab-highlight','') == 'TAB_DASHBOARD' else 'bt_normal'}}" onmouseover="menu_move_over(this)" onmouseout="menu_move_out(this)" onclick="redirect('{{url_for('bpRoot.view',action = 'dashboard')}}')">管理员控制台</td>
 			      <td class="gap2"></td>
 			      {% endif %}

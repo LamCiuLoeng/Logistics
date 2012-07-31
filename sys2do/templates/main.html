@@ -79,25 +79,34 @@
     </div></td>
 
      <td valign="top" class="main_right_td">
+     
+      {% if 'MANAGE_ORDER' is get_permission%}
       <div class="nav_tab" onclick="redirect('{{url_for('bpOrder.view')}}')">
       	<div class="header_div"></div>
       	<div class="body_div"><img width="80" height="80" src="/static/images/system/img_so.jpg"><span>订单管理</span>
       		<p>关于订单管理的一些说明。说明订单管理功能的用法与注意事项。</p>
       	</div>
       </div>
+      {% endif %}
+      
+      {% if 'MANAGE_DELIVER' is get_permission%}
       <div class="nav_tab" onclick="redirect('{{url_for('bpDeliver.view')}}')">
         <div class="header_div"></div>
         <div class="body_div"><img width="80" height="80" src="/static/images/system/img_po.jpg"><span>送货单管理</span>
           <p>关于订单管理的一些说明。说明订单管理功能的用法与注意事项。</p>
         </div>
       </div>
+      {% endif %}
+      
+      
+      {% if 'MANAGE_FIN' is get_permission%}
       <div class="nav_tab" onclick="redirect('{{url_for('bpFin.view')}}')">
         <div class="header_div"></div>
         <div class="body_div"><img width="80" height="80" src="/static/images/system/img_cm.jpg"><span>财务管理</span>
           <p>关于订单管理的一些说明。说明订单管理功能的用法与注意事项。</p>
         </div>
       </div>
-   
+   	  {% endif %}
      
   </tr>
 </tbody></table>

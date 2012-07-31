@@ -68,25 +68,34 @@
      
      <td valign="top" class="main_right_td">
 
-
+	  {% if 'MANAGE_USER' is get_permission%}
       <div class="nav_tab" onclick="redirect('{{url_for('bpAdmin.view',action='user')}}')">
         <div class="header_div"></div>
         <div class="body_div"><img width="80" height="80" src="/static/images/system/img_um.jpg"><span>用户管理</span>
           <p>关于订单管理的一些说明。说明订单管理功能的用法与注意事项。</p>
         </div>
       </div>
+      {% endif %}
+      
+      {% if 'MANAGE_GROUP' is get_permission%}
       <div class="nav_tab" onclick="redirect('{{url_for('bpAdmin.view',action='group')}}')">
         <div class="header_div"></div>
         <div class="body_div"><img width="80" height="80" src="/static/images/system/img_gm.jpg"><span>组管理</span>
           <p>关于订单管理的一些说明。说明订单管理功能的用法与注意事项。</p>
         </div>
       </div>
+      {% endif %}
+      
+      {% if 'MANAGE_PERMISSION' is get_permission%}
       <div class="nav_tab" onclick="redirect('{{url_for('bpAdmin.view',action='permission')}}')">
         <div class="header_div"></div>
         <div class="body_div"><img width="80" height="80" src="/static/images/system/img_permissions.jpg"><span>权限管理</span>
           <p>关于订单管理的一些说明。说明订单管理功能的用法与注意事项。</p>
         </div>
-      </div></td>
+      </div>
+      {% endif %}
+      
+      </td>
 
      
      

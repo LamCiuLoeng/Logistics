@@ -1,0 +1,166 @@
+{% extends "master.html" %}
+
+{% block extJS %}
+<script language="JavaScript" type="text/javascript">
+//<![CDATA[
+	
+	function add_line(){
+		var city_name = $("#city_name").val();
+	    var city_code = $("#city_code").val();
+	    
+	    if(!city_name || !city_code){
+	    	alert('请填写必填项后再添加！');
+	    	return;
+	    }
+	    
+	    $.post(
+	            "{{url_for('.view', action = 'diqu',m='ADD_CITY')}}",
+	            {
+	            	'city_name' : city_name,
+	            	'city_code' : city_code,
+	            	'code' : {{obj.code}},
+					't' : nowstr()            	
+	            },
+	            function(r){
+	            	if(r.code==0){
+	            		$("#city_name").val('');
+					    $("#city_code").val('');
+					    
+					    var html = '<tr class="data_table_tr">';
+					    html += '<th>'+city_name+'</th>';
+					    html += '<td>'+city_code+'</td>';
+					    html += '<td><input type="button" onclick="del_line('+r.data.id+',this)" value="删除"/></td>';
+					    html += '</tr>';
+					    $("#city_list").append(html);
+	            	}else{
+	            	}
+            		alert(r.msg);
+	            }
+	    );
+
+	}
+	
+	
+	function del_line(id,obj){
+		if(!confirm('{{MSG_CONFIRM_DELETE}}')){
+			return;
+		}
+		$.post(
+	            "{{url_for('.view', action = 'diqu',m='DELETE_CITY')}}",
+	            {
+	                'id' : id,
+					't' : nowstr()          	
+	            },
+	            function(r){
+	            	if(r.code==0){
+						$($(obj).parents('tr')[0]).remove(); 
+	            	}
+	           	    alert(r.msg)       
+	            })         
+	}
+	
+	function tosave(){
+		$("form").submit();
+	}
+
+//]]>
+</script>
+{% endblock %}
+
+{% block inner_menu %}
+<div class="inner_menu">
+	<ul>
+	    <li><a href="{{url_for('.view', action = 'diqu')}}"><img width="71" height="21" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image1','','/static/images/system/order_manage_h_25.jpg',1)" id="Image1" src="/static/images/system/order_manage_25.jpg"/></a></li>
+        <li><input type="image" src="/static/images/system/order_manage_33.jpg" width="77" height="21" id="Image3" onmouseover="MM_swapImage('Image3','','/static/images/system/order_manage_h_33.jpg',1)" onmouseout="MM_swapImgRestore()" onclick="return tosave()"/></li>
+        
+    </ul>
+</div>
+{% endblock %}
+
+        
+
+{% block content %}
+
+<table width="100%" cellspacing="0" cellpadding="0" border="0">
+<tbody>
+<tr>
+    <td class="title_fonts_display">· 省/直辖市管理</td>
+</tr>
+</tbody>
+</table>
+
+
+
+<form action="{{url_for('.view', action = 'diqu',m='SAVE_UPDATE')}}" method="post">
+
+<input type="hidden" name="id" value="{{obj.id}}"/>
+
+<div class="order_add_div">
+  <div class="order_add_div_header">省/直辖市详情</div>
+    <div class="order_add_div_body">
+  		<ul>
+        	<li style="width:450px;"><span style="width:100px"><sup class="warn">*</sup>省份/直辖市</span>
+        	  <input type="text" style="width:300px" name="name" id="name" value="{{obj.name|f}}" class="must_input"/>
+        	</li>
+       	  <li style="width:480px;"><span style="width:100px"><sup class="warn">*</sup>邮政编码</span>
+    	    <input type="text" style="width:300px" name="code" id="code" value="{{obj.code|f}}" class="must_input numeric"/>
+  	    </li>
+    	  <li style="width:280px;"><span>创建日期</span>
+    	    {{obj.create_time|ft}}
+  	    </li>
+    	  
+    	  <li style="width:200px;"><span>创建人</span>
+    	    {{obj.create_by|f}}
+  	    </li>
+      </ul>
+  <div style="clear:both"></div>
+  </div>
+  
+  
+			
+<div class="order_add_div_header">市/区/县</div>
+	<div class="order_add_div_body" style="padding:10px;">
+	<table border="0" cellpadding="0" cellspacing="0">
+		<tr>
+			<td valign="top" width="150px" align="center" height="30px"><sup class="warn">*</sup>市/区/县名称</td>
+			<td valign="top"><input type="text" id="city_name" class="order_add_div_body_input must_input" style="width:150px;"/></td>
+			<td valign="top" align="center" width="150px">邮政编码</td>
+			<td valign="top"><input type="text" id="city_code" value="" class="order_add_div_body_input numeric" style="width:150px;"/></td>
+		</tr>
+	</table>
+			
+	<p><input type="button" value="{{_('Add')}}" onclick="add_line()"/></p>
+	
+	<br />
+  
+  <table  border="0" cellspacing="0" cellpadding="0">
+  	<thead>
+  	<tr class="field_head">
+      <th align="center">市/区/县名称</th>
+      <th align="center">邮政编码</th>
+      <th align="center">操作</th>
+    </tr>
+	</thead>
+	<tbody id="city_list">
+		{% for r in obj.children %}
+			<tr class="data_table_tr {{ loop.cycle('data_table_tr_odd', 'data_table_tr_even') }}">
+				<th>{{r.name}}</th>
+				<td>{{r.code|f}}</td>
+				<td><input type="button" value="删除" onclick="del_line({{r.id}},this)"/></td>
+			</tr>
+		{% endfor %}
+	</tbody>
+  </table>
+  
+  <div style="clear:both"><br /><br /></div>
+  
+  
+	</div>  
+  
+  
+</div>
+
+
+</form>
+
+{% endblock %}

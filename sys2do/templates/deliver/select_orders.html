@@ -37,7 +37,9 @@
 <div class="inner_menu">
 	<ul>
 		<li><img src="/static/images/system/order_manage_25.jpg" width="71" height="21" id="Image1" onmouseover="MM_swapImage('Image1','','/static/images/system/order_manage_h_25.jpg',1)" onmouseout="MM_swapImgRestore()" onclick="toreturn()"/></li>
+        {% if 'CREATE_DELIVER' is get_permission%}
         <li><img src="/static/images/system/order_manage1_new.jpg" width="101" height="21" id="Image8" onmouseover="MM_swapImage('Image8','','/static/images/system/order_manage_new.jpg',1)" onmouseout="MM_swapImgRestore()" onclick="tosubmit();"/></li>
+   		{% endif %}
     </ul>
 </div>
 {% endblock %}

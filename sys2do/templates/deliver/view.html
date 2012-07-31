@@ -29,7 +29,9 @@
 <div class="inner_menu">
 	<ul>
 		<li><img src="/static/images/system/order_manage_25.jpg" width="71" height="21" id="Image1" onmouseover="MM_swapImage('Image1','','/static/images/system/order_manage_h_25.jpg',1)" onmouseout="MM_swapImgRestore()" onclick="toreturn()"/></li>
+		{% if 'UPDATE_DELIVER' is get_permission%}
 		<li><a href="{{url_for('.view', action = 'revise',id=header.id)}}"><img src="/static/images/system/edit.jpg" width="71" height="21" id="Image2" onmouseover="MM_swapImage('Image2','','/static/images/system/edit_h.jpg',1)" onmouseout="MM_swapImgRestore()"/></a></li>
+		{% endif %}		
         {% if 'FIN_SUPPLIER_PAID' is get_permission %}
 	        <li>
 	        	<select onchange="todo_supplier_paid(this);">

@@ -14,8 +14,9 @@
 <div class="inner_menu">
 	<ul>
     	<li><a href="{{url_for('.view', action = 'supplier')}}"><img width="71" height="21" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image1','','/static/images/system/order_manage_h_25.jpg',1)" id="Image1" src="/static/images/system/order_manage_25.jpg"/></a></li>
+        {% if 'CREATE_SUPPLIER' is get_permission%}
         <li><img width="77" height="21" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image3','','images/order_manage_h_33.jpg',1)" id="Image3" src="/static/images/system/order_manage_33.jpg" onclick="return todave()"/></li>
-        
+        {% endif %}
     </ul>
 </div>
 {% endblock %}

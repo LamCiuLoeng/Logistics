@@ -8,9 +8,8 @@
 {% block inner_menu %}
 <div class="inner_menu">
 	<ul>
-		{% if 'CREATE_CUSTOMER' is get_permission%}
-        <li><a href="{{url_for('.view',action='customer',m='NEW')}}"><img src="/static/images/system/order_manage_31.jpg" width="77" height="21" id="Image2" onmouseover="MM_swapImage('Image2','','/static/images/system/order_manage_h_31.jpg',1)" onmouseout="MM_swapImgRestore()" /></a></li>
-        {% endif %}
+        <li><a href="{{url_for('.view',action='diqu',m='NEW')}}"><img src="/static/images/system/order_manage_31.jpg" width="77" height="21" id="Image2" onmouseover="MM_swapImage('Image2','','/static/images/system/order_manage_h_31.jpg',1)" onmouseout="MM_swapImgRestore()" /></a></li>
+        
     </ul>
 </div>
 {% endblock %}
@@ -37,29 +36,29 @@
             <td>&nbsp;</td>
             <td><table width="100%" border="0" cellspacing="0" cellpadding="0">
               <tr>
-                <td class="title_fonts_display">客户管理</td>
+                <td class="title_fonts_display">省/市管理</td>
               </tr>
               <tr>
                 <td>&nbsp;</td>
               </tr>
             </table>
-              <table  border="0" cellspacing="0" cellpadding="0" style="width:1050px;">
+              <table border="0" cellspacing="0" cellpadding="0" style="width:900px">
                 <tr class="field_head">
-                  <th align="center" style="width:300px;">{{_('Customer Name')}}</th>
-                  <th align="center" style="width:300px;">{{_('Address')}}</th>
-                  <th align="center" style="width:150px;">{{_('Contact Person')}}</th>
-                  <th align="center" style="width:100px;">{{_('Phone')}}</th>
-                  <th align="center" style="width:100px;">{{_('Mobile')}}</th>
-                  <th align="center" style="width:80px;">{{_('Payment')}}</th>
+                  <th align="center" style="width:200px">省份/直辖市</th>
+                  <th align="center" style="width:100px">邮政编码</th>
+                  <th align="center" style="width:200px">{{_('Create Time')}}</th>
+                  <th align="center" style="width:100px">{{_('Creator')}}</th>
+                  <th align="center" style="width:200px">{{_('Update Time')}}</th>
+                  <th align="center" style="width:100px">{{_('Last Updator')}}</th>
                 </tr>
 				{% for r in records %}
 					<tr class="data_table_tr {{ loop.cycle('data_table_tr_odd', 'data_table_tr_even') }}">
-						<td><a href="{{url_for('.view', action = 'customer',m = 'UPDATE',id=r.id)}}">{{r}}</a></td>
-						<td>{{r.address}}</td>
-						<td>{{r.contact_person|ifFalse}}</td>
-						<td>{{r.phone|ifFalse}}</td>
-						<td>{{r.mobile|ifFalse}}</td>
-						<td>{{r.payment|f}}</td>
+						<td><a href="{{url_for('.view', action = 'diqu',m = 'UPDATE',id=r.id)}}">{{r}}</a></td>
+						<td>{{r.code}}</td>
+						<td>{{r.create_time|ft}}</td>
+						<td>{{r.create_by|f}}</td>
+						<td>{{r.update_time|ft}}</td>
+						<td>{{r.update_by|f}}</td>
 					</tr>
 				{% endfor %}
 				<tr class="data_table_tr">

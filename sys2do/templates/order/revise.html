@@ -51,10 +51,14 @@
 <div class="inner_menu">
 	<ul>
     	<li><img src="/static/images/system/order_manage_25.jpg" width="71" height="21" id="Image1" onmouseover="MM_swapImage('Image1','','/static/images/system/order_manage_h_25.jpg',1)" onmouseout="MM_swapImgRestore()" onclick="toreturn()"/></li>
+        {% if 'UPDATE_ORDER' is get_permission%}
         <li><img src="/static/images/system/order_manage_33.jpg" width="77" height="21" id="Image2" onmouseover="MM_swapImage('Image2','','/static/images/system/order_manage_h_33.jpg',1)" onmouseout="MM_swapImgRestore()" onclick="save_header()"/></li>
+        {% endif %}
         <li><a href="{{url_for('.view',action='print_barcode',id=header.id)}}" target="_blank"><img src="/static/images/system/order_manage_11_35.jpg" width="77" height="21" id="Image5" onmouseover="MM_swapImage('Image5','','/static/images/system/order_manage_1_35.jpg',1)" onmouseout="MM_swapImgRestore()" /></a></li>
+        {% if 'CREATE_ORDER' is get_permission%}
         <li><a href="{{url_for('.view',action='copy',id=header.id)}}"><img src="/static/images/system/order_manage_copy.jpg" width="77" height="21" id="Image7" onmouseover="MM_swapImage('Image7','','/static/images/system/order_manage_copy_h.jpg',1)" onmouseout="MM_swapImgRestore()" /></a></li>
-        {% if header.status < SORTING[0] %}
+        {% endif %}
+        {% if header.status < SORTING[0] and 'CREATE_DELIVER' is get_permission%}  	
 	        <li><a href="{{url_for('bpDeliver.view',action='add_deliver',order_ids=header.id)}}"><img src="/static/images/system/order_manage1_new.jpg" width="101" height="21" id="Image8" onmouseover="MM_swapImage('Image8','','/static/images/system/order_manage_new.jpg',1)" onmouseout="MM_swapImgRestore()"/></a></li>
         {% endif %}
         {% if 'FIN_APPROVE' is get_permission %}
@@ -137,7 +141,7 @@
     	  <li style="width:459px;"><span><sup class="warn">*</sup>&nbsp;{{_('Source Company')}}</span>
     	      {{mymacros.select(id='source_company_id',list=MASTER_ALL('Customer'),value=header.source_company_id,class="must_input",style="width:360px")}}
     	  </li>
-    	  <li style="width:459px;"><span><sup class="warn">*</sup>&nbsp;{{_('Destination Company')}}</span>
+    	  <li style="width:459px;height:20px"><span><sup class="warn">*</sup>&nbsp;{{_('Destination Company')}}</span>
     	      {{mymacros.select(id='destination_company_id',list=targets,value=header.destination_company_id,class="must_input",style="width:360px")}}
     	  </li>
     	  <li style="width:459px;"><span><sup class="warn">*</sup>&nbsp;{{_('Source Contact')}}</span>
@@ -308,7 +312,9 @@
 				    <td valign="top" width="70px" align="center">{{_('Remark')}}</td>
 				    <td valign="top"><textarea name="item_remark" id="item_remark"></textarea></td></tr>
 				</table>
+				{% if 'UPDATE_ORDER' is get_permission%}
 				<p><input type="button" value="{{_('Add')}}" onclick="save_item()"/></p>
+				{% endif %}
 			</div>
 			<br />
 			<table>
@@ -368,7 +374,9 @@
 					<td valign="top"><textarea name="receiver_remark" id="receiver_remark">{{header.receiver_remark|f}}</textarea></td>
 				</tr>
 			</table>
+			{% if 'UPDATE_ORDER' is get_permission%}
 			<p><input type="button" value="确认派遣收件人" onclick="save_receiver()"/>&nbsp;&nbsp;<input type="button" value="取消" onclick="close_receiver()"/></p>
+			{% endif %}
 		</div>
 		<!-- Review -->
 		<div id="reveiver_review_div">
@@ -385,7 +393,9 @@
 				</tr>
 			</table>
 			<br />
+			{% if 'UPDATE_ORDER' is get_permission%}
 			<p><input type="button" value="编辑" onclick="open_receiver()"/></p>
+			{% endif %}
 		</div>
 	</div>
 
@@ -404,7 +414,9 @@
 					<td valign="top"><textarea name="wh_remark" id="wh_remark" style="width:500px;">订单: {{header.ref_no}} 确认入仓</textarea></td>
 				</tr>
 			</table>
+			{% if 'UPDATE_ORDER' is get_permission%}
 			<p><input type="button" value="确认入仓" onclick="save_warehouse('IN')"/></p>
+			{% endif %}
 			
 		{% elif  header.status < OUT_WAREHOUSE[0] %}
 			<p>出仓信息</p>
@@ -417,7 +429,9 @@
 					<td valign="top"><textarea name="wh_remark" id="wh_remark" style="width:500px;">订单: {{header.ref_no}} 确认出仓</textarea></td>
 				</tr>
 			</table>
+			{% if 'UPDATE_ORDER' is get_permission%}
 			<p><input type="button" value="确认出仓" onclick="save_warehouse('OUT')"/></p>
+			{% endif %}
 		{% else %}
 			<p>货物已出仓。<p>
 		{% endif %}
@@ -439,7 +453,9 @@
 					<td valign="top"><textarea name="transit_remark" id="transit_remark" style="width:500px;"></textarea></td>
 				</tr>
 			</table>
+			{% if 'UPDATE_ORDER' is get_permission%}
 			<p><input type="button" value="{{_('Add')}}" onclick="save_transit()"/></p>
+			{% endif %}
 		</div>
 		<br />
 		<table>
@@ -454,9 +470,6 @@
 					<tr class="data_table_tr">
 						<td>{{t.transfer_date|ft}}</td>
 						<td>{{t.remark|f}}</td>
-						<!-- 
-						<td><input type="button" value="{{_('Del')}}" onclick="del_transit({{t.id}},this)"/></td>
-						 -->
 					</tr>
 				{% endfor %}
 			</tbody>
@@ -478,7 +491,9 @@
 					<td valign="top"><textarea name="signed_remark" id="signed_remark">{{header.signed_remark|f}}</textarea></td>
 				</tr>
 			</table>
+			{% if 'UPDATE_ORDER' is get_permission%}
 			<p><input type="button" value="确认签收" onclick="save_signed()"/>&nbsp;&nbsp;<input type="button" value="取消" onclick="close_signed()"/></p>
+			{% endif %}
 		</div>
 		
 		<div id="signed_review_div">
@@ -495,7 +510,9 @@
 				</tr>
 			</table>
 			<br />
+			{% if 'UPDATE_ORDER' is get_permission%}
 			<p><input type="button" value="编辑" onclick="open_signed()"/></p>
+			{% endif %}
 		</div>
 	</div>
 
@@ -516,7 +533,9 @@
 					<td valign="top"><textarea name="pickup_remark" id="pickup_remark"></textarea></td>
 				</tr>
 			</table>
+			{% if 'UPDATE_ORDER' is get_permission%}
 			<p><input type="button" value="{{_('Save')}}" onclick="save_pickup()"/></p>
+			{% endif %}
 		</div>
 		<br />
 		<table width="100%" border="0" cellspacing="0" cellpadding="0">

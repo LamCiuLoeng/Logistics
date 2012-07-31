@@ -7,8 +7,9 @@
 {% block inner_menu %}
 <div class="inner_menu">
 	<ul>
+		{% if 'CREATE_PERMISSION' is get_permission%}        
         <li><a href="{{url_for('.view', action = 'permission',m = 'NEW')}}"><img src="/static/images/system/order_manage_31.jpg" width="77" height="21" id="Image2" onmouseover="MM_swapImage('Image2','','/static/images/system/order_manage_h_31.jpg',1)" onmouseout="MM_swapImgRestore()" /></a></li>
-        
+    	{% endif %}
     </ul>
 </div>
 {% endblock %}
@@ -56,7 +57,7 @@
 					</tr>
 				{% endfor %}
 				<tr class="data_table_tr">
-				    <td colspan="100" style="text-align:right">{{records.pager(**PAGINATE_PARAMS)}}</td>
+				    <td colspan="100" style="text-align:right">{{mymacros.mypaginate(records)}}</td>
 				</tr>
               </table></td>
             <td>&nbsp;</td>

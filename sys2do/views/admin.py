@@ -28,7 +28,7 @@ from sys2do.util.common import _g, _gl, getMasterAll, _error, _gp
 from sys2do.model.master import Customer, CustomerProfile, \
     SupplierProfile, Supplier, Payment, Item, PickupType, PackType, Ratio, \
     Receiver, InventoryLocation, CustomerTarget, Note, CustomerTargetContact, \
-    Barcode
+    Barcode, Province, City
 from sys2do.util.barcode_helper import generate_barcode_file
 
 __all__ = ['bpAdmin']
@@ -686,6 +686,101 @@ class AdminView(BasicView):
                               index_page = 'admin/customer_index.html',
                               new_page = 'admin/customer_new.html',
                               update_page = 'admin/customer_update.html',)
+
+
+    @tab_highlight('TAB_MASTER')
+    def diqu(self):
+        method = _g('m', 'LIST')
+        if method not in ['LIST', 'NEW', 'UPDATE', 'DELETE', 'SAVE_NEW', 'SAVE_UPDATE', 'ADD_CITY', 'DELETE_CITY']:
+            flash(MSG_NO_SUCH_ACTION, MESSAGE_ERROR);
+            return redirect(url_for('.view', action = 'index'))
+
+        if method == 'LIST':
+            page = _g('page') or 1
+            objs = DBSession.query(Province).filter(Province.active == 0).order_by(Province.name).all()
+            def url_for_page(**params): return url_for('bpAdmin.view', action = 'diqu', m = 'LIST', page = params['page'])
+            records = paginate.Page(objs, page, show_if_single_page = True, items_per_page = PAGINATE_PER_PAGE, url = url_for_page)
+            return render_template('admin/diqu_index.html', records = records)
+        elif method == 'NEW':
+            return render_template('admin/diqu_new.html')
+
+        elif method == 'UPDATE':
+            id = _g('id', None)
+            if not id :
+                flash(MSG_NO_ID_SUPPLIED, MESSAGE_ERROR)
+                return redirect(url_for('.view', action = 'customer'))
+            obj = DBSession.query(Province).get(id)
+            if not obj :
+                flash(MSG_RECORD_NOT_EXIST, MESSAGE_ERROR)
+                return redirect(url_for('.view', action = 'diqu'))
+            return render_template('admin/diqu_update.html', obj = obj)
+        elif method == 'DELETE':
+            id = _g('id', None)
+            if not id :
+                flash(MSG_NO_ID_SUPPLIED, MESSAGE_ERROR)
+                return redirect(url_for('.view', action = 'diqu'))
+            obj = DBSession.query(Province).get(id)
+            if not obj :
+                flash(MSG_RECORD_NOT_EXIST, MESSAGE_ERROR)
+                return redirect(url_for('.view', action = 'diqu'))
+            obj.active = 1
+            DBSession.commit()
+            flash(MSG_DELETE_SUCC, MESSAGE_INFO)
+            return redirect(url_for('.view', action = 'diqu'))
+
+        elif method == 'SAVE_NEW':
+            obj = Province(name = _g('name'), code = _g('code'))
+            DBSession.add(obj)
+
+            for nk, nv in _gp('city_name_'):
+                id = nk.split("_")[2]
+                if not nv : continue
+                DBSession.add(City(name = nv, code = _g('city_code_%s' % id), parent_code = obj.code))
+            DBSession.commit()
+            flash(MSG_SAVE_SUCC, MESSAGE_INFO)
+            return redirect(url_for('.view', action = 'diqu'))
+
+        elif method == 'SAVE_UPDATE':
+            id = _g('id', None)
+            if not id :
+                flash(MSG_NO_ID_SUPPLIED, MESSAGE_ERROR)
+                return redirect(url_for('.view', action = 'diqu'))
+            obj = DBSession.query(Province).get(id)
+            if not obj :
+                flash(MSG_RECORD_NOT_EXIST, MESSAGE_ERROR)
+                return redirect(url_for('.view', action = 'diqu'))
+
+            for c in obj.children:
+                c.parent_code = _g('code')
+            for f in ['name', 'code']:
+                setattr(obj, f, _g(f))
+
+            DBSession.commit()
+            flash(MSG_UPDATE_SUCC, MESSAGE_INFO)
+            return redirect(url_for('.view', action = 'diqu'))
+        elif method == 'ADD_CITY':
+            try:
+                city = City(name = _g('city_name'), code = _g('city_code'), parent_code = _g('code'))
+                DBSession.add(city)
+                DBSession.commit()
+                return jsonify({'code' : 0 , 'msg' : MSG_SAVE_SUCC , 'data' : city.populate()})
+            except:
+                _error(traceback.print_exc())
+                DBSession.rollback()
+                return jsonify({'code' : 1, 'msg' : MSG_SERVER_ERROR})
+        elif method == 'DELETE_CITY':
+            id = _g('id', None)
+            if not id : return jsonify({'code' : 1, 'msg' : MSG_NO_ID_SUPPLIED})
+            try:
+                obj = DBSession.query(City).get(id)
+                obj.active = 1
+                DBSession.commit()
+                return jsonify({'code' : 0 , 'msg' : MSG_DELETE_SUCC})
+            except:
+                _error(traceback.print_exc())
+                DBSession.rollback()
+                return jsonify({'code' : 1, 'msg' : MSG_SERVER_ERROR})
+
 
     @tab_highlight('TAB_MASTER')
     def barcode(self):

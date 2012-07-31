@@ -156,7 +156,7 @@ class Diqu(DeclarativeBase, SysMixin):
 
 
 
-class Province(DeclarativeBase, SysMixin):
+class Province(DeclarativeBase, SysMixin, CRUDMixin):
     __tablename__ = 'master_province'
 
     id = Column(Integer, autoincrement = True, primary_key = True)
@@ -166,11 +166,17 @@ class Province(DeclarativeBase, SysMixin):
     def __str__(self): return self.name
     def __repr__(self): return self.name
     def __unicode__(self): return self.name
+
+    @property
     def children(self):
         return DBSession.query(City).filter(and_(City.parent_code == self.code)).order_by(City.name).all()
 
+    @classmethod
+    def _get_fields(clz):
+        return ['name', 'code']
 
-class City(DeclarativeBase, SysMixin):
+
+class City(DeclarativeBase, SysMixin, CRUDMixin):
     __tablename__ = 'master_city'
 
     id = Column(Integer, autoincrement = True, primary_key = True)
@@ -185,6 +191,9 @@ class City(DeclarativeBase, SysMixin):
     def parent(self):  return DBSession.query(Province).filter(Province.code == self.parent_code).one()
 #    def children(self): return DBSession.query(District).filter(and_(District.parent_code == self.code)).all()
 
+    @classmethod
+    def _get_fields(clz):
+        return ['name', 'code', 'parent_code']
 
 #class District(DeclarativeBase, SysMixin):
 #    __tablename__ = 'master_district'

@@ -37,11 +37,27 @@ def init():
         uWarehouse = User(name = 'warehouse', email = 'warehouse@sfhlwl.com', password = '123')
 
 
-
+        pAdminManage = Permission(name = 'AMIN_MANAGE')
         pCreateUser = Permission(name = 'CREATE_USER')
         pUpdateUser = Permission(name = 'UPDATE_USER')
         pDeleteUser = Permission(name = 'DELETE_USER')
         pSearchUser = Permission(name = 'SEARCH_USER')
+        pManageUser = Permission(name = 'MANAGE_USER')
+        pCreateGroup = Permission(name = 'CREATE_GROUP')
+        pUpdateGroup = Permission(name = 'UPDATE_GROUP')
+        pDeleteGroup = Permission(name = 'DELETE_GROUP')
+        pSearchGroup = Permission(name = 'SEARCH_GROUP')
+        pManageGroup = Permission(name = 'MANAGE_GROUP')
+        pCreatePermission = Permission(name = 'CREATE_PERMISSION')
+        pUpdatePermission = Permission(name = 'UPDATE_PERMISSION')
+        pDeletePermission = Permission(name = 'DELETE_PERMISSION')
+        pSearchPermission = Permission(name = 'SEARCH_PERMISSION')
+        pManagePermission = Permission(name = 'MANAGE_PERMISSION')
+        pCreateMaster = Permission(name = 'CREATE_MASTER')
+        pUpdateMaster = Permission(name = 'UPDATE_MASTER')
+        pDeleteMaster = Permission(name = 'DELETE_MASTER')
+        pSearchMaster = Permission(name = 'SEARCH_MASTER')
+        pManageMaster = Permission(name = 'MANAGE_MASTER')
         pCreateOrder = Permission(name = 'CREATE_ORDER')
         pUpdateOrder = Permission(name = 'UPDATE_ORDER')
         pDeleteOrder = Permission(name = 'DELETE_ORDER')
@@ -66,55 +82,58 @@ def init():
         pUpdateWarehouse = Permission(name = 'UPDATE_WAREHOUSE')
         pDeleteWarehouse = Permission(name = 'DELETE_WAREHOUSE')
         pSearchWarehouse = Permission(name = 'SEARCH_WAREHOUSE')
-        pCreateDriver = Permission(name = 'CREATE_DRIVER')
-        pUpdateDriver = Permission(name = 'UPDATE_DRIVER')
-        pDeleteDriver = Permission(name = 'DELETE_DRIVER')
-        pSearchDriver = Permission(name = 'SEARCH_DRIVER')
 
+        pManageFin = Permission(name = 'MANAGE_FIN')
         pFinSearch = Permission(name = 'FIN_SEARCH')
         pFinApprove = Permission(name = 'FIN_APPROVE')
         pFinPaid = Permission(name = 'FIN_PAID')
         pFinSupplierPaid = Permission(name = 'FIN_SUPPLIER_PAID')
 
 
-        gAdmin = Group(name = 'ADMIN', display_name = 'Administrator', type = 0)
-        gAdmin.permissions = [pCreateUser, pUpdateUser, pDeleteUser, pSearchUser,
+        gAdmin = Group(name = u'管理员组', display_name = u'管理员组', type = 0)
+        gAdmin.permissions = [pAdminManage, pCreateUser, pUpdateUser, pDeleteUser, pSearchUser, pManageUser,
+                              pCreateGroup, pUpdateGroup, pDeleteGroup, pSearchGroup, pManageGroup,
+                              pCreatePermission, pUpdatePermission, pDeletePermission, pSearchPermission, pManagePermission,
+                              pCreateMaster, pUpdateMaster, pDeleteMaster, pSearchMaster, pManageMaster,
                               pCreateOrder, pUpdateOrder, pDeleteOrder, pSearchOrder, pSearchAllOrder, pManageOrder,
                               pCreateDeliver, pUpdateDeliver, pDeleteDeliver, pSearchDeliver, pSearchAllDeliver, pManageDeliver,
                               pCreateCustomer, pUpdateCustomer, pDeleteCustomer, pSearchCustomer,
                               pCreateSupplier, pUpdateSupplier, pDeleteSupplier, pSearchSupplier,
                               pCreateWarehouse, pUpdateWarehouse, pDeleteWarehouse, pSearchWarehouse,
-                              pCreateDriver, pUpdateDriver, pDeleteDriver, pSearchDriver,
-                              pFinSearch, pFinApprove, pFinPaid, pFinSupplierPaid
+                              pManageFin, pFinSearch, pFinApprove, pFinPaid, pFinSupplierPaid
                               ]
         gAdmin.users = [uAdmin, ]
-        gCustomer = Group(name = 'CUSTOMER', display_name = 'Customer', type = 0)
+        gCustomer = Group(name = u'客户组', display_name = u'客户组', type = 0)
         gCustomer.permissions = [pCreateOrder, pUpdateOrder, pDeleteOrder, pSearchOrder, ]
         gCustomer.users = [uKinlong, uWeiqian ]
         gKinlongGroup = Group(name = 'KINLONG_GROUP', display_name = 'KINLONG GROUP', type = 1)
         gKinlongGroup.users = [uKinlong, ]
         gWeiqianGroup = Group(name = 'WEIQIAN_GROUP', display_name = 'WEIQIAN GROUP', type = 1)
         gWeiqianGroup.users = [uWeiqian]
-        gOfficer = Group(name = 'OFFICER', display_name = 'Officer', type = 0)
-        gOfficer.permissions = [pCreateOrder, pUpdateOrder, pDeleteOrder, pSearchOrder, pSearchAllOrder,
+        gOfficer = Group(name = u'客服组', display_name = u'客服组', type = 0)
+        gOfficer.permissions = [
+                                pCreateMaster, pUpdateMaster, pDeleteMaster, pSearchMaster, pManageMaster,
+                                pCreateOrder, pUpdateOrder, pDeleteOrder, pSearchOrder, pSearchAllOrder, pManageOrder,
                                 pCreateDeliver, pUpdateDeliver, pDeleteDeliver, pSearchDeliver, pManageDeliver, pSearchAllDeliver,
                                 ]
         gOfficer.users = [uKefu1, uKefu2]
 
-        gFin = Group(name = 'FIN', display_name = 'Fin', type = 0)
-        gFin.permissions = [pCreateOrder, pUpdateOrder, pDeleteOrder, pSearchOrder, pSearchAllOrder,
+        gFin = Group(name = u'财务组', display_name = u'财务组', type = 0)
+        gFin.permissions = [
+                            pCreateMaster, pUpdateMaster, pDeleteMaster, pSearchMaster, pManageMaster,
+                            pCreateOrder, pUpdateOrder, pDeleteOrder, pSearchOrder, pSearchAllOrder, pManageOrder,
                             pCreateDeliver, pUpdateDeliver, pDeleteDeliver, pSearchDeliver, pManageDeliver, pSearchAllDeliver,
-                            pFinSearch, pFinApprove, pFinPaid, pFinSupplierPaid
+                            pManageFin, pFinSearch, pFinApprove, pFinPaid, pFinSupplierPaid
                             ]
         gFin.users = [uFin1, ]
 
-        gSupplier = Group(name = 'SUPPLIER', display_name = 'Supplier', type = 0)
+        gSupplier = Group(name = u'承运商组', display_name = u'承运商组', type = 0)
         gSupplier.permissions = [pUpdateDeliver, pSearchDeliver ]
         gSupplier.users = [uSupplier]
 
         gSupplier1 = Group(name = 'SUPPLIER_1', display_name = 'Supplier1', type = 1)
         gSupplier1.users = [uSupplier]
-        gWarehouse = Group(name = 'WAREHOUSE', display_name = 'Warehouse', type = 0)
+        gWarehouse = Group(name = u'仓库组', display_name = u'仓库组', type = 0)
         gWarehouse.permissions = [pUpdateOrder, pSearchOrder, pSearchAllOrder,
                                   pUpdateDeliver, pSearchDeliver, pSearchAllDeliver, ]
         gWarehouse.users = [uWarehouse]
@@ -122,13 +141,15 @@ def init():
 
         DBSession.add_all([
                             uAdmin, uKefu1, uKefu2, uSupplier, uWarehouse,
-                            pCreateUser, pUpdateUser, pDeleteUser, pSearchUser,
+                            pCreateUser, pUpdateUser, pDeleteUser, pSearchUser, pManageUser,
+                            pCreateGroup, pUpdateGroup, pDeleteGroup, pSearchGroup, pManageGroup,
+                            pCreatePermission, pUpdatePermission, pDeletePermission, pSearchPermission, pManagePermission,
+                            pCreateMaster, pUpdateMaster, pDeleteMaster, pSearchMaster, pManageMaster,
                             pCreateOrder, pUpdateOrder, pDeleteOrder, pSearchOrder, pSearchAllOrder, pManageOrder,
                             pCreateDeliver, pUpdateDeliver, pDeleteDeliver, pSearchDeliver, pSearchAllDeliver, pManageDeliver,
                             pCreateCustomer, pUpdateCustomer, pDeleteCustomer, pSearchCustomer,
                             pCreateSupplier, pUpdateSupplier, pDeleteSupplier, pSearchSupplier,
                             pCreateWarehouse, pUpdateWarehouse, pDeleteWarehouse, pSearchWarehouse,
-                            pCreateDriver, pUpdateDriver, pDeleteDriver, pSearchDriver,
                             gAdmin, gCustomer, gOfficer, gSupplier, gWarehouse,
                             gKinlongGroup, gWeiqianGroup,
                             ])
