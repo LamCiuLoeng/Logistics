@@ -1,6 +1,7 @@
 {% extends "master.html" %}
 
 {% block extJS %}
+<script src="{{url_for('static', filename='js/customer/customer_add.js')}}" type="text/javascript"></script>
 <script language="JavaScript" type="text/javascript">
 //<![CDATA[
 	function tosave(){
@@ -10,12 +11,24 @@
 		}
 		
 		if(msg.length<1){
+			$("#targets_json").val(JSON.stringify(targets_array));
 			$("form").submit();
 		}else{
 			alert(msg.join("\n"));
 		}
 	
 	}
+
+	var targets_array = JSON.parse('{{targets_json|safe}}');
+	$(document).ready(function(){
+		
+		$( "#dialog-form" ).dialog({
+    		modal: true,
+    		height: 500,
+    		width:800,
+    		autoOpen: false
+    	});
+	});
 
 //]]>
 </script>
@@ -48,44 +61,46 @@
 
 <form action="{{url_for('.view', action = 'customer',m='SAVE_UPDATE')}}" method="post">
 
-<input type="hidden" name="id" value="{{v['id']}}"/>
+<input type="hidden" name="id" value="{{obj.id}}"/>
+<input type="hidden" name="targets_json" id="targets_json" value=""/>
+
 
 <div class="order_add_div">
   <div class="order_add_div_header">客户详情</div>
     <div class="order_add_div_body">
   <ul>
         	<li style="width:450px;"><span><sup class="warn">*</sup>{{_('Customer Name')}}</span>
-        	  <input type="text" class="must_input" style="width:300px" name="name" id="name" value="{{v['name']|f}}"/>
+        	  <input type="text" class="must_input" style="width:300px" name="name" id="name" value="{{obj.name|f}}"/>
         	</li>
        	  <li style="width:180px;"><span>客户编号</span>
-    	    <input type="text" style="width:100px" name="no" value="{{v['no']|f}}"/>
+    	    <input type="text" style="width:100px" name="no" value="{{obj.no|f}}"/>
   	    </li>
     	  <li style="width:280px;"><span>创建日期</span>
-    	    {{v['create_time']|ft}}
+    	    {{obj.create_time|ft}}
   	    </li>
     	  <li style="width:859px;"><span>{{_('Address')}}</span>
-    	    <input type="text" style="width:760px" name="address" value="{{v['address']|f}}"/>
+    	    <input type="text" style="width:760px" name="address" value="{{obj.address|f}}"/>
     	  </li>
     	  <li style="width:459px;"><span>{{_('Contact Person')}}</span>
-    	    <input type="text" style="width:360px" name="contact_person"  value="{{v['contact_person']|f}}"/>
+    	    <input type="text" style="width:360px" name="contact_person"  value="{{obj.contact_person|f}}"/>
     	  </li>
     	  <li style="width:459px;"><span>{{_('Mobile')}}</span>
-    	    <input type="text" style="width:360px" name="mobile" value="{{v['mobile']|f}}"/>
+    	    <input type="text" style="width:360px" name="mobile" value="{{obj.mobile|f}}"/>
     	  </li>
     	  <li style="width:227px;"><span>{{_('Phone')}}</span>
-    	    <input type="text" style="width:140px" name="phone" value="{{v['phone']|f}}"/>
+    	    <input type="text" style="width:140px" name="phone" value="{{obj.phone|f}}"/>
   	    </li>
     	  <li style="width:260px;"><span>公司邮箱</span>
-    	    <input type="text" style="width:170px" name="email" value="{{v['email']|f}}"/>
+    	    <input type="text" style="width:170px" name="email" value="{{obj.email|f}}"/>
   	    </li>
     	  <li style="width:200px;"><span>创建人</span>
-    	    {{v['create_by']|f}}
+    	    {{obj.create_by|f}}
   	    </li>
     	  <li style="width:220px;">付款方式
     	  	<select name="payment_id">
     	  		<option value=""></option>
     	  		{% for p in MASTER_ALL('Payment') %}
-    	  			{% if p.id == v['payment_id'] %}
+    	  			{% if p.id == obj.payment_id %}
     	  				<option value="{{p.id}}" selected="selected">{{p}}</option>
     	  			{% else %}
     	  				<option value="{{p.id}}">{{p}}</option>
@@ -94,12 +109,94 @@
     	  	</select>
   	    </li>
     	  <li style="width:925px;"><span>{{_('Remark')}}</span>
-    	    <textarea class="order_add_div_body_input" style="width:840px; height:100px" name="remark">{{v['remark']|f}}</textarea>
+    	    <textarea class="order_add_div_body_input" style="width:840px; height:100px" name="remark">{{obj.remark|f}}</textarea>
         </li>
       </ul>
   <div style="clear:both"></div>
   </div>
+  
+  <div class="order_add_div_header">收货公司管理</div>
+	<div class="order_add_div_body" style="padding:10px;">
+	
+	<input type="button" value="添加" onclick="add_target()"/>
+	
+	<table border="0" cellpadding="0" cellspacing="0">
+		<thead>
+		<tr class="field_head">
+          <th align="center" style="width:600px;">收货公司</th>
+          <th align="center">操作</th>
+        </tr>
+        </thead>
+        <tbody id="targets_list">
+        	{% for target in obj.targets %}
+        		<tr class="data_table_tr">
+        			<td>{{target.name}}</td>
+        			<td>
+        				<input type="button" value="删除" onclick="del_target('{{'old_%s'%target.id}}',this)"/>&nbsp;
+        				<input type="button" value="编辑" onclick="edit_target('{{'old_%s'%target.id}}')"/>
+        			</td>
+        		</tr>
+        	{% endfor %}
+        </tbody>
+	</table>
+	</div>
+
+</div>
 <br /></br />
 </form>
+
+<!-- customer target form begin -->
+
+<div id="dialog-form" title="添加新收货公司" style="background-color:white;">
+	<table border="0" cellpadding="0" cellspacing="0">
+		<tr>
+			<td valign="top" width="100px" align="center" height="30px">收货公司名称</td>
+			<td valign="top"><input type="text" id="target_name" class="order_add_div_body_input"/>
+			<td valign="top" width="100px" align="center">{{_('Remark')}}</td>
+			<td valign="top"><textarea class="" style="width:250px;" id="target_remark"></textarea></td>
+		</tr>
+	</table>
+	
+	<hr/>
+	
+	<br />
+	<table border="0" cellpadding="0" cellspacing="0">
+		<tr>
+			<td valign="top" width="100px" align="center" height="30px"><sup class="warn">*</sup>{{_('Destination Contact')}}</td>
+			<td valign="top"><input type="text" id="contact_name" value="" class="order_add_div_body_input must_input" style="width:150px;"/></td>
+			<td valign="top" width="100px" align="center">{{_('Destination Address')}}</td>
+			<td valign="top"><input type="text" id="contact_address" value="" class="order_add_div_body_input must_input" style="width:250px;"/></td>
+			<td valign="top" width="100px" align="center">{{_('Phone')}}</td>
+			<td valign="top"><input type="text" id="contact_phone" value="" class="order_add_div_body_input must_input numeric" style="width:150px;"/></td>
+		</tr>
+		<tr>
+			<td valign="top" align="center">{{_('Mobile')}}</td>
+			<td valign="top"><input type="text" id="contact_mobile" value="" class="order_add_div_body_input numeric" style="width:150px;"/></td>
+		    <td valign="top" align="center">{{_('Remark')}}</td>
+		    <td valign="top"><textarea id="contact_remark" style="width:250px;"></textarea></td>
+		</tr>
+	</table>
+			
+	<p><input type="button" value="{{_('Add')}}" onclick="add_contact()"/></p>
+	<table>
+		<thead>
+		  	<tr class="field_head">
+		      <th align="center">{{_('Destination Contact')}}</th>
+		      <th align="center">{{_('Destination Address')}}</th>
+		      <th align="center">{{_('Destination Phone')}}</th>
+		      <th align="center">{{_('Destination Mobile')}}</th>
+		      <th align="center">{{_('Remark')}}</th>
+		      <th align="center">操作</th>
+		    </tr>
+		</thead>
+		<tbody id="contact_list">
+		
+		</tbody>
+	</table>
+	<p><input type="button" value="保存" onclick="save_target()"/>&nbsp;<input type="button" value="取消" onclick="cancel_target()"/></p>
+</div>
+
+<!-- customer target form end -->
+
 
 {% endblock %}
