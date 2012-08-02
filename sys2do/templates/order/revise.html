@@ -61,40 +61,6 @@
         {% if header.status < SORTING[0] and 'CREATE_DELIVER' is get_permission%}  	
 	        <li><a href="{{url_for('bpDeliver.view',action='add_deliver',order_ids=header.id)}}"><img src="/static/images/system/order_manage1_new.jpg" width="101" height="21" id="Image8" onmouseover="MM_swapImage('Image8','','/static/images/system/order_manage_new.jpg',1)" onmouseout="MM_swapImgRestore()"/></a></li>
         {% endif %}
-        {% if 'FIN_APPROVE' is get_permission %}
-        <li>
-        	<select onchange="todo_approve(this);">
-        		<option></option>
-        		<option value="{{ORDER_APPROVED[0]}}">{{_(ORDER_APPROVED[1])}}</option>
-        		<option value="{{ORDER_DISAPPROVED[0]}}">{{_(ORDER_DISAPPROVED[1])}}</option>
-        	</select/>
-        </li>
-        {% endif %}
-        {% if 'FIN_PAID' is get_permission %}
-        <li>
-        	<select onchange="todo_paid(this);">
-        		<option></option>
-        		<option value="{{ORDER_NOT_PAID[0]}}">{{_(ORDER_NOT_PAID[1])}}</option>
-        		<option value="{{ORDER_PAID[0]}}">{{_(ORDER_PAID[1])}}</option>
-        	</select/>
-        </li>
-        {% endif %}
-        {% if 'FIN_SUPPLIER_PAID' is get_permission %}
-        <li>
-        	<select onchange="todo_supplier_paid(this);">
-        		<option></option>
-        		<option value="{{DELIVER_NOT_PAID[0]}}">{{_(DELIVER_NOT_PAID[1])}}</option>
-        		<option value="{{DELIVER_PAID[0]}}">{{_(DELIVER_PAID[1])}}</option>
-        	</select/>
-        </li>
-        {% endif %}
-        <li>
-        	<select onchange="todo_order_return(this);">
-        		<option></option>
-        		<option value="{{ORDER_NOT_RETURN_NOTE[0]}}">{{_(ORDER_NOT_RETURN_NOTE[1])}}</option>
-        		<option value="{{ORDER_RETURN_NOTE[0]}}">{{_(ORDER_RETURN_NOTE[1])}}</option>
-        	</select/>
-        </li>
         <li><img src="/static/images/system/order_manage_29.jpg" width="77" height="21" id="Image6" onmouseover="MM_swapImage('Image6','','/static/images/system/order_manage_h_29.jpg',1)" onmouseout="MM_swapImgRestore()" onclick="return todelete()"/></li>
     </ul>
 </div>
@@ -104,6 +70,8 @@
 <input type="hidden" name="id" id="id" value="{{header.id}}">
 
 
+<div id="msg_div" style="display:none;color:red;padding-left:30px;padding-top:5px;"></div>
+
 <div class="order_add_div">
   <div class="order_add_div_header">{{_('Order Detail')}}</div>
     <div class="order_add_div_body">
@@ -111,15 +79,6 @@
     <div id="order_header">
   <ul>
     	  
-    	<li style="width:450px;"><span><sup class="warn">*</sup>&nbsp;{{_('Source Station')}}</span>
-    	  {{mymacros.select(id='source_province_id',list=MASTER_ALL('Province'),value=header.source_province_id,class="must_input",style="width:150px")}}
-    	  {{mymacros.select(id='source_city_id',list=source_cites,value=header.source_city_id,class="",style="width:150px")}}
-    	</li>    	
-    	    
-    	  <li style="width:450px;"><span><sup class="warn">*</sup>&nbsp;{{_('Destination Station')}}</span>
-	    	  {{mymacros.select(id='destination_province_id',list=MASTER_ALL('Province'),value=header.destination_province_id,class="must_input",style="width:150px")}}
-	    	  {{mymacros.select(id='destination_city_id',list=destination_cites,value=header.destination_city_id,class="",style="width:150px")}}	      
-   	      </li>
     	  <li style="width:180px;"><span><sup class="warn">*</sup>&nbsp;单号</span>
     	    <input name="ref_no" id="ref_no" type="text" style="width:100px" value="{{header.ref_no|f}}" class="must_input"/>
   	    </li>
@@ -127,17 +86,10 @@
     	    {{mymacros.select(id='note_id',list=MASTER_ALL('Note'),value=header.note_id,class="must_input",style="width:100px")}}
   	    </li>
   	    <li style="width:200px;"><span><sup class="warn">*</sup>&nbsp;票据单号</span>
-    	    <input name="note_no" id="note_no" type="text" class="must_input" style="width:100px" value="{{header.note_no|f}}"/>
+    	    <input name="note_no" id="note_no" type="text" class="must_input numeric" style="width:100px" value="{{header.note_no|f}}"/>
   	    </li>
-    	  <li style="width:200px;"><span>系统编号</span><input type="text" name="no" id="no" value="{{header.no|f}}" class="numeric" style="width:100px"/></li>
-    	  <li style="width:200px;"><span>{{_('Create Time')}}</span>{{header.create_time|ft}}</li>
-    	  <li style="width:200px;"><span>{{_('Creator')}}</span>{{header.create_by|f}}</li>
-    	  <li style="width:300px;"><span>送货单号</span>
-    	  	&nbsp;
-    	  	{% if header.deliver_header_no %}
-	    	  	<a href="{{url_for('bpDeliver.view',action='view_by_no',no=header.deliver_header_no)}}">{{header.deliver_header_no|f}}</a>
-    	  	{% endif %}
-    	  </li>
+    	  <li style="width:200px;"><span>系统编号</span><input type="text" name="no" id="no" value="{{header.no|f}}" class="numeric" style="width:100px" readonly="true"/></li>
+    	 
     	  <li style="width:459px;"><span><sup class="warn">*</sup>&nbsp;{{_('Source Company')}}</span>
     	      {{mymacros.select(id='source_company_id',list=MASTER_ALL('Customer'),value=header.source_company_id,class="must_input",style="width:360px")}}
     	  </li>
@@ -150,6 +102,15 @@
     	  <li style="width:459px;"><span><sup class="warn">*</sup>&nbsp;{{_('Destination Contact')}}</span>
     	    <input name="destination_contact" id="destination_contact" type="text" style="width:360px" value="{{header.destination_contact|f}}" class="must_input"/>
     	  </li>
+    	  <li style="width:459px;"><span><sup class="warn">*</sup>&nbsp;{{_('Source Station')}}</span>
+    	  {{mymacros.select(id='source_province_id',list=MASTER_ALL('Province'),value=header.source_province_id,class="must_input",style="width:150px")}}
+    	  {{mymacros.select(id='source_city_id',list=source_cites,value=header.source_city_id,class="",style="width:150px")}}
+    	</li>    	
+    	    
+    	  <li style="width:459px;"><span><sup class="warn">*</sup>&nbsp;{{_('Destination Station')}}</span>
+	    	  {{mymacros.select(id='destination_province_id',list=MASTER_ALL('Province'),value=header.destination_province_id,class="must_input",style="width:150px")}}
+	    	  {{mymacros.select(id='destination_city_id',list=destination_cites,value=header.destination_city_id,class="",style="width:150px")}}	      
+   	      </li>
     	  <li style="width:459px;"><span>{{_('Source Address')}}</span>
     	    <input name="source_address" id="source_address" type="text" style="width:360px" value="{{header.source_address|f}}"/>
     	  </li>
@@ -181,16 +142,29 @@
     	    {% endif %}
     	    短信通知
   	    </li>
+    	
     	  <li style="width:227px;"><span>{{_('Pickup Type')}}</span>
     	    {{mymacros.select(id='pickup_type_id',list=MASTER_ALL('PickupType'),value=header.pickup_type_id,class="",style="")}}
   	    </li>
     	  <li style="width:227px;"><span>{{_('Package Type')}}</span>
     	    {{mymacros.select(id='pack_type_id',list=MASTER_ALL('PackType'),value=header.pack_type_id,class="",style="")}}
   	    </li>
+  	    <li style="width:226px;"><span>估计到达</span>
+    	    <input type="text" style="width:140px" id="estimate_time" name="estimate_time"  readonly="true"/>
+  	    </li>
   	    <li style="width:226px;"><span>{{_('Expect Time')}}</span>
     	    <input type="text" style="width:140px" id="expect_time" name="expect_time" class="datepicker" value="{{header.expect_time|fd}}"/>
   	    </li>
-  	    <li style="width:226px;"><span>{{_('Actual Time')}}</span>
+  	    
+  	     <li style="width:200px;"><span>{{_('Create Time')}}</span>{{header.create_time|ft}}</li>
+    	  <li style="width:200px;"><span>{{_('Creator')}}</span>{{header.create_by|f}}</li>
+    	  <li style="width:280px;"><span>送货单号</span>
+    	  	&nbsp;
+    	  	{% if header.deliver_header_no %}
+	    	  	<a href="{{url_for('bpDeliver.view',action='view_by_no',no=header.deliver_header_no)}}">{{header.deliver_header_no|f}}</a>
+    	  	{% endif %}
+    	  </li>
+    	  <li style="width:226px;"><span>{{_('Actual Time')}}</span>
     	    <input type="text" style="width:140px" id="actual_time" name="actual_time" class="datepicker" value="{{header.actual_time|fd}}"/>
   	    </li>
     	  <li style="width:925px;"><span>{{_('Remark')}}</span>
@@ -207,7 +181,7 @@
     <td width="9%" align="center">{{_('Weight Ratio')}}</td>
     <td width="9%" align="center">{{_('Vol')}}</td>
     <td width="9%" align="center">{{_('Vol Ratio')}}</td>
-    <td width="9%" align="center"><sup class="warn">*</sup>&nbsp;{{_('Amount')}}</td>
+    <td width="9%" align="center"><sup class="warn">*</sup>&nbsp;{{_('Amount')}}(元)</td>
     <td width="9%" align="center">{{_('Payment')}}</td>
     </tr>
   <tr>
@@ -218,13 +192,13 @@
       <input name="qty_ratio" id="qty_ratio" type="text" class="order_add_div_body_input numeric compute number_input_right" style="width:70px" value="{{header.qty_ratio|f}}"/>
     </span></td>
     <td align="center"><span style="width:180px;">
-      <input name="weight" id="weight" type="text" class="order_add_div_body_input numeric compute number_input_right" style="width:70px" value="{{header.weight|f}}"/>
+      <input name="weight" id="weight" type="text" class="order_add_div_body_input numeric compute number_input_right" style="width:70px" value="{{header.weight|f}}"/>&nbsp;吨
     </span></td>
     <td align="center"><span style="width:180px;">
       <input name="weight_ratio" id="weight_ratio" type="text" class="order_add_div_body_input numeric compute number_input_right" style="width:70px" value="{{header.weight_ratio|f}}"/>
     </span></td>
     <td align="center"><span style="width:180px;">
-      <input name="vol" id="vol" type="text" class="order_add_div_body_input numeric compute number_input_right" style="width:70px" value="{{header.vol|f}}"/>
+      <input name="vol" id="vol" type="text" class="order_add_div_body_input numeric compute number_input_right" style="width:70px" value="{{header.vol|f}}"/>&nbsp;米<sup>3</sup>
     </span></td>
     <td align="center"><span style="width:180px;">
       <input name="vol_ratio" id="vol_ratio" type="text" class="order_add_div_body_input numeric compute number_input_right" style="width:70px" value="{{header.vol_ratio|f}}"/>
@@ -244,9 +218,6 @@
 	    <td width="9%" align="center">包装费用</td>
 	    <td width="9%" align="center">保险费用</td>
 	    <td width="9%" align="center">其它费用</td>
-	    <td width="9%" align="center">&nbsp;</td>
-	    <td width="9%" align="center">审核状态</td>
-	    <td width="9%" align="center">付款状态</td>
 	</tr>
 	<tr>
 		<td align="center"><span style="width:180px;">
@@ -264,9 +235,7 @@
 	    <td align="center"><span style="width:180px;">
 	      <input name="other_charge" id="other_charge" type="text" class="order_add_div_body_input numeric compute" style="width:70px" value="{{header.other_charge|f}}"/>
 	    </span></td>
-	    <td>&nbsp;</td>
-	    <td style="text-align:center" class="approval_span">{{mymacros.show_approve(header.approve)}}</td>
-		<td style="text-align:center" class="paid_span">{{mymacros.show_paid(header.paid)}}</td>
+
 	</tr>
 </table>
 	</div>
@@ -283,7 +252,9 @@
 			<li><a href="#tabs-4">运输信息</a></li>
 			<li><a href="#tabs-5">签收信息</a></li>
 			<li><a href="#tabs-6">提货信息</a></li>
-			<!-- <li><a href="#tabs-7">财务信息</a></li> -->
+			{% if 'MANAGE_FIN' is get_permission %}
+				<li><a href="#tabs-7">财务信息</a></li>
+			{% endif %}
 			<li><a href="#tabs-8">历史记录</a></li>
 		</ul>
 	</div>
@@ -562,13 +533,63 @@
 		</table>
 	</div>
 
+	{% if 'MANAGE_FIN' is get_permission %}
 	<!-- fin info -->
-	<!-- 
 	<div class="order_add_info_tab_body" id="tabs-7">
-	
+		<table>
+			<tr>
+				<td align="left" style="width:150px">审核状态</td>
+				<td style="text-align:left;width:150px" class="approval_span">{{mymacros.show_approve(header.approve)}}</td>
+				<td style="width:200px">
+					{% if 'FIN_APPROVE' is get_permission %}
+			        	<select onchange="todo_approve(this);">
+			        		<option></option>
+			        		<option value="{{ORDER_APPROVED[0]}}">{{_(ORDER_APPROVED[1])}}</option>
+			        		<option value="{{ORDER_DISAPPROVED[0]}}">{{_(ORDER_DISAPPROVED[1])}}</option>
+			        	</select/>
+			        {% endif %}
+				</td>
+			<tr>
+			<tr>
+				<td align="left" style="width:150px">客户付款状态</td>
+				<td style="text-align:left;width:150px" class="paid_span">{{mymacros.show_paid(header.paid)}}</td>
+				<td>
+					{% if 'FIN_PAID' is get_permission %}
+			        	<select onchange="todo_paid(this);">
+			        		<option></option>
+			        		<option value="{{ORDER_NOT_PAID[0]}}">{{_(ORDER_NOT_PAID[1])}}</option>
+			        		<option value="{{ORDER_PAID[0]}}">{{_(ORDER_PAID[1])}}</option>
+			        	</select/>
+			        {% endif %}
+				</td>
+			</tr>
+			<tr>
+				<td align="left" style="width:150px">付款予承运商状态</td>
+				<td style="text-align:left;width:150px" class="paid_span">{{mymacros.show_supplier_paid(header.supplier_paid)}}</td>
+				<td>
+					{% if 'FIN_SUPPLIER_PAID' is get_permission %}
+			        	<select onchange="todo_supplier_paid(this);">
+			        		<option></option>
+			        		<option value="{{DELIVER_NOT_PAID[0]}}">{{_(DELIVER_NOT_PAID[1])}}</option>
+			        		<option value="{{DELIVER_PAID[0]}}">{{_(DELIVER_PAID[1])}}</option>
+			        	</select/>
+			        {% endif %}
+				</td>
+			</tr>
+			<tr>
+				<td align="left" style="width:150px">客户回单状态</td>
+				<td style="text-align:left;width:150px" class="order_return_span">{{mymacros.show_return(header.is_return_note)}}</td>
+				<td>
+		        	<select onchange="todo_order_return(this);">
+		        		<option></option>
+		        		<option value="{{ORDER_NOT_RETURN_NOTE[0]}}">{{_(ORDER_NOT_RETURN_NOTE[1])}}</option>
+		        		<option value="{{ORDER_RETURN_NOTE[0]}}">{{_(ORDER_RETURN_NOTE[1])}}</option>
+		        	</select/>
+				</td>
+			</tr>
+		</table>
 	</div>
-	-->
-	
+	{% endif %}
 	
 	<!-- history info -->
 	<div class="order_add_info_tab_body" id="tabs-8">

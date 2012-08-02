@@ -109,7 +109,7 @@ function tosave(){
                           return false;
                       }else{
                           if(r.result!=0){
-                              show_error('该票据不在可用范围内，请修改！');
+                              display_error('该票据不在可用范围内，请修改！');
                               return false;
                           }else{
                               show_hold('正在保存，请稍候。。。');
@@ -126,13 +126,24 @@ function tosave(){
         }
         s += '</ul>';
 
-        show_error(s);
+        display_error(s);
         
         
         return false;
     }
     
 }
+
+
+
+
+
+
+function display_error(content){
+    $("#msg_div").html(content);
+    $("#msg_div").show();
+}
+
 
 
 

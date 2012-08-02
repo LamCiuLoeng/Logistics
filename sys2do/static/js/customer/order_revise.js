@@ -69,7 +69,7 @@ function save_header() {
                         return false;
                     }else{
                         if(r.result!=0){
-                            show_error('该票据不在可用范围内，请修改！');
+                            display_error('该票据不在可用范围内，请修改！');
                             return false;
                         }else{
                             var params = {
@@ -98,7 +98,7 @@ function save_header() {
                                     alert(r.msg);
                                     header_have_update = 0;
                                 }else{
-                                    alert(r.msg);
+                                    display_error(r.msg);
                                 }
                             })
                         }
@@ -111,7 +111,7 @@ function save_header() {
         for(var i=0;i<msg.length;i++){
             s += msg[i] + '\n';
         }
-        alert(s);  
+        display_error(s);  
     }
 }
 
@@ -590,4 +590,10 @@ function todo(type,flag,handler){
              },
              handler
     )
+}
+
+
+function display_error(content){
+    $("#msg_div").html(content);
+    $("#msg_div").show();
 }

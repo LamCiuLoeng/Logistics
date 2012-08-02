@@ -133,16 +133,16 @@
 	
 	<br />
   
-  <table  border="0" cellspacing="0" cellpadding="0">
+  <table  border="0" cellspacing="0" cellpadding="0" style="width:500px;">
   	<thead>
   	<tr class="field_head">
-      <th align="center">市/区/县名称</th>
-      <th align="center">邮政编码</th>
-      <th align="center">操作</th>
+      <th align="center" style="width:300px;">市/区/县名称</th>
+      <th align="center" style="width:100px;">邮政编码</th>
+      <th align="center" style="width:100px;">操作</th>
     </tr>
 	</thead>
 	<tbody id="city_list">
-		{% for r in obj.children %}
+		{% for r in obj.children() %}
 			<tr class="data_table_tr {{ loop.cycle('data_table_tr_odd', 'data_table_tr_even') }}">
 				<th>{{r.name}}</th>
 				<td>{{r.code|f}}</td>

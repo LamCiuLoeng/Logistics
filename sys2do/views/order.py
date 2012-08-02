@@ -195,7 +195,8 @@ class OrderView(BasicView):
 
         no = _g('no')
         if not no: #if not barcode, create a new one for this
-            order.no = genSystemNo()
+            b = genSystemNo()
+#            order.no, b.ref_no = b.value, order.ref_no
         else:
             try:
                 b = DBSession.query(Barcode).filter(and_(Barcode.active == 0, Barcode.value == no)).one()
@@ -203,7 +204,8 @@ class OrderView(BasicView):
             except:
                 _error(traceback.print_exc())
                 b = Barcode(value = no)
-            order.no = b.value
+#            order.no = b.value
+        order.no, b.ref_no = b.value, order.ref_no
         order.barcode = generate_barcode_file(order.no)
 
         DBSession.add(TransferLog(
@@ -225,6 +227,17 @@ class OrderView(BasicView):
 #        else:
 #            locations = []
 #        return {'header' : header , 'details' : header.details, 'locations' : locations}
+
+
+    def revise_by_barcode(self):
+        barcode = _g('no')
+        try:
+            header = DBSession.query(OrderHeader).filter(OrderHeader.no == barcode).one()
+            return redirect(url_for('.view', action = 'revise', id = header.id))
+        except:
+            flash(MSG_RECORD_NOT_EXIST, MESSAGE_ERROR)
+            return redirect(url_for("bpRoot.view", action = "index"))
+
 
 
     @templated('order/revise.html')

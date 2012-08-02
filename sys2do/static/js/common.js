@@ -80,7 +80,7 @@ function refresh(){
 }
 
 
-function province_change(obj,city){
+function province_change(obj,city,handler=null){
     var t = $(obj);
     
     var c = $(city);
@@ -106,6 +106,11 @@ function province_change(obj,city){
                      }
                      c.html(html);
                  }
+                 
+                 if(handler){
+                     handler();
+                 }
+                 
              }
     );
     
@@ -114,4 +119,9 @@ function province_change(obj,city){
 
 function nowstr(){
     return Date.parse(new Date())
+}
+
+function check_mobile(v){
+    var pattern = /^1\d{10}$/;
+    return pattern.test(v);
 }

@@ -21,7 +21,7 @@ def genSystemNo():
     DBSession.add(b)
     DBSession.flush()
     b.value = '%s%06d' % (dt.now().strftime('%y%m%d'), (b.id % 1000000))
-    return b.value
+    return b
 
 #    return '%s%06d' % (dt.now().strftime('%y%m%d'), (id % 1000000))
 

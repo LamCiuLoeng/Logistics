@@ -95,6 +95,7 @@ class OrderHeader(DeclarativeBase, SysMixin, CRUDMixin):
 
 
     order_time = Column(Text)
+    estimate_time = Column(Text)
     expect_time = Column(Text)
     actual_time = Column(Text)
 

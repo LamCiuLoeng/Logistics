@@ -59,12 +59,133 @@ function clear_destination(){
     $('#destination_address').val('');
     $('#destination_tel').val('');
     $('#destination_mobile').val('');
+    $("#destination_province_id").val('');
+    $("#destination_city_id").empty();
+    $("#estimate_time").val('');
 }
 
-function check_mobile(v){
-    var pattern = /^1\d{10}$/;
-    return pattern.test(v);
+
+
+function customer_change(){
+    var tmp = $("#source_company_id");
+    
+    if(!tmp.val()){
+        clear_source();
+        clear_destination();
+        $('#destination_company_id').html('');
+        return;
+    }
+    
+    $.getJSON(
+            '/ajax_master',
+            {
+                'm' : 'customer_detail',
+                't' : nowstr(),
+                'need_city_list' : 1, //also return back the city master list
+                'id' : tmp.val()
+            },
+            function(r){
+                if(r.code==0){
+                    $('#source_contact').val(r.data.contact_person);
+                    $('#source_address').val(r.data.address);
+                    $('#source_tel').val(r.data.phone);
+                    $('#source_mobile').val(r.data.mobile);
+                    $('#payment_id').val(r.data.payment_id);
+                    
+                    var html = '<option value=""></option>';
+                    for(var i=0;i<r.targets.length;i++){
+                        var t = r.targets[i];
+                        html += '<option value="'+t.id+'">'+t.name+'</option>';
+                    }
+                    $('#destination_company_id').html(html);
+                    clear_destination();
+                    
+                    $("#source_province_id").val(r.data.province_id);
+                    
+                    var city_html = '<option value=""></option>';
+                    for(var j=0;j<r.cities.length;j++){
+                        var t = r.cities[j];
+                        city_html += '<option value="'+t.id+'">'+t.name+'</option>';
+                    }
+                    $("#source_city_id").html(city_html);
+                    $("#source_city_id").val(r.data.city_id);
+                }else{
+                    alert(r.msg)  
+                }
+            }
+    );
+    
 }
+
+
+
+function destination_change(){
+    var tmp = $("#destination_company_id");
+    
+    if(!tmp.val()){
+        clear_destination();
+        return
+    }
+    
+    $.getJSON(
+            '/ajax_master',
+            {
+                'm' : 'target_detail',
+                't' : nowstr(),
+                'need_city_list' : 1, //also return back the city master list
+                'id' : tmp.val()
+            },
+            function(r){
+                if(r.code==0){
+                    if(r.data.contact.address){
+                        $('#destination_address').val(r.data.contact.address);
+                    }
+                    if(r.data.contact.name){
+                        $('#destination_contact').val(r.data.contact.name);
+                    }
+                    if(r.data.contact.phone){
+                        $('#destination_tel').val(r.data.contact.phone);
+                    }
+                    if(r.data.contact.mobile){
+                        $('#destination_mobile').val(r.data.contact.mobile);                        
+                    }
+                    
+                    $("#destination_province_id").val(r.data.province_id);
+                    var city_html = '<option value=""></option>';
+                    for(var j=0;j<r.cities.length;j++){
+                        var t = r.cities[j];
+                        city_html += '<option value="'+t.id+'">'+t.name+'</option>';
+                    }
+                    $("#destination_city_id").html(city_html);
+                    $("#destination_city_id").val(r.data.city_id);
+                    $("#destination_city_id").trigger('change');
+                    
+                }else{
+                    alert(r.msg);
+                }
+            }
+    );
+}
+
+
+
+function estimate_by_diqu(){
+    $.getJSON('/compute_day_by_diqu',
+              {
+                't' : nowstr(),
+                'province_id' : $("#destination_province_id").val(),
+                'city_id' : $("#destination_city_id").val()
+              },
+              function(r){
+                  if(r.code == 0){
+                      $("#estimate_time").val(r.day)
+                  }
+              }
+    )
+}
+
+
+
 
 $(document).ready(function(){
     $(".order_add_info_tab_div").tabs();
@@ -79,86 +200,22 @@ $(document).ready(function(){
     });
     
     $("#destination_province_id").change(function(){
-        province_change(this,'#destination_city_id');
+        province_change(this,'#destination_city_id',estimate_by_diqu);
     });
+    
+    
+    $("#destination_city_id").change(function(){
+        estimate_by_diqu();
+    });
+    
     
     $("#source_company_id").change(function(){
-        var tmp = $(this);
-        
-        if(!tmp.val()){
-            clear_source();
-            clear_destination();
-            $('#destination_company_id').html('');
-            return;
-        }
-        
-        $.getJSON(
-                '/ajax_master',
-                {
-                    'm' : 'customer_detail',
-                    't' : nowstr(),
-                    'id' : tmp.val()
-                },
-                function(r){
-                    if(r.code==0){
-                        $('#source_contact').val(r.data.contact_person);
-                        $('#source_address').val(r.data.address);
-                        $('#source_tel').val(r.data.phone);
-                        $('#source_mobile').val(r.data.mobile);
-                        $('#payment_id').val(r.data.payment_id);
-                        
-                        var html = '<option value=""></option>';
-                        for(var i=0;i<r.targets.length;i++){
-                            var t = r.targets[i];
-                            html += '<option value="'+t.id+'">'+t.name+'</option>';
-                        }
-                        $('#destination_company_id').html(html);
-                        clear_destination();
-                    }else{
-                        alert(r.msg)  
-                    }
-                }
-        );
+        customer_change();
     });
-    
-    
-    
-    
+
     
     $("#destination_company_id").change(function(){
-        var tmp = $(this);
-        
-        if(!tmp.val()){
-            clear_destination();
-            return
-        }
-        
-        $.getJSON(
-                '/ajax_master',
-                {
-                    'm' : 'target_detail',
-                    't' : nowstr(),
-                    'id' : tmp.val()
-                },
-                function(r){
-                    if(r.code==0){
-                        if(r.data.contact.address){
-                            $('#destination_address').val(r.data.contact.address);
-                        }
-                        if(r.data.contact.name){
-                            $('#destination_contact').val(r.data.contact.name);
-                        }
-                        if(r.data.contact.phone){
-                            $('#destination_tel').val(r.data.contact.phone);
-                        }
-                        if(r.data.contact.mobile){
-                            $('#destination_mobile').val(r.data.contact.mobile);                        
-                        }  
-                    }else{
-                        alert(r.msg);
-                    }
-                }
-        );
+        destination_change();
     });
     
     

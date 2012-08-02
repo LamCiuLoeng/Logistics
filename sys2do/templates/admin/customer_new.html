@@ -9,6 +9,23 @@
 		if(!$('#name').val()){
 			msg.push('请填写客户名称！');
 		}
+		if(!$("#address").val()){
+			msg.push('请填写地址！');
+		}
+		if(!$("#contact_person").val()){
+			msg.push('请填写联系人！');
+		}
+		if(!$("#payment_id").val()){
+			msg.push('请填写付款方式！');
+		}
+		if($("#targets_list tr").length<1){
+			msg.push('请添加最少一个收货公司！');
+		}
+		var mobile = $("#mobile").val();
+		if(mobile && !check_mobile(mobile)){
+			msg.push("请正确填写手机号码！");
+		}
+		
 		
 		if(msg.length<1){
 			$("#targets_json").val(JSON.stringify(targets_array));
@@ -19,6 +36,9 @@
 	
 	}
 	
+	
+	var targets_array = new Array();
+	
     $(document).ready(function(){
     	var targets_array = new Array();
     
@@ -28,7 +48,14 @@
     		width:800,
     		autoOpen: false
     	});
-    
+    	
+    	$("#province_id").change(function(){
+	        province_change(this,'#city_id');
+	    });
+    	
+    	$("#tmp_province_id").change(function(){
+	        province_change(this,'#tmp_city_id');
+	    });
     });
 //]]>
 </script>
@@ -71,13 +98,15 @@
     	    <input type="text" style="width:100px" name="no"/>
   	    </li>
     	  <li style="width:859px;"><span>{{_('Address')}}</span>
-    	    <input type="text" style="width:760px" name="address"/>
+    	  	{{mymacros.select(id='province_id',list=MASTER_ALL('Province'),value=None,class="must_input",style="width:150px")}}
+    	  	<select name="city_id" id="city_id" style="width:150px"></select>
+    	    <input type="text" style="width:460px" name="address" id="address" class="must_input"/>
     	  </li>
     	  <li style="width:459px;"><span>{{_('Contact Person')}}</span>
-    	    <input type="text" style="width:360px" name="contact_person"/>
+    	    <input type="text" style="width:360px" name="contact_person" id="contact_person" class="must_input"/>
     	  </li>
     	  <li style="width:459px;"><span>{{_('Mobile')}}</span>
-    	    <input type="text" style="width:360px" name="mobile"/>
+    	    <input type="text" style="width:360px" name="mobile" id="mobile" class="numeric"/>
     	  </li>
     	  <li style="width:227px;"><span>{{_('Phone')}}</span>
     	    <input type="text" style="width:140px" name="phone"/>
@@ -86,7 +115,7 @@
     	    <input type="text" style="width:170px" name="email"/>
   	    </li>
     	  <li style="width:220px;">付款方式
-    	  	<select name="payment_id">
+    	  	<select name="payment_id" class="must_input" id="payment_id">
     	  		<option value=""></option>
     	  		{% for p in MASTER_ALL('Payment') %}
     	  			<option value="{{p.id}}">{{p}}</option>
@@ -102,11 +131,11 @@
   </div>
 	
 	
-	<div class="order_add_div_header">收货公司管理</div>
+	<div class="order_add_div_header">收货公司列表</div>
 	<div class="order_add_div_body" style="padding:10px;">
 	
-	<input type="button" value="添加" onclick="add_target()"/>
-	
+	<p><input type="button" value="添加收货公司" onclick="add_target()"/></p>
+	<br />
 	<table border="0" cellpadding="0" cellspacing="0">
 		<thead>
 		<tr class="field_head">
@@ -132,20 +161,29 @@
 	<table border="0" cellpadding="0" cellspacing="0">
 		<tr>
 			<td valign="top" width="100px" align="center" height="30px">收货公司名称</td>
-			<td valign="top"><input type="text" id="target_name" class="order_add_div_body_input"/>
+			<td valign="top"><input type="text" id="target_name" class="order_add_div_body_input must_input" style="width:550px;"/></td>
+		</tr>
+		<tr>
+			<td valign="top" width="100px" align="center" height="30px">所在省/直辖市</td>
+			<td valign="top">
+				{{mymacros.select(id='tmp_province_id',list=MASTER_ALL('Province'),value=None,class="must_input",style="width:150px")}}
+				<select name="tmp_city_id" id="tmp_city_id" style="width:150px"></select>
+			</td>
+		</tr>
+		<tr>
 			<td valign="top" width="100px" align="center">{{_('Remark')}}</td>
-			<td valign="top"><textarea class="" style="width:250px;" id="target_remark"></textarea></td>
+			<td valign="top"><textarea class="" style="width:550px;height:30px;" id="target_remark"></textarea></td>
 		</tr>
 	</table>
 	
-	<hr/>
-	
+	<br />
+	<p>联系人列表：</p>
 	<br />
 	<table border="0" cellpadding="0" cellspacing="0">
 		<tr>
 			<td valign="top" width="100px" align="center" height="30px"><sup class="warn">*</sup>{{_('Destination Contact')}}</td>
 			<td valign="top"><input type="text" id="contact_name" value="" class="order_add_div_body_input must_input" style="width:150px;"/></td>
-			<td valign="top" width="100px" align="center">{{_('Destination Address')}}</td>
+			<td valign="top" width="100px" align="center">具体地址</td>
 			<td valign="top"><input type="text" id="contact_address" value="" class="order_add_div_body_input must_input" style="width:250px;"/></td>
 			<td valign="top" width="100px" align="center">{{_('Phone')}}</td>
 			<td valign="top"><input type="text" id="contact_phone" value="" class="order_add_div_body_input must_input numeric" style="width:150px;"/></td>
@@ -157,24 +195,26 @@
 		    <td valign="top"><textarea id="contact_remark" style="width:250px;"></textarea></td>
 		</tr>
 	</table>
-			
-	<p><input type="button" value="{{_('Add')}}" onclick="add_contact()"/></p>
-	<table>
+	<br />
+	<p style="text-align:right;"><input type="button" value="添加到列表" onclick="add_contact()"/></p>
+	<br />
+	<table style="width:750px">
 		<thead>
 		  	<tr class="field_head">
-		      <th align="center">{{_('Destination Contact')}}</th>
-		      <th align="center">{{_('Destination Address')}}</th>
-		      <th align="center">{{_('Destination Phone')}}</th>
-		      <th align="center">{{_('Destination Mobile')}}</th>
-		      <th align="center">{{_('Remark')}}</th>
-		      <th align="center">操作</th>
+		      <th align="center" style="width:100px">{{_('Destination Contact')}}</th>
+		      <th align="center" style="width:200px">具体地址</th>
+		      <th align="center" style="width:80px">{{_('Destination Phone')}}</th>
+		      <th align="center" style="width:80px">{{_('Destination Mobile')}}</th>
+		      <th align="center" style="width:100px">{{_('Remark')}}</th>
+		      <th align="center" style="width:80px">操作</th>
 		    </tr>
 		</thead>
 		<tbody id="contact_list">
 		
 		</tbody>
 	</table>
-	<p><input type="button" value="保存" onclick="save_target()"/>&nbsp;<input type="button" value="取消" onclick="cancel_target()"/></p>
+	<br />
+	<p style="text-align:right;"><input type="button" value="保存" onclick="save_target()"/>&nbsp;<input type="button" value="取消" onclick="cancel_target()"/></p>
 </div>
 
 <!-- customer target form end -->

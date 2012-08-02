@@ -2,7 +2,7 @@
 import traceback
 import os
 import random
-from datetime import datetime as dt
+from datetime import datetime as dt, timedelta
 from flask import g, render_template, flash, session, redirect, url_for, request
 from flask.blueprints import Blueprint
 from flask.views import View
@@ -16,12 +16,13 @@ from sys2do.util.decorator import templated, login_required, tab_highlight
 from sys2do.util.common import _g, _gp, _gl, _info, _error
 from sys2do.constant import MESSAGE_ERROR, MESSAGE_INFO, MSG_NO_SUCH_ACTION, \
     MSG_SAVE_SUCC, GOODS_PICKUP, GOODS_SIGNED, OUT_WAREHOUSE, IN_WAREHOUSE, \
-    MSG_RECORD_NOT_EXIST, LOG_GOODS_PICKUPED, LOG_GOODS_SIGNED, MSG_SERVER_ERROR
+    MSG_RECORD_NOT_EXIST, LOG_GOODS_PICKUPED, LOG_GOODS_SIGNED, MSG_SERVER_ERROR, \
+    SYSTEM_DATE_FORMAT
 from sys2do.views import BasicView
 from sys2do.model.master import CustomerProfile, Customer, Supplier, \
     CustomerTarget, Receiver, CustomerTargetContact, Province, City, Barcode
 from sys2do.model.logic import OrderHeader, TransferLog, PickupDetail
-from sys2do.util.logic_helper import genSystemNo, check_barcode
+from sys2do.util.logic_helper import check_barcode
 
 
 __all__ = ['bpRoot']
@@ -68,7 +69,12 @@ class RootView(BasicView):
         if master == 'customer_detail':
             c = DBSession.query(Customer).get(_g('id'))
             ts = [{'id' : t.id , 'name' : t.name } for t in c.targets]
-            return jsonify({'code' : 0 , 'msg' : '' , 'data' : c.populate() , 'targets' : ts})
+
+            cities = []
+            if _g('need_city_list', None) == '1' and c.province_id:
+                cities = [{'id' : city.id, 'name' : city.name } for city in c.province.children()]
+
+            return jsonify({'code' : 0 , 'msg' : '' , 'data' : c.populate() , 'targets' : ts, 'cities' : cities})
 
         if master == 'target':
             ts = DBSession.query(CustomerTarget).filter(and_(CustomerTarget.active == 0, CustomerTarget.customer_id == _g('id')))
@@ -81,7 +87,13 @@ class RootView(BasicView):
             data = t.populate()
             if t.contact: data['contact'] = t.contact.populate()
             else : data['contact'] = {}
-            return jsonify({'code' : 0 , 'msg' : '' , 'data' : data})
+
+            cities = []
+            if _g('need_city_list', None) == '1' and t.province_id:
+                cities = [{'id' : city.id, 'name' : city.name } for city in t.province.children()]
+
+            return jsonify({'code' : 0 , 'msg' : '' , 'data' : data, 'cities' : cities})
+
 
         if master == 'target_contact_search':
             ts = DBSession.query(CustomerTargetContact).filter(and_(CustomerTargetContact.active == 0,
@@ -230,6 +242,7 @@ class RootView(BasicView):
                     try:
                         DBSession.add(OrderHeader(no = no, ref_no = ref_no, status = -2))
                         b.status = 0
+                        b.ref_no = ref_no
                         DBSession.commit()
                         return self._compose_xml_response(0)
                     except:
@@ -286,6 +299,26 @@ class RootView(BasicView):
         (code, status) = check_barcode(value)
 
         return jsonify({'code' : code, 'status' : status})
+
+
+    def compute_day_by_diqu(self):
+        province_id = _g('province_id')
+        city_id = _g('city_id')
+
+        try:
+            if city_id:
+                c = DBSession.query(City).get(city_id)
+                if c.shixiao:
+                    result = dt.now() + timedelta(days = c.shixiao)
+                    return jsonify({'code' : 0 , 'day' : result.strftime(SYSTEM_DATE_FORMAT)})
+            elif province_id:
+                p = DBSession.query(Province).get(province_id)
+                if p.shixiao:
+                    result = dt.now() + timedelta(days = p.shixiao)
+                    return jsonify({'code' : 0 , 'day' : result.strftime(SYSTEM_DATE_FORMAT)})
+            return jsonify({'code' : 0 , 'day' : dt.now().strftime(SYSTEM_DATE_FORMAT)})
+        except:
+            return jsonify({'code' : 1 , 'day' : ''})
 
 
 

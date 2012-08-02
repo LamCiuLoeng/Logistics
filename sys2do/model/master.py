@@ -162,12 +162,14 @@ class Province(DeclarativeBase, SysMixin, CRUDMixin):
     id = Column(Integer, autoincrement = True, primary_key = True)
     name = Column(Text)
     code = Column(Text)
+    shixiao = Column(Integer, default = 0)
+
 
     def __str__(self): return self.name
     def __repr__(self): return self.name
     def __unicode__(self): return self.name
 
-    @property
+
     def children(self):
         return DBSession.query(City).filter(and_(City.parent_code == self.code)).order_by(City.name).all()
 
@@ -183,6 +185,7 @@ class City(DeclarativeBase, SysMixin, CRUDMixin):
     name = Column(Text)
     code = Column(Text)
     parent_code = Column(Text)
+    shixiao = Column(Integer, default = 0)
 
     def __str__(self): return self.name
     def __repr__(self): return self.name
@@ -218,6 +221,11 @@ class Customer(DeclarativeBase, SysMixin, CRUDMixin):
     no = Column(Text)
     name = Column(Text)
     display_name = Column(Text)
+    province_id = Column(Integer, ForeignKey('master_province.id'))
+    province = relation(Province)
+    city_id = Column(Integer, ForeignKey('master_city.id'))
+    city = relation(City)
+
     address = Column(Text)
     contact_person = Column(Text)
     mobile = Column(Text)
@@ -233,7 +241,8 @@ class Customer(DeclarativeBase, SysMixin, CRUDMixin):
 
     def populate(self):
         params = {}
-        for k in ['id', 'name', 'no', 'address', 'phone', 'mobile', 'contact_person', 'remark', 'payment_id', 'email' ]:
+        for k in ['id', 'name', 'no', 'province_id', 'city_id', 'address', 'phone',
+                  'mobile', 'contact_person', 'remark', 'payment_id', 'email' ]:
             params[k] = getattr(self, k)
 
         params['create_time'] = self.create_time.strftime(SYSTEM_DATETIME_FORMAT)
@@ -243,7 +252,7 @@ class Customer(DeclarativeBase, SysMixin, CRUDMixin):
 
     @classmethod
     def _get_fields(clz):
-        return ['name', 'no', 'address', 'phone', 'mobile', 'email', 'contact_person', 'remark', 'payment_id']
+        return ['name', 'no', 'province_id', 'city_id', 'address', 'phone', 'mobile', 'email', 'contact_person', 'remark', 'payment_id']
 
 
 
@@ -254,7 +263,10 @@ class CustomerTarget(DeclarativeBase, SysMixin):
     customer_id = Column(Integer, ForeignKey('master_customer.id'))
     customer = relation(Customer, backref = backref("targets", order_by = id), primaryjoin = "and_(Customer.id == CustomerTarget.customer_id, CustomerTarget.active == 0)")
     name = Column(Text)
-#    address = Column(Text)
+    province_id = Column(Integer, ForeignKey('master_province.id'))
+    province = relation(Province)
+    city_id = Column(Integer, ForeignKey('master_city.id'))
+    city = relation(City)
     remark = Column(Text)
 
     def __str__(self): return self.name
@@ -264,7 +276,7 @@ class CustomerTarget(DeclarativeBase, SysMixin):
 
     def populate(self):
         params = {}
-        for k in ['id', 'name', 'customer_id',
+        for k in ['id', 'name', 'customer_id', 'province_id', 'city_id',
 #                  'address', 
                   ]:
             params[k] = getattr(self, k)
@@ -553,6 +565,7 @@ class Barcode(DeclarativeBase, SysMixin, CRUDMixin):
 
     id = Column(Integer, autoincrement = True, primary_key = True)
     value = Column(Text)
+    ref_no = Column(Text)
     status = Column(Integer, default = 0)  #0 is used ,1 is reserved ,2 is cancelled 
     img_id = Column(Integer, ForeignKey('system_upload_file.id'))
     img = relation(UploadFile)

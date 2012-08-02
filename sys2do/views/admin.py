@@ -720,7 +720,11 @@ class AdminView(BasicView):
                                                     } for c in target.contacts]
                                      })
 
-            return render_template('admin/customer_update.html', obj = obj, targets_json = json.dumps(targets_json))
+            if obj.province_id:
+                cities = obj.province.children()
+            else: cities = []
+
+            return render_template('admin/customer_update.html', obj = obj, cities = cities, targets_json = json.dumps(targets_json))
         elif method == 'DELETE':
             id = _g('id', None)
             if not id :
@@ -739,6 +743,8 @@ class AdminView(BasicView):
                             no = _g('no'),
                             name = _g('name'),
                             display_name = _g('display_name'),
+                            province_id = _g('province_id'),
+                            city_id = _g('city_id'),
                             address = _g('address'),
                             contact_person = _g('contact_person'),
                             mobile = _g('mobile'),
@@ -752,7 +758,11 @@ class AdminView(BasicView):
             targets_json = _g('targets_json', '')
             targets_json = json.loads(targets_json)
             for target in targets_json:
-                t = CustomerTarget(customer = obj, name = target['target_name'], remark = target['target_remark'])
+                t = CustomerTarget(customer = obj,
+                                   name = target['target_name'],
+                                   province_id = target['province_id'],
+                                   city_id = target['city_id'],
+                                   remark = target['target_remark'])
                 DBSession.add(t)
                 for contact in target['contacts']:
                     DBSession.add(CustomerTargetContact(customer_target = t,
@@ -776,7 +786,8 @@ class AdminView(BasicView):
             if not obj :
                 flash(MSG_RECORD_NOT_EXIST, MESSAGE_ERROR)
                 return redirect(url_for('.view', action = 'customer'))
-            for f in ['no', 'name', 'display_name', 'address', 'contact_person', 'mobile', 'phone', 'email', 'remark', 'payment_id' ]:
+            for f in ['no', 'name', 'display_name', 'province_id', 'city_id', 'address', 'contact_person',
+                      'mobile', 'phone', 'email', 'remark', 'payment_id' ]:
                 setattr(obj, f, _g(f))
 
 
@@ -794,6 +805,8 @@ class AdminView(BasicView):
                     t = DBSession.query(CustomerTarget).get(tid)
                     t.name = target.get('target_name', None)
                     t.remark = target.get('target_remark', None)
+                    t.province_id = target.get('province_id', None)
+                    t.city_id = target.get('city_id', None)
                     target_ids.remove(t.id)
 
 
@@ -824,6 +837,8 @@ class AdminView(BasicView):
                     t = CustomerTarget(
                                        customer = obj,
                                        name = target.get('target_name', None),
+                                       province_id = target.get('province_id', None),
+                                       city_id = target.get('city_id', None),
                                        remark = target.get('target_remark', None),
                                       )
                     DBSession.add(t)
@@ -913,7 +928,7 @@ class AdminView(BasicView):
                 flash(MSG_RECORD_NOT_EXIST, MESSAGE_ERROR)
                 return redirect(url_for('.view', action = 'diqu'))
 
-            for c in obj.children:
+            for c in obj.children():
                 c.parent_code = _g('code')
             for f in ['name', 'code']:
                 setattr(obj, f, _g(f))

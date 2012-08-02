@@ -60,10 +60,11 @@
               </tr>
             </table>
             <form action="{{url_for('.view', action = 'barcode',m='PRINT')}}" method="post" id="records_form">
-              <table border="0" cellspacing="0" cellpadding="0" style="width:600px;">
+              <table border="0" cellspacing="0" cellpadding="0" style="width:800px;">
                 <tr class="field_head">
                   <td align="center" style="width:50px;"><input type="checkbox" onclick="allselect(this);"/></td>
                   <td align="center" style="width:200px;">号码</td>
+                  <td align="center" style="width:200px;">订单号码</td>
                   <td align="center" style="width:100px;">状态</td>
                   <td align="center" style="width:150px;">{{_('Create Time')}}</td>
                   <td align="center" style="width:100px;">{{_('Creator')}}</td>
@@ -72,6 +73,11 @@
 					<tr class="data_table_tr {{ loop.cycle('data_table_tr_odd', 'data_table_tr_even') }}">
 						<td><input type="checkbox" name="ids" value="{{r.id}}"/></td>
 						<td>{{r.value}}</td>
+						<td>&nbsp;
+							{% if r.ref_no %}
+								<a href="{{url_for('bpOrder.view',action='revise_by_barcode',no=r.value)}}">{{r.ref_no}}</a>
+							{% endif %}
+						</td>
 						<td>{%- if r.status == 0%}
 								已用
 							{% elif r.status == 1%}
