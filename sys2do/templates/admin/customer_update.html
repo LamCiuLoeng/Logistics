@@ -99,8 +99,8 @@
        	  <li style="width:180px;"><span>客户编号</span>
     	    <input type="text" style="width:100px" name="no" value="{{obj.no|f}}"/>
   	    </li>
-    	  <li style="width:280px;"><span>创建日期</span>
-    	    {{obj.create_time|ft}}
+    	   <li style="width:180px;"><span>显示名称</span>
+    	    <input type="text" style="width:100px" name="display_name" id="display_name" value="{{obj.display_name|f}}"/>
   	    </li>
   	    <li style="width:859px;"><span>{{_('Address')}}</span>
     	  	{{mymacros.select(id='province_id',list=MASTER_ALL('Province'),value=obj.province_id,class="must_input",style="width:150px")}}
@@ -119,9 +119,7 @@
     	  <li style="width:260px;"><span>公司邮箱</span>
     	    <input type="text" style="width:170px" name="email" value="{{obj.email|f}}"/>
   	    </li>
-    	  <li style="width:200px;"><span>创建人</span>
-    	    {{obj.create_by|f}}
-  	    </li>
+    	  
     	  <li style="width:220px;">付款方式
     	  	<select name="payment_id" class="must_input" id="payment_id">
     	  		<option value=""></option>
@@ -137,6 +135,10 @@
     	  <li style="width:925px;"><span>{{_('Remark')}}</span>
     	    <textarea class="order_add_div_body_input" style="width:840px; height:100px" name="remark">{{obj.remark|f}}</textarea>
         </li>
+        <li style="width:200px;"><span>创建日期</span>{{obj.create_time|ft}}</li>
+        <li style="width:200px;"><span>创建人</span>{{obj.create_by|f}}</li>
+        <li style="width:200px;"><span>更新日期</span>{{obj.update_time|ft}}</li>
+        <li style="width:200px;"><span>更新人</span>{{obj.update_by|f}}</li>
       </ul>
   <div style="clear:both"></div>
   </div>

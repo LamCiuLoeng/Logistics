@@ -64,7 +64,28 @@ function load_target(obj) {
     $("#target_name").val(obj.target_name);
     $("#target_remark").val(obj.target_remark);
     $("#tmp_province_id").val(obj.province_id);
-    $("#tmp_city_id").val(obj.city_id);
+    
+    if(obj.city_id){
+        $.getJSON('/ajax_master',
+                {
+                    't' : nowstr(),
+                    'm' : 'province_city',
+                    'pid' : obj.province_id
+                },function(r){
+                    if(r.code!=0){
+                        
+                    }else{
+                        var html = '<option value=""></option>';
+                        for(var i=0;i<r.data.length;i++){
+                            var tmp = r.data[i];
+                            html += '<option value="'+tmp.id+'">'+tmp.name+'</option>';
+                        }
+                        $("#tmp_city_id").html(html);
+                        $("#tmp_city_id").val(obj.city_id);
+                    }
+                });
+    }
+
     load_contact(obj.contacts);
 }
 

@@ -8,7 +8,7 @@
 '''
 import os
 import traceback
-from datetime import datetime as dt
+from datetime import date, datetime as dt
 import urllib2
 import json
 
@@ -22,10 +22,10 @@ from sys2do.setting import UPLOAD_FOLDER, ALLOWED_EXTENSIONS, UPLOAD_FOLDER_URL,
     SMS_KEY, SMS_FORMAT
 from sys2do.model import DBSession, UploadFile
 from sys2do.constant import MSG_RECORD_NOT_EXIST, MSG_NO_FILE_UPLOADED, \
-    MSG_INVALID_FILE_TO_UPLOAD
+    MSG_INVALID_FILE_TO_UPLOAD, SYSTEM_DATE_FORMAT, SYSTEM_DATETIME_FORMAT
 
 
-__all__ = ['_g', '_gl', '_gp', '_debug', '_info', '_error', 'getOr404', 'upload', 'makeException', 'number2alphabet']
+__all__ = ['_g', '_gl', '_gp', '_debug', '_info', '_error', 'getOr404', 'upload', 'makeException', 'number2alphabet', 'date2text']
 
 
 
@@ -154,6 +154,29 @@ def send_sms(no, content):
         _error(traceback.print_exc())
         return (1, 'error')
 
+
+
+def date2text(value = None, dateTimeFormat = SYSTEM_DATETIME_FORMAT, defaultNow = False):
+    if not value and defaultNow : value = dt.now()
+
+    format = dateTimeFormat
+    result = value
+
+    if isinstance(value, date):
+        try:
+            result = value.strftime(format)
+        except:
+            traceback.print_exc()
+    elif hasattr(value, "strftime"):
+        try:
+            result = value.strftime(format)
+        except:
+            traceback.print_exc()
+
+    if not result:
+        result = ""
+
+    return result
 
 
 

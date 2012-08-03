@@ -1,0 +1,106 @@
+{% extends "master.html" %}
+
+{% block extJS %}
+
+<script language="JavaScript" type="text/javascript">
+//<![CDATA[
+	function append(id,l){
+		var e = $(id);
+		
+		var html = '';
+		
+		for(var i=0;i<l.list.length;i++){
+		   var tmp = l.list[i];
+		   html += '<li class="level_two item_line"><a href="/order/revise?id='+tmp.id+'">'+tmp.ref_no+'</a></li>';
+		}
+		$(id+'_count').text(l.count);
+		e.after(html);
+	}
+
+	$(document).ready(function(){
+		$.getJSON('/order/ajax_todo_list',
+				  {'t' : nowstr()},
+				  function(r){
+				      if(r.result != 0){ return; }
+				      
+				      $('.item_line').remove();
+				      append('#orders_new',r.data.orders_new);
+				      append('#order_receiver',r.data.order_receiver);
+				      append('#order_inhouse',r.data.order_inhouse);
+				      append('#order_sorted',r.data.order_sorted);
+				  }
+		);
+	})
+//]]>
+</script>
+{% endblock %}
+
+{% block content %}
+	<table width="100%" cellspacing="0" cellpadding="0" border="0">
+  <tbody><tr>
+    <td width="220" class="main_left_td" valign="top">
+    <div class="todo_list_header">
+    <img width="220" height="31" src="/static/images/system/main_page_03.jpg"></div>
+      <div class="todo_list_div">
+        <div>
+        	<ul>
+           	  <li class="level_one" id="orders_new">需要指派收件人(<span id="orders_new_count">0</span>)</li>               
+            </ul>
+        </div>
+        <div>
+			<ul>
+            	<li class="level_one" id="order_receiver">等待入仓(<span id="order_receiver_count">0</span>)</li>
+            </ul>
+        </div>
+        <div>
+			<ul>
+            	<li class="level_one" id="order_inhouse">等待分拣(<span id="order_inhouse_count">0</span>)</li>
+            </ul>
+        </div>
+        <div>
+			<ul>
+            	<li class="level_one" id="order_sorted">等待出仓(<span id="order_sorted_count">0</span>)</li>
+            </ul>
+        </div>
+    </div></td>
+     
+     
+     
+     <td valign="top" class="main_right_td">
+
+	  {% if 'MANAGE_USER' is get_permission%}
+      <div class="nav_tab" onclick="redirect('{{url_for('bpAdmin.view',action='user')}}')">
+        <div class="header_div"></div>
+        <div class="body_div"><img width="80" height="80" src="/static/images/system/img_um.jpg"><span>用户管理</span>
+          <p>关于订单管理的一些说明。说明订单管理功能的用法与注意事项。</p>
+        </div>
+      </div>
+      {% endif %}
+      
+      {% if 'MANAGE_GROUP' is get_permission%}
+      <div class="nav_tab" onclick="redirect('{{url_for('bpAdmin.view',action='group')}}')">
+        <div class="header_div"></div>
+        <div class="body_div"><img width="80" height="80" src="/static/images/system/img_gm.jpg"><span>组管理</span>
+          <p>关于订单管理的一些说明。说明订单管理功能的用法与注意事项。</p>
+        </div>
+      </div>
+      {% endif %}
+      
+      {% if 'MANAGE_PERMISSION' is get_permission%}
+      <div class="nav_tab" onclick="redirect('{{url_for('bpAdmin.view',action='permission')}}')">
+        <div class="header_div"></div>
+        <div class="body_div"><img width="80" height="80" src="/static/images/system/img_permissions.jpg"><span>权限管理</span>
+          <p>关于订单管理的一些说明。说明订单管理功能的用法与注意事项。</p>
+        </div>
+      </div>
+      {% endif %}
+      
+      </td>
+
+     
+     
+     
+  </tr>
+</tbody></table>
+
+{% endblock %}

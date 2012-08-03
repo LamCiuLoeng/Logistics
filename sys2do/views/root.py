@@ -13,7 +13,7 @@ from sys2do import app
 from sys2do.model import DBSession, User
 from flask.helpers import jsonify, send_file
 from sys2do.util.decorator import templated, login_required, tab_highlight
-from sys2do.util.common import _g, _gp, _gl, _info, _error
+from sys2do.util.common import _g, _gp, _gl, _info, _error, date2text
 from sys2do.constant import MESSAGE_ERROR, MESSAGE_INFO, MSG_NO_SUCH_ACTION, \
     MSG_SAVE_SUCC, GOODS_PICKUP, GOODS_SIGNED, OUT_WAREHOUSE, IN_WAREHOUSE, \
     MSG_RECORD_NOT_EXIST, LOG_GOODS_PICKUPED, LOG_GOODS_SIGNED, MSG_SERVER_ERROR, \
@@ -21,8 +21,9 @@ from sys2do.constant import MESSAGE_ERROR, MESSAGE_INFO, MSG_NO_SUCH_ACTION, \
 from sys2do.views import BasicView
 from sys2do.model.master import CustomerProfile, Customer, Supplier, \
     CustomerTarget, Receiver, CustomerTargetContact, Province, City, Barcode
-from sys2do.model.logic import OrderHeader, TransferLog, PickupDetail
-from sys2do.util.logic_helper import check_barcode
+from sys2do.model.logic import OrderHeader, TransferLog, PickupDetail, \
+    DeliverDetail
+
 
 
 __all__ = ['bpRoot']
@@ -232,17 +233,11 @@ class RootView(BasicView):
                 if action_type == -2:
                     no = _g('barcode')
                     ref_no = _g('orderno')
-                    try:
-                        b = DBSession.query(Barcode).filter(Barcode.value == no).one()
-                        if b.status != 1 :
-                            return self._compose_xml_response(1)
-                    except:
-                        return self._compose_xml_response(1)
 
+                    b = Barcode.getOrCreate(no, ref_no, status = 0)
                     try:
                         DBSession.add(OrderHeader(no = no, ref_no = ref_no, status = -2))
                         b.status = 0
-                        b.ref_no = ref_no
                         DBSession.commit()
                         return self._compose_xml_response(0)
                     except:
@@ -296,7 +291,7 @@ class RootView(BasicView):
 
     def ajax_check_barcode(self):
         value = _g('value')
-        (code, status) = check_barcode(value)
+        (code, status) = Barcode.check(value)
 
         return jsonify({'code' : code, 'status' : status})
 
@@ -319,6 +314,48 @@ class RootView(BasicView):
             return jsonify({'code' : 0 , 'day' : dt.now().strftime(SYSTEM_DATE_FORMAT)})
         except:
             return jsonify({'code' : 1 , 'day' : ''})
+
+
+    def ajax_order_info(self):
+        ref_no = _g('order_no')
+        try:
+            header = DBSession.query(OrderHeader).filter(and_(OrderHeader.active == 0, OrderHeader.ref_no == ref_no)).one()
+            logs = []
+            logs.extend(header.get_logs())
+            try:
+                deliver_detail = DBSession.query(DeliverDetail).filter(and_(DeliverDetail.active == 0, DeliverDetail.order_header_id == header.id)).one()
+                deliver_heaer = deliver_detail.header
+                logs.extend(deliver_heaer.get_logs())
+            except:
+                pass
+            logs = sorted(logs, cmp = lambda x, y: cmp(x.transfer_date, y.transfer_date))
+
+            return jsonify({'code' : 0 , 'msg' : '', 'data' : {
+                                                               'no' : header.no,
+                                                               'ref_no' :header.ref_no,
+                                                               'status' : header.status,
+                                                               'source_company' : unicode(header.source_company),
+                                                               'source_province' : unicode(header.source_province),
+                                                               'source_city' : unicode(header.source_city),
+                                                               'source_address' : header.source_address,
+                                                               'source_contact' : header.source_contact,
+                                                               'destination_company' : unicode(header.destination_company),
+                                                               'destination_province' : unicode(header.destination_province),
+                                                               'destination_city' : unicode(header.destination_city),
+                                                               'destination_address' : header.destination_address,
+                                                               'destination_contact' : header.destination_contact,
+                                                               'order_time' : header.order_time,
+                                                               'actual_time' : header.actual_time,
+                                                               'logs' : [{
+                                                                          'transfer_date' : l.transfer_date,
+                                                                          'remark' : l.remark,
+                                                                          } for l in logs]
+                                                               }})
+
+        except:
+            _error(traceback.print_exc())
+            return jsonify({'code' : 1, 'msg' : MSG_RECORD_NOT_EXIST})
+
 
 
 

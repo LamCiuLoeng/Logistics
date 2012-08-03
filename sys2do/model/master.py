@@ -6,6 +6,7 @@
 #  Description:
 ###########################################
 '''
+from datetime import datetime as dt
 from sqlalchemy import Table, Column, ForeignKey
 from sqlalchemy.types import Unicode, Integer, DateTime, Float, Text
 from sqlalchemy.orm import relation, backref, synonym
@@ -17,6 +18,7 @@ from sys2do.model.auth import CRUDMixin, Group
 from sys2do.util.common import _gl, _gp, _info
 from sys2do.constant import SYSTEM_DATETIME_FORMAT
 from sys2do.model.system import UploadFile
+from sys2do.util.barcode_helper import generate_barcode_file
 
 #__all__ = ['']
 
@@ -171,7 +173,7 @@ class Province(DeclarativeBase, SysMixin, CRUDMixin):
 
 
     def children(self):
-        return DBSession.query(City).filter(and_(City.parent_code == self.code)).order_by(City.name).all()
+        return DBSession.query(City).filter(and_(City.parent_code == self.code, City.active == 0)).order_by(City.name).all()
 
     @classmethod
     def _get_fields(clz):
@@ -574,3 +576,28 @@ class Barcode(DeclarativeBase, SysMixin, CRUDMixin):
     def __repr__(self): return self.value
     def __unicode__(self): return self.value
 
+
+    @classmethod
+    def getOrCreate(clz, value, ref_no, status = 0):
+        if value: # get the existing
+            try:
+                b = DBSession.query(clz).filter(clz.value == value).one()
+                return b
+            except:
+                pass
+        #create
+        b = clz(value = value, ref_no = ref_no, status = status)
+        DBSession.add(b)
+        DBSession.flush()
+        b.value = '%s%06d' % (dt.now().strftime('%y%m%d'), (b.id % 1000000))
+        b.img = generate_barcode_file(b.value)
+        return b
+
+
+    @classmethod
+    def check(clz, value):
+        try:
+            b = DBSession.query(clz).filter(clz.value == value).one()
+            return (0, b.status) #barcode exist
+        except:
+            return (1, None) # barcode not exist

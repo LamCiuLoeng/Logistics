@@ -14,29 +14,14 @@ from sqlalchemy.sql.functions import sum
 from sqlalchemy.sql.expression import and_
 from sys2do.model.master import Barcode
 
-__all__ = ['genSystemNo', 'getDeliverNo', 'updateDeliverHeaderStatus', 'updateDeliverDetailsStatus']
+__all__ = ['getDeliverNo', ]
 
-def genSystemNo():
-    b = Barcode()
-    DBSession.add(b)
-    DBSession.flush()
-    b.value = '%s%06d' % (dt.now().strftime('%y%m%d'), (b.id % 1000000))
-    return b
-
-#    return '%s%06d' % (dt.now().strftime('%y%m%d'), (id % 1000000))
 
 
 def getDeliverNo():
     return 'DL%s%s' % (dt.now().strftime('%Y%m%d%H%M%S'), random.randint(0, 999))
 
 
-
-def check_barcode(value):
-    try:
-        b = DBSession.query(Barcode).filter(Barcode.value == value).one()
-        return (0, b.status) #barcode exist
-    except:
-        return (1, None) # barcode not exist
 
 #def updateDeliverHeaderStatus(id, status):
 #    dheader = DBSession.query(DeliverHeader).get(id)
@@ -93,5 +78,3 @@ def check_barcode(value):
 #        if all(map(lambda d : d.status >= status, affected_order_headers.details)) : affected_order_headers.status = status
 
 
-if __name__ == "__main__":
-    print genSystemNo(1)

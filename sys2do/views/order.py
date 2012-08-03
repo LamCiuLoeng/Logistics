@@ -43,7 +43,6 @@ from sys2do.util.common import _g, getOr404, _gp, getMasterAll, _debug, _info, \
     _gl, _error
 from sys2do.util.decorator import templated, login_required, tab_highlight
 from sys2do.util.excel_helper import SummaryReport
-from sys2do.util.logic_helper import genSystemNo
 from sys2do.views import BasicView
 from sys2do.model.system import SystemLog
 
@@ -192,21 +191,11 @@ class OrderView(BasicView):
         DBSession.add(order)
         DBSession.flush()
 
-
         no = _g('no')
-        if not no: #if not barcode, create a new one for this
-            b = genSystemNo()
-#            order.no, b.ref_no = b.value, order.ref_no
-        else:
-            try:
-                b = DBSession.query(Barcode).filter(and_(Barcode.active == 0, Barcode.value == no)).one()
-                b.status = 0 #mark the barcode is used
-            except:
-                _error(traceback.print_exc())
-                b = Barcode(value = no)
-#            order.no = b.value
-        order.no, b.ref_no = b.value, order.ref_no
-        order.barcode = generate_barcode_file(order.no)
+        b = Barcode.getOrCreate(no, order.ref_no)
+        order.barcode = b.img
+        order.no = b.value
+        b.status = 0 # mark the barcode is use
 
         DBSession.add(TransferLog(
                                   refer_id = order.id,

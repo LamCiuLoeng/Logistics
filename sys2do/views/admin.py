@@ -710,6 +710,8 @@ class AdminView(BasicView):
                                      "id" : "old_%s" % target.id,
                                      "target_name" : target.name,
                                      "target_remark" : target.remark,
+                                     "province_id" : target.province_id,
+                                     "city_id" : target.city_id,
                                      "contacts" : [{
                                                     "id" : "old_%s" % c.id,
                                                     "contact_name" : c.name,
@@ -891,7 +893,16 @@ class AdminView(BasicView):
             if not obj :
                 flash(MSG_RECORD_NOT_EXIST, MESSAGE_ERROR)
                 return redirect(url_for('.view', action = 'diqu'))
-            return render_template('admin/diqu_update.html', obj = obj)
+
+            city_json = [{
+                          'id' : 'old_%s' % c.id,
+                          'city_name' : c.name,
+                          'city_code' : c.code,
+                          'city_shixiao' : c.shixiao,
+                          } for c in obj.children()]
+
+            return render_template('admin/diqu_update.html', obj = obj, city_json = json.dumps(city_json))
+
         elif method == 'DELETE':
             id = _g('id', None)
             if not id :
@@ -907,16 +918,21 @@ class AdminView(BasicView):
             return redirect(url_for('.view', action = 'diqu'))
 
         elif method == 'SAVE_NEW':
-            obj = Province(name = _g('name'), code = _g('code'))
+            obj = Province(name = _g('name'), code = _g('code'), shixiao = _g('shixiao'))
             DBSession.add(obj)
 
-            for nk, nv in _gp('city_name_'):
-                id = nk.split("_")[2]
-                if not nv : continue
-                DBSession.add(City(name = nv, code = _g('city_code_%s' % id), parent_code = obj.code))
+            city_json = _g('city_json', '')
+            for city in json.loads(city_json):
+                DBSession.add(City(
+                                   name = city.get('city_name', None),
+                                   code = city.get('city_code', None),
+                                   shixiao = city.get('city_shixiao', None),
+                                   parent_code = obj.code
+                                   ))
             DBSession.commit()
             flash(MSG_SAVE_SUCC, MESSAGE_INFO)
             return redirect(url_for('.view', action = 'diqu'))
+
 
         elif method == 'SAVE_UPDATE':
             id = _g('id', None)
@@ -928,17 +944,36 @@ class AdminView(BasicView):
                 flash(MSG_RECORD_NOT_EXIST, MESSAGE_ERROR)
                 return redirect(url_for('.view', action = 'diqu'))
 
-            for c in obj.children():
-                c.parent_code = _g('code')
-            for f in ['name', 'code']:
+            for f in ['name', 'code', 'shixiao']:
                 setattr(obj, f, _g(f))
 
+            city_json = _g('city_json', '')
+            city_ids = map(lambda v : v.id, obj.children())
+            for city in json.loads(city_json):
+                if not city.get('id', None) : continue
+                if isinstance(city['id'], basestring) and city['id'].startswith("old_"):  #existing target
+                    cid = city['id'].split("_")[1]
+                    c = DBSession.query(City).get(cid)
+                    c.name = city.get('city_name', None)
+                    c.code = city.get('city_code', None)
+                    c.shixiao = city.get('city_shixiao', None)
+                    c.parent_code = obj.code
+                    city_ids.remove(c.id)
+                else:
+                    DBSession.add(City(
+                                       name = city.get('city_name', None),
+                                       code = city.get('city_code', None),
+                                       shixiao = city.get('city_shixiao', None),
+                                       parent_code = obj.code
+                                       ))
+
+            DBSession.query(City).filter(City.id.in_(city_ids)).update({'active' : 1}, False)
             DBSession.commit()
             flash(MSG_UPDATE_SUCC, MESSAGE_INFO)
             return redirect(url_for('.view', action = 'diqu'))
         elif method == 'ADD_CITY':
             try:
-                city = City(name = _g('city_name'), code = _g('city_code'), parent_code = _g('code'))
+                city = City(name = _g('city_name'), code = _g('city_code'), parent_code = _g('code'), shixiao = _g('city_shixiao'))
                 DBSession.add(city)
                 DBSession.commit()
                 return jsonify({'code' : 0 , 'msg' : MSG_SAVE_SUCC , 'data' : city.populate()})
@@ -987,12 +1022,7 @@ class AdminView(BasicView):
             return render_template(print_page, records = records)
         elif method == 'SAVE_NEW':
             qty = _g('qty')
-            records = [DBObj(status = 1) for i in range(int(qty))]
-            DBSession.add_all(records)
-            DBSession.flush()
-            for b in  records:
-                b.value = '%s%06d' % (dt.now().strftime('%y%m%d'), (b.id % 1000000))
-                b.img = generate_barcode_file(b.value)
+            records = [DBObj.getOrCreate(None, None, status = 1) for i in range(int(qty))]
             DBSession.commit()
             if _g('type') == 'CREATE':
                 flash(MSG_SAVE_SUCC, MESSAGE_INFO)

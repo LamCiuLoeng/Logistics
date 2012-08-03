@@ -46,6 +46,7 @@
                 <tr class="field_head">
                   <th align="center" style="width:200px">省份/直辖市</th>
                   <th align="center" style="width:100px">邮政编码</th>
+                  <th align="center" style="width:50px">时效</th>
                   <th align="center" style="width:200px">{{_('Create Time')}}</th>
                   <th align="center" style="width:100px">{{_('Creator')}}</th>
                   <th align="center" style="width:200px">{{_('Update Time')}}</th>
@@ -55,6 +56,7 @@
 					<tr class="data_table_tr {{ loop.cycle('data_table_tr_odd', 'data_table_tr_even') }}">
 						<td><a href="{{url_for('.view', action = 'diqu',m = 'UPDATE',id=r.id)}}">{{r}}</a></td>
 						<td>{{r.code}}</td>
+						<td>{{r.shixiao|f}}</td>
 						<td>{{r.create_time|ft}}</td>
 						<td>{{r.create_by|f}}</td>
 						<td>{{r.update_time|ft}}</td>

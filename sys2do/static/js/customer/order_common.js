@@ -52,6 +52,9 @@ function clear_source(){
     $('#source_tel').val('');
     $('#source_mobile').val('');
     $('#payment_id').val('');
+    $('#source_province_id').val('');
+    $("#source_city_id").empty();
+    $("input[type='checkbox'][name='source_sms']").removeAttr('checked');
 }
 
 function clear_destination(){
@@ -62,6 +65,9 @@ function clear_destination(){
     $("#destination_province_id").val('');
     $("#destination_city_id").empty();
     $("#estimate_time").val('');
+    $('#destination_province_id').val('');
+    $("#destination_city_id").empty();
+    $("input[type='checkbox'][name='destination_sms']").removeAttr('checked');
 }
 
 
