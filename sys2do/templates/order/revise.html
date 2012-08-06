@@ -52,7 +52,7 @@
 	<ul>
     	<li><img src="/static/images/system/order_manage_25.jpg" width="71" height="21" id="Image1" onmouseover="MM_swapImage('Image1','','/static/images/system/order_manage_h_25.jpg',1)" onmouseout="MM_swapImgRestore()" onclick="toreturn()"/></li>
         {% if 'UPDATE_ORDER' is get_permission%}
-        <li><img src="/static/images/system/order_manage_33.jpg" width="77" height="21" id="Image2" onmouseover="MM_swapImage('Image2','','/static/images/system/order_manage_h_33.jpg',1)" onmouseout="MM_swapImgRestore()" onclick="save_header()"/></li>
+        	<li><img src="/static/images/system/order_manage_33.jpg" width="77" height="21" id="Image2" onmouseover="MM_swapImage('Image2','','/static/images/system/order_manage_h_33.jpg',1)" onmouseout="MM_swapImgRestore()" onclick="save_header()"/></li>        	
         {% endif %}
         <li><a href="{{url_for('.view',action='print_barcode',id=header.id)}}" target="_blank"><img src="/static/images/system/order_manage_11_35.jpg" width="77" height="21" id="Image5" onmouseover="MM_swapImage('Image5','','/static/images/system/order_manage_1_35.jpg',1)" onmouseout="MM_swapImgRestore()" /></a></li>
         {% if 'CREATE_ORDER' is get_permission%}
@@ -150,15 +150,15 @@
     	    {{mymacros.select(id='pack_type_id',list=MASTER_ALL('PackType'),value=header.pack_type_id,class="",style="")}}
   	    </li>
   	    <li style="width:226px;"><span>估计到达</span>
-    	    <input type="text" style="width:140px" id="estimate_time" name="estimate_time"  readonly="true"/>
+    	    <input type="text" style="width:140px" id="estimate_time" name="estimate_time"  readonly="true" value="{{header.estimate_time|fd}}"/>
   	    </li>
   	    <li style="width:226px;"><span>{{_('Expect Time')}}</span>
     	    <input type="text" style="width:140px" id="expect_time" name="expect_time" class="datepicker" value="{{header.expect_time|fd}}"/>
   	    </li>
   	    
-  	     <li style="width:200px;"><span>{{_('Create Time')}}</span>{{header.create_time|ft}}</li>
+  	     <li style="width:250px;"><span>{{_('Create Time')}}</span>{{header.create_time|ft}}</li>
     	  <li style="width:200px;"><span>{{_('Creator')}}</span>{{header.create_by|f}}</li>
-    	  <li style="width:280px;"><span>送货单号</span>
+    	  <li style="width:230px;"><span>送货单号</span>
     	  	&nbsp;
     	  	{% if header.deliver_header_no %}
 	    	  	<a href="{{url_for('bpDeliver.view',action='view_by_no',no=header.deliver_header_no)}}">{{header.deliver_header_no|f}}</a>
@@ -538,12 +538,39 @@
 	<div class="order_add_info_tab_body" id="tabs-7">
 		<table>
 			<tr>
+				<td align="left" style="width:150px">订单指标</td>
+				<td style="width:150px">当前状态</td>
+				<td style="width:200px">操作</td>
+			</tr>
+			<tr>
+				<td align="left" style="width:150px">是否异常</td>
+				<td style="text-align:left;width:150px" class="exception_span">{{'是' if header.is_exception == 1 else '否'}}</td>
+				<td style="width:200px">
+		        	<select onchange="todo_exception(this);" style="width:150px">
+		        		<option>--是否异常--</option>
+		        		<option value="1">标记为异常</option>
+		        		<option value="0">取消异常标记</option>
+		        	</select/>
+				</td>
+			<tr>
+			<tr>
+				<td align="left" style="width:150px">是否少货</td>
+				<td style="text-align:left;width:150px" class="lessqty_span">{{'是' if header.is_less_qty == 1 else '否'}}</td>
+				<td style="width:200px">
+		        	<select onchange="todo_less_qty(this);" style="width:150px">
+		        		<option>--是否少货--</option>
+		        		<option value="1">标记为少货</option>
+		        		<option value="0">取消少货标记</option>
+		        	</select/>
+				</td>
+			<tr>
+			<tr>
 				<td align="left" style="width:150px">审核状态</td>
 				<td style="text-align:left;width:150px" class="approval_span">{{mymacros.show_approve(header.approve)}}</td>
 				<td style="width:200px">
 					{% if 'FIN_APPROVE' is get_permission %}
-			        	<select onchange="todo_approve(this);">
-			        		<option></option>
+			        	<select onchange="todo_approve(this);" style="width:150px">
+			        		<option>--审核是否通过--</option>
 			        		<option value="{{ORDER_APPROVED[0]}}">{{_(ORDER_APPROVED[1])}}</option>
 			        		<option value="{{ORDER_DISAPPROVED[0]}}">{{_(ORDER_DISAPPROVED[1])}}</option>
 			        	</select/>
@@ -555,8 +582,8 @@
 				<td style="text-align:left;width:150px" class="paid_span">{{mymacros.show_paid(header.paid)}}</td>
 				<td>
 					{% if 'FIN_PAID' is get_permission %}
-			        	<select onchange="todo_paid(this);">
-			        		<option></option>
+			        	<select onchange="todo_paid(this);" style="width:150px">
+			        		<option>--客户是否付款--</option>
 			        		<option value="{{ORDER_NOT_PAID[0]}}">{{_(ORDER_NOT_PAID[1])}}</option>
 			        		<option value="{{ORDER_PAID[0]}}">{{_(ORDER_PAID[1])}}</option>
 			        	</select/>
@@ -568,8 +595,8 @@
 				<td style="text-align:left;width:150px" class="paid_span">{{mymacros.show_supplier_paid(header.supplier_paid)}}</td>
 				<td>
 					{% if 'FIN_SUPPLIER_PAID' is get_permission %}
-			        	<select onchange="todo_supplier_paid(this);">
-			        		<option></option>
+			        	<select onchange="todo_supplier_paid(this);" style="width:150px">
+			        		<option>--是否付款予承运商--</option>
 			        		<option value="{{DELIVER_NOT_PAID[0]}}">{{_(DELIVER_NOT_PAID[1])}}</option>
 			        		<option value="{{DELIVER_PAID[0]}}">{{_(DELIVER_PAID[1])}}</option>
 			        	</select/>
@@ -580,8 +607,8 @@
 				<td align="left" style="width:150px">客户回单状态</td>
 				<td style="text-align:left;width:150px" class="order_return_span">{{mymacros.show_return(header.is_return_note)}}</td>
 				<td>
-		        	<select onchange="todo_order_return(this);">
-		        		<option></option>
+		        	<select onchange="todo_order_return(this);" style="width:150px">
+		        		<option>--客户是否回单--</option>
 		        		<option value="{{ORDER_NOT_RETURN_NOTE[0]}}">{{_(ORDER_NOT_RETURN_NOTE[1])}}</option>
 		        		<option value="{{ORDER_RETURN_NOTE[0]}}">{{_(ORDER_RETURN_NOTE[1])}}</option>
 		        	</select/>

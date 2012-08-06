@@ -28,13 +28,27 @@ def init():
         #add the default value here
 
         uAdmin = User(name = 'admin', email = 'admin@sfhlwl.com', password = 'admin')
-        uKinlong = User(name = u'kinlong', email = 'customer@test.com', password = '123')
-        uWeiqian = User(name = u'weiqian', email = 'customer@test.com', password = '123')
-        uKefu1 = User(name = u'kefu1', email = 'kefu1@sfhlwl.com', password = '123')
-        uKefu2 = User(name = u'kefu2', email = 'kefu2@sfhlwl.com', password = '123')
-        uFin1 = User(name = u'fin1', email = 'fin1@sfhlwl.com', password = '123')
-        uSupplier = User(name = 'supplier', email = 'supplier@test.com', password = '123')
-        uWarehouse = User(name = 'warehouse', email = 'warehouse@sfhlwl.com', password = '123')
+#        uKinlong = User(name = u'kinlong', email = 'customer@test.com', password = '123')
+#        uWeiqian = User(name = u'weiqian', email = 'customer@test.com', password = '123')
+        uKefua = User(name = u'kefu1', email = 'kefu1@sfhlwl.com', password = '123')
+        uWha = User(name = u'wh1', email = 'kefu1@sfhlwl.com', password = '123')
+        uFina = User(name = u'fin1', email = 'kefu1@sfhlwl.com', password = '123')
+
+        uUser1 = User(name = u'罗凌云', email = 'kefu1@sfhlwl.com', password = '123')
+        uUser2 = User(name = u'陈龙', email = 'kefu1@sfhlwl.com', password = '123')
+        uUser3 = User(name = u'邓二', email = 'kefu1@sfhlwl.com', password = '123')
+        uUser4 = User(name = u'刘坤', email = 'kefu1@sfhlwl.com', password = '123')
+        uUser5 = User(name = u'何灿明', email = 'kefu1@sfhlwl.com', password = '123')
+        uUser6 = User(name = u'黄燕琴', email = 'kefu1@sfhlwl.com', password = '123')
+        uUser7 = User(name = u'吴丽玲', email = 'kefu1@sfhlwl.com', password = '123')
+        uUser8 = User(name = u'徐腾芳', email = 'kefu1@sfhlwl.com', password = '123')
+        uUser9 = User(name = u'黄霄莹', email = 'kefu1@sfhlwl.com', password = '123')
+        uUser10 = User(name = u'林凤', email = 'kefu1@sfhlwl.com', password = '123')
+        uUser11 = User(name = u'吴秋梅', email = 'kefu1@sfhlwl.com', password = '123')
+        uUser12 = User(name = u'林秀贤', email = 'kefu1@sfhlwl.com', password = '123')
+        uUser13 = User(name = u'曾德莲', email = 'kefu1@sfhlwl.com', password = '123')
+        uUser14 = User(name = u'李时坚', email = 'kefu1@sfhlwl.com', password = '123')
+        uUser15 = User(name = u'深福合力', email = 'kefu1@sfhlwl.com', password = '123')
 
 
         pAdminManage = Permission(name = 'AMIN_MANAGE')
@@ -105,18 +119,18 @@ def init():
         gAdmin.users = [uAdmin, ]
         gCustomer = Group(name = u'客户组', display_name = u'客户组', type = 0)
         gCustomer.permissions = [pCreateOrder, pUpdateOrder, pDeleteOrder, pSearchOrder, ]
-        gCustomer.users = [uKinlong, uWeiqian ]
+
         gKinlongGroup = Group(name = 'KINLONG_GROUP', display_name = 'KINLONG GROUP', type = 1)
-        gKinlongGroup.users = [uKinlong, ]
+
         gWeiqianGroup = Group(name = 'WEIQIAN_GROUP', display_name = 'WEIQIAN GROUP', type = 1)
-        gWeiqianGroup.users = [uWeiqian]
+
         gOfficer = Group(name = u'客服组', display_name = u'客服组', type = 0)
         gOfficer.permissions = [
                                 pCreateMaster, pUpdateMaster, pDeleteMaster, pSearchMaster, pManageMaster,
                                 pCreateOrder, pUpdateOrder, pDeleteOrder, pSearchOrder, pSearchAllOrder, pManageOrder,
                                 pCreateDeliver, pUpdateDeliver, pDeleteDeliver, pSearchDeliver, pManageDeliver, pSearchAllDeliver,
                                 ]
-        gOfficer.users = [uKefu1, uKefu2]
+        gOfficer.users = [uKefua, uUser7, uUser9, uUser10, uUser13 ]
 
         gFin = Group(name = u'财务组', display_name = u'财务组', type = 0)
         gFin.permissions = [
@@ -125,22 +139,25 @@ def init():
                             pCreateDeliver, pUpdateDeliver, pDeleteDeliver, pSearchDeliver, pManageDeliver, pSearchAllDeliver,
                             pManageFin, pFinSearch, pFinApprove, pFinPaid, pFinSupplierPaid
                             ]
-        gFin.users = [uFin1, ]
+        gFin.users = [uFina, uUser1, uUser2, uUser4, uUser5, uUser12, uUser15]
 
         gSupplier = Group(name = u'承运商组', display_name = u'承运商组', type = 0)
         gSupplier.permissions = [pUpdateDeliver, pSearchDeliver ]
-        gSupplier.users = [uSupplier]
+#        gSupplier.users = [uSupplier]
 
         gSupplier1 = Group(name = 'SUPPLIER_1', display_name = 'Supplier1', type = 1)
-        gSupplier1.users = [uSupplier]
+#        gSupplier1.users = [uSupplier]
         gWarehouse = Group(name = u'仓库组', display_name = u'仓库组', type = 0)
-        gWarehouse.permissions = [pUpdateOrder, pSearchOrder, pSearchAllOrder,
-                                  pUpdateDeliver, pSearchDeliver, pSearchAllDeliver, ]
-        gWarehouse.users = [uWarehouse]
+        gWarehouse.permissions = [pUpdateOrder, pSearchOrder, pSearchAllOrder, pManageOrder,
+                                  pCreateDeliver, pUpdateDeliver, pSearchDeliver, pSearchAllDeliver, pManageDeliver ]
+        gWarehouse.users = [uWha, uUser3, uUser6, uUser8, uUser14]
 
 
         DBSession.add_all([
-                            uAdmin, uKefu1, uKefu2, uSupplier, uWarehouse,
+                            uAdmin, uKefua, uFina, uWha,
+#                            uKefu2, uSupplier, uWarehouse,
+                            uUser1, uUser2, uUser3, uUser4, uUser5, uUser6, uUser7, uUser8, uUser9, uUser10,
+                            uUser11, uUser12, uUser13, uUser14, uUser15,
                             pCreateUser, pUpdateUser, pDeleteUser, pSearchUser, pManageUser,
                             pCreateGroup, pUpdateGroup, pDeleteGroup, pSearchGroup, pManageGroup,
                             pCreatePermission, pUpdatePermission, pDeletePermission, pSearchPermission, pManagePermission,

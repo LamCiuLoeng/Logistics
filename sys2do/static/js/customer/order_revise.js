@@ -580,6 +580,46 @@ function todo_order_return(obj){
 }
 
 
+function todo_exception(obj){
+    var v = $(":selected",obj).val();
+    $(obj).val('');
+    if(v){
+        return todo('EXCEPTION',v,function(r){
+            if(r.code != 0 ){
+                show_error(r.msg);
+            }else{
+                if(v=='1'){
+                    $(".exception_span").text("是");
+                }else{
+                    $(".exception_span").text("否");
+                }           
+                show_info(r.msg);
+            }   
+        });
+    }
+}
+
+
+function todo_less_qty(obj){
+    var v = $(":selected",obj).val();
+    $(obj).val('');
+    if(v){
+        return todo('LESS_QTY',v,function(r){
+            if(r.code != 0 ){
+                show_error(r.msg);
+            }else{
+                if(v=='1'){
+                    $(".lessqty_span").text("是");
+                }else{
+                    $(".lessqty_span").text("否");
+                }           
+                show_info(r.msg);
+            }   
+        });
+    }
+}
+
+
 function todo(type,flag,handler){   
     $.getJSON("/order/ajax_change_flag",
              {

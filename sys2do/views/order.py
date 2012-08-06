@@ -180,7 +180,7 @@ class OrderView(BasicView):
                   'source_province_id', 'source_city_id', 'destination_province_id', 'destination_city_id',
                   'source_company_id', 'source_address', 'source_contact', 'source_tel', 'source_mobile',
                   'destination_company_id', 'destination_address', 'destination_contact', 'destination_tel', 'destination_mobile',
-                  'ref_no', 'order_time', 'expect_time', 'actual_time', 'remark',
+                  'ref_no', 'estimate_time', 'expect_time', 'actual_time', 'remark',
                   'payment_id', 'pickup_type_id', 'pack_type_id', 'qty', 'qty_ratio', 'vol', 'vol_ratio',
                   'weight', 'weight_ratio', 'weight_ratio', 'amount', 'insurance_charge', 'sendout_charge', 'receive_charge',
                   'package_charge', 'other_charge', 'note_id', 'note_no',
@@ -549,7 +549,7 @@ class OrderView(BasicView):
                       'ref_no', 'source_company_id', 'source_address', 'source_contact', 'source_tel', 'source_mobile',
                       'payment_id', 'qty', 'weight', 'vol', 'shipment_type_id',
                        'destination_company_id', 'destination_address', 'destination_contact', 'destination_tel', 'destination_mobile',
-                      'order_time', 'expect_time', 'actual_time', 'qty_ratio', 'weight_ratio', 'vol_ratio', 'amount', 'cost', 'remark',
+                      'estimate_time', 'expect_time', 'actual_time', 'qty_ratio', 'weight_ratio', 'vol_ratio', 'amount', 'cost', 'remark',
                       'pickup_type_id', 'pack_type_id',
                       'insurance_charge', 'sendout_charge', 'receive_charge', 'package_charge', 'other_charge',
                       'note_id', 'note_no',
@@ -562,8 +562,8 @@ class OrderView(BasicView):
                 for f in fields:
                     old_v = getattr(header, f)
                     new_v = _g(f)
-                    if unicode(old_v) != unicode(new_v):
-                        _remark.append(u"[%s]'%s' 修改为 '%s'" % (f, old_v, new_v))
+                    if unicode(old_v or '') != unicode(new_v or ''):
+                        _remark.append(u"[%s]'%s' 修改为 '%s'" % (f, old_v or '', new_v or ''))
                     setattr(header, f, _g(f))
 
                 for f in checkbox_fields:
@@ -904,6 +904,18 @@ class OrderView(BasicView):
                     remark = u'%s 确认该订单为客户已返回单。' % session['user_profile']['name']
                 else:
                     remark = u'%s 确认该订单为客户未返回单。' % session['user_profile']['name']
+            elif type == 'EXCEPTION':
+                r.is_exception = flag
+                if flag == '1':
+                    remark = u'%s 标记该订单为异常。' % session['user_profile']['name']
+                else:
+                    remark = u'%s 取消该订单的异常标记。' % session['user_profile']['name']
+            elif type == 'LESS_QTY':
+                r.is_less_qty = flag
+                if flag == '1':
+                    remark = u'%s 标记该订单为少货。' % session['user_profile']['name']
+                else:
+                    remark = u'%s 取消该订单的少货标记。' % session['user_profile']['name']
 
             DBSession.add(SystemLog(
                                     type = r.__class__.__name__,

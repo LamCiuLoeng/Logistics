@@ -67,6 +67,26 @@
 {%- endmacro %}
 
 
+{% macro show_exception(value) -%}
+	{% if value == 0 %}
+		否
+	{% else %}
+		是
+	{% endif %}
+{%- endmacro %}
+
+
+
+{% macro show_lessqty(value) -%}
+	{% if value == 0 %}
+		否
+	{% else %}
+		是
+	{% endif %}
+{%- endmacro %}
+
+
+
 {% macro mypaginate(records) -%}
 	{{records.pager(format='$link_first $link_previous ~3~ $link_next $link_last, 共计 $item_count 条记录',
 					show_if_single_page=True,

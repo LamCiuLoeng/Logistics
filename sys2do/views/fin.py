@@ -152,6 +152,19 @@ class FinView(BasicView):
                         remark = u'%s 确认该订单为客户已返回单。' % session['user_profile']['name']
                     else:
                         remark = u'%s 确认该订单为客户未返回单。' % session['user_profile']['name']
+                elif type == 'EXCEPTION':
+                    r.is_exception = flag
+                    if flag == '1':
+                        remark = u'%s 标记该订单为异常。' % session['user_profile']['name']
+                    else:
+                        remark = u'%s 取消该订单的异常标记。' % session['user_profile']['name']
+                elif type == 'LESS_QTY':
+                    r.is_less_qty = flag
+                    if flag == '1':
+                        remark = u'%s 标记该订单为少货。' % session['user_profile']['name']
+                    else:
+                        remark = u'%s 取消该订单的少货标记。' % session['user_profile']['name']
+
 
             DBSession.add(SystemLog(
                                     type = r.__class__.__name__,

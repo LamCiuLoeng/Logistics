@@ -118,11 +118,61 @@
 	            if(r.code != 0 ){
 	                show_error(r.msg);
 	            }else{
-	                if(v=='0'){
-	                    $(".order_return_span").text("客户未返回单");
-	                }else{
-	                    $(".order_return_span").text("客户已返回单");
-	                }           
+	                $("input[name='order_ids']:checked").each(function(){
+						var tmp = $(this);
+						var tr = $(tmp.parents("tr")[0]);
+		                if(v=='0'){
+		                    $(".order_return_span").text("未返");
+		                }else{
+		                    $(".order_return_span").text("已返");
+		                }   
+					});	        
+	                show_info(r.msg);
+	            }   
+	        });
+	    }
+	}
+	
+	function todo_exception(obj){
+	    var v = $(":selected",obj).val();
+	    $(obj).val('');
+	    if(v){
+	        return todo('EXCEPTION',v,function(r){
+	            if(r.code != 0 ){
+	                show_error(r.msg);
+	            }else{
+	                $("input[name='order_ids']:checked").each(function(){
+						var tmp = $(this);
+						var tr = $(tmp.parents("tr")[0]);
+						if(v=='1'){
+		                    $(".exception_span").text("是");
+		                }else{
+		                    $(".exception_span").text("否");
+		                } 
+					});	                
+	                show_info(r.msg);
+	            }   
+	        });
+	    }
+	}
+	
+	function todo_less_qty(obj){
+	    var v = $(":selected",obj).val();
+	    $(obj).val('');
+	    if(v){
+	        return todo('LESS_QTY',v,function(r){
+	            if(r.code != 0 ){
+	                show_error(r.msg);
+	            }else{
+	                $("input[name='order_ids']:checked").each(function(){
+						var tmp = $(this);
+						var tr = $(tmp.parents("tr")[0]);
+						if(v=='1'){
+		                    $(".lessqty_span").text("是");
+		                }else{
+		                    $(".lessqty_span").text("否");
+		                } 
+					});	           
 	                show_info(r.msg);
 	            }   
 	        });
@@ -169,11 +219,27 @@
 {% block inner_menu %}
 <div class="inner_menu">
 	<ul>
+		<!-- 
         <li><img src="/static/images/system/order_manage2_35.jpg" width="101" height="21" id="Image7" onmouseover="MM_swapImage('Image7','','/static/images/system/order_manage1_35.jpg',1)" onmouseout="MM_swapImgRestore()" onclick="return toexp();"/></li>
+		-->
+        <li>
+        	<select onchange="todo_exception(this);">
+        		<option>--是否异常--</option>
+        		<option value="1">标记为异常</option>
+        		<option value="0">取消异常标记</option>
+        	</select/>
+        </li>
+        <li>
+        	<select onchange="todo_less_qty(this);">
+        		<option>--是否少货--</option>
+        		<option value="1">标记为少货</option>
+        		<option value="0">取消少货标记</option>
+        	</select/>
+        </li>
         {% if 'FIN_APPROVE' is get_permission %}
         <li>
         	<select onchange="todo_approve(this);">
-        		<option></option>
+        		<option>--审核是否通过--</option>
         		<option value="1">{{_(ORDER_APPROVED[1])}}</option>
         		<option value="2">{{_(ORDER_DISAPPROVED[1])}}</option>
         	</select/>
@@ -182,7 +248,7 @@
         {% if 'FIN_PAID' is get_permission %}
         <li>
         	<select onchange="todo_paid(this);">
-        		<option></option>
+        		<option>--客户是否付款--</option>
         		<option value="0">{{_(ORDER_NOT_PAID[1])}}</option>
         		<option value="1">{{_(ORDER_PAID[1])}}</option>
         	</select/>
@@ -191,7 +257,7 @@
         {% if 'FIN_SUPPLIER_PAID' is get_permission %}
         <li>
         	<select onchange="todo_supplier_paid(this);">
-        		<option></option>
+        		<option>--是否付款予承运商--</option>
         		<option value="0">{{_(DELIVER_NOT_PAID[1])}}</option>
         		<option value="1">{{_(DELIVER_PAID[1])}}</option>
         	</select/>
@@ -199,7 +265,7 @@
         {% endif %}
         <li>
         	<select onchange="todo_order_return(this);">
-        		<option></option>
+        		<option>--客户是否回单--</option>
         		<option value="{{ORDER_NOT_RETURN_NOTE[0]}}">{{_(ORDER_NOT_RETURN_NOTE[1])}}</option>
         		<option value="{{ORDER_RETURN_NOTE[0]}}">{{_(ORDER_RETURN_NOTE[1])}}</option>
         	</select/>
@@ -360,7 +426,7 @@
     <td align="center" style="width:300px;">{{_('Source Company')}}</td>
     <td align="center" style="width:200px;">{{mymacros.show_direction(values,'destination_province_id')}}{{_('Destination Station')}}</td>
     <td align="center" style="width:300px;">{{_('Destination Company')}}</td>
-    <td align="center" style="width:80px;">{{mymacros.show_direction(values,'amount')}}{{_('Amount')}}</td>
+    <td align="center" style="width:80px;">{{mymacros.show_direction(values,'amount')}}{{_('Amount')}}(元)</td>
     <td align="center" style="width:80px;">{{mymacros.show_direction(values,'cost')}}费用(元)</td>
     <td align="center" style="width:200px;">{{mymacros.show_direction(values,'create_time')}}{{_('Create Time')}}</td>
     <td align="center" style="width:120px;">{{mymacros.show_direction(values,'create_by_id')}}{{_('Creator')}}</td>
@@ -394,8 +460,8 @@
 			<td><span class="approval_span">{{mymacros.show_approve(r.approve)}}</span></td>
 			<td><span class="paid_span">{{mymacros.show_paid(r.paid)}}</span></td>
 			<td><span class="supplier_paid_span">{{mymacros.show_supplier_paid(r.supplier_paid)}}</span></td>
-			<td>{{mymacros.show_exception(r.is_exception)}}</td>
-			<td>{{mymacros.show_less_qty(r.is_less_qty)}}</td>
+			<td><span class="exception_span">{{mymacros.show_exception(r.is_exception)}}</span></td>
+			<td><span class="lessqty_span">{{mymacros.show_lessqty(r.is_less_qty)}}</span></td>
 			<td><span class="order_return_span">{{mymacros.show_return(r.is_return_note)}}</span></td>
 		  </tr>
   {% endfor %}
