@@ -1,4 +1,5 @@
 {% extends "master.html" %}
+{% block subtitle %} - 财务管理{% endblock %}
 
 {% block extCSS %}
 
@@ -389,6 +390,18 @@
                   <option value=""></option>
                   {% for v,n in [('1','少货'),('0','正常')]%}
                       {% if v == values.get('is_less_qty',None)%}
+                          <option value="{{v}}" selected="selected">{{n}}</option>
+                      {% else %}
+                          <option value="{{v}}">{{n}}</option>
+                      {% endif %}
+                  {% endfor %}
+              </select>
+          </li>
+          <li style="width:500px"><span>客户返单</span>
+              <select name="is_return_note" id="is_return_note">
+                  <option value=""></option>
+                  {% for v,n in [('0','未返'),('1','已返')]%}
+                      {% if v == values.get('is_return_note',None)%}
                           <option value="{{v}}" selected="selected">{{n}}</option>
                       {% else %}
                           <option value="{{v}}">{{n}}</option>

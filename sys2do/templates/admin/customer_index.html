@@ -1,7 +1,18 @@
 {% extends "master.html" %}
 
-{% block extJS %}
+{% block subtitle %} - 客户管理{% endblock %}
 
+{% block extJS %}
+<script language="JavaScript" type="text/javascript">
+//<![CDATA[
+	$(document).ready(function(){
+		$("#province_id").change(function(){
+	        province_change(this,'#city_id');
+	    });
+
+	});
+//]]>
+</script>
 {% endblock %}
 
 
@@ -17,66 +28,70 @@
 
 
 {% block content %}
-	<table width="100%" border="0" cellspacing="0" cellpadding="0">
-      <tr>
-        <td>&nbsp;</td>
-      </tr>
-      <tr>
-        <td>&nbsp;</td>
-      </tr>
-      <tr>
-        <td align="left">
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+	<tr><td class="title_fonts_display">&middot; 客户管理</td></tr>
+</table>
+<div class="search_div">
+	<div class="search_div_header">客户搜索</div>
+    <div class="search_div_body">
+    	<form action="{{url_for('.view',action='customer',m='LIST')}}" method="post" id="search_form">
+
+    	<ul>
+          <li><span>客户名称</span><input type="text" name="name" value="{{values.get('name','')|f}}"/></li>
+          <li><span>客户编号</span><input type="text" name="no" value="{{values.get('no','')|f}}"/></li>
+          <li><span>联系人</span><input type="text" name="contact_person" value="{{values.get('contact_person','')|f}}"/></li>
+          <li><span>联系人电话</span><input type="text" name="phone" value="{{values.get('phone','')|f}}"/></li>
+          <li><span>联系人手机</span><input type="text" name="mobile" value="{{values.get('mobile','')|f}}"/></li>
+          
+          <li style="width:755px"><span>所在地区</span>
+          	  {% set province_id = values.get('province_id',None)|int  %}
+	    	  {{mymacros.select('province_id',MASTER_ALL('Province'),province_id,style="width:150px")}}
+          	  {% set city_id = values.get('city_id',None)|int  %}
+	    	  {{mymacros.select('city_id',cites,city_id,style="width:150px")}}
+          </li>
+        </ul>
         
-        	<table width="99%" border="0" cellspacing="0" cellpadding="0" bgcolor="#FFFFFF">
-          <tr>
-            <td width="13">&nbsp;</td>
-            <td></td>
-            <td width="13">&nbsp;</td>
-          </tr>
-          <tr>
-            <td>&nbsp;</td>
-            <td><table width="100%" border="0" cellspacing="0" cellpadding="0">
-              <tr>
-                <td class="title_fonts_display">客户管理</td>
-              </tr>
-              <tr>
-                <td>&nbsp;</td>
-              </tr>
-            </table>
-              <table  border="0" cellspacing="0" cellpadding="0" style="width:1050px;">
-                <tr class="field_head">
-                  <th align="center" style="width:300px;">{{_('Customer Name')}}</th>
-                  <th align="center" style="width:300px;">{{_('Address')}}</th>
-                  <th align="center" style="width:150px;">{{_('Contact Person')}}</th>
-                  <th align="center" style="width:100px;">{{_('Phone')}}</th>
-                  <th align="center" style="width:100px;">{{_('Mobile')}}</th>
-                  <th align="center" style="width:80px;">{{_('Payment')}}</th>
-                </tr>
-				{% for r in records %}
-					<tr class="data_table_tr {{ loop.cycle('data_table_tr_odd', 'data_table_tr_even') }}">
-						<td><a href="{{url_for('.view', action = 'customer',m = 'UPDATE',id=r.id)}}">{{r}}</a></td>
-						<td>{{r.address}}</td>
-						<td>{{r.contact_person|ifFalse}}</td>
-						<td>{{r.phone|ifFalse}}</td>
-						<td>{{r.mobile|ifFalse}}</td>
-						<td>{{r.payment|f}}</td>
-					</tr>
-				{% endfor %}
-				<tr class="data_table_tr">
-				    <td colspan="100" style="text-align:right">{{mymacros.mypaginate(records)}}</td>
-				</tr>
-              </table></td>
-            <td>&nbsp;</td>
-          </tr>
-          <tr>
-            <td>&nbsp;</td>
-            <td></td>
-            <td>&nbsp;</td>
-          </tr>
-        </table></td>
-      </tr>
-      <tr>
-        <td>&nbsp;</td>
-      </tr>
-    </table>
+        <div class="button_div"><input type="submit" value="{{_('Search')}}"/></div>
+        <input type="hidden" name="SEARCH_SUBMIT" value="TRUE"/>
+        <input type="hidden" name="field" id="field" value=""/>
+        <input type="hidden" name="direction" id="direction" value=""/>
+    	</form>
+        <div style="clear:both"></div>
+    </div>
+</div>
+
+<div class="point_div"><img src="/static/images/system/order_manage_54.jpg" width="22" height="28" /><span>{{_('Input the conditions and search.')}}</span></div>
+
+<table  border="0" cellspacing="0" cellpadding="0" style="width:1250px;">
+    <tr class="field_head">
+      <th align="center" style="width:350px;">{{_('Customer Name')}}</th>
+      <th align="center" style="width:80px;">客户编号</th>
+      <th align="center" style="width:100px;">所在地区</th>
+      <th align="center" style="width:100px;">{{_('Contact Person')}}</th>
+      <th align="center" style="width:100px;">{{_('Phone')}}</th>
+      <th align="center" style="width:100px;">{{_('Mobile')}}</th>
+      <th align="center" style="width:80px;">{{_('Payment')}}</th>
+      <th align="center" style="width:100px;">{{_('Create Time')}}</th>
+      <th align="center" style="width:100px;">{{_('Creator')}}</th>
+    </tr>
+	{% for r in records %}
+		<tr class="data_table_tr {{ loop.cycle('data_table_tr_odd', 'data_table_tr_even') }}">
+			<td><a href="{{url_for('.view', action = 'customer',m = 'UPDATE',id=r.id)}}">{{r}}</a></td>
+			<td>{{r.no|f}}</td>
+			<td>{{r.province|f}}{{r.city|f}}</td>
+			<td>{{r.contact_person|ifFalse}}</td>
+			<td>{{r.phone|ifFalse}}</td>
+			<td>{{r.mobile|ifFalse}}</td>
+			<td>{{r.payment|f}}</td>
+			<td>{{r.create_time|ft}}</td>
+			<td>{{r.create_by|f}}</td>
+		</tr>
+	{% endfor %}
+	<tr class="data_table_tr">
+	    <td colspan="100" style="text-align:right">{{mymacros.mypaginate(records)}}</td>
+	</tr>
+  </table>
+  
+  <br /><br />
+  
 {% endblock %}

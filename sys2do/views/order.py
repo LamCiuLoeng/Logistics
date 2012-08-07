@@ -544,7 +544,6 @@ class OrderView(BasicView):
 
         if type == 'order_header':
             fields = [
-#                      'source_station', 'destination_station',
                       'source_province_id', 'source_city_id', 'destination_province_id', 'destination_city_id',
                       'ref_no', 'source_company_id', 'source_address', 'source_contact', 'source_tel', 'source_mobile',
                       'payment_id', 'qty', 'weight', 'vol', 'shipment_type_id',
@@ -556,21 +555,16 @@ class OrderView(BasicView):
                       'source_sms', 'destination_sms',
                       ]
             _remark = []
+            old_info = header.serialize(fields) # to used for the history log
 
             checkbox_fields = ['source_sms', 'destination_sms', ]
             try:
-                for f in fields:
-                    old_v = getattr(header, f)
-                    new_v = _g(f)
-                    if unicode(old_v or '') != unicode(new_v or ''):
-                        _remark.append(u"[%s]'%s' 修改为 '%s'" % (f, old_v or '', new_v or ''))
-                    setattr(header, f, _g(f))
+                for f in fields: setattr(header, f, _g(f))
 
                 for f in checkbox_fields:
                     vs = _gl(f)
                     if vs : setattr(header, f, vs[0])
                     else : setattr(header, f, None)
-
                 no = _g('no')
                 if no != header.no:
                     try:
@@ -587,18 +581,29 @@ class OrderView(BasicView):
                         pass
                     header.no = no
                     header.barcode = generate_barcode_file(header.no)
-                DBSession.add(SystemLog(
-                                        type = header.__class__.__name__,
-                                        ref_id = header.id,
-                                        remark = u"%s 修改该记录。修改内容为:%s" % (session['user_profile']['name'], ";".join(_remark))
-                                        ))
+
                 if header.status == -2 : header.status = 0
                 DBSession.commit()
+
+                try:
+                    new_info = header.serialize(fields)
+                    change_result = self._compareObject(old_info, new_info)
+                    _remark = [u"[%s]'%s' 修改为 '%s'" % (name, ov, nv) for (name, ov, nv) in change_result['update']]
+                    DBSession.add(SystemLog(
+                                            type = header.__class__.__name__,
+                                            ref_id = header.id,
+                                            remark = u"%s 修改该记录。%s" % (session['user_profile']['name'], ";".join(_remark))
+                                            ))
+                    DBSession.commit()
+                except:
+                    _error(traceback.print_exc())
+                    DBSession.rollback()
                 return jsonify({'code' : 0 , 'msg' : unicode(MSG_SAVE_SUCC)})
             except:
                 _error(traceback.print_exc())
                 DBSession.rollback()
                 return jsonify({'code' : 1 , 'msg' : unicode(MSG_SERVER_ERROR)})
+
 
         elif type == 'item_detail':
             action_type = _g('action_type')
@@ -660,8 +665,8 @@ class OrderView(BasicView):
                 DBSession.commit()
                 return jsonify({'code' : 0 , 'msg' : unicode(MSG_SAVE_SUCC)})
             except:
-                    DBSession.rollback()
-                    return jsonify({'code' : 1 , 'msg' : unicode(MSG_SERVER_ERROR)})
+                DBSession.rollback()
+                return jsonify({'code' : 1 , 'msg' : unicode(MSG_SERVER_ERROR)})
 
         elif type == 'warehouse' :
             action = _g('action')
@@ -929,6 +934,30 @@ class OrderView(BasicView):
             DBSession.rollback()
             return jsonify({'code' : 1, 'msg' : MSG_SERVER_ERROR})
 
+
+
+    def _compareObject(self, old_obj, new_obj):
+        old_keys = old_obj.keys()
+        new_keys = new_obj.keys()
+        result = {
+                  "new" : [],
+                  "update" : [],
+                  "delete" : [],
+                  }
+
+        for key in list(set(old_keys).intersection(set(new_keys))):
+            old_val = old_obj[key][0]
+            new_val = new_obj[key][0]
+
+            if old_val != new_val:
+                result['update'].append((old_obj[key][1], old_obj[key][0], new_obj[key][0]))
+
+        for key in list(set(old_obj).difference(set(new_obj))):
+            result['delete'].append((old_obj[key][1], old_obj[key][0], None))
+
+        for key in list(set(new_obj).difference(set(old_obj))):
+            result['new'].append((old_obj[key][1], None, new_obj[key][0]))
+        return result
 
 
 

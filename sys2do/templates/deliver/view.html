@@ -35,7 +35,7 @@
         {% if 'FIN_SUPPLIER_PAID' is get_permission %}
 	        <li>
 	        	<select onchange="todo_supplier_paid(this);">
-	        		<option></option>
+	        		<option>--是否付款予承运商--</option>
 	        		<option value="0">{{_(DELIVER_NOT_PAID[1])}}</option>
 	        		<option value="1">{{_(DELIVER_PAID[1])}}</option>
 	        	</select/>

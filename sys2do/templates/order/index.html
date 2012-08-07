@@ -1,5 +1,5 @@
 {% extends "master.html" %}
-
+{% block subtitle %} - 订单管理{% endblock %}
 
 {% block extCSS %}
 
@@ -107,61 +107,21 @@
           <li style="width:500px"><span>系统编号</span><input type="text" name="no" value="{{values.get('no','')|f}}"/></li>
                  
           <li style="width:755px"><span>{{_('Source Station')}}</span>
-	          	<select name="source_province_id" id="source_province_id" style="width:150px">
-	    	      <option value=""></option>
-	    	      {% for p in MASTER_ALL('Province') %}
-	    	          {% if '%s' %p.id == values.get('source_province_id',None) %}
-	    	          	<option value="{{p.id}}" selected="selected">{{p}}</option>
-	    	          {% else %}
-	    	          	<option value="{{p.id}}">{{p}}</option>
-	    	          {% endif %}
-	    	      {% endfor %}
-	    	  </select>
-	    	  	<select name="source_city_id" id="source_city_id" style="width:150px">
-	    	  	    <option value=""></option>
-	    	  		{% for c in source_cites %}
-	    	          {% if '%s' %c.id == values.get('source_city_id',None) %}
-	    	          	<option value="{{c.id}}" selected="selected">{{c}}</option>
-	    	          {% else %}
-	    	          	<option value="{{c.id}}">{{c}}</option>
-	    	          {% endif %}
-	    	        {% endfor %}
-	    	  	</select>
+	    	  {% set source_province_id = values.get('source_province_id',None)|int  %}
+	    	  {{mymacros.select('source_province_id',MASTER_ALL('Province'),source_province_id,style="width:150px")}}
+	    	  {% set source_city_id = values.get('source_city_id',None)|int  %}
+	    	  {{mymacros.select('source_city_id',source_cites,source_city_id,style="width:150px")}}
           </li>
 
           <li style="width:755px"><span>{{_('Destination Station')}}</span>
-	          	<select name="destination_province_id" id="destination_province_id" style="width:150px">
-		    	      <option value=""></option>
-		    	      {% for p in MASTER_ALL('Province') %}
-		    	          {% if '%s' %p.id == values.get('destination_province_id',None) %}
-		    	          	<option value="{{p.id}}" selected="selected">{{p}}</option>
-		    	          {% else %}
-		    	          	<option value="{{p.id}}">{{p}}</option>
-		    	          {% endif %}
-		    	      {% endfor %}
-		    	  </select> 
-		    	  <select name="destination_city_id" id="destination_city_id" style="width:150px">
-		    	      <option value=""></option>
-		    	      {% for c in destination_cites %}
-		    	          {% if '%s' %c.id == values.get('destination_city_id',None) %}
-		    	          	<option value="{{c.id}}" selected="selected">{{c}}</option>
-		    	          {% else %}
-		    	          	<option value="{{c.id}}">{{c}}</option>
-		    	          {% endif %}
-		    	        {% endfor %}
-		    	  </select>
+          	  {% set destination_province_id = values.get('destination_province_id',None)|int  %}
+	    	  {{mymacros.select('destination_province_id',MASTER_ALL('Province'),destination_province_id,style="width:150px")}}
+          	  {% set destination_city_id = values.get('destination_city_id',None)|int  %}
+	    	  {{mymacros.select('destination_city_id',destination_cites,destination_city_id,style="width:150px")}}
           </li>
           <li style="width:755px"><span>{{_('Source Company')}}</span>
-              <select name="source_company_id" id="source_company_id" style="width:400px">
-                  <option value=""></option>
-                  {% for c in MASTER_ALL('Customer') %}
-                      {% if '%s' % c.id == values.get('source_company_id',None) %}
-                          <option value="{{c.id}}" selected="selected">{{c}}</option>
-                      {% else %}
-                          <option value="{{c.id}}">{{c}}</option>
-                      {% endif %}
-                  {% endfor %}
-          	  </select>
+          	  {% set source_company_id = values.get('source_company_id',None)|int  %}
+          	  {{mymacros.select('source_company_id',MASTER_ALL('Customer'),source_company_id,style="width:400px")}}
           </li>
           <li><span>审核</span>
               <select name="approve" id="approve">
@@ -228,7 +188,7 @@
 
 <form method="post" action="" id="records">
 
-<table border="0" cellpadding="0" cellspacing="0" style="width:1650px">
+<table border="0" cellpadding="0" cellspacing="0" style="width:1500px">
   <tr class="data_table_tr">
 	    <td colspan="100" style="text-align:right">{{mymacros.mypaginate(records)}}</td>
 	</tr>
@@ -251,7 +211,6 @@
     <td align="center" style="width:150px;">客户付款</td>
     <td align="center" style="width:50px;">异常</td>
     <td align="center" style="width:50px;">少货</td>
-    <td align="center" style="width:150px;">客户回单</td>
   </tr>
   
   {% for r in records.items %}
@@ -279,7 +238,6 @@
 		<td>{{mymacros.show_paid(r.paid)}}</td>
 		<td>{{mymacros.show_exception(r.is_exception)}}</td>
 		<td>{{mymacros.show_less_qty(r.is_less_qty)}}</td>
-		<td><span class="order_return_span">{{mymacros.show_return(r.is_return_note)}}</span></td>
 	  </tr>
   {% endfor %}
   		<tr class="data_table_tr">

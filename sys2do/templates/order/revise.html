@@ -648,7 +648,7 @@
 				{% for t in header.system_logs %}
 					<tr class="data_table_tr">
 						<td>{{t.create_time|ft}}</td>
-						<td>{{t.remark|f}}</td>
+						<td style="text-align:left">{{t.remark|f}}</td>
 					</tr>
 				{% endfor %}
 			</tbody>

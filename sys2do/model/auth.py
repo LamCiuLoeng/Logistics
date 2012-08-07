@@ -7,10 +7,13 @@
 ###########################################
 '''
 
-from datetime import datetime as dt
+import traceback
+from datetime import datetime as dt, date
 import os
 import sys
 from sqlalchemy.sql.expression import desc, and_
+from sys2do.constant import SYSTEM_DATETIME_FORMAT, SYSTEM_DATE_FORMAT
+
 
 
 try:
@@ -61,6 +64,35 @@ class SysMixin(object):
         from sys2do.model.system import SystemLog
         return DBSession.query(SystemLog).filter(and_(SystemLog.type == self.__class__.__name__, SystemLog.ref_id == self.id)).order_by(desc(SystemLog.create_time))
 
+
+
+    def serialize(self, fields = []):
+        from sys2do.util.common import _info
+        result = {}
+        m = self.__mapper__.columns
+
+        for cname in fields:
+            if cname not in m.keys(): continue
+            colClz = m[cname]
+            if isinstance(colClz, Column):
+                v = getattr(self, cname)
+
+                if v is None: v = u'' #the value is None
+                elif m[cname].foreign_keys : #it's a foreign key
+                    tmp_name = cname.replace("_id", '')
+                    try:
+                        v = unicode(getattr(self, tmp_name))
+                    except:
+                        _info(traceback.print_exc())
+                        v = u''
+                elif isinstance(v, dt) : v = dt.strftime(SYSTEM_DATETIME_FORMAT)
+                elif isinstance(v, date) : v = dt.strftime(SYSTEM_DATE_FORMAT)
+                elif isinstance(v, (int, float)) : v = u'%s' % v
+                else: v = unicode(v)
+
+                result[cname] = (v, colClz.doc or cname)
+        _info(result)
+        return result
 
 
 class CRUDMixin(object):

@@ -1,5 +1,7 @@
 {% extends "master.html" %}
 
+{% block subtitle %} - 承运商管理{% endblock %}
+
 {% block extJS %}
 
 {% endblock %}
@@ -16,67 +18,63 @@
 
 
 {% block content %}
-	<table width="100%" border="0" cellspacing="0" cellpadding="0">
-       <tr>
-        <td>&nbsp;</td>
-      </tr>
-      <tr>
-        <td>&nbsp;</td>
-      </tr>
-      <tr>
-        <td align="left">
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+	<tr><td class="title_fonts_display">&middot; 承运商管理</td></tr>
+</table>
+<div class="search_div">
+	<div class="search_div_header">承运商搜索</div>
+    <div class="search_div_body">
+    	<form action="{{url_for('.view',action='supplier',m='LIST')}}" method="post" id="search_form">
+
+    	<ul>
+          <li><span>承运商名称</span><input type="text" name="name" value="{{values.get('name','')|f}}"/></li>
+          <li><span>承运商编号</span><input type="text" name="no" value="{{values.get('no','')|f}}"/></li>
+          <li><span>联系人</span><input type="text" name="contact_person" value="{{values.get('contact_person','')|f}}"/></li>
+          <li><span>联系人电话</span><input type="text" name="phone" value="{{values.get('phone','')|f}}"/></li>
+          <li><span>联系人手机</span><input type="text" name="mobile" value="{{values.get('mobile','')|f}}"/></li>
+        </ul>
         
-        	<table width="99%" border="0" cellspacing="0" cellpadding="0" bgcolor="#FFFFFF">
-          <tr>
-            <td width="13">&nbsp;</td>
-            <td></td>
-            <td width="13">&nbsp;</td>
-          </tr>
-          <tr>
-            <td>&nbsp;</td>
-            <td><table width="100%" border="0" cellspacing="0" cellpadding="0">
-              <tr>
-                <td class="title_fonts_display">承运商管理</td>
-              </tr>
-              <tr>
-                <td>&nbsp;</td>
-              </tr>
-            </table>
-              <table border="0" cellspacing="0" cellpadding="0" style="width:1350px;">
-                <tr class="field_head">
-                  <td align="center" style="width:300px;">{{_('Supplier Name')}}</td>
-                  <td align="center" style="width:300px;">{{_('Address')}}</td>
-                  <td align="center" style="width:150px;">{{_('Contact Person')}}</td>
-                  <td align="center" style="width:100px;">{{_('Phone')}}</td>
-                  <th align="center" style="width:150px">{{_('Create Time')}}</th>
-                  <th align="center" style="width:100px">{{_('Creator')}}</th>
-                  <th align="center" style="width:150px">{{_('Update Time')}}</th>
-                  <th align="center" style="width:100px">{{_('Last Updator')}}</th>
-                </tr>
-				{% for r in records %}
-					<tr class="data_table_tr">
-						<td><a href="{{url_for('.view', action = 'supplier',m = 'UPDATE',id=r.id)}}">{{r}}</a></td>
-						<td>{{r.provice|ifFalse}}{{r.city|ifFalse}}{{r.district|ifFalse}}{{r.address|ifFalse}}</td>
-						<td>{{r.contact_person|ifFalse}}</td>
-						<td>{{r.phone|ifFalse}}</td>
-						
-					</tr>
-				{% endfor %}
-				<tr class="data_table_tr">
-				    <td colspan="100" style="text-align:right">{{mymacros.mypaginate(records)}}</td>
-				</tr>
-              </table></td>
-            <td>&nbsp;</td>
-          </tr>
-          <tr>
-            <td>&nbsp;</td>
-            <td></td>
-            <td>&nbsp;</td>
-          </tr>
-        </table></td>
-      </tr>
-      <tr>
-        <td>&nbsp;</td>
-      </tr>
-    </table>
+        <div class="button_div"><input type="submit" value="{{_('Search')}}"/></div>
+        <input type="hidden" name="SEARCH_SUBMIT" value="TRUE"/>
+        <input type="hidden" name="field" id="field" value=""/>
+        <input type="hidden" name="direction" id="direction" value=""/>
+    	</form>
+        <div style="clear:both"></div>
+    </div>
+</div>
+
+<div class="point_div"><img src="/static/images/system/order_manage_54.jpg" width="22" height="28" /><span>{{_('Input the conditions and search.')}}</span></div>
+
+
+
+
+<table border="0" cellspacing="0" cellpadding="0" style="width:1400px;">
+    <tr class="field_head">
+      <td align="center" style="width:300px;">{{_('Supplier Name')}}</td>
+      <td align="center" style="width:80px;">承运商编码</td>
+      <td align="center" style="width:300px;">{{_('Address')}}</td>
+      <td align="center" style="width:150px;">{{_('Contact Person')}}</td>
+      <td align="center" style="width:100px;">{{_('Phone')}}</td>
+      <td align="center" style="width:100px;">{{_('Mobile')}}</td>
+      <th align="center" style="width:150px">{{_('Create Time')}}</th>
+      <th align="center" style="width:100px">{{_('Creator')}}</th>
+    </tr>
+	{% for r in records %}
+		<tr class="data_table_tr">
+			<td><a href="{{url_for('.view', action = 'supplier',m = 'UPDATE',id=r.id)}}">{{r}}</a></td>
+			<td>{{r.no|f}}</td>
+			<td>{{r.address|f}}</td>
+			<td>{{r.contact_person|f}}</td>
+			<td>{{r.phone|f}}</td>
+			<td>{{r.mobile|f}}</td>
+			<td>{{r.create_time|ft}}</td>
+			<td>{{r.create_by|f}}</td>
+		</tr>
+	{% endfor %}
+	<tr class="data_table_tr">
+	    <td colspan="100" style="text-align:right">{{mymacros.mypaginate(records)}}</td>
+	</tr>
+  </table>
+  
+  <br /><br />
 {% endblock %}

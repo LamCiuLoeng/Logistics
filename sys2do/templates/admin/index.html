@@ -1,4 +1,5 @@
 {% extends "master.html" %}
+{% block subtitle %} - 系统设置{% endblock %}
 
 {% block extJS %}
 
@@ -85,58 +86,50 @@
       <div class="nav_tab" onclick="redirect('{{url_for('bpAdmin.view',action='customer')}}')">
         <div class="header_div"></div>
         <div class="body_div"><img width="80" height="80" src="/static/images/system/img_cm.jpg"><span>客户管理</span>
-          <p>关于订单管理的一些说明。说明订单管理功能的用法与注意事项。</p>
+          <p>关于客户管理的一些说明。说明客户管理功能的用法与注意事项。</p>
         </div>
       </div>
-      <!-- 
-      <div class="nav_tab" onclick="redirect('{{url_for('bpAdmin.view',action='customer_target')}}')">
-        <div class="header_div"></div>
-        <div class="body_div"><img width="80" height="80" src="/static/images/system/img_cm.jpg"><span>收货公司管理</span>
-          <p>关于订单管理的一些说明。说明订单管理功能的用法与注意事项。</p>
-        </div>
-      </div>
-      -->
       
       <div class="nav_tab" onclick="redirect('{{url_for('bpAdmin.view',action='supplier')}}')">
         <div class="header_div"></div>
         <div class="body_div"><img width="80" height="80" src="/static/images/system/img_sm.jpg"><span>承运商管理</span>
-          <p>关于订单管理的一些说明。说明订单管理功能的用法与注意事项。</p>
+          <p>关于承运商管理的一些说明。说明承运商管理功能的用法与注意事项。</p>
         </div>
       </div>
       <div class="nav_tab" onclick="redirect('{{url_for('bpAdmin.view',action='receiver')}}')">
       <div class="header_div"></div>
       <div class="body_div"><img width="80" height="80" src="/static/images/system/img_rm.jpg"><span>收件人管理</span>
-        <p>关于订单管理的一些说明。说明订单管理功能的用法与注意事项。</p>
+        <p>关于收件人管理的一些说明。说明收件人管理功能的用法与注意事项。</p>
       </div>
     </div>
       <div class="nav_tab" onclick="redirect('{{url_for('bpAdmin.view',action='item')}}')">
         <div class="header_div"></div>
         <div class="body_div"><img width="80" height="80" src="/static/images/system/img_item.jpg"><span>货品管理</span>
-          <p>关于订单管理的一些说明。说明订单管理功能的用法与注意事项。</p>
+          <p>关于货品管理的一些说明。说明货品管理功能的用法与注意事项。</p>
         </div>
       </div>
       <div class="nav_tab" onclick="redirect('{{url_for('bpAdmin.view',action='payment')}}')">
         <div class="header_div"></div>
         <div class="body_div"><img width="80" height="80" src="/static/images/system/img_payment.jpg"><span>付款方式管理</span>
-          <p>关于订单管理的一些说明。说明订单管理功能的用法与注意事项。</p>
+          <p>关于付款方式管理的一些说明。说明付款方式管理功能的用法与注意事项。</p>
         </div>
       </div>
       <div class="nav_tab" onclick="redirect('{{url_for('bpAdmin.view',action='pickuptype')}}')">
         <div class="header_div"></div>
         <div class="body_div"><img width="80" height="80" src="/static/images/system/img_pickup.jpg"><span>提货方式管理</span>
-          <p>关于订单管理的一些说明。说明订单管理功能的用法与注意事项。</p>
+          <p>关于提货方式管理的一些说明。说明提货方式管理功能的用法与注意事项。</p>
         </div>
       </div>
       <div class="nav_tab" onclick="redirect('{{url_for('bpAdmin.view',action='packtype')}}')">
         <div class="header_div"></div>
         <div class="body_div"><img width="80" height="80" src="/static/images/system/img_package.jpg"><span>包装方式管理</span>
-          <p>关于订单管理的一些说明。说明订单管理功能的用法与注意事项。</p>
+          <p>关于包装方式管理的一些说明。说明包装管理功能的用法与注意事项。</p>
         </div>
       </div>
       <div class="nav_tab" onclick="redirect('{{url_for('bpAdmin.view',action='ratio',m='UPDATE')}}')">
         <div class="header_div"></div>
         <div class="body_div"><img width="80" height="80" src="/static/images/system/img_ratio.jpg"><span>费率管理</span>
-          <p>关于订单管理的一些说明。说明订单管理功能的用法与注意事项。</p>
+          <p>关于费率管理的一些说明。说明费率管理功能的用法与注意事项。</p>
         </div>
       </div>
       <!-- 
@@ -151,19 +144,19 @@
       <div class="nav_tab" onclick="redirect('{{url_for('bpAdmin.view',action='note')}}')">
         <div class="header_div"></div>
         <div class="body_div"><img width="80" height="80" src="/static/images/system/img_warehouse.jpg"><span>票据管理</span>
-          <p>关于订单管理的一些说明。说明订单管理功能的用法与注意事项。</p>
+          <p>关于票据管理的一些说明。说明根据管理功能的用法与注意事项。</p>
         </div>
       </div>
       <div class="nav_tab" onclick="redirect('{{url_for('bpAdmin.view',action='barcode')}}')">
         <div class="header_div"></div>
         <div class="body_div"><img width="80" height="80" src="/static/images/system/img_warehouse.jpg"><span>条码管理</span>
-          <p>关于订单管理的一些说明。说明订单管理功能的用法与注意事项。</p>
+          <p>关于条码管理的一些说明。说明条码管理功能的用法与注意事项。</p>
         </div>
       </div>
       <div class="nav_tab" onclick="redirect('{{url_for('bpAdmin.view',action='diqu')}}')">
         <div class="header_div"></div>
         <div class="body_div"><img width="80" height="80" src="/static/images/system/img_warehouse.jpg"><span>地区管理</span>
-          <p>关于订单管理的一些说明。说明订单管理功能的用法与注意事项。</p>
+          <p>关于地区管理的一些说明。说明地区管理功能的用法与注意事项。</p>
         </div>
       </div>
   </tr>

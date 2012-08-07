@@ -1,4 +1,6 @@
 {% extends "master.html" %}
+{% block subtitle %} - 用户管理{% endblock %}
+
 
 {% block extJS %}
 
@@ -46,16 +48,22 @@
                   <td align="center">{{_('User Name')}}</td>
                   <td align="center" style="width:200px;">{{_('Create Time')}}</td>
                   <td align="center" style="width:200px;">{{_('Creator')}}</td>
+                  <!-- 
                   <td align="center" style="width:200px;">{{_('Update Time')}}</td>
                   <td align="center" style="width:200px;">{{_('Last Updator')}}</td>
+                  -->
+                  <td align="center" style="width:200px;">最后登录时间</td>
                 </tr>
 				{% for r in records %}
 					<tr class="data_table_tr {{ loop.cycle('data_table_tr_odd', 'data_table_tr_even') }}">
 						<td><a href="{{url_for('.view', action = 'user',m = 'UPDATE',id=r.id)}}">{{r}}</a></td>
 						<td>{{r.create_time|ft}}</td>
 						<td>{{r.create_by|f}}</td>
+						<!-- 
 						<td>{{r.update_time|ft}}</td>
 						<td>{{r.update_by|f}}</td>
+						-->
+						<td>{{r.last_login|ft}}</td>
 					</tr>
 				{% endfor %}
 		          <tr class="data_table_tr">

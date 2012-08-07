@@ -31,116 +31,116 @@ class OrderHeader(DeclarativeBase, SysMixin, CRUDMixin):
 
     id = Column(Integer, autoincrement = True, primary_key = True)
 
-    no = Column(Text)
-    ref_no = Column(Text)
+    no = Column(Text, doc = u'系统编号')
+    ref_no = Column(Text, doc = u'单号')
 
-    note_id = Column(Integer, ForeignKey('master_note.id'))
+    note_id = Column(Integer, ForeignKey('master_note.id'), doc = u'票据前缀')
     note = relation(Note, backref = backref("orders", order_by = id), primaryjoin = "and_(Note.id == OrderHeader.note_id, OrderHeader.active == 0)")
-    note_no = Column(Text)
+    note_no = Column(Text, doc = u'票据号码')
 
-    source_province_id = Column(Integer, ForeignKey('master_province.id'))
+    source_province_id = Column(Integer, ForeignKey('master_province.id'), doc = u'始发站(省)')
     source_province = relation(Province, backref = backref("source_orders", order_by = id), primaryjoin = "and_(Province.id == OrderHeader.source_province_id, OrderHeader.active == 0)")
-    source_city_id = Column(Integer, ForeignKey('master_city.id'))
+    source_city_id = Column(Integer, ForeignKey('master_city.id'), doc = u'始发站(市)')
     source_city = relation(City, backref = backref("source_orders", order_by = id), primaryjoin = "and_(City.id == OrderHeader.source_city_id, OrderHeader.active == 0)")
 
 
-    source_company_id = Column(Integer, ForeignKey('master_customer.id'))
+    source_company_id = Column(Integer, ForeignKey('master_customer.id'), doc = u'发货公司')
     source_company = relation(Customer, backref = backref("orders", order_by = id), primaryjoin = "and_(Customer.id == OrderHeader.source_company_id, OrderHeader.active == 0)")
 #    source_station = Column(Text)
-    source_address = Column(Text)
-    source_contact = Column(Text)
-    source_tel = Column(Text)
-    source_mobile = Column(Text)
-    source_sms = Column(Integer, default = 0) # 0 is no sms, 1 is send sms when the order status changed
+    source_address = Column(Text, doc = u'发货地址')
+    source_contact = Column(Text, doc = u'发货人')
+    source_tel = Column(Text, doc = u'发货人电话')
+    source_mobile = Column(Text, doc = u'发货人手机')
+    source_sms = Column(Integer, default = 0, doc = u'发货人短信通知') # 0 is no sms, 1 is send sms when the order status changed
 
-    payment_id = Column(Integer, ForeignKey('master_payment.id'))
+    payment_id = Column(Integer, ForeignKey('master_payment.id'), doc = u'付款方式')
     payment = relation(Payment)
 
 #    item = Column(Text)
 #    item_remark = Column(Text)
-    qty = Column(Float, default = None) #client order qty
-    unit_id = Column(Integer, ForeignKey('master_item_unit.id'))
+    qty = Column(Float, default = None, doc = u'数量') #client order qty
+    unit_id = Column(Integer, ForeignKey('master_item_unit.id'), doc = u'')
     unit = relation(ItemUnit)
 
-    weight = Column(Float, default = None)
-    weight_unit_id = Column(Integer, ForeignKey('master_weight_unit.id'))
+    weight = Column(Float, default = None, doc = u'重量')
+    weight_unit_id = Column(Integer, ForeignKey('master_weight_unit.id'), doc = u'')
     weight_unit = relation(WeightUnit)
 
-    vol = Column(Float, default = None)
+    vol = Column(Float, default = None, doc = u'体积')
 
-    shipment_type_id = Column(Integer, ForeignKey('master_shipment_type.id'))
+    shipment_type_id = Column(Integer, ForeignKey('master_shipment_type.id'), doc = u'')
     shipment_type = relation(ShipmentType)
 
-    pickup_type_id = Column(Integer, ForeignKey('master_pickup_type.id'))
+    pickup_type_id = Column(Integer, ForeignKey('master_pickup_type.id'), doc = u'提货方式')
     pickup_type = relation(PickupType)
 
-    pack_type_id = Column(Integer, ForeignKey('master_pack_type.id'))
+    pack_type_id = Column(Integer, ForeignKey('master_pack_type.id'), doc = u'包装方式')
     pack_type = relation(PackType)
 
 
-    destination_province_id = Column(Integer, ForeignKey('master_province.id'))
+    destination_province_id = Column(Integer, ForeignKey('master_province.id'), doc = u'目的站(省)')
     destination_province = relation(Province, backref = backref("destination_orders", order_by = id), primaryjoin = "and_(Province.id == OrderHeader.destination_province_id, OrderHeader.active == 0)")
-    destination_city_id = Column(Integer, ForeignKey('master_city.id'))
+    destination_city_id = Column(Integer, ForeignKey('master_city.id'), doc = u'目的站(市)')
     destination_city = relation(City, backref = backref("destination_orders", order_by = id), primaryjoin = "and_(City.id == OrderHeader.destination_city_id, OrderHeader.active == 0)")
 
 
 #    destination_station = Column(Text)
-    destination_company_id = Column(Integer, ForeignKey('master_customer_target.id'))
+    destination_company_id = Column(Integer, ForeignKey('master_customer_target.id'), doc = u'收货公司')
     destination_company = relation(CustomerTarget, backref = backref("orders", order_by = id), primaryjoin = "and_(CustomerTarget.id == OrderHeader.destination_company_id, OrderHeader.active == 0)")
-    destination_address = Column(Text)
-    destination_contact = Column(Text)
-    destination_tel = Column(Text)
-    destination_mobile = Column(Text)
-    destination_sms = Column(Integer, default = 0) # 0 is no sms, 1 is send sms when the order arrive
+    destination_address = Column(Text, doc = u'收货地址')
+    destination_contact = Column(Text, doc = u'收货人')
+    destination_tel = Column(Text, doc = u'收货人电话')
+    destination_mobile = Column(Text, doc = u'收货人手机')
+    destination_sms = Column(Integer, default = 0, doc = u'收货人短信通知') # 0 is no sms, 1 is send sms when the order arrive
 
 
-    order_time = Column(Text)
-    estimate_time = Column(Text)
-    expect_time = Column(Text)
-    actual_time = Column(Text)
+#    order_time = Column(Text, doc = u'')
+    estimate_time = Column(Text, doc = u'估计到达')
+    expect_time = Column(Text, doc = u'到达预期')
+    actual_time = Column(Text, doc = u'实际到达')
 
-    qty_ratio = Column(Float, default = None)
-    weight_ratio = Column(Float, default = None)
-    vol_ratio = Column(Float, default = None)
-    amount = Column(Float, default = 0)
-    cost = Column(Float, default = 0)
+    qty_ratio = Column(Float, default = None, doc = u'件数费率')
+    weight_ratio = Column(Float, default = None, doc = u'重量费率')
+    vol_ratio = Column(Float, default = None, doc = u'体积费率')
+    amount = Column(Float, default = 0, doc = u'金额(元)')
+    cost = Column(Float, default = 0, doc = u'')
 
-    insurance_charge = Column(Float, default = 0)
-    sendout_charge = Column(Float, default = 0)
-    receive_charge = Column(Float, default = 0)
-    package_charge = Column(Float, default = 0)
-    other_charge = Column(Float, default = 0)
+    insurance_charge = Column(Float, default = 0, doc = u'保险费用')
+    sendout_charge = Column(Float, default = 0, doc = u'送货费用')
+    receive_charge = Column(Float, default = 0, doc = u'上门接货费用')
+    package_charge = Column(Float, default = 0, doc = u'包装费用')
+    other_charge = Column(Float, default = 0, doc = u'其它费用')
 
-    receiver_contact_id = Column(Integer, ForeignKey('master_receiver.id'))
+    receiver_contact_id = Column(Integer, ForeignKey('master_receiver.id'), doc = u'')
     receiver_contact = relation(Receiver, backref = backref("orders", order_by = id), primaryjoin = "and_(Receiver.id == OrderHeader.receiver_contact_id, OrderHeader.active == 0)")
 #    receiver_contact = Column(Text)
-    receiver_tel = Column(Text)
-    receiver_mobile = Column(Text)
-    receiver_remark = Column(Text)
+    receiver_tel = Column(Text, doc = u'')
+    receiver_mobile = Column(Text, doc = u'')
+    receiver_remark = Column(Text, doc = u'')
 
 
-    signed_contact = Column(Text)
-    signed_tel = Column(Text)
-    signed_time = Column(Text)
-    signed_remark = Column(Text)
+    signed_contact = Column(Text, doc = u'')
+    signed_tel = Column(Text, doc = u'')
+    signed_time = Column(Text, doc = u'')
+    signed_remark = Column(Text, doc = u'')
 
-    barcode_id = Column(Integer, ForeignKey('system_upload_file.id'))
+    barcode_id = Column(Integer, ForeignKey('system_upload_file.id'), doc = u'')
     barcode = relation(UploadFile)
 
-    inventory_location_id = Column(Integer, ForeignKey('master_inventory_location.id'))
+    inventory_location_id = Column(Integer, ForeignKey('master_inventory_location.id'), doc = u'')
     inventory_location = relation(InventoryLocation, backref = backref("items", order_by = id))
 
-    approve = Column(Integer, default = 0) # 0 is undone ,1 is approved ,2 is disapprove
-    paid = Column(Integer, default = 0) # 0 is not paid, 1 is paid
-    supplier_paid = Column(Integer, default = 0) # 0 is not paid to supplier, 1 is paid to supplier
-    is_exception = Column(Integer, default = 0) # 0 is normal ,1 is exception
-    is_less_qty = Column(Integer, default = 0) # 0 is normal ,1 is less than the order qty
-    is_return_note = Column(Integer, default = 0) # 0 is not return note ,1 is return note
-    remark = Column(Text)
+    approve = Column(Integer, default = 0, doc = u'') # 0 is undone ,1 is approved ,2 is disapprove
+    paid = Column(Integer, default = 0, doc = u'') # 0 is not paid, 1 is paid
+    supplier_paid = Column(Integer, default = 0, doc = u'') # 0 is not paid to supplier, 1 is paid to supplier
+    is_exception = Column(Integer, default = 0, doc = u'') # 0 is normal ,1 is exception
+    is_less_qty = Column(Integer, default = 0, doc = u'') # 0 is normal ,1 is less than the order qty
+    is_return_note = Column(Integer, default = 0, doc = u'') # 0 is not return note ,1 is return note
+    remark = Column(Text, doc = u'')
 
-    deliver_header_ref = Column(Integer, default = None)
-    deliver_header_no = Column(Text)
-    status = Column(Integer, default = 0)
+    deliver_header_ref = Column(Integer, default = None, doc = u'')
+    deliver_header_no = Column(Text, doc = u'')
+    status = Column(Integer, default = 0, doc = u'')
 
 
     def __str__(self): return self.no
@@ -274,33 +274,33 @@ class DeliverHeader(DeclarativeBase, SysMixin, CRUDMixin):
     __tablename__ = 'deliver_header'
 
     id = Column(Integer, autoincrement = True, primary_key = True)
-    no = Column(Text)
+    no = Column(Text, doc = u'')
 
-    destination_province_id = Column(Integer, ForeignKey('master_province.id'))
+    destination_province_id = Column(Integer, ForeignKey('master_province.id'), doc = u'')
     destination_provice = relation(Province)
-    destination_city_id = Column(Integer, ForeignKey('master_city.id'))
+    destination_city_id = Column(Integer, ForeignKey('master_city.id'), doc = u'')
     destination_city = relation(City)
 
 #    destination_address = Column(Text)
-    supplier_id = Column(Integer, ForeignKey('master_supplier.id'))
+    supplier_id = Column(Integer, ForeignKey('master_supplier.id'), doc = u'')
     supplier = relation(Supplier)
 
-    supplier_contact = Column(Text)
-    supplier_tel = Column(Text)
+    supplier_contact = Column(Text, doc = u'')
+    supplier_tel = Column(Text, doc = u'')
 
-    need_transfer = Column(Text)
+    need_transfer = Column(Text, doc = u'')
 
 #    send_out_remark = Column(Text)
 #    arrived_remark = Column(Text)
 
-    sendout_time = Column(Text)
-    expect_time = Column(Text)
-    actual_time = Column(Text)
+    sendout_time = Column(Text, doc = u'')
+    expect_time = Column(Text, doc = u'')
+    actual_time = Column(Text, doc = u'')
 
-    amount = Column(Float, default = 0)
-    supplier_paid = Column(Integer, default = 0) # 0 is not paid to supplier, 1 is paid to supplier
+    amount = Column(Float, default = 0, doc = u'')
+    supplier_paid = Column(Integer, default = 0, doc = u'') # 0 is not paid to supplier, 1 is paid to supplier
 
-    remark = Column(Text)
+    remark = Column(Text, doc = u'')
     _status = Column('status', Integer, default = 0)
 
 
@@ -371,8 +371,8 @@ class DeliverDetail(DeclarativeBase, SysMixin):
 
 #    deliver_qty = Column(Integer)
 
-    remark = Column(Text)
-    cost = Column(Float, default = 0)
+    remark = Column(Text, doc = u'')
+    cost = Column(Float, default = 0, doc = u'')
     supplier_paid = Column(Integer, default = 0) # 0 is not paid to supplier, 1 is paid to supplier
     _status = Column('status', Integer, default = 0)
 

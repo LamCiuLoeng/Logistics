@@ -44,7 +44,7 @@ class FinView(BasicView):
             for f in ['no', 'create_time_from', 'create_time_to', 'ref_no',
                       'source_province_id', 'source_city_id', 'destination_province_id', 'destination_city_id',
                       'source_company_id', 'destination_company_id',
-                      'approve', 'paid', 'is_exception', 'is_less_qty'] :
+                      'approve', 'paid', 'is_exception', 'is_less_qty', 'is_return_note'] :
                 values[f] = _g(f)
                 values['field'] = _g('field', None) or 'create_time'
                 values['direction'] = _g('direction', None) or 'desc'
@@ -62,44 +62,34 @@ class FinView(BasicView):
 
 
         conditions = [OrderHeader.active == 0]
-        if values.get('create_time_from', None):
-            conditions.append(OrderHeader.create_time > values['create_time_from'])
-        if values.get('create_time_to', None):
-            conditions.append(OrderHeader.create_time < '%s 23:59' % values['create_time_to'])
-        if values.get('ref_no', None):
-            conditions.append(OrderHeader.ref_no.op('like')('%%%s%%' % values['ref_no']))
-        if values.get('no', None):
-            conditions.append(OrderHeader.no.op('like')('%%%s%%' % values['no']))
+        if values.get('create_time_from', None):       conditions.append(OrderHeader.create_time > values['create_time_from'])
+        if values.get('create_time_to', None):         conditions.append(OrderHeader.create_time < '%s 23:59' % values['create_time_to'])
+        if values.get('ref_no', None):                 conditions.append(OrderHeader.ref_no.op('like')('%%%s%%' % values['ref_no']))
+        if values.get('no', None):                     conditions.append(OrderHeader.no.op('like')('%%%s%%' % values['no']))
         if values.get('source_province_id', None):
             conditions.append(OrderHeader.source_province_id == values['source_province_id'])
             sp = DBSession.query(Province).get(values['source_province_id'])
             source_cites = sp.children()
         else: source_cites = []
-        if values.get('source_city_id', None):
-            conditions.append(OrderHeader.source_city_id == values['source_city_id'])
+        if values.get('source_city_id', None):          conditions.append(OrderHeader.source_city_id == values['source_city_id'])
         if values.get('destination_province_id', None):
             conditions.append(OrderHeader.destination_province_id == values['destination_province_id'])
             dp = DBSession.query(Province).get(values['destination_province_id'])
             destination_cites = dp.children()
         else: destination_cites = []
-        if values.get('destination_city_id', None):
-            conditions.append(OrderHeader.destination_city_id == values['destination_city_id'])
+        if values.get('destination_city_id', None):  conditions.append(OrderHeader.destination_city_id == values['destination_city_id'])
 
         if values.get('source_company_id', None):
             conditions.append(OrderHeader.source_company_id == values['source_company_id'])
             targets = DBSession.query(CustomerTarget).filter(and_(CustomerTarget.active == 0, CustomerTarget.customer_id == values['source_company_id']))
         else:
             targets = []
-        if values.get('destination_company_id', None):
-            conditions.append(OrderHeader.destination_company_id == values['destination_company_id'])
-        if values.get('approve', None):
-            conditions.append(OrderHeader.approve == values['approve'])
-        if values.get('paid', None):
-            conditions.append(OrderHeader.paid == values['paid'])
-        if values.get('is_exception', None):
-            conditions.append(OrderHeader.is_exception == values['is_exception'])
-        if values.get('is_less_qty', None):
-            conditions.append(OrderHeader.is_less_qty == values['is_less_qty'])
+        if values.get('destination_company_id', None):       conditions.append(OrderHeader.destination_company_id == values['destination_company_id'])
+        if values.get('approve', None):        conditions.append(OrderHeader.approve == values['approve'])
+        if values.get('paid', None):           conditions.append(OrderHeader.paid == values['paid'])
+        if values.get('is_exception', None):   conditions.append(OrderHeader.is_exception == values['is_exception'])
+        if values.get('is_less_qty', None):    conditions.append(OrderHeader.is_less_qty == values['is_less_qty'])
+        if values.get('is_return_note', None): conditions.append(OrderHeader.is_return_note == values['is_return_note'])
 
         # for the sort function
         field = values.get('field', 'create_time')
