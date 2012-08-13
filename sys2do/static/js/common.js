@@ -80,7 +80,7 @@ function refresh(){
 }
 
 
-function province_change(obj,city,handler=null){
+function province_change(obj,city,handler){
     var t = $(obj);
     
     var c = $(city);

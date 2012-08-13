@@ -465,3 +465,11 @@ body{
 .main_right_td_bg {
 	background:url(/static/images/system/main_bg.png) no-repeat right bottom;
 }
+.user_new_table{
+	margin:30px;
+	background:#FFF;
+	border:#000 solid 1px;
+}
+.user_new_table tr td{
+	padding:5px 15px 5px 15px;
+}

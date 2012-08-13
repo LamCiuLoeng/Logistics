@@ -457,9 +457,10 @@ class DeliverView(BasicView):
                 if order_header.destination_sms and order_header.destination_mobile:
                     users.append(order_header.destination_mobile)
                 if users:
-                    content = u'订单:%s[目的站:%s，发货人:%s，收货人:%s，数量:%s]%s' % (order_header.ref_no,
-                                                                       order_header.destination_province, order_header.source_contact, order_header.destination_contact,
-                                                                       order_header.qty, suffix)
+                    content = u'订单:%s[目的站:%s，发货人:深福合力，收货人:%s，数量:%s件]%s' % (order_header.ref_no,
+                                                                           order_header.destination_city or order_header.destination_province,
+                                                                           order_header.destination_contact,
+                                                                           order_header.qty, suffix)
                     send_sms(users, content)
         except:
             _error(traceback.print_exc())

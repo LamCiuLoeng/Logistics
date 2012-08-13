@@ -20,7 +20,8 @@ from sys2do.constant import MESSAGE_ERROR, MESSAGE_INFO, MSG_NO_SUCH_ACTION, \
     SYSTEM_DATE_FORMAT
 from sys2do.views import BasicView
 from sys2do.model.master import CustomerProfile, Customer, Supplier, \
-    CustomerTarget, Receiver, CustomerTargetContact, Province, City, Barcode
+    CustomerTarget, Receiver, CustomerTargetContact, Province, City, Barcode, \
+    CustomerDiquRatio
 from sys2do.model.logic import OrderHeader, TransferLog, PickupDetail, \
     DeliverDetail
 
@@ -296,24 +297,71 @@ class RootView(BasicView):
         return jsonify({'code' : code, 'status' : status})
 
 
-    def compute_day_by_diqu(self):
+    def compute_by_diqu(self):
         province_id = _g('province_id')
         city_id = _g('city_id')
+        customer_id = _g('customer_id')
 
-        try:
-            if city_id:
-                c = DBSession.query(City).get(city_id)
-                if c.shixiao:
-                    result = dt.now() + timedelta(days = c.shixiao)
-                    return jsonify({'code' : 0 , 'day' : result.strftime(SYSTEM_DATE_FORMAT)})
-            elif province_id:
+        #count the ratio
+        ratio_result = self._compute_ratio(customer_id, province_id, city_id)
+        #count the day
+        day_result = self._compute_day(province_id, city_id)
+
+        ratio_result.update(day_result)
+        ratio_result.update({'code' : 0})
+        return jsonify(ratio_result)
+
+
+    def _compute_day(self, province_id, city_id):
+        estimate_day = ''
+        if city_id:
+            c = DBSession.query(City).get(city_id)
+            if c.shixiao:
+                estimate_day = (dt.now() + timedelta(days = c.shixiao)).strftime(SYSTEM_DATE_FORMAT)
+            else:
                 p = DBSession.query(Province).get(province_id)
                 if p.shixiao:
-                    result = dt.now() + timedelta(days = p.shixiao)
-                    return jsonify({'code' : 0 , 'day' : result.strftime(SYSTEM_DATE_FORMAT)})
-            return jsonify({'code' : 0 , 'day' : dt.now().strftime(SYSTEM_DATE_FORMAT)})
+                    estimate_day = (dt.now() + timedelta(days = p.shixiao)).strftime(SYSTEM_DATE_FORMAT)
+        elif province_id:
+            p = DBSession.query(Province).get(province_id)
+            if p.shixiao:
+                estimate_day = (dt.now() + timedelta(days = p.shixiao)).strftime(SYSTEM_DATE_FORMAT)
+        return {'day' : estimate_day}
+
+
+
+    def _compute_ratio(self, customer_id, province_id, city_id):
+        qty_ratio = ''
+        weight_ratio = ''
+        vol_ratio = ''
+
+        try:
+            t = DBSession.query(CustomerDiquRatio).filter(and_(CustomerDiquRatio.active == 0,
+                                                           CustomerDiquRatio.customer_id == customer_id,
+                                                           CustomerDiquRatio.province_id == province_id,
+                                                           CustomerDiquRatio.city_id == city_id,
+                                                           )).one()
+            qty_ratio, weight_ratio, vol_ratio = t.qty_ratio, t.weight_ratio, t.vol_ratio
         except:
-            return jsonify({'code' : 1 , 'day' : ''})
+            try:
+                t = DBSession.query(CustomerDiquRatio).filter(and_(CustomerDiquRatio.active == 0,
+                                                           CustomerDiquRatio.customer_id == customer_id,
+                                                           CustomerDiquRatio.province_id == province_id,
+                                                           CustomerDiquRatio.city_id == None,
+                                                           )).one()
+                qty_ratio, weight_ratio, vol_ratio = t.qty_ratio, t.weight_ratio, t.vol_ratio
+            except:
+                try:
+                    c = DBSession.query(City).filter(and_(City.active == 0, City.id == city_id)).one()
+                    qty_ratio, weight_ratio, vol_ratio = c.qty_ratio, c.weight_ratio, c.vol_ratio
+                except:
+                    try:
+                        p = DBSession.query(Province).filter(and_(Province.active == 0, Province.id == province_id)).one()
+                        qty_ratio, weight_ratio, vol_ratio = p.qty_ratio, p.weight_ratio, p.vol_ratio
+                    except: pass
+
+        return {'qty_ratio' : qty_ratio, 'weight_ratio' : weight_ratio, 'vol_ratio' : vol_ratio}
+
 
 
     def ajax_order_info(self):
@@ -363,7 +411,12 @@ class RootView(BasicView):
             return jsonify({'code' : 1, 'msg' : MSG_RECORD_NOT_EXIST})
 
 
-
+    def wsdl(self):
+        f = open('aws_rtracorderstofinalize.wsdl')
+        rv = app.make_response("".join(f.readlines()))
+        f.close()
+        rv.mimetype = 'text/xml'
+        return rv
 
 bpRoot.add_url_rule('/', view_func = RootView.as_view('view'), defaults = {'action':'index'})
 bpRoot.add_url_rule('/<action>', view_func = RootView.as_view('view'))

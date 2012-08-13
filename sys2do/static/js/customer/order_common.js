@@ -176,19 +176,48 @@ function destination_change(){
 
 
 function estimate_by_diqu(){
-    $.getJSON('/compute_day_by_diqu',
+    $.getJSON('/compute_by_diqu',
               {
                 't' : nowstr(),
                 'province_id' : $("#destination_province_id").val(),
-                'city_id' : $("#destination_city_id").val()
+                'city_id' : $("#destination_city_id").val(),
+                'customer_id' : $("#source_company_id").val()
               },
               function(r){
                   if(r.code == 0){
-                      $("#estimate_time").val(r.day)
+                      $("#estimate_time").val(r.day);
+                      $("#qty_ratio").val(r.qty_ratio);
+                      $("#weight_ratio").val(r.weight_ratio);
+                      $("#vol_ratio").val(r.vol_ratio);
+                      $("#vol_ratio").trigger('change');
                   }
               }
     )
 }
+
+
+//function get_ratio(){
+//    var province_id = $("#destination_province_id").val();
+//    var city_id = $("#destination_city_id").val();
+//    var customer_id = $("#source_company_id").val();
+//    $.getJSON('/compute_ratio',{
+//        't' : nowstr(),
+//        'province_id' : province_id,
+//        'city_id' : city_id,
+//        'customer_id' : customer_id
+//    },function(r){
+//        if(r.code != 0 ){
+//            
+//        }else{
+//            $("#qty_ratio").val(r.qty_ratio);
+//            $("#weight_ratio").val(r.weight_ratio);
+//            $("#vol_ratio").val(r.vol_ratio);
+//            $("#vol_ratio").trigger('change');
+//        }
+//    });
+//    
+//}
+
 
 
 

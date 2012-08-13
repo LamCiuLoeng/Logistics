@@ -25,26 +25,26 @@
 
 {% block content %}
 	<form action="{{url_for('.view', action = 'user',m='SAVE_NEW')}}" method="post">
-		<table>
+    <table border="0" cellpadding="0" cellspacing="0" class="user_new_table">
 			<tr>
-				<td>{{_('User Name')}}</td>
-				<td><input type="text" name="name"/></td>
+				<td height="30">{{_('User Name')}}</td>
+			  <td><input type="text" name="name" class="order_add_div_body_input"/></td>
 			</tr>
 			<tr>
-				<td>{{_('Password')}}</td>
-				<td><input type="password" name="password"/></td>
+				<td height="30">{{_('Password')}}</td>
+				<td><input type="password" name="password" class="order_add_div_body_input"/></td>
 			</tr>
 			<tr>
-				<td>{{_('Confirm Password')}}</td>
-				<td><input type="password" name="repassword"/></td>
+				<td height="30">{{_('Confirm Password')}}</td>
+				<td><input type="password" name="repassword" class="order_add_div_body_input"/></td>
 			</tr>
 			<tr>
-				<td>{{_('E-mail')}}</td>
-				<td><input type="text" name="email"/></td>
+				<td height="30">{{_('E-mail')}}</td>
+				<td><input type="text" name="email" class="order_add_div_body_input"/></td>
 			</tr>
 			<tr>
-				<td>{{_('Phone')}}</td>
-				<td><input type="text" name="phone"/></td>
+				<td height="30">{{_('Phone')}}</td>
+				<td><input type="text" name="phone" class="order_add_div_body_input"/></td>
 			</tr>
 			<tr>
 				<td>{{_('Group')}}</td>

@@ -165,7 +165,9 @@ class Province(DeclarativeBase, SysMixin, CRUDMixin):
     name = Column(Text)
     code = Column(Text)
     shixiao = Column(Integer, default = 0)
-
+    qty_ratio = Column(Float, default = 0, doc = u'数量费率')
+    weight_ratio = Column(Float, default = 0, doc = u'重量费率')
+    vol_ratio = Column(Float, default = 0, doc = u'体积费率')
 
     def __str__(self): return self.name
     def __repr__(self): return self.name
@@ -188,6 +190,9 @@ class City(DeclarativeBase, SysMixin, CRUDMixin):
     code = Column(Text)
     parent_code = Column(Text)
     shixiao = Column(Integer, default = 0)
+    qty_ratio = Column(Float, default = 0, doc = u'数量费率')
+    weight_ratio = Column(Float, default = 0, doc = u'重量费率')
+    vol_ratio = Column(Float, default = 0, doc = u'体积费率')
 
     def __str__(self): return self.name
     def __repr__(self): return self.name
@@ -255,6 +260,24 @@ class Customer(DeclarativeBase, SysMixin, CRUDMixin):
     @classmethod
     def _get_fields(clz):
         return ['name', 'no', 'province_id', 'city_id', 'address', 'phone', 'mobile', 'email', 'contact_person', 'remark', 'payment_id']
+
+
+
+class CustomerDiquRatio(DeclarativeBase, SysMixin, CRUDMixin):
+    __tablename__ = 'master_customer_ditu_ratio'
+
+    id = Column(Integer, autoincrement = True, primary_key = True)
+    customer_id = Column(Integer, ForeignKey('master_customer.id'))
+    customer = relation(Customer)
+    province_id = Column(Integer, ForeignKey('master_province.id'))
+    province = relation(Province)
+    city_id = Column(Integer, ForeignKey('master_city.id'))
+    city = relation(City)
+    qty_ratio = Column(Float, default = 0, doc = u'数量费率')
+    weight_ratio = Column(Float, default = 0, doc = u'重量费率')
+    vol_ratio = Column(Float, default = 0, doc = u'体积费率')
+
+
 
 
 

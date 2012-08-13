@@ -62,9 +62,9 @@ body, table, tr, td{
     <table width="100%" border="0" cellspacing="0" cellpadding="0">
       <tr>
         <td width="65" height="45" align="right">始发站：</td>
-        <td width="210" align="left" class="print_big_td">{{header.source_station}}</td>
+        <td width="210" align="left" class="print_big_td">{{header.source_city or header.source_province }}</td>
         <td width="65" align="right">目的站：</td>
-        <td align="left" class="print_big_td">{{header.destination_station}}</td>
+        <td align="left" class="print_big_td">{{header.destination_city or header.destination_province}}</td>
       </tr>
     </table>
     <table width="100%" border="0" cellspacing="0" cellpadding="0">
@@ -115,11 +115,11 @@ body, table, tr, td{
       <table width="100%" border="0" cellspacing="0" cellpadding="0">
         <tr>
           <td width="65" height="45" align="right">数量：</td>
-          <td align="left" class="print_big_td">{{header.qty|f}}&nbsp;</td>
+          <td align="left" class="print_big_td">{{header.qty|f}}&nbsp;件</td>
           <td width="65" align="right">重量：</td>
-          <td align="left" class="print_big_td">{{header.weight|f}}&nbsp;</td>
+          <td align="left" class="print_big_td">{{header.weight|f}}&nbsp;吨</td>
           <td width="65" align="right">体积：</td>
-          <td align="left" class="print_big_td">{{header.vol|f}}&nbsp;</td>
+          <td align="left" class="print_big_td">{{header.vol|f}}&nbsp;立方</td>
         </tr>
     </table></td>
   </tr>

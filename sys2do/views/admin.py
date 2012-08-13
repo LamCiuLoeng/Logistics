@@ -28,7 +28,7 @@ from sys2do.util.common import _g, _gl, getMasterAll, _error, _gp, _info
 from sys2do.model.master import Customer, CustomerProfile, \
     SupplierProfile, Supplier, Payment, Item, PickupType, PackType, Ratio, \
     Receiver, InventoryLocation, CustomerTarget, Note, CustomerTargetContact, \
-    Barcode, Province, City
+    Barcode, Province, City, CustomerDiquRatio
 from sys2do.util.barcode_helper import generate_barcode_file
 
 __all__ = ['bpAdmin']
@@ -706,7 +706,8 @@ class AdminView(BasicView):
     @tab_highlight('TAB_MASTER')
     def customer(self):
         method = _g('m', 'LIST')
-        if method not in ['LIST', 'NEW', 'UPDATE', 'DELETE', 'SAVE_NEW', 'SAVE_UPDATE']:
+        if method not in ['LIST', 'NEW', 'UPDATE', 'DELETE', 'SAVE_NEW', 'SAVE_UPDATE', 'DIQUREATIO',
+                          'DIQUREATIO_CREATE', 'DIQUREATIO_SAVE_NEW', 'DIQUREATIO_UPDATE', 'DIQUREATIO_SAVE_UPDATE']:
             flash(MSG_NO_SUCH_ACTION, MESSAGE_ERROR);
             return redirect(url_for('.view', action = 'index'))
 
@@ -925,6 +926,47 @@ class AdminView(BasicView):
             flash(MSG_UPDATE_SUCC, MESSAGE_INFO)
             return redirect(url_for('.view', action = 'customer'))
 
+
+        elif method == 'DIQUREATIO':
+            obj = DBSession.query(Customer).get(_g('id'))
+            result = DBSession.query(CustomerDiquRatio).filter(and_(CustomerDiquRatio.customer_id == obj.id, CustomerDiquRatio.active == 0)).order_by(CustomerDiquRatio.province_id)
+            page = _g('page') or 1
+            def url_for_page(**params): return url_for('bpAdmin.view', action = "customer", m = 'DIQUREATIO', id = obj.id, page = page)
+
+            records = paginate.Page(result, page, show_if_single_page = True, items_per_page = PAGINATE_PER_PAGE, url = url_for_page)
+            return render_template('admin/customer_diquratio_index.html', obj = obj, records = records)
+
+        elif method == 'DIQUREATIO_CREATE':
+            obj = DBSession.query(Customer).get(_g('id'))
+            return render_template('admin/customer_diquratio_new.html', obj = obj)
+
+        elif method == 'DIQUREATIO_SAVE_NEW':
+            DBSession.add(CustomerDiquRatio(
+                                            customer_id = _g('customer_id'),
+                                            province_id = _g('province_id'),
+                                            city_id = _g('city_id'),
+                                            qty_ratio = _g('qty_ratio'),
+                                            weight_ratio = _g('weight_ratio'),
+                                            vol_ratio = _g('vol_ratio'),
+                                            ))
+
+            DBSession.commit()
+            flash(MSG_SAVE_SUCC, MESSAGE_INFO)
+            return redirect(url_for('.view', action = 'customer', m = 'DIQUREATIO', id = _g('customer_id')))
+        elif method == 'DIQUREATIO_UPDATE':
+            obj = DBSession.query(CustomerDiquRatio).get(_g('id'))
+            if obj.province_id:
+                cities = obj.province.children()
+            else:
+                cities = []
+            return render_template('admin/customer_diquratio_update.html', obj = obj, cities = cities)
+
+        elif method == 'DIQUREATIO_SAVE_UPDATE':
+            obj = DBSession.query(CustomerDiquRatio).get(_g('id'))
+            for f in ['province_id', 'city_id', 'qty_ratio', 'weight_ratio', 'vol_ratio', ]:
+                setattr(obj, f, _g(f))
+            flash(MSG_UPDATE_SUCC, MESSAGE_INFO)
+            return redirect(url_for('.view', action = 'customer', m = 'DIQUREATIO', id = obj.customer_id))
 
 
 

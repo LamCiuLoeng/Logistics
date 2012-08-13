@@ -479,10 +479,16 @@
 		  </tr>
   {% endfor %}
       <tr class="data_table_tr">
+      	{% set total_amount = records.items|sum_with_none(attribute='amount') %}
+        {% set total_cost = records.items|sum_with_none(attribute='cost') %}
+      
       	<th>&nbsp;</th>
       	<td colspan="7" style="text-align:left">&nbsp;合计</td>
-      	<td>{{records.items|sum_with_none(attribute='amount')}}</td>
-      	<td>{{records.items|sum_with_none(attribute='cost')}}</td>
+      	<td colspan="3">
+      		(总金额)<span style="color:green;font-weight:bold">{{total_amount}}</span>&nbsp;&nbsp;-&nbsp;&nbsp;
+      		(总费用)<span style="color:orange;font-weight:bold">{{total_cost}}</span>&nbsp;&nbsp;=&nbsp;&nbsp;
+      		(毛利)<span style="color:blue;font-weight:bold">{{ total_amount - total_cost }}</span>
+      	</td>
       	<td colspan="100">&nbsp;</td>
       </tr>
       <tfoot>

@@ -33,21 +33,21 @@ def init():
         uKefua = User(name = u'kefu1', email = 'kefu1@sfhlwl.com', password = '123')
         uWha = User(name = u'wh1', email = 'kefu1@sfhlwl.com', password = '123')
         uFina = User(name = u'fin1', email = 'kefu1@sfhlwl.com', password = '123')
-
         uUser1 = User(name = u'罗凌云', email = 'kefu1@sfhlwl.com', password = '123')
         uUser2 = User(name = u'陈龙', email = 'kefu1@sfhlwl.com', password = '123')
-        uUser3 = User(name = u'邓二', email = 'kefu1@sfhlwl.com', password = '123')
+#        uUser3 = User(name = u'邓二', email = 'kefu1@sfhlwl.com', password = '123')
         uUser4 = User(name = u'刘坤', email = 'kefu1@sfhlwl.com', password = '123')
         uUser5 = User(name = u'何灿明', email = 'kefu1@sfhlwl.com', password = '123')
-        uUser6 = User(name = u'黄燕琴', email = 'kefu1@sfhlwl.com', password = '123')
+#        uUser6 = User(name = u'黄燕琴', email = 'kefu1@sfhlwl.com', password = '123')
         uUser7 = User(name = u'吴丽玲', email = 'kefu1@sfhlwl.com', password = '123')
         uUser8 = User(name = u'徐腾芳', email = 'kefu1@sfhlwl.com', password = '123')
         uUser9 = User(name = u'黄霄莹', email = 'kefu1@sfhlwl.com', password = '123')
         uUser10 = User(name = u'林凤', email = 'kefu1@sfhlwl.com', password = '123')
-        uUser11 = User(name = u'吴秋梅', email = 'kefu1@sfhlwl.com', password = '123')
+#        uUser11 = User(name = u'吴秋梅', email = 'kefu1@sfhlwl.com', password = '123')
         uUser12 = User(name = u'林秀贤', email = 'kefu1@sfhlwl.com', password = '123')
         uUser13 = User(name = u'曾德莲', email = 'kefu1@sfhlwl.com', password = '123')
         uUser14 = User(name = u'李时坚', email = 'kefu1@sfhlwl.com', password = '123')
+
         uUser15 = User(name = u'深福合力', email = 'kefu1@sfhlwl.com', password = '123')
 
 
@@ -150,14 +150,13 @@ def init():
         gWarehouse = Group(name = u'仓库组', display_name = u'仓库组', type = 0)
         gWarehouse.permissions = [pUpdateOrder, pSearchOrder, pSearchAllOrder, pManageOrder,
                                   pCreateDeliver, pUpdateDeliver, pSearchDeliver, pSearchAllDeliver, pManageDeliver ]
-        gWarehouse.users = [uWha, uUser3, uUser6, uUser8, uUser14]
+        gWarehouse.users = [uWha, uUser8, uUser14]
 
 
         DBSession.add_all([
                             uAdmin, uKefua, uFina, uWha,
 #                            uKefu2, uSupplier, uWarehouse,
-                            uUser1, uUser2, uUser3, uUser4, uUser5, uUser6, uUser7, uUser8, uUser9, uUser10,
-                            uUser11, uUser12, uUser13, uUser14, uUser15,
+                            uUser1, uUser2, uUser4, uUser5, uUser7, uUser8, uUser9, uUser10, uUser12, uUser13, uUser14, uUser15,
                             pCreateUser, pUpdateUser, pDeleteUser, pSearchUser, pManageUser,
                             pCreateGroup, pUpdateGroup, pDeleteGroup, pSearchGroup, pManageGroup,
                             pCreatePermission, pUpdatePermission, pDeletePermission, pSearchPermission, pManagePermission,
@@ -170,6 +169,7 @@ def init():
                             gAdmin, gCustomer, gOfficer, gSupplier, gWarehouse,
                             gKinlongGroup, gWeiqianGroup,
                             ])
+
 
         for n, en, tn in [(u'米', u'meter', u'米'), (u'分米', u'dm', u'分米'), (u'厘米', u'cm', u'釐米'), (u'吨', u'ton', u'噸'), (u'千克', u'kg', u'千克'), (u'克', u'g', u'克'),
                      (u'箱', u'box', u'箱'), (u'瓶', u'bottle', u'瓶'), (u'只', u'pic', u'只'), (u'打', u'dozen', u'打'), ]:
@@ -228,7 +228,7 @@ def init():
         DBSession.add(Item(name = u"家具"))
 
 
-        kinlong = Customer(name = u"广东坚朗五金制品股份有限公司", display_name = u'坚朗', address = u"广东省东莞市塘厦镇大坪村工业区卢地坑路3号", phone = "0769-82166666", contact_person = u'陈先生', mobile = '12800138999', payment = payment1)
+        kinlong = Customer(name = u"广东坚朗五金制品股份有限公司", display_name = u'坚朗', province_id = 19, city_id = 304, address = u"塘厦镇大坪村工业区卢地坑路3号", phone = "0769-82166666", contact_person = u'陈先生', mobile = '12800138999', payment = payment1)
         kinlong_profile = CustomerProfile(name = "KINLONG_PROFILE", customer = kinlong, group = gKinlongGroup)
 
         kinlong_target1 = CustomerTarget(customer = kinlong, name = u'收货公司一')
@@ -246,7 +246,7 @@ def init():
         kinlong_target3_c2 = CustomerTargetContact(customer_target = kinlong_target3, name = u'林一', mobile = u'13800138332', phone = u'14587542', address = u'湖南省长沙市BB区')
         kinlong_target3_c3 = CustomerTargetContact(customer_target = kinlong_target3, name = u'余一', mobile = u'13800138333', phone = u'14587543', address = u'湖南省长沙市CC区')
 
-        weiqian = Customer(name = u"味千（中国）控股有限公司", display_name = u'味千', address = u"广东省深圳市福田区金田路3037号金中环商务大厦主楼23号", phone = "0755-8280 5333", contact_person = u'胡先生', mobile = '12800138999', payment = payment1)
+        weiqian = Customer(name = u"味千（中国）控股有限公司", display_name = u'味千', province_id = 19, city_id = 290, address = u"金田路3037号金中环商务大厦主楼23号", phone = "0755-8280 5333", contact_person = u'胡先生', mobile = '12800138999', payment = payment1)
         weiqian_profile = CustomerProfile(name = "WEIQIAN_PROFILE", customer = weiqian, group = gWeiqianGroup)
 
         weiqian_target1 = CustomerTarget(customer = weiqian, name = u'味千收货公司一')
