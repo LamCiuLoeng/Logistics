@@ -177,6 +177,7 @@ class OrderView(BasicView):
         params = {}
         for k in [
 #                  'source_station', 'destination_station',
+                  'customer_id',
                   'source_province_id', 'source_city_id', 'destination_province_id', 'destination_city_id',
                   'source_company_id', 'source_address', 'source_contact', 'source_tel', 'source_mobile',
                   'destination_company_id', 'destination_address', 'destination_contact', 'destination_tel', 'destination_mobile',
@@ -250,10 +251,10 @@ class OrderView(BasicView):
             pass
         logs = sorted(logs, cmp = lambda x, y: cmp(x.transfer_date, y.transfer_date))
 
-        if header.source_company_id:
-            targets = header.source_company.targets
-        else:
-            targets = {}
+#        if header.source_company_id:
+#            targets = header.source_company.targets
+#        else:
+#            targets = {}
 
         if header.source_province_id:
             source_cites = header.source_province.children()
@@ -266,7 +267,7 @@ class OrderView(BasicView):
         return {
                 'header' : header ,
                 'transit_logs' : logs,
-                'targets' : targets,
+#                'targets' : targets,
                 'source_cites' : source_cites,
                 'destination_cites' : destination_cites,
                 }
@@ -544,6 +545,7 @@ class OrderView(BasicView):
 
         if type == 'order_header':
             fields = [
+                      'customer_id',
                       'source_province_id', 'source_city_id', 'destination_province_id', 'destination_city_id',
                       'ref_no', 'source_company_id', 'source_address', 'source_contact', 'source_tel', 'source_mobile',
                       'payment_id', 'qty', 'weight', 'vol', 'shipment_type_id',

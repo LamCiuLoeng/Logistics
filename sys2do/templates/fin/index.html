@@ -7,7 +7,7 @@
 
 
 {% block extJS %}
-
+<script src="{{url_for('static', filename='js/customer/order_todo.js')}}" type="text/javascript"></script>
 <script language="JavaScript" type="text/javascript">
 //<![CDATA[
 	$(document).ready(function(){
@@ -18,6 +18,8 @@
 	    $("#destination_province_id").change(function(){
 	        province_change(this,'#destination_city_id');
 	    });
+	    
+	    $("#customer_id").change(customer_change);
 	});
 	
 	
@@ -41,166 +43,23 @@
 	}
 	
 
-	function todo_approve(obj){	
-		var v = $(":selected",obj).val();
-		$(obj).val('');
-		if(v){
-			return todo('APPROVE',v,function(r){
-				if(r.code != 0 ){
-					show_error(r.msg);
-				}else{
-					$("input[name='order_ids']:checked").each(function(){
-						var tmp = $(this);
-						var tr = $(tmp.parents("tr")[0]);
-						if(v=='1'){
-							$(".approval_span",tr).text("{{_(ORDER_APPROVED[1])}}");
-						}else{
-							$(".approval_span",tr).text("{{_(ORDER_DISAPPROVED[1])}}");
-						}
-					});				
-					show_info(r.msg);
-				}	
-			});
-		}
-	}
-						
-	
-	function todo_paid(obj){
-		var v = $(":selected",obj).val();
-		$(obj).val('');
-		if(v){
-			return todo('PAID',v,function(r){
-				if(r.code != 0 ){
-					show_error(r.msg);
-				}else{
-					$("input[name='order_ids']:checked").each(function(){
-						var tmp = $(this);
-						var tr = $(tmp.parents("tr")[0]);
-						if(v=='0'){
-							$(".paid_span",tr).text("{{_(ORDER_NOT_PAID[1])}}");
-						}else{
-							$(".paid_span",tr).text("{{_(ORDER_PAID[1])}}");
-						}
-					});				
-					show_info(r.msg);
-				}	
-			});
-		}
-	}
-	
-	function todo_supplier_paid(obj){
-		var v = $(":selected",obj).val();
-		$(obj).val('');
-		if(v){
-			return todo('SUPLLIER_PAID',v,function(r){
-				if(r.code != 0 ){
-					show_error(r.msg);
-				}else{
-					$("input[name='order_ids']:checked").each(function(){
-						var tmp = $(this);
-						var tr = $(tmp.parents("tr")[0]);
-						if(v=='0'){
-							$(".supplier_paid_span",tr).text("{{_(DELIVER_NOT_PAID[1])}}");
-						}else{
-							$(".supplier_paid_span",tr).text("{{_(DELIVER_PAID[1])}}");
-						}
-					});				
-					show_info(r.msg);
-				}	
-			});
-		}
-	}
-	
-	function todo_order_return(obj){
-	    var v = $(":selected",obj).val();
-	    $(obj).val('');
-	    if(v){
-	        return todo('ORDER_RETURN',v,function(r){
-	            if(r.code != 0 ){
-	                show_error(r.msg);
-	            }else{
-	                $("input[name='order_ids']:checked").each(function(){
-						var tmp = $(this);
-						var tr = $(tmp.parents("tr")[0]);
-		                if(v=='0'){
-		                    $(".order_return_span").text("未返");
-		                }else{
-		                    $(".order_return_span").text("已返");
-		                }   
-					});	        
-	                show_info(r.msg);
-	            }   
-	        });
-	    }
-	}
-	
-	function todo_exception(obj){
-	    var v = $(":selected",obj).val();
-	    $(obj).val('');
-	    if(v){
-	        return todo('EXCEPTION',v,function(r){
-	            if(r.code != 0 ){
-	                show_error(r.msg);
-	            }else{
-	                $("input[name='order_ids']:checked").each(function(){
-						var tmp = $(this);
-						var tr = $(tmp.parents("tr")[0]);
-						if(v=='1'){
-		                    $(".exception_span").text("是");
-		                }else{
-		                    $(".exception_span").text("否");
-		                } 
-					});	                
-	                show_info(r.msg);
-	            }   
-	        });
-	    }
-	}
-	
-	function todo_less_qty(obj){
-	    var v = $(":selected",obj).val();
-	    $(obj).val('');
-	    if(v){
-	        return todo('LESS_QTY',v,function(r){
-	            if(r.code != 0 ){
-	                show_error(r.msg);
-	            }else{
-	                $("input[name='order_ids']:checked").each(function(){
-						var tmp = $(this);
-						var tr = $(tmp.parents("tr")[0]);
-						if(v=='1'){
-		                    $(".lessqty_span").text("是");
-		                }else{
-		                    $(".lessqty_span").text("否");
-		                } 
-					});	           
-	                show_info(r.msg);
-	            }   
-	        });
-	    }
-	}
-	
-	function todo(type,flag,handler){
-		var ids = new Array();
-		
-		$("input[name='order_ids']:checked").each(function(){
-			ids.push($(this).val());
+	function customer_change(){
+		$("#source_company_id").empty();
+		$.getJSON('/ajax_master',{
+			't' : nowstr(),
+			'm' : 'source',
+			'id' : $("#customer_id").val()
+		},function(r){
+			if(r.code==0){
+				var html = "<option></option>";
+				for(var i=0;i<r.data.length;i++){
+					var t = r.data[i];
+					html += '<option value="'+t.id+'">'+t.name+'</option>';
+				}
+				$("#source_company_id").html(html);
+			}
 		});
-		if(ids.length < 1){
-			show_error('请先选择订单然后再进行操作！');
-			return false;
-		}
-		
-		$.getJSON("{{ url_for('.view',action='ajax_change_flag') }}",
-				 {
-				 	't' : nowstr(),
-				 	'order_ids' : ids.join('|'),
-				 	'type' : type,
-				 	'flag' : flag
-				 },
-				 handler
-		)
-	}
+	}	
 		
 		
 	function toSort(f,d){
@@ -237,7 +96,6 @@
         		<option value="0">取消少货标记</option>
         	</select/>
         </li>
-        {% if 'FIN_APPROVE' is get_permission %}
         <li>
         	<select onchange="todo_approve(this);">
         		<option>--审核是否通过--</option>
@@ -245,6 +103,7 @@
         		<option value="2">{{_(ORDER_DISAPPROVED[1])}}</option>
         	</select/>
         </li>
+        {% if 'FIN_APPROVE' is get_permission %}
         {% endif %}
         {% if 'FIN_PAID' is get_permission %}
         <li>
@@ -293,61 +152,25 @@
           <li style="width:500px"><span>系统编号</span><input type="text" name="no" value="{{values.get('no','')|f}}"/></li>
                  
           <li style="width:755px"><span>{{_('Source Station')}}</span>
-	          	<select name="source_province_id" id="source_province_id" style="width:150px">
-	    	      <option value=""></option>
-	    	      {% for p in MASTER_ALL('Province') %}
-	    	          {% if '%s' %p.id == values.get('source_province_id',None) %}
-	    	          	<option value="{{p.id}}" selected="selected">{{p}}</option>
-	    	          {% else %}
-	    	          	<option value="{{p.id}}">{{p}}</option>
-	    	          {% endif %}
-	    	      {% endfor %}
-	    	  </select>
-	    	  	<select name="source_city_id" id="source_city_id" style="width:150px">
-	    	  	    <option value=""></option>
-	    	  		{% for c in source_cites %}
-	    	          {% if '%s' %c.id == values.get('source_city_id',None) %}
-	    	          	<option value="{{c.id}}" selected="selected">{{c}}</option>
-	    	          {% else %}
-	    	          	<option value="{{c.id}}">{{c}}</option>
-	    	          {% endif %}
-	    	        {% endfor %}
-	    	  	</select>
+	          	{% set source_province_id = values.get('source_province_id',None)|int  %}
+	    	  {{mymacros.select('source_province_id',MASTER_ALL('Province'),source_province_id,style="width:150px")}}
+	    	  {% set source_city_id = values.get('source_city_id',None)|int  %}
+	    	  {{mymacros.select('source_city_id',source_cites,source_city_id,style="width:150px")}}
           </li>
           <li style="width:755px"><span>{{_('Destination Station')}}</span>
-	          	<select name="destination_province_id" id="destination_province_id" style="width:150px">
-		    	      <option value=""></option>
-		    	      {% for p in MASTER_ALL('Province') %}
-		    	          {% if '%s' %p.id == values.get('destination_province_id',None) %}
-		    	          	<option value="{{p.id}}" selected="selected">{{p}}</option>
-		    	          {% else %}
-		    	          	<option value="{{p.id}}">{{p}}</option>
-		    	          {% endif %}
-		    	      {% endfor %}
-		    	  </select> 
-		    	  <select name="destination_city_id" id="destination_city_id" style="width:150px">
-		    	      <option value=""></option>
-		    	      {% for c in destination_cites %}
-		    	          {% if '%s' %c.id == values.get('destination_city_id',None) %}
-		    	          	<option value="{{c.id}}" selected="selected">{{c}}</option>
-		    	          {% else %}
-		    	          	<option value="{{c.id}}">{{c}}</option>
-		    	          {% endif %}
-		    	        {% endfor %}
-		    	  </select>
+	          {% set destination_province_id = values.get('destination_province_id',None)|int  %}
+	    	  {{mymacros.select('destination_province_id',MASTER_ALL('Province'),destination_province_id,style="width:150px")}}
+          	  {% set destination_city_id = values.get('destination_city_id',None)|int  %}
+	    	  {{mymacros.select('destination_city_id',destination_cites,destination_city_id,style="width:150px")}}
           </li>
          
           <li style="width:755px"><span>{{_('Source Company')}}</span>
-              <select name="source_company_id" id="source_company_id" style="width:400px">
-                  <option value=""></option>
-                  {% for c in customers%}
-                      {% if '%s' % c.id == values.get('source_company_id',None) %}
-                          <option value="{{c.id}}" selected="selected">{{c}}</option>
-                      {% else %}
-                          <option value="{{c.id}}">{{c}}</option>
-                      {% endif %}
-                  {% endfor %}
-          	  </select>
+          	{% set customer_id = values.get('customer_id',None)|int  %}
+            {{mymacros.select('customer_id',MASTER_ALL('Customer'),customer_id,style="width:250px")}}
+			
+			{% set source_company_id = values.get('source_company_id',None)|int  %}
+			{{mymacros.select('source_company_id',sources,source_company_id,style="width:250px")}}
+         
           </li>
           <li><span>审核</span>
               <select name="approve" id="approve">
@@ -436,11 +259,12 @@
     <td align="center" style="width:200px;">{{mymacros.show_direction(values,'no')}}系统编号</td>
     <td align="center" style="width:150px;">送货单</td>
     <td align="center" style="width:200px;">{{mymacros.show_direction(values,'source_province_id')}}{{_('Source Station')}}</td>
-    <td align="center" style="width:300px;">{{_('Source Company')}}</td>
+    <td align="center" style="width:100px;">客户</td>
+    <td align="center" style="width:200px;">{{_('Source Company')}}</td>
     <td align="center" style="width:200px;">{{mymacros.show_direction(values,'destination_province_id')}}{{_('Destination Station')}}</td>
     <td align="center" style="width:300px;">{{_('Destination Company')}}</td>
-    <td align="center" style="width:80px;">{{mymacros.show_direction(values,'amount')}}{{_('Amount')}}(元)</td>
-    <td align="center" style="width:80px;">{{mymacros.show_direction(values,'cost')}}费用(元)</td>
+    <td align="center" style="width:100px;">{{mymacros.show_direction(values,'amount')}}{{_('Amount')}}(元)</td>
+    <td align="center" style="width:100px;">{{mymacros.show_direction(values,'cost')}}费用(元)</td>
     <td align="center" style="width:200px;">{{mymacros.show_direction(values,'create_time')}}{{_('Create Time')}}</td>
     <td align="center" style="width:120px;">{{mymacros.show_direction(values,'create_by_id')}}{{_('Creator')}}</td>
     <td align="center" style="width:80px;">审核</td>
@@ -463,7 +287,8 @@
 				{%endif%}
 			</td>
 			<td>{{r.source_province|f}}{{r.source_city|f}}</td>
-			<td>{{r.source_company.display_name|f}}</td>
+			<td>{{r.customer.display_name|f}}</td>
+			<td>{{r.source_company|f}}</td>
 			<td>{{r.destination_province|f}}{{r.destination_city|f}}</td>
 			<td>{{r.destination_company|f}}</td>
 			<td>{{r.amount|f}}</td>

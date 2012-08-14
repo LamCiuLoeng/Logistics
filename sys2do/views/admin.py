@@ -27,7 +27,7 @@ from sys2do.constant import MESSAGE_ERROR, MSG_NO_SUCH_ACTION, \
 from sys2do.util.common import _g, _gl, getMasterAll, _error, _gp, _info
 from sys2do.model.master import Customer, CustomerProfile, \
     SupplierProfile, Supplier, Payment, Item, PickupType, PackType, Ratio, \
-    Receiver, InventoryLocation, CustomerTarget, Note, CustomerTargetContact, \
+    Receiver, InventoryLocation, CustomerTarget, Note, CustomerContact, \
     Barcode, Province, City, CustomerDiquRatio
 from sys2do.util.barcode_helper import generate_barcode_file
 
@@ -829,7 +829,7 @@ class AdminView(BasicView):
                                    remark = target['target_remark'])
                 DBSession.add(t)
                 for contact in target['contacts']:
-                    DBSession.add(CustomerTargetContact(customer_target = t,
+                    DBSession.add(CustomerContact(customer_target = t,
                                                         name = contact['contact_name'],
                                                         address = contact['contact_address'],
                                                         mobile = contact['contact_mobile'],
@@ -878,7 +878,7 @@ class AdminView(BasicView):
                         if not contact.get('id', None) : continue
                         if isinstance(contact['id'], basestring) and contact['id'].startswith("old_"):  #existing contact
                             cid = contact['id'].split("_")[1]
-                            c = DBSession.query(CustomerTargetContact).get(cid)
+                            c = DBSession.query(CustomerContact).get(cid)
                             c.name = contact.get('contact_name', None)
                             c.address = contact.get('contact_address', None)
                             c.mobile = contact.get('contact_mobile', None)
@@ -888,7 +888,7 @@ class AdminView(BasicView):
                             contact_ids.remove(c.id)
 
                         else: # new contact
-                            DBSession.add(CustomerTargetContact(
+                            DBSession.add(CustomerContact(
                                                                 customer_target = t,
                                                                 name = contact.get('contact_name', None),
                                                                 address = contact.get('contact_address', None),
@@ -907,7 +907,7 @@ class AdminView(BasicView):
                                       )
                     DBSession.add(t)
                     for contact in target['contacts']:
-                        DBSession.add(CustomerTargetContact(
+                        DBSession.add(CustomerContact(
                                                             customer_target = t,
                                                             name = contact.get('contact_name', None),
                                                             address = contact.get('contact_address', None),
@@ -920,7 +920,7 @@ class AdminView(BasicView):
 #            _info(target_ids)
 #            _info(contact_ids)
             DBSession.query(CustomerTarget).filter(CustomerTarget.id.in_(target_ids)).update({'active' : 1}, False)
-            DBSession.query(CustomerTargetContact).filter(CustomerTargetContact.id.in_(contact_ids)).update({'active' : 1}, False)
+            DBSession.query(CustomerContact).filter(CustomerContact.id.in_(contact_ids)).update({'active' : 1}, False)
 
             DBSession.commit()
             flash(MSG_UPDATE_SUCC, MESSAGE_INFO)

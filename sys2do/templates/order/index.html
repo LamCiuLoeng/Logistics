@@ -7,7 +7,7 @@
 
 
 {% block extJS %}
-
+<script src="{{url_for('static', filename='js/customer/order_todo.js')}}" type="text/javascript"></script>
 <script language="JavaScript" type="text/javascript">
 //<![CDATA[
 	$(document).ready(function(){
@@ -84,7 +84,35 @@
         <li><img src="/static/images/system/order_manage2_35.jpg" width="101" height="21" id="Image7" onmouseover="MM_swapImage('Image7','','/static/images/system/order_manage1_35.jpg',1)" onmouseout="MM_swapImgRestore()" onclick="return toexp();"/></li>
         {% if 'CREATE_DELIVER' is get_permission%}
         <li><img src="/static/images/system/order_manage1_new.jpg" width="101" height="21" id="Image8" onmouseover="MM_swapImage('Image8','','/static/images/system/order_manage_new.jpg',1)" onmouseout="MM_swapImgRestore()" onclick="return todeliver();"/></li>     
-		{% endif %}        
+		{% endif %}
+		<li>
+        	<select onchange="todo_exception(this);">
+        		<option>--是否异常--</option>
+        		<option value="1">标记为异常</option>
+        		<option value="0">取消异常标记</option>
+        	</select/>
+        </li>
+        <li>
+        	<select onchange="todo_less_qty(this);">
+        		<option>--是否少货--</option>
+        		<option value="1">标记为少货</option>
+        		<option value="0">取消少货标记</option>
+        	</select/>
+        </li>
+        <li>
+        	<select onchange="todo_approve(this);">
+        		<option>--审核是否通过--</option>
+        		<option value="1">{{_(ORDER_APPROVED[1])}}</option>
+        		<option value="2">{{_(ORDER_DISAPPROVED[1])}}</option>
+        	</select/>
+        </li>
+        <li>
+        	<select onchange="todo_order_return(this);">
+        		<option>--客户是否回单--</option>
+        		<option value="{{ORDER_NOT_RETURN_NOTE[0]}}">{{_(ORDER_NOT_RETURN_NOTE[1])}}</option>
+        		<option value="{{ORDER_RETURN_NOTE[0]}}">{{_(ORDER_RETURN_NOTE[1])}}</option>
+        	</select/>
+        </li>   
     </ul>
 </div>
 {% endblock %}
@@ -208,9 +236,9 @@
     <td align="center" style="width:120px;">{{mymacros.show_direction(values,'create_by_id')}}{{_('Creator')}}</td>
     <td align="center" style="width:150px;">{{_('Status')}}</td>
     <td align="center" style="width:50px;">审核</td>
-    <td align="center" style="width:150px;">客户付款</td>
     <td align="center" style="width:50px;">异常</td>
     <td align="center" style="width:50px;">少货</td>
+    <td align="center" style="width:100px;">客户回单</td>
   </tr>
   
   {% for r in records.items %}
@@ -219,7 +247,7 @@
 	    <td><a href="{{url_for('.view', action = 'revise',id=r.id)}}">{{r.ref_no|f('没有订单号')}}</a></td>
 	    <td>{{r.no|f}}</td>
 		<td>{{r.source_province|f}}{{r.source_city|f}}</td>
-		<td>{{r.source_company.display_name|f}}</td>
+		<td>{{r.customer.display_name|f}}</td>
 		<td>{{r.destination_province|f}}{{r.destination_city|f}}</td>
 		<td>{{r.destination_company|f}}</td>
 		<td>{{r.qty|f}}</td>
@@ -234,10 +262,10 @@
 		<td>{{r.create_time|ft}}</td>
 		<td>{{r.create_by|f}}</td>
 		<td>{{r.status|showStatus}}</td>
-		<td>{{mymacros.show_approve(r.approve)}}</td>
-		<td>{{mymacros.show_paid(r.paid)}}</td>
-		<td>{{mymacros.show_exception(r.is_exception)}}</td>
-		<td>{{mymacros.show_less_qty(r.is_less_qty)}}</td>
+		<td><span class="approval_span">{{mymacros.show_approve(r.approve)}}</span></td>
+		<td><span class="exception_span">{{mymacros.show_exception(r.is_exception)}}</span></td>
+		<td><span class="lessqty_span">{{mymacros.show_lessqty(r.is_less_qty)}}</span></td>
+		<td><span class="order_return_span">{{mymacros.show_return(r.is_return_note)}}</span></td>
 	  </tr>
   {% endfor %}
   		<tr class="data_table_tr">

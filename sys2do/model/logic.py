@@ -14,7 +14,7 @@ from sys2do.model import DeclarativeBase, metadata, DBSession
 from auth import SysMixin
 from sys2do.model.master import Customer, Supplier, ItemUnit, ShipmentType, \
     WeightUnit, InventoryLocation, Payment, PickupType, PackType, CustomerTarget, \
-    Receiver, Item, Note, Province, City
+    Receiver, Item, Note, Province, City, CustomerSource
 from sys2do.model.auth import CRUDMixin
 from sys2do.model.system import UploadFile
 from sqlalchemy.sql.expression import and_
@@ -37,16 +37,16 @@ class OrderHeader(DeclarativeBase, SysMixin, CRUDMixin):
     note_id = Column(Integer, ForeignKey('master_note.id'), doc = u'票据前缀')
     note = relation(Note, backref = backref("orders", order_by = id), primaryjoin = "and_(Note.id == OrderHeader.note_id, OrderHeader.active == 0)")
     note_no = Column(Text, doc = u'票据号码')
+    customer_id = Column(Integer, ForeignKey('master_customer.id'), doc = u'客户')
+    customer = relation(Customer, backref = backref("orders", order_by = id), primaryjoin = "and_(Customer.id == OrderHeader.customer_id, OrderHeader.active == 0)")
 
     source_province_id = Column(Integer, ForeignKey('master_province.id'), doc = u'始发站(省)')
     source_province = relation(Province, backref = backref("source_orders", order_by = id), primaryjoin = "and_(Province.id == OrderHeader.source_province_id, OrderHeader.active == 0)")
     source_city_id = Column(Integer, ForeignKey('master_city.id'), doc = u'始发站(市)')
     source_city = relation(City, backref = backref("source_orders", order_by = id), primaryjoin = "and_(City.id == OrderHeader.source_city_id, OrderHeader.active == 0)")
 
-
-    source_company_id = Column(Integer, ForeignKey('master_customer.id'), doc = u'发货公司')
-    source_company = relation(Customer, backref = backref("orders", order_by = id), primaryjoin = "and_(Customer.id == OrderHeader.source_company_id, OrderHeader.active == 0)")
-#    source_station = Column(Text)
+    source_company_id = Column(Integer, ForeignKey('master_customer_source.id'), doc = u'发货公司')
+    source_company = relation(CustomerSource)
     source_address = Column(Text, doc = u'发货地址')
     source_contact = Column(Text, doc = u'发货人')
     source_tel = Column(Text, doc = u'发货人电话')
@@ -83,10 +83,8 @@ class OrderHeader(DeclarativeBase, SysMixin, CRUDMixin):
     destination_city_id = Column(Integer, ForeignKey('master_city.id'), doc = u'目的站(市)')
     destination_city = relation(City, backref = backref("destination_orders", order_by = id), primaryjoin = "and_(City.id == OrderHeader.destination_city_id, OrderHeader.active == 0)")
 
-
-#    destination_station = Column(Text)
     destination_company_id = Column(Integer, ForeignKey('master_customer_target.id'), doc = u'收货公司')
-    destination_company = relation(CustomerTarget, backref = backref("orders", order_by = id), primaryjoin = "and_(CustomerTarget.id == OrderHeader.destination_company_id, OrderHeader.active == 0)")
+    destination_company = relation(CustomerTarget)
     destination_address = Column(Text, doc = u'收货地址')
     destination_contact = Column(Text, doc = u'收货人')
     destination_tel = Column(Text, doc = u'收货人电话')

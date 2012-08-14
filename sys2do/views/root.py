@@ -20,8 +20,8 @@ from sys2do.constant import MESSAGE_ERROR, MESSAGE_INFO, MSG_NO_SUCH_ACTION, \
     SYSTEM_DATE_FORMAT
 from sys2do.views import BasicView
 from sys2do.model.master import CustomerProfile, Customer, Supplier, \
-    CustomerTarget, Receiver, CustomerTargetContact, Province, City, Barcode, \
-    CustomerDiquRatio
+    CustomerTarget, Receiver, CustomerContact, Province, City, Barcode, \
+    CustomerDiquRatio, CustomerSource
 from sys2do.model.logic import OrderHeader, TransferLog, PickupDetail, \
     DeliverDetail
 
@@ -70,13 +70,35 @@ class RootView(BasicView):
 
         if master == 'customer_detail':
             c = DBSession.query(Customer).get(_g('id'))
+            ss = [{'id' : s.id , 'name' : s.name } for s in c.sources]
             ts = [{'id' : t.id , 'name' : t.name } for t in c.targets]
 
-            cities = []
-            if _g('need_city_list', None) == '1' and c.province_id:
-                cities = [{'id' : city.id, 'name' : city.name } for city in c.province.children()]
 
-            return jsonify({'code' : 0 , 'msg' : '' , 'data' : c.populate() , 'targets' : ts, 'cities' : cities})
+            return jsonify({'code' : 0 , 'msg' : '' ,
+                            'data' : c.populate() ,
+                            'sources' : ss,
+                            'targets' : ts,
+                            })
+
+
+        if master == 'source':
+            ts = DBSession.query(CustomerSource).filter(and_(CustomerSource.active == 0, CustomerSource.customer_id == _g('id')))
+            data = [{'id' : c.id , 'name' : c.name } for c in ts]
+            return jsonify({'code' : 0, 'msg' : '', 'data' : data})
+
+
+        if master == 'source_detail':
+            s = DBSession.query(CustomerSource).get(_g('id'))
+            data = s.populate()
+
+            if s.default_contact() : data['contact'] = s.default_contact().populate()
+            else: data['contact'] = {}
+
+            cities = []
+            if _g('need_city_list', None) == '1' and s.province_id:
+                cities = [{'id' : city.id, 'name' : city.name } for city in s.province.children()]
+            return jsonify({'code' : 0 , 'msg' : '' , 'data' : data, 'cities' : cities})
+
 
         if master == 'target':
             ts = DBSession.query(CustomerTarget).filter(and_(CustomerTarget.active == 0, CustomerTarget.customer_id == _g('id')))
@@ -87,7 +109,7 @@ class RootView(BasicView):
         if master == 'target_detail':
             t = DBSession.query(CustomerTarget).get(_g('id'))
             data = t.populate()
-            if t.contact: data['contact'] = t.contact.populate()
+            if t.default_contact(): data['contact'] = t.default_contact().populate()
             else : data['contact'] = {}
 
             cities = []
@@ -97,18 +119,20 @@ class RootView(BasicView):
             return jsonify({'code' : 0 , 'msg' : '' , 'data' : data, 'cities' : cities})
 
 
-        if master == 'target_contact_search':
-            ts = DBSession.query(CustomerTargetContact).filter(and_(CustomerTargetContact.active == 0,
-                                                               CustomerTargetContact.customer_target_id == _g('customer_target_id'),
-                                                               CustomerTargetContact.name.op('like')("%%%s%%" % _g('customer_target_contact')),
+        if master == 'contact_search':
+            ts = DBSession.query(CustomerContact).filter(and_(CustomerContact.active == 0,
+                                                              CustomerContact.type == _g('type'),
+                                                              CustomerContact.refer_id == _g('refer_id'),
+                                                              CustomerContact.name.op('like')("%%%s%%" % _g('customer_contact')),
                                                                )).all()
             data = [t.populate() for t in ts]
             return jsonify({'code' : 0 , 'msg' : '' , 'data' : data})
 
+
         if master == 'target_contact_detail':
             try:
-                c = DBSession.query(CustomerTargetContact).filter(and_(CustomerTargetContact.active == 0,
-                                                               CustomerTargetContact.name == _g('name'),
+                c = DBSession.query(CustomerContact).filter(and_(CustomerContact.active == 0,
+                                                               CustomerContact.name == _g('name'),
                                                                )).one()
                 return jsonify({'code' : 0 , 'data' : c.populate()})
             except:

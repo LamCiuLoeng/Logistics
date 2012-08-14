@@ -20,6 +20,7 @@ from sys2do.constant import SYSTEM_DATETIME_FORMAT
 from sys2do.model.system import UploadFile
 from sys2do.util.barcode_helper import generate_barcode_file
 
+
 #__all__ = ['']
 
 class Payment(DeclarativeBase, SysMixin, CRUDMixin):
@@ -219,6 +220,75 @@ class City(DeclarativeBase, SysMixin, CRUDMixin):
 #    def parent(self):  return DBSession.query(City).filter(City.code == self.parent_code).one()
 
 
+class Note(DeclarativeBase, SysMixin, CRUDMixin):
+    __tablename__ = 'master_note'
+
+    id = Column(Integer, autoincrement = True, primary_key = True)
+    name = Column(Text)
+    _range = Column('range', Text)
+    remark = Column(Text)
+
+    def __str__(self): return self.name
+    def __repr__(self): return self.name
+    def __unicode__(self): return self.name
+
+    @classmethod
+    def _get_fields(clz):
+        return ['name', 'range', 'remark']
+
+    def _get_range(self):
+        if not self._range : return []
+        return map(lambda v: v.split("~"), self._range.split("|"))
+
+    def _set_range(self, ranges):
+        if not ranges: self._range = None
+        self._range = ("|").join([("~").join(r) for r in ranges])
+
+    range = synonym('_range', descriptor = property(_get_range, _set_range))
+
+
+    def populate(self):
+        _info(self.range)
+        result = {
+                  'id' : self.id,
+                  'range' : self.range,
+                  }
+        for f in ['name', 'remark']:
+            result[f] = unicode(getattr(self, f) or '')
+        return result
+
+
+    @classmethod
+    def saveAsNew(clz, v):
+
+        begins = _gp('begin_')
+        ends = _gp('end_')
+        range = map(lambda (vv1, vv2) : (vv1[1], vv2[1]), filter(lambda (v1, v2) : v1[1] and v2[1], zip(begins, ends)))
+
+        params = {
+                  'name' : v.get('name', None) or None,
+                  'range' : range,
+                  'remark' : v.get('remark', None) or None,
+                  }
+
+        obj = clz(**params)
+        DBSession.add(obj)
+        return obj
+
+
+    def saveAsUpdate(self, v):
+        begins = _gp('begin_')
+        ends = _gp('end_')
+        self.range = map(lambda (vv1, vv2) : (vv1[1], vv2[1]), filter(lambda (v1, v2) : v1[1] and v2[1], zip(begins, ends)))
+
+        for f in ['name', 'remark']:
+            setattr(self, f, v.get(f, None) or None)
+        return self
+
+
+
+
+
 
 
 class Customer(DeclarativeBase, SysMixin, CRUDMixin):
@@ -238,9 +308,12 @@ class Customer(DeclarativeBase, SysMixin, CRUDMixin):
     mobile = Column(Text)
     phone = Column(Text)
     email = Column(Text)
+
+    note_id = Column(Integer, ForeignKey('master_note.id'), doc = u'票据前缀')
+    note = relation(Note)
+
     remark = Column(Text)
-    payment_id = Column(Integer, ForeignKey('master_payment.id'))
-    payment = relation(Payment)
+
 
     def __str__(self): return self.name
     def __repr__(self): return self.name
@@ -249,7 +322,7 @@ class Customer(DeclarativeBase, SysMixin, CRUDMixin):
     def populate(self):
         params = {}
         for k in ['id', 'name', 'no', 'province_id', 'city_id', 'address', 'phone',
-                  'mobile', 'contact_person', 'remark', 'payment_id', 'email' ]:
+                  'mobile', 'contact_person', 'email' , 'note_id', 'remark']:
             params[k] = getattr(self, k)
 
         params['create_time'] = self.create_time.strftime(SYSTEM_DATETIME_FORMAT)
@@ -260,6 +333,58 @@ class Customer(DeclarativeBase, SysMixin, CRUDMixin):
     @classmethod
     def _get_fields(clz):
         return ['name', 'no', 'province_id', 'city_id', 'address', 'phone', 'mobile', 'email', 'contact_person', 'remark', 'payment_id']
+
+
+
+
+
+class CustomerSource(DeclarativeBase, SysMixin, CRUDMixin):
+    __tablename__ = 'master_customer_source'
+
+
+    id = Column(Integer, autoincrement = True, primary_key = True)
+    customer_id = Column(Integer, ForeignKey('master_customer.id'))
+    customer = relation(Customer, backref = backref("sources", order_by = id), primaryjoin = "and_(Customer.id == CustomerSource.customer_id, CustomerSource.active == 0)")
+    name = Column(Text)
+
+    province_id = Column(Integer, ForeignKey('master_province.id'))
+    province = relation(Province)
+    city_id = Column(Integer, ForeignKey('master_city.id'))
+    city = relation(City)
+    remark = Column(Text)
+    payment_id = Column(Integer, ForeignKey('master_payment.id'))
+    payment = relation(Payment)
+
+
+    def __str__(self): return self.name
+    def __repr__(self): return self.name
+    def __unicode__(self): return self.name
+
+    def populate(self):
+        params = {}
+        for k in ['id', 'name', 'customer_id', 'province_id', 'city_id', 'payment_id']:
+            params[k] = getattr(self, k)
+        return params
+
+
+    def contacts(self):
+        return DBSession.query(CustomerContact).filter(and_(CustomerContact.active == 0 ,
+                                                     CustomerContact.customer_id == self.customer_id,
+                                                     CustomerContact.refer_id == self.id,
+                                                     CustomerContact.type == 'S',
+                                                     )).order_by(CustomerContact.name)
+
+    def default_contact(self):
+        try:
+            return DBSession.query(CustomerContact).filter(and_(CustomerContact.active == 0 ,
+                                                     CustomerContact.customer_id == self.customer_id,
+                                                     CustomerContact.refer_id == self.id,
+                                                     CustomerContact.type == 'S',
+                                                     CustomerContact.is_default == 1
+                                                     )).one()
+        except:
+            return None
+
 
 
 
@@ -307,26 +432,64 @@ class CustomerTarget(DeclarativeBase, SysMixin):
             params[k] = getattr(self, k)
         return params
 
-    @property
-    def contact(self):
+
+    def contacts(self):
+        return DBSession.query(CustomerContact).filter(and_(CustomerContact.active == 0 ,
+                                                     CustomerContact.customer_id == self.customer_id,
+                                                     CustomerContact.refer_id == self.id,
+                                                     CustomerContact.type == 'T',
+                                                     )).order_by(CustomerContact.name)
+
+    def default_contact(self):
         try:
-            c = DBSession.query(CustomerTargetContact).filter(and_(CustomerTargetContact.active == 0,
-                                                           CustomerTargetContact.customer_target_id == self.id ,
-                                                           CustomerTargetContact.is_default == 1
-                                                           )).one()
-            return c
+            return DBSession.query(CustomerContact).filter(and_(CustomerContact.active == 0 ,
+                                                     CustomerContact.customer_id == self.customer_id,
+                                                     CustomerContact.refer_id == self.id,
+                                                     CustomerContact.type == 'T',
+                                                     CustomerContact.is_default == 1
+                                                     )).one()
         except:
             return None
 
 
 
+#class CustomerTargetContact(DeclarativeBase, SysMixin):
+#    __tablename__ = 'master_customer_target_contact'
+#
+#    id = Column(Integer, autoincrement = True, primary_key = True)
+#    customer_target_id = Column(Integer, ForeignKey('master_customer_target.id'))
+#    customer_target = relation(CustomerTarget, backref = backref("contacts", order_by = id), primaryjoin = "and_(CustomerTarget.id == CustomerTargetContact.customer_target_id, CustomerTargetContact.active == 0)")
+#    name = Column(Text)
+#    address = Column(Text)
+#    mobile = Column(Text)
+#    phone = Column(Text)
+#    email = Column(Text)
+#    remark = Column(Text)
+#    is_default = Column(Integer, default = 0) # 1 is default , 0 is normal 
+#
+#    def __str__(self): return self.name
+#    def __repr__(self): return self.name
+#    def __unicode__(self): return self.name
+#
+#
+#    def populate(self):
+#        params = {}
+#        for k in ['id', 'name', 'phone', 'email', 'mobile', 'address']:
+#            params[k] = getattr(self, k)
+#        return params
 
-class CustomerTargetContact(DeclarativeBase, SysMixin):
-    __tablename__ = 'master_customer_target_contact'
+
+
+
+
+class CustomerContact(DeclarativeBase, SysMixin):
+    __tablename__ = 'master_customer_contact'
 
     id = Column(Integer, autoincrement = True, primary_key = True)
-    customer_target_id = Column(Integer, ForeignKey('master_customer_target.id'))
-    customer_target = relation(CustomerTarget, backref = backref("contacts", order_by = id), primaryjoin = "and_(CustomerTarget.id == CustomerTargetContact.customer_target_id, CustomerTargetContact.active == 0)")
+    customer_id = Column(Integer, ForeignKey('master_customer.id'))
+    customer = relation(Customer, backref = backref("contacts", order_by = id), primaryjoin = "and_(Customer.id == CustomerContact.customer_id, CustomerContact.active == 0)")
+    type = Column(Text, default = None) # S is source contact , T is target contact
+    refer_id = Column(Integer, default = None)
     name = Column(Text)
     address = Column(Text)
     mobile = Column(Text)
@@ -342,9 +505,14 @@ class CustomerTargetContact(DeclarativeBase, SysMixin):
 
     def populate(self):
         params = {}
-        for k in ['id', 'name', 'phone', 'email', 'mobile', 'address']:
+        for k in ['id', 'customer_id', 'type', 'refer_id', 'name', 'phone', 'email', 'mobile', 'address', 'is_default']:
             params[k] = getattr(self, k)
         return params
+
+
+
+
+
 
 
 
@@ -518,70 +686,7 @@ class InventoryItem(DeclarativeBase, SysMixin):
 #        return DBSession.query(OrderDetail).get(self.refer_order_detail_id)
 
 
-class Note(DeclarativeBase, SysMixin, CRUDMixin):
-    __tablename__ = 'master_note'
 
-    id = Column(Integer, autoincrement = True, primary_key = True)
-    name = Column(Text)
-    _range = Column('range', Text)
-    remark = Column(Text)
-
-    def __str__(self): return self.name
-    def __repr__(self): return self.name
-    def __unicode__(self): return self.name
-
-    @classmethod
-    def _get_fields(clz):
-        return ['name', 'range', 'remark']
-
-    def _get_range(self):
-        if not self._range : return []
-        return map(lambda v: v.split("~"), self._range.split("|"))
-
-    def _set_range(self, ranges):
-        if not ranges: self._range = None
-        self._range = ("|").join([("~").join(r) for r in ranges])
-
-    range = synonym('_range', descriptor = property(_get_range, _set_range))
-
-
-    def populate(self):
-        _info(self.range)
-        result = {
-                  'id' : self.id,
-                  'range' : self.range,
-                  }
-        for f in ['name', 'remark']:
-            result[f] = unicode(getattr(self, f) or '')
-        return result
-
-
-    @classmethod
-    def saveAsNew(clz, v):
-
-        begins = _gp('begin_')
-        ends = _gp('end_')
-        range = map(lambda (vv1, vv2) : (vv1[1], vv2[1]), filter(lambda (v1, v2) : v1[1] and v2[1], zip(begins, ends)))
-
-        params = {
-                  'name' : v.get('name', None) or None,
-                  'range' : range,
-                  'remark' : v.get('remark', None) or None,
-                  }
-
-        obj = clz(**params)
-        DBSession.add(obj)
-        return obj
-
-
-    def saveAsUpdate(self, v):
-        begins = _gp('begin_')
-        ends = _gp('end_')
-        self.range = map(lambda (vv1, vv2) : (vv1[1], vv2[1]), filter(lambda (v1, v2) : v1[1] and v2[1], zip(begins, ends)))
-
-        for f in ['name', 'remark']:
-            setattr(self, f, v.get(f, None) or None)
-        return self
 
 
 

@@ -60,17 +60,20 @@
     	 <li style="width:180px;"><span><sup class="warn">*</sup>&nbsp;单号</span>
     	    <input name="ref_no" id="ref_no" type="text" class="must_input" style="width:100px"/>
   	    </li>
+  	    <li style="width:740px;"><span>&nbsp;系统编号</span>
+    	    <input name="no" id="no" type="text" class="numeric" style="width:150px"/>
+  	    </li>
+  	    <li style="width:459px;"><span><sup class="warn">*</sup>&nbsp;客户</span>
+    	    {{mymacros.select(id='customer_id',list=MASTER_ALL('Customer'),value=None,class="must_input",style="width:360px")}}
+  	    </li>
   	    <li style="width:180px;"><span><sup class="warn">*</sup>&nbsp;票据前缀</span>
     	    {{mymacros.select(id='note_id',list=MASTER_ALL('Note'),value=None,class="must_input",style="width:100px")}}
   	    </li>
   	    <li style="width:180px;"><span><sup class="warn">*</sup>&nbsp;票据单号</span>
     	    <input name="note_no" id="note_no" type="text" class="must_input numeric" style="width:100px"/>
   	    </li>
-  	    <li style="width:350px;"><span>&nbsp;系统编号</span>
-    	    <input name="no" id="no" type="text" class="numeric" style="width:150px"/>
-  	    </li>
     	  <li style="width:459px;"><span><sup class="warn">*</sup>&nbsp;{{_('Source Company')}}</span>
-    	  	  {{mymacros.select(id='source_company_id',list=MASTER_ALL('Customer'),value=None,class="must_input",style="width:360px")}}
+    	  	  {{mymacros.select(id='source_company_id',list=[],value=None,class="must_input",style="width:360px")}}
     	  </li>
     	  <li style="width:459px;"><span><sup class="warn">*</sup>&nbsp;{{_('Destination Company')}}</span>
     	  	<select name="destination_company_id" id="destination_company_id"style="width:360px" class="must_input">

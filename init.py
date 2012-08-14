@@ -13,7 +13,7 @@ import sys
 from sys2do.model.master import CustomerProfile, Customer, \
     ItemUnit, InventoryLocation, WeightUnit, ShipmentType, Payment, Supplier, \
     SupplierProfile, Ratio, PickupType, PackType, Diqu, CustomerTarget, Receiver, \
-    Item, CustomerTargetContact, Note
+    Item, CustomerContact, Note, CustomerSource
 reload(sys)
 sys.setdefaultencoding('utf8')
 
@@ -134,10 +134,13 @@ def init():
 
         gFin = Group(name = u'财务组', display_name = u'财务组', type = 0)
         gFin.permissions = [
-                            pCreateMaster, pUpdateMaster, pDeleteMaster, pSearchMaster, pManageMaster,
-                            pCreateOrder, pUpdateOrder, pDeleteOrder, pSearchOrder, pSearchAllOrder, pManageOrder,
-                            pCreateDeliver, pUpdateDeliver, pDeleteDeliver, pSearchDeliver, pManageDeliver, pSearchAllDeliver,
-                            pManageFin, pFinSearch, pFinApprove, pFinPaid, pFinSupplierPaid
+                              pCreateMaster, pUpdateMaster, pDeleteMaster, pSearchMaster, pManageMaster,
+                              pCreateOrder, pUpdateOrder, pDeleteOrder, pSearchOrder, pSearchAllOrder, pManageOrder,
+                              pCreateDeliver, pUpdateDeliver, pDeleteDeliver, pSearchDeliver, pSearchAllDeliver, pManageDeliver,
+                              pCreateCustomer, pUpdateCustomer, pDeleteCustomer, pSearchCustomer,
+                              pCreateSupplier, pUpdateSupplier, pDeleteSupplier, pSearchSupplier,
+                              pCreateWarehouse, pUpdateWarehouse, pDeleteWarehouse, pSearchWarehouse,
+                              pManageFin, pFinSearch, pFinApprove, pFinPaid, pFinSupplierPaid
                             ]
         gFin.users = [uFina, uUser1, uUser2, uUser4, uUser5, uUser12, uUser15]
 
@@ -227,68 +230,6 @@ def init():
         DBSession.add(Item(name = u"器具"))
         DBSession.add(Item(name = u"家具"))
 
-
-        kinlong = Customer(name = u"广东坚朗五金制品股份有限公司", display_name = u'坚朗', province_id = 19, city_id = 304, address = u"塘厦镇大坪村工业区卢地坑路3号", phone = "0769-82166666", contact_person = u'陈先生', mobile = '12800138999', payment = payment1)
-        kinlong_profile = CustomerProfile(name = "KINLONG_PROFILE", customer = kinlong, group = gKinlongGroup)
-
-        kinlong_target1 = CustomerTarget(customer = kinlong, name = u'收货公司一')
-        kinlong_target1_c1 = CustomerTargetContact(customer_target = kinlong_target1, name = u'李一', mobile = u'13880138111', phone = u'1234561', address = u'福建省福州市AA区', is_default = 1)
-        kinlong_target1_c2 = CustomerTargetContact(customer_target = kinlong_target1, name = u'张一', mobile = u'13880138112', phone = u'1234562', address = u'福建省福州市BB区',)
-        kinlong_target1_c3 = CustomerTargetContact(customer_target = kinlong_target1, name = u'王一', mobile = u'13880138113', phone = u'1234563', address = u'福建省福州市CC区',)
-
-        kinlong_target2 = CustomerTarget(customer = kinlong, name = u'收货公司二')
-        kinlong_target2_c1 = CustomerTargetContact(customer_target = kinlong_target2, name = u'樊一', mobile = u'13800138221', phone = u'4578251', address = u'广东省深圳市AA区', is_default = 1)
-        kinlong_target2_c2 = CustomerTargetContact(customer_target = kinlong_target2, name = u'林一', mobile = u'13800138222', phone = u'4578252', address = u'广东省深圳市BB区')
-        kinlong_target2_c3 = CustomerTargetContact(customer_target = kinlong_target2, name = u'余一', mobile = u'13800138223', phone = u'4578253', address = u'广东省深圳市CC区')
-
-        kinlong_target3 = CustomerTarget(customer = kinlong, name = u'收货公司三')
-        kinlong_target3_c1 = CustomerTargetContact(customer_target = kinlong_target3, name = u'樊一', mobile = u'13800138331', phone = u'14587541', address = u'湖南省长沙市AA区', is_default = 1)
-        kinlong_target3_c2 = CustomerTargetContact(customer_target = kinlong_target3, name = u'林一', mobile = u'13800138332', phone = u'14587542', address = u'湖南省长沙市BB区')
-        kinlong_target3_c3 = CustomerTargetContact(customer_target = kinlong_target3, name = u'余一', mobile = u'13800138333', phone = u'14587543', address = u'湖南省长沙市CC区')
-
-        weiqian = Customer(name = u"味千（中国）控股有限公司", display_name = u'味千', province_id = 19, city_id = 290, address = u"金田路3037号金中环商务大厦主楼23号", phone = "0755-8280 5333", contact_person = u'胡先生', mobile = '12800138999', payment = payment1)
-        weiqian_profile = CustomerProfile(name = "WEIQIAN_PROFILE", customer = weiqian, group = gWeiqianGroup)
-
-        weiqian_target1 = CustomerTarget(customer = weiqian, name = u'味千收货公司一')
-        weiqian_target1_c1 = CustomerTargetContact(customer_target = weiqian_target1 , name = u'张二', mobile = u'1388013111', phone = u'123456', address = u'福建省福清市AA区', is_default = 1)
-        weiqian_target1_c2 = CustomerTargetContact(customer_target = weiqian_target1 , name = u'李二', mobile = u'1388013111', phone = u'123456', address = u'福建省福清市BB区')
-
-        weiqian_target2 = CustomerTarget(customer = weiqian, name = u'味千收货公司二')
-        weiqian_target2_c1 = CustomerTargetContact(customer_target = weiqian_target2 , name = u'林二', mobile = u'1388013111', phone = u'123456', address = u'广东省珠海市AA区', is_default = 1)
-        weiqian_target2_c2 = CustomerTargetContact(customer_target = weiqian_target2 , name = u'五二', mobile = u'1388013111', phone = u'123456', address = u'广东省珠海市BB区')
-
-        weiqian_target3 = CustomerTarget(customer = weiqian, name = u'味千收货公司三')
-        weiqian_target2_c1 = CustomerTargetContact(customer_target = weiqian_target3 , name = u'林三', mobile = u'1388013111', phone = u'123456', address = u'湖北省武汉市AA区', is_default = 1)
-        weiqian_target2_c2 = CustomerTargetContact(customer_target = weiqian_target3 , name = u'五三', mobile = u'1388013111', phone = u'123456', address = u'湖北省武汉市BB区')
-
-        supplier1 = Supplier(name = u"承运商一", display_name = u'承运商一', address = u"广东省珠海市吉大区", phone = "0756-25361422", contact_person = u"林先生")
-        supplier1_profile = SupplierProfile(name = "SUPPLIER1_PROFILE", supplier = supplier1, group = gSupplier1)
-
-
-        DBSession.add_all([kinlong, kinlong_profile,
-                           kinlong_target1, kinlong_target1_c1, kinlong_target1_c2, kinlong_target1_c3,
-                           kinlong_target2, kinlong_target2_c1, kinlong_target2_c2, kinlong_target2_c3,
-                           kinlong_target3, kinlong_target3_c1, kinlong_target3_c2, kinlong_target3_c3,
-                           weiqian, weiqian_profile,
-                           weiqian_target1, weiqian_target1_c1, weiqian_target1_c2,
-                           weiqian_target2, weiqian_target2_c1, weiqian_target2_c2,
-                           weiqian_target3, weiqian_target2_c1, weiqian_target2_c2,
-                           supplier1, supplier1_profile])
-
-
-        receiver1 = Receiver(code = 'C001', name = '李司机', tel = '0755-12345671', mobile = '13800138111',)
-        receiver2 = Receiver(code = 'C002', name = '张司机', tel = '0755-12345672', mobile = '13800138222',)
-        receiver3 = Receiver(code = 'C003', name = '黄司机', tel = '0755-12345673', mobile = '13800138333',)
-        receiver4 = Receiver(code = 'C004', name = '王司机', tel = '0755-12345674', mobile = '13800138444',)
-        DBSession.add_all([receiver1, receiver2, receiver3, receiver4])
-
-
-        DBSession.add_all([
-                           Note(name = u'坚朗', range = [('1001', '2000'), ('3001', '4000')]),
-                           Note(name = u'味千', range = [('2001', '3000'), ('4001', '5000')]),
-                           ])
-
-
         print 'insert diqu'
         province_f = open('sys2do/sql/master_province.sql')
         province_sql = "".join(province_f.readlines())
@@ -301,6 +242,62 @@ def init():
         conn = DBSession.connection()
         conn.execute(province_sql)
         conn.execute(city_sql)
+
+        receiver1 = Receiver(code = 'C001', name = '李司机', tel = '0755-12345671', mobile = '13800138111',)
+        receiver2 = Receiver(code = 'C002', name = '张司机', tel = '0755-12345672', mobile = '13800138222',)
+        receiver3 = Receiver(code = 'C003', name = '黄司机', tel = '0755-12345673', mobile = '13800138333',)
+        receiver4 = Receiver(code = 'C004', name = '王司机', tel = '0755-12345674', mobile = '13800138444',)
+        DBSession.add_all([receiver1, receiver2, receiver3, receiver4])
+
+        note1 = Note(name = u'坚朗', range = [('1001', '2000'), ('3001', '4000')])
+        note2 = Note(name = u'味千', range = [('2001', '3000'), ('4001', '5000')])
+        DBSession.add_all([
+                           note1, note2,
+                           ])
+
+
+
+        kinlong = Customer(name = u"广东坚朗五金制品股份有限公司", display_name = u'坚朗', province_id = 19, city_id = 304,
+                           address = u"塘厦镇大坪村工业区卢地坑路3号", phone = "0769-82166666", contact_person = u'陈先生',
+                           mobile = '12800138999', note = note1)
+
+        kinlong_source1 = CustomerSource(customer = kinlong, name = u"坚朗一厂", province_id = 19, city_id = 304, payment = payment1)  #东莞
+        kinlong_source2 = CustomerSource(customer = kinlong, name = u"坚朗二厂", province_id = 19, city_id = 304, payment = payment1)  #东莞
+        kinlong_source3 = CustomerSource(customer = kinlong, name = u"坚朗三厂", province_id = 19, city_id = 304, payment = payment1)  #东莞
+        kinlong_target1 = CustomerTarget(customer = kinlong, name = u'盐城办', province_id = 10, city_id = 174) #盐城
+        kinlong_target2 = CustomerTarget(customer = kinlong, name = u'合肥办', province_id = 12, city_id = 190)  #合肥
+
+        DBSession.add_all([
+                           kinlong, kinlong_source1, kinlong_source2, kinlong_source3,
+                           ])
+
+        DBSession.flush()
+
+
+        kinlong_source1_c1 = CustomerContact(customer = kinlong, type = 'S', refer_id = kinlong_source1.id, name = u'李小明', mobile = u'13880138111', phone = u'1234561', address = u'厚街', is_default = 1)
+        kinlong_source1_c2 = CustomerContact(customer = kinlong, type = 'S', refer_id = kinlong_source1.id, name = u'张三', mobile = u'13880138112', phone = u'1234562', address = u'长安',)
+
+        kinlong_source2_c1 = CustomerContact(customer = kinlong, type = 'S', refer_id = kinlong_source2.id, name = u'王二', mobile = u'13880138113', phone = u'1234563', address = u'常平',)
+        kinlong_source2_c2 = CustomerContact(customer = kinlong, type = 'S', refer_id = kinlong_source2.id, name = u'王小川', mobile = u'13880138114', phone = u'1234563', address = u'虎门',)
+
+        kinlong_source3_c1 = CustomerContact(customer = kinlong, type = 'S', refer_id = kinlong_source3.id, name = u'黄强', mobile = u'13880138115', phone = u'1234563', address = u'塘厦',)
+        kinlong_source3_c2 = CustomerContact(customer = kinlong, type = 'S', refer_id = kinlong_source3.id, name = u'钟远', mobile = u'13880138116', phone = u'1234563', address = u'大岭山',)
+
+
+        kinlong_target1_c1 = CustomerContact(customer = kinlong, type = 'T', refer_id = kinlong_target1.id, name = u'李四', mobile = u'13880138117', phone = u'1234563', address = u'亭湖区先锋街道',)
+        kinlong_target1_c2 = CustomerContact(customer = kinlong, type = 'T', refer_id = kinlong_target1.id, name = u'樊五', mobile = u'13880138118', phone = u'1234563', address = u'文峰街道',)
+
+        kinlong_target2_c1 = CustomerContact(customer = kinlong, type = 'T', refer_id = kinlong_target2.id, name = u'陈先生', mobile = u'13880138119', phone = u'1234563', address = u'庐阳区三孝口',)
+        kinlong_target2_c2 = CustomerContact(customer = kinlong, type = 'T', refer_id = kinlong_target2.id, name = u'林先生', mobile = u'13880138120', phone = u'1234563', address = u'蜀山区荷叶地街道',)
+
+
+        DBSession.add_all([
+                           kinlong_source1_c1, kinlong_source1_c2, kinlong_source2_c1, kinlong_source2_c2, kinlong_source3_c1, kinlong_source3_c2,
+                           kinlong_target1_c1, kinlong_target1_c2, kinlong_target2_c1, kinlong_target2_c2,
+                           ])
+
+
+
 
         DBSession.commit()
         print "finish init!"

@@ -78,23 +78,28 @@
     
     <div id="order_header">
   <ul>
-    	  
     	  <li style="width:180px;"><span><sup class="warn">*</sup>&nbsp;单号</span>
     	    <input name="ref_no" id="ref_no" type="text" style="width:100px" value="{{header.ref_no|f}}" class="must_input"/>
   	    </li>
-  	     <li style="width:180px;"><span><sup class="warn">*</sup>&nbsp;票据前缀</span>    	    
+
+    	  <li style="width:740px;"><span>&nbsp;系统编号</span><input type="text" name="no" id="no" value="{{header.no|f}}" class="numeric" style="width:100px" readonly="true"/></li>
+
+    	 <li style="width:459px;"><span><sup class="warn">*</sup>&nbsp;客户</span>
+    	    {{mymacros.select(id='customer_id',list=MASTER_ALL('Customer'),value=header.customer_id,class="must_input",style="width:360px")}}
+  	    </li>
+  	    <li style="width:180px;"><span><sup class="warn">*</sup>&nbsp;票据前缀</span>
     	    {{mymacros.select(id='note_id',list=MASTER_ALL('Note'),value=header.note_id,class="must_input",style="width:100px")}}
   	    </li>
-  	    <li style="width:200px;"><span><sup class="warn">*</sup>&nbsp;票据单号</span>
+  	    <li style="width:180px;"><span><sup class="warn">*</sup>&nbsp;票据单号</span>
     	    <input name="note_no" id="note_no" type="text" class="must_input numeric" style="width:100px" value="{{header.note_no|f}}"/>
   	    </li>
-    	  <li style="width:200px;"><span>系统编号</span><input type="text" name="no" id="no" value="{{header.no|f}}" class="numeric" style="width:100px" readonly="true"/></li>
     	 
     	  <li style="width:459px;"><span><sup class="warn">*</sup>&nbsp;{{_('Source Company')}}</span>
-    	      {{mymacros.select(id='source_company_id',list=MASTER_ALL('Customer'),value=header.source_company_id,class="must_input",style="width:360px")}}
+    	      {{mymacros.select(id='source_company_id',list=header.customer.sources,value=header.source_company_id,class="must_input",style="width:360px")}}
     	  </li>
+    	 
     	  <li style="width:459px;height:20px"><span><sup class="warn">*</sup>&nbsp;{{_('Destination Company')}}</span>
-    	      {{mymacros.select(id='destination_company_id',list=targets,value=header.destination_company_id,class="must_input",style="width:360px")}}
+    	      {{mymacros.select(id='destination_company_id',list=header.customer.targets,value=header.destination_company_id,class="must_input",style="width:360px")}}
     	  </li>
     	  <li style="width:459px;"><span><sup class="warn">*</sup>&nbsp;{{_('Source Contact')}}</span>
     	    <input name="source_contact" id="source_contact" type="text" style="width:360px" value="{{header.source_contact|f}}" class="must_input"/>
@@ -221,19 +226,19 @@
 	</tr>
 	<tr>
 		<td align="center"><span style="width:180px;">
-	      <input name="sendout_charge" id="sendout_charge" type="text" class="order_add_div_body_input numeric compute" style="width:70px" value="{{header.sendout_charge|f}}"/>
+	      <input name="sendout_charge" id="sendout_charge" type="text" class="order_add_div_body_input numeric compute number_input_right" style="width:70px" value="{{header.sendout_charge|f}}"/>
 	    </span></td>
 	    <td align="center"><span style="width:180px;">
-	      <input name="receive_charge" id="receive_charge" type="text" class="order_add_div_body_input numeric compute" style="width:70px" value="{{header.receive_charge|f}}"/>
+	      <input name="receive_charge" id="receive_charge" type="text" class="order_add_div_body_input numeric compute number_input_right" style="width:70px" value="{{header.receive_charge|f}}"/>
 	    </span></td>
 	    <td align="center"><span style="width:180px;">
-	      <input name="package_charge" id="package_charge" type="text" class="order_add_div_body_input numeric compute" style="width:70px" value="{{header.package_charge|f}}"/>
+	      <input name="package_charge" id="package_charge" type="text" class="order_add_div_body_input numeric compute number_input_right" style="width:70px" value="{{header.package_charge|f}}"/>
 	    </span></td>
 	    <td align="center"><span style="width:180px;">
-	      <input name="insurance_charge" id="insurance_charge" type="text" class="order_add_div_body_input numeric compute" style="width:70px" value="{{header.insurance_charge|f}}"/>
+	      <input name="insurance_charge" id="insurance_charge" type="text" class="order_add_div_body_input numeric compute number_input_right" style="width:70px" value="{{header.insurance_charge|f}}"/>
 	    </span></td>
 	    <td align="center"><span style="width:180px;">
-	      <input name="other_charge" id="other_charge" type="text" class="order_add_div_body_input numeric compute" style="width:70px" value="{{header.other_charge|f}}"/>
+	      <input name="other_charge" id="other_charge" type="text" class="order_add_div_body_input numeric compute number_input_right" style="width:70px" value="{{header.other_charge|f}}"/>
 	    </span></td>
 
 	</tr>

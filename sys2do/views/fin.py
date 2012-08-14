@@ -17,7 +17,8 @@ from webhelpers import paginate
 
 from sys2do.views import BasicView
 from sys2do.util.decorator import templated, login_required
-from sys2do.model.master import Customer, CustomerTarget, Province
+from sys2do.model.master import Customer, CustomerTarget, Province, \
+    CustomerSource
 from sys2do.model import DBSession
 from sys2do.util.common import _g, getMasterAll, _error
 from sys2do.constant import MESSAGE_INFO, MSG_SAVE_SUCC, MSG_UPDATE_SUCC, \
@@ -41,9 +42,8 @@ class FinView(BasicView):
     def index(self):
         if _g('SEARCH_SUBMIT'):  # come from search
             values = {'page' : 1}
-            for f in ['no', 'create_time_from', 'create_time_to', 'ref_no',
+            for f in ['no', 'create_time_from', 'create_time_to', 'ref_no', 'customer_id', 'source_company_id',
                       'source_province_id', 'source_city_id', 'destination_province_id', 'destination_city_id',
-                      'source_company_id', 'destination_company_id',
                       'approve', 'paid', 'is_exception', 'is_less_qty', 'is_return_note'] :
                 values[f] = _g(f)
                 values['field'] = _g('field', None) or 'create_time'
@@ -79,12 +79,13 @@ class FinView(BasicView):
         else: destination_cites = []
         if values.get('destination_city_id', None):  conditions.append(OrderHeader.destination_city_id == values['destination_city_id'])
 
-        if values.get('source_company_id', None):
-            conditions.append(OrderHeader.source_company_id == values['source_company_id'])
-            targets = DBSession.query(CustomerTarget).filter(and_(CustomerTarget.active == 0, CustomerTarget.customer_id == values['source_company_id']))
+        if values.get('customer_id', None):
+            conditions.append(OrderHeader.customer_id == values['customer_id'])
+            sources = DBSession.query(CustomerSource).filter(and_(CustomerSource.active == 0, CustomerSource.customer_id == values['customer_id']))
         else:
-            targets = []
-        if values.get('destination_company_id', None):       conditions.append(OrderHeader.destination_company_id == values['destination_company_id'])
+            sources = []
+
+        if values.get('source_company_id', None):       conditions.append(OrderHeader.source_company_id == values['source_company_id'])
         if values.get('approve', None):        conditions.append(OrderHeader.approve == values['approve'])
         if values.get('paid', None):           conditions.append(OrderHeader.paid == values['paid'])
         if values.get('is_exception', None):   conditions.append(OrderHeader.is_exception == values['is_exception'])
@@ -104,7 +105,7 @@ class FinView(BasicView):
         return {
                 'values' : values ,
                 'customers' : getMasterAll(Customer),
-                'targets' : targets,
+                'sources' : sources,
                 'records' : records,
                 'source_cites' : source_cites,
                 'destination_cites' : destination_cites,
