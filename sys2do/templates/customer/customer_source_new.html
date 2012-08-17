@@ -1,0 +1,168 @@
+{% extends "master.html" %}
+{% block subtitle %} - 新建客户发货公司{% endblock %}
+
+
+{% block extJS %}
+<script src="{{url_for('static', filename='js/customer/customer_common.js')}}" type="text/javascript"></script>
+<script language="JavaScript" type="text/javascript">
+//<![CDATA[
+	function tosave(){
+		var msg = new Array();
+		if(!$('#name').val()){
+			msg.push('请填写发货公司名称！');
+		}
+		if(!$("#province_id").val()){
+			msg.push('请选择所在省/直辖市！');
+		}
+		if(!$("#payment_id").val()){
+			msg.push('请填写付款方式！');
+		}
+		if($("#contact_list tr").length<1){
+			msg.push('请添加最少一个联系人！');
+		}
+				
+		if(msg.length<1){
+			$("#contact_json").val(JSON.stringify(contact_array));
+			$("form").submit();
+		}else{
+			alert(msg.join("\n"));
+		}
+	
+	}
+	
+	
+	var contact_array = new Array();
+	
+    $(document).ready(function(){    
+    	$( "#dialog-form" ).dialog({
+    		modal: true,
+    		height: 200,
+    		width:800,
+    		autoOpen: false
+    	});
+    	
+    	$("#province_id").change(function(){
+	        province_change(this,'#city_id');
+	    });
+    	
+    	$("#tmp_province_id").change(function(){
+	        province_change(this,'#tmp_city_id');
+	    });
+    });
+//]]>
+</script>
+{% endblock %}
+
+{% block inner_menu %}
+<div class="inner_menu">
+	<ul>
+    	<li><a href="{{url_for('.view', action = 'source',id=customer_id)}}"><img width="71" height="21" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image1','','/static/images/system/order_manage_h_25.jpg',1)" id="Image1" src="/static/images/system/order_manage_25.jpg"/></a></li>
+        {% if 'CREATE_CUSTOMER' is get_permission%}
+        <li><img width="77" height="21" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image3','','images/order_manage_h_33.jpg',1)" id="Image3" src="/static/images/system/order_manage_33.jpg" onclick="return tosave()"/></li>
+        {% endif %}
+    </ul>
+</div>
+{% endblock %}
+
+{% block content %}
+<table width="100%" cellspacing="0" cellpadding="0" border="0">
+<tbody>
+<tr>
+    <td class="title_fonts_display">· 客户发货公司管理</td>
+</tr>
+</tbody>
+</table>
+
+
+
+<form action="{{url_for('.view', action = 'source',m='SAVE_NEW')}}" method="post">
+	<input type="hidden" name="customer_id" value="{{customer_id}}"/>
+	<input type="hidden" id="contact_json" name="contact_json" value=""/>
+	
+<div class="order_add_div">
+  <div class="order_add_div_header">新建客户发货公司</div>
+
+    <div class="order_add_div_body">
+  <table border="0" cellpadding="0" cellspacing="0">
+		<tr>
+			<td valign="top" width="100px" align="center" height="30px">发货公司名称</td>
+			<td valign="top"><input type="text" id="name" name="name" class="order_add_div_body_input must_input" style="width:550px;"/></td>
+		</tr>
+		<tr>
+			<td valign="top" width="100px" align="center" height="30px">所在省/直辖市</td>
+			<td valign="top">
+				{{mymacros.select(id='province_id',list=MASTER_ALL('Province'),value=None,class="must_input",style="width:150px")}}
+				<select name="city_id" id="city_id" style="width:150px"></select>
+			</td>
+		</tr>
+		<tr>
+			<td valign="top" width="100px" align="center" height="30px">付款方式</td>
+			<td valign="top">
+				{{mymacros.select(id='payment_id',list=MASTER_ALL('Payment'),value=None,class="must_input",style="width:150px")}}
+			</td>
+		</tr>
+		<tr>
+			<td valign="top" width="100px" align="center">{{_('Remark')}}</td>
+			<td valign="top"><textarea class="" style="width:550px;height:30px;" id="remark" name="remark"></textarea></td>
+		</tr>
+	</table>
+  <div style="clear:both"></div>
+  
+  </div>
+	
+	
+	<div class="order_add_div_header">联系人列表</div>
+	<div class="order_add_div_body" style="padding:10px;">
+	
+	<p><input type="button" value="添加联系人" onclick="add_contact()"/></p>
+	<br />
+	<table border="0" cellpadding="0" cellspacing="0">
+		<thead>
+		<tr class="field_head">
+          <th align="center" style="width:150px;">联系人</th>
+          <th align="center" style="width:400px;">具体地址</th>
+          <th align="center" style="width:100px;">电话</th>
+          <th align="center" style="width:100px;">手机</th>
+          <th align="center">操作</th>
+        </tr>
+        </thead>
+        <tbody id="contact_list">
+        
+        </tbody>
+	</table>
+	</div>
+
+</div>
+</form>
+<br /><br />
+
+
+
+<!-- customer source form begin -->
+
+<div id="dialog-form" title="联系人信息" style="background-color:white;">
+	<table border="0" cellpadding="0" cellspacing="0">
+		<tr>
+			<td valign="top" width="100px" align="center" height="30px"><sup class="warn">*</sup>联系人姓名</td>
+			<td valign="top"><input type="text" id="contact_name" value="" class="order_add_div_body_input must_input" style="width:150px;"/></td>
+			<td valign="top" width="100px" align="center">具体地址</td>
+			<td valign="top"><input type="text" id="contact_address" value="" class="order_add_div_body_input must_input" style="width:250px;"/></td>
+			<td valign="top" width="100px" align="center">{{_('Phone')}}</td>
+			<td valign="top"><input type="text" id="contact_phone" value="" class="order_add_div_body_input" style="width:150px;"/></td>
+		</tr>
+		<tr>
+			<td valign="top" align="center">{{_('Mobile')}}</td>
+			<td valign="top"><input type="text" id="contact_mobile" value="" class="order_add_div_body_input numeric" style="width:150px;"/></td>
+		    <td valign="top" align="center">{{_('Remark')}}</td>
+		    <td valign="top"><textarea id="contact_remark" style="width:250px;"></textarea></td>
+		</tr>
+	</table>
+	
+	<br />
+	<p style="text-align:right;"><input type="button" value="保存" onclick="save_contact()"/>&nbsp;<input type="button" value="取消" onclick="cancel_contact()"/></p>
+</div>
+
+<!-- customer target form end -->
+
+
+{% endblock %}

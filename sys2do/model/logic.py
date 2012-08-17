@@ -10,14 +10,16 @@ from datetime import datetime as dt
 from sqlalchemy import Table, Column, ForeignKey
 from sqlalchemy.types import Unicode, Integer, DateTime, Float, Date, Text
 from sqlalchemy.orm import relation, backref, synonym
+from sqlalchemy.sql.expression import and_
+
+
 from sys2do.model import DeclarativeBase, metadata, DBSession
 from auth import SysMixin
 from sys2do.model.master import Customer, Supplier, ItemUnit, ShipmentType, \
     WeightUnit, InventoryLocation, Payment, PickupType, PackType, CustomerTarget, \
     Receiver, Item, Note, Province, City, CustomerSource
-from sys2do.model.auth import CRUDMixin
+from sys2do.model.auth import CRUDMixin, User
 from sys2do.model.system import UploadFile
-from sqlalchemy.sql.expression import and_
 
 
 
@@ -56,8 +58,6 @@ class OrderHeader(DeclarativeBase, SysMixin, CRUDMixin):
     payment_id = Column(Integer, ForeignKey('master_payment.id'), doc = u'付款方式')
     payment = relation(Payment)
 
-#    item = Column(Text)
-#    item_remark = Column(Text)
     qty = Column(Float, default = None, doc = u'数量') #client order qty
     unit_id = Column(Integer, ForeignKey('master_item_unit.id'), doc = u'')
     unit = relation(ItemUnit)
@@ -100,14 +100,17 @@ class OrderHeader(DeclarativeBase, SysMixin, CRUDMixin):
     qty_ratio = Column(Float, default = None, doc = u'件数费率')
     weight_ratio = Column(Float, default = None, doc = u'重量费率')
     vol_ratio = Column(Float, default = None, doc = u'体积费率')
-    amount = Column(Float, default = 0, doc = u'金额(元)')
     cost = Column(Float, default = 0, doc = u'')
 
     insurance_charge = Column(Float, default = 0, doc = u'保险费用')
     sendout_charge = Column(Float, default = 0, doc = u'送货费用')
     receive_charge = Column(Float, default = 0, doc = u'上门接货费用')
     package_charge = Column(Float, default = 0, doc = u'包装费用')
+    load_charge = Column(Float, default = 0, doc = u'装货费用')
+    unload_charge = Column(Float, default = 0, doc = u'卸货费用')
+    proxy_charge = Column(Float, default = 0, doc = u'代理费用')
     other_charge = Column(Float, default = 0, doc = u'其它费用')
+    amount = Column(Float, default = 0, doc = u'金额(元)')
 
     receiver_contact_id = Column(Integer, ForeignKey('master_receiver.id'), doc = u'')
     receiver_contact = relation(Receiver, backref = backref("orders", order_by = id), primaryjoin = "and_(Receiver.id == OrderHeader.receiver_contact_id, OrderHeader.active == 0)")
@@ -134,6 +137,12 @@ class OrderHeader(DeclarativeBase, SysMixin, CRUDMixin):
     is_exception = Column(Integer, default = 0, doc = u'') # 0 is normal ,1 is exception
     is_less_qty = Column(Integer, default = 0, doc = u'') # 0 is normal ,1 is less than the order qty
     is_return_note = Column(Integer, default = 0, doc = u'') # 0 is not return note ,1 is return note
+    is_discount_return = Column(Integer, default = 0, doc = u'') # 0 is not discount ,1 is discount
+    discount_return_time = Column(Text, doc = u'退款时间')
+    discount_return_person_id = Column(Integer, ForeignKey('system_user.id'), doc = u'退款人员')
+    discount_return_person = relation(User)
+    discount_return_remark = Column(Text, doc = u'退款备注')
+
     remark = Column(Text, doc = u'')
 
     deliver_header_ref = Column(Integer, default = None, doc = u'')
@@ -146,9 +155,6 @@ class OrderHeader(DeclarativeBase, SysMixin, CRUDMixin):
     def __unicode__(self): return self.no
 
     def populate(self):
-
-#        address = " ".join(filter(lambda v: v or '', [self.source_provice, self.source_city, self.source_district, self.source_address]))
-
         return {
                 'id' : self.id,
                 'no' : self.no,
@@ -295,8 +301,20 @@ class DeliverHeader(DeclarativeBase, SysMixin, CRUDMixin):
     expect_time = Column(Text, doc = u'')
     actual_time = Column(Text, doc = u'')
 
-    amount = Column(Float, default = 0, doc = u'')
+
+
+    insurance_charge = Column(Float, default = 0, doc = u'保险费用')
+    sendout_charge = Column(Float, default = 0, doc = u'送货费用')
+    receive_charge = Column(Float, default = 0, doc = u'上门接货费用')
+    package_charge = Column(Float, default = 0, doc = u'包装费用')
+    other_charge = Column(Float, default = 0, doc = u'其它费用')
+    load_charge = Column(Float, default = 0, doc = u'装货费用')
+    unload_charge = Column(Float, default = 0, doc = u'卸货费用')
+    amount = Column(Float, default = 0, doc = u'总费用')
+
     supplier_paid = Column(Integer, default = 0, doc = u'') # 0 is not paid to supplier, 1 is paid to supplier
+    payment_id = Column(Integer, ForeignKey('master_payment.id'), doc = u'付款方式')
+    payment = relation(Payment)
 
     remark = Column(Text, doc = u'')
     _status = Column('status', Integer, default = 0)
@@ -321,6 +339,11 @@ class DeliverHeader(DeclarativeBase, SysMixin, CRUDMixin):
                 'supplier_contact' : self.supplier_contact,
                 'supplier_tel' : self.supplier_tel,
                 'expect_time' : self.expect_time,
+                'insurance_charge' : self.insurance_charge ,
+                'sendout_charge' : self.sendout_charge ,
+                'receive_charge' : self.receive_charge ,
+                'package_charge' : self.package_charge ,
+                'other_charge' : self.other_charge ,
                 'amount' : self.amount,
                 'supplier_paid' : self.supplier_paid,
                 'remark' : self.remark,
@@ -365,12 +388,18 @@ class DeliverDetail(DeclarativeBase, SysMixin):
 
     order_header_id = Column(Integer, ForeignKey('order_header.id'))
     order_header = relation(OrderHeader)
-#    order_detail_line_no = Column(Integer)
 
-#    deliver_qty = Column(Integer)
+    insurance_charge = Column(Float, default = 0, doc = u'保险费用')
+    sendout_charge = Column(Float, default = 0, doc = u'送货费用')
+    receive_charge = Column(Float, default = 0, doc = u'上门接货费用')
+    package_charge = Column(Float, default = 0, doc = u'包装费用')
+    other_charge = Column(Float, default = 0, doc = u'其它费用')
+    load_charge = Column(Float, default = 0, doc = u'装货费用')
+    unload_charge = Column(Float, default = 0, doc = u'卸货费用')
+    amount = Column(Float, default = 0, doc = u'单笔总费用')
 
-    remark = Column(Text, doc = u'')
-    cost = Column(Float, default = 0, doc = u'')
+    remark = Column(Text, doc = u'备注')
+
     supplier_paid = Column(Integer, default = 0) # 0 is not paid to supplier, 1 is paid to supplier
     _status = Column('status', Integer, default = 0)
 

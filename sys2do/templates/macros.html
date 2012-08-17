@@ -86,6 +86,14 @@
 {%- endmacro %}
 
 
+{% macro show_discount(value) -%}
+	{% if value == 0 %}
+		未返
+	{% else %}
+		已返
+	{% endif %}
+{%- endmacro %}
+
 
 {% macro mypaginate(records) -%}
 	{{records.pager(format='$link_first $link_previous ~3~ $link_next $link_last, 共计 $item_count 条记录',

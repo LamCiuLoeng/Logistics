@@ -78,11 +78,13 @@
     
     <div id="order_header">
   <ul>
-    	  <li style="width:180px;"><span><sup class="warn">*</sup>&nbsp;单号</span>
+    	  <li style="width:227px;"><span><sup class="warn">*</sup>&nbsp;单号</span>
     	    <input name="ref_no" id="ref_no" type="text" style="width:100px" value="{{header.ref_no|f}}" class="must_input"/>
   	    </li>
 
-    	  <li style="width:740px;"><span>&nbsp;系统编号</span><input type="text" name="no" id="no" value="{{header.no|f}}" class="numeric" style="width:100px" readonly="true"/></li>
+    	  <li style="width:227px;"><span>&nbsp;系统编号</span><input type="text" name="no" id="no" value="{{header.no|f}}" class="numeric" style="width:100px" readonly="true"/></li>
+		  <li style="width:227px;"><span>{{_('Create Time')}}</span>{{header.create_time|ft}}</li>
+    	  <li style="width:227px;"><span>{{_('Creator')}}</span>{{header.create_by|f}}</li>
 
     	 <li style="width:459px;"><span><sup class="warn">*</sup>&nbsp;客户</span>
     	    {{mymacros.select(id='customer_id',list=MASTER_ALL('Customer'),value=header.customer_id,class="must_input",style="width:360px")}}
@@ -160,16 +162,16 @@
   	    <li style="width:226px;"><span>{{_('Expect Time')}}</span>
     	    <input type="text" style="width:140px" id="expect_time" name="expect_time" class="datepicker" value="{{header.expect_time|fd}}"/>
   	    </li>
-  	    
-  	     <li style="width:250px;"><span>{{_('Create Time')}}</span>{{header.create_time|ft}}</li>
-    	  <li style="width:200px;"><span>{{_('Creator')}}</span>{{header.create_by|f}}</li>
-    	  <li style="width:230px;"><span>送货单号</span>
+  	    <li style="width:227px;"><span>承运商</span>
+			{{header.get_deliver_header().supplier|f}}  	
+  	    </li>
+    	  <li style="width:227px;"><span>送货单号</span>
     	  	&nbsp;
     	  	{% if header.deliver_header_no %}
 	    	  	<a href="{{url_for('bpDeliver.view',action='view_by_no',no=header.deliver_header_no)}}">{{header.deliver_header_no|f}}</a>
     	  	{% endif %}
     	  </li>
-    	  <li style="width:226px;"><span>{{_('Actual Time')}}</span>
+    	  <li style="width:227px;"><span>{{_('Actual Time')}}</span>
     	    <input type="text" style="width:140px" id="actual_time" name="actual_time" class="datepicker" value="{{header.actual_time|fd}}"/>
   	    </li>
     	  <li style="width:925px;"><span>{{_('Remark')}}</span>
@@ -222,6 +224,9 @@
 	    <td width="9%" align="center">上门接货费用</td>
 	    <td width="9%" align="center">包装费用</td>
 	    <td width="9%" align="center">保险费用</td>
+	    <td width="9%" align="center">装货费用</td>
+	    <td width="9%" align="center">卸货费用</td>
+	    <td width="9%" align="center">代理费用</td>
 	    <td width="9%" align="center">其它费用</td>
 	</tr>
 	<tr>
@@ -236,6 +241,15 @@
 	    </span></td>
 	    <td align="center"><span style="width:180px;">
 	      <input name="insurance_charge" id="insurance_charge" type="text" class="order_add_div_body_input numeric compute number_input_right" style="width:70px" value="{{header.insurance_charge|f}}"/>
+	    </span></td>
+	    <td align="center"><span style="width:180px;">
+	      <input name="load_charge" id="load_charge" type="text" class="order_add_div_body_input numeric compute number_input_right" style="width:70px" value="{{header.load_charge|f}}"/>
+	    </span></td>
+	    <td align="center"><span style="width:180px;">
+	      <input name="unload_charge" id="unload_charge" type="text" class="order_add_div_body_input numeric compute number_input_right" style="width:70px" value="{{header.unload_charge|f}}"/>
+	    </span></td>
+	    <td align="center"><span style="width:180px;">
+	      <input name="proxy_charge" id="proxy_charge" type="text" class="order_add_div_body_input numeric compute number_input_right" style="width:70px" value="{{header.proxy_charge|f}}"/>
 	    </span></td>
 	    <td align="center"><span style="width:180px;">
 	      <input name="other_charge" id="other_charge" type="text" class="order_add_div_body_input numeric compute number_input_right" style="width:70px" value="{{header.other_charge|f}}"/>

@@ -1,0 +1,130 @@
+{% extends "master.html" %}
+{% block subtitle %} - 新建客户{% endblock %}
+
+
+{% block extJS %}
+<script src="{{url_for('static', filename='js/customer/customer_add.js')}}" type="text/javascript"></script>
+<script language="JavaScript" type="text/javascript">
+//<![CDATA[
+	function tosave(){
+		var msg = new Array();
+		if(!$('#name').val()){
+			msg.push('请填写客户名称！');
+		}
+		if(!$("#address").val()){
+			msg.push('请填写地址！');
+		}
+		if(!$("#contact_person").val()){
+			msg.push('请填写联系人！');
+		}
+		var mobile = $("#mobile").val();
+		if(mobile && !check_mobile(mobile)){
+			msg.push("请正确填写手机号码！");
+		}
+		
+		
+		if(msg.length<1){
+			$("#targets_json").val(JSON.stringify(targets_array));
+			$("form").submit();
+		}else{
+			alert(msg.join("\n"));
+		}
+	
+	}
+	
+	
+	var targets_array = new Array();
+	
+    $(document).ready(function(){
+    	//var targets_array = new Array();
+    
+    	$( "#dialog-form" ).dialog({
+    		modal: true,
+    		height: 500,
+    		width:800,
+    		autoOpen: false
+    	});
+    	
+    	$("#province_id").change(function(){
+	        province_change(this,'#city_id');
+	    });
+    	
+    	$("#tmp_province_id").change(function(){
+	        province_change(this,'#tmp_city_id');
+	    });
+    });
+//]]>
+</script>
+{% endblock %}
+
+{% block inner_menu %}
+<div class="inner_menu">
+	<ul>
+    	<li><a href="{{url_for('.view')}}"><img width="71" height="21" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image1','','/static/images/system/order_manage_h_25.jpg',1)" id="Image1" src="/static/images/system/order_manage_25.jpg"/></a></li>
+        {% if 'CREATE_CUSTOMER' is get_permission%}
+        <li><img width="77" height="21" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image3','','images/order_manage_h_33.jpg',1)" id="Image3" src="/static/images/system/order_manage_33.jpg" onclick="return tosave()"/></li>
+        {% endif %}
+    </ul>
+</div>
+{% endblock %}
+
+{% block content %}
+<table width="100%" cellspacing="0" cellpadding="0" border="0">
+<tbody>
+<tr>
+    <td class="title_fonts_display">· 客户管理</td>
+</tr>
+</tbody>
+</table>
+
+
+
+<form action="{{url_for('.view', action = 'save_new')}}" method="post">
+	
+<div class="order_add_div">
+  <div class="order_add_div_header">新建客户</div>
+
+    <div class="order_add_div_body">
+  <ul>
+        	<li style="width:450px;"><span><sup class="warn">*</sup>{{_('Customer Name')}}</span>
+        	  <input type="text" class="must_input" style="width:300px" name="name" id="name"/>
+        	</li>
+       	  <li style="width:180px;"><span>客户编号</span>
+    	    <input type="text" style="width:100px" name="no"/>
+  	    </li>
+    	  <li style="width:859px;"><span>{{_('Address')}}</span>
+    	  	{{mymacros.select(id='province_id',list=MASTER_ALL('Province'),value=None,class="must_input",style="width:150px")}}
+    	  	<select name="city_id" id="city_id" style="width:150px"></select>
+    	    <input type="text" style="width:460px" name="address" id="address" class="must_input"/>
+    	  </li>
+    	  <li style="width:459px;"><span>{{_('Contact Person')}}</span>
+    	    <input type="text" style="width:360px" name="contact_person" id="contact_person" class="must_input"/>
+    	  </li>
+    	  <li style="width:459px;"><span>{{_('Mobile')}}</span>
+    	    <input type="text" style="width:360px" name="mobile" id="mobile" class="numeric"/>
+    	  </li>
+    	  <li style="width:227px;"><span>{{_('Phone')}}</span>
+    	    <input type="text" style="width:140px" name="phone"/>
+  	    </li>
+    	  <li style="width:260px;"><span>公司邮箱</span>
+    	    <input type="text" style="width:170px" name="email"/>
+  	    </li>
+    	  <li style="width:220px;">票据
+    	  	{{mymacros.select(id='note_id',list=MASTER_ALL('Note'),value=None,class="",style="width:150px")}}
+  	    </li>
+    	  <li style="width:925px;"><span>{{_('Remark')}}</span>
+    	    <textarea class="order_add_div_body_input" style="width:840px; height:100px" name="remark"></textarea>
+        </li>
+      </ul>
+  <div style="clear:both"></div>
+  
+  </div>
+	
+
+
+</div>
+</form>
+<br /><br />
+
+
+{% endblock %}

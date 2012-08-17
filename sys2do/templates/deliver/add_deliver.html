@@ -137,9 +137,34 @@
 				  <td><input type="text" name="expect_time" id="expect_time" class="datepicker order_add_div_body_input must_input" style="width: 200px"/></td>
 				</tr>
 				<tr>
+					<td height="30" align="right">保险费用</td>
+					<td>&nbsp;</td>
+				  <td><input type="text" name="insurance_charge" id="insurance_charge" class="numeric order_add_div_body_input compute number_input_right" style="width: 200px" value=""/></td>
+				</tr>
+				<tr>
+					<td height="30" align="right">送货费用</td>
+					<td>&nbsp;</td>
+				  <td><input type="text" name="sendout_charge" id="sendout_charge" class="numeric order_add_div_body_input compute number_input_right" style="width: 200px" value=""/></td>
+				</tr>
+				<tr>
+					<td height="30" align="right">上门接货费用</td>
+					<td>&nbsp;</td>
+				  <td><input type="text" name="receive_charge" id="receive_charge" class="numeric order_add_div_body_input compute number_input_right" style="width: 200px" value=""/></td>
+				</tr>
+				<tr>
+					<td height="30" align="right">包装费用</td>
+					<td>&nbsp;</td>
+				  <td><input type="text" name="package_charge" id="package_charge" class="numeric order_add_div_body_input compute number_input_right" style="width: 200px" value=""/></td>
+				</tr>
+				<tr>
+					<td height="30" align="right">其它费用</td>
+					<td>&nbsp;</td>
+				  <td><input type="text" name="other_charge" id="other_charge" class="numeric order_add_div_body_input compute number_input_right" style="width: 200px" value=""/></td>
+				</tr>
+				<tr>
 					<td height="30" align="right">总费用</td>
 					<td>&nbsp;</td>
-				  <td><input type="text" name="amount" id="amount" class="numeric order_add_div_body_input must_input" style="width: 200px"/></td>
+				  <td><input type="text" name="amount" id="amount" class="numeric order_add_div_body_input must_input number_input_right" style="width: 200px" value=""/></td>
 				</tr>
 				<tr>
 					<td height="30" align="right">{{_('Remark')}}</td>
@@ -162,13 +187,12 @@
 					<th style="width:50px">{{_('Weight')}}</th>
 					<th style="width:100px">{{_('Destination Contact')}}</th>
 					<th style="width:100px">{{_('Destination Tel')}}</th>
-					<th style="width:50px">费用</th>
 					<th style="width:150px">{{_('Create Time')}}</th>
 					<th style="width:150px">{{_('Creator')}}</th>
 				</tr>
 			</thead>
 			{% for d in result %}		
-				<tr class="data_table_tr {{ loop.cycle('data_table_tr_odd', 'data_table_tr_even') }}">
+				<tr class="data_table_tr data_table_tr_odd">
 					<th>{{d.ref_no|f}}<input type="hidden" name="detail_{{d.id}}" value="{{d.id}}"/></th>
 					<td>{{d.source_province}}{{d.source_city}}</td>
 					<td>{{d.destination_province}}{{d.destination_city}}</td>
@@ -176,10 +200,21 @@
 					<td>{{d.vol|f}}</td>
 					<td>{{d.weight|f}}</td>
 					<td>{{d.destination_contact|f}}</td>
-					<td>{{d.destination_tel|f}}</td>
-					<td><input type="text" name="cost_{{d.id}}" value="" class="numeric compute must_input" style="width:80px;text-align:right;"/></td>
+					<td>{{d.destination_tel|f}}</td>			
 					<td>{{d.create_time|ft}}</td>
 					<td>{{d.create_by|ifFalse}}</td>
+				</tr>
+				<tr class="data_table_tr data_table_tr_even">
+					<td colspan="20" style="text-align:right">
+						<span>保险费用</span><input type="text" name="insurance_charge_{{d.id}}" value="" class="numeric number_input_right"/>&nbsp;
+						<span>送货费用</span><input type="text" name="sendout_charge_{{d.id}}" value="" class="numeric number_input_right"/>&nbsp;
+						<span>上门接货费用</span><input type="text" name="receive_charge_{{d.id}}" value="" class="numeric number_input_right"/>&nbsp;
+						<span>包装费用</span><input type="text" name="package_charge_{{d.id}}" value="" class="numeric number_input_right"/>&nbsp;
+						<span>装货费用</span><input type="text" name="load_charge_{{d.id}}" value="" class="numeric number_input_right"/>&nbsp;
+						<span>卸货费用</span><input type="text" name="unload_charge_{{d.id}}" value="" class="numeric number_input_right"/>&nbsp;
+						<span>其它费用</span><input type="text" name="other_charge_{{d.id}}" value="" class="numeric number_input_right"/>&nbsp;
+						<span>单笔总费用</span><input type="text" name="amount_{{d.id}}" value="" class="numeric number_input_right"/>&nbsp;
+					</td>
 				</tr>
 			{% endfor %}
 				<tr class="data_table_tr">
@@ -187,9 +222,7 @@
 					<td>{{result|sum_with_none(attribute='qty')}}</td>
 					<td>{{result|sum_with_none(attribute='vol')}}</td>
 					<td>{{result|sum_with_none(attribute='weight')}}</td>
-					<td colspan="2">&nbsp;</td>
-					<td><span id="amount_span">0</span></td>
-					<td colspan="2">&nbsp;</td>
+					<td colspan="20">&nbsp;</td>
 				</tr>
 		</table>
 		<br />	

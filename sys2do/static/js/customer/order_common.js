@@ -35,7 +35,7 @@ function compute(){
         amount += parseFloat(weight) * parseFloat(weight_ratio); 
     }
     
-    var charge = ['insurance_charge','sendout_charge','receive_charge','package_charge','other_charge'];
+    var charge = ['insurance_charge','sendout_charge','receive_charge','package_charge','load_charge','unload_charge','proxy_charge','other_charge'];
     for(var i=0;i<charge.length;i++){
         var t = charge[i];
         var v = $("#"+t).val();

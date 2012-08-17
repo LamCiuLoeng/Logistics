@@ -273,6 +273,7 @@
     <td align="center" style="width:80px;">异常</td>
     <td align="center" style="width:80px;">少货</td>
     <td align="center" style="width:150px;">客户回单</td>
+    <td align="center" style="width:50px;">回扣</td>
   </tr>
   
   {% for r in records.items %}
@@ -301,6 +302,7 @@
 			<td><span class="exception_span">{{mymacros.show_exception(r.is_exception)}}</span></td>
 			<td><span class="lessqty_span">{{mymacros.show_lessqty(r.is_less_qty)}}</span></td>
 			<td><span class="order_return_span">{{mymacros.show_return(r.is_return_note)}}</span></td>
+			<td><span class="order_return_span">{{mymacros.show_discount(r.is_discount_return)}}</span></td>
 		  </tr>
   {% endfor %}
       <tr class="data_table_tr">

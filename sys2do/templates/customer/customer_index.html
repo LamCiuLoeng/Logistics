@@ -20,7 +20,7 @@
 <div class="inner_menu">
 	<ul>
 		{% if 'CREATE_CUSTOMER' is get_permission%}
-        <li><a href="{{url_for('.view',action='customer',m='NEW')}}"><img src="/static/images/system/order_manage_31.jpg" width="77" height="21" id="Image2" onmouseover="MM_swapImage('Image2','','/static/images/system/order_manage_h_31.jpg',1)" onmouseout="MM_swapImgRestore()" /></a></li>
+        <li><a href="{{url_for('.view',action='add')}}"><img src="/static/images/system/order_manage_31.jpg" width="77" height="21" id="Image2" onmouseover="MM_swapImage('Image2','','/static/images/system/order_manage_h_31.jpg',1)" onmouseout="MM_swapImgRestore()" /></a></li>
         {% endif %}
     </ul>
 </div>
@@ -34,7 +34,7 @@
 <div class="search_div">
 	<div class="search_div_header">客户搜索</div>
     <div class="search_div_body">
-    	<form action="{{url_for('.view',action='customer',m='LIST')}}" method="post" id="search_form">
+    	<form action="{{url_for('.view',action='index')}}" method="post" id="search_form">
 
     	<ul>
           <li><span>客户名称</span><input type="text" name="name" value="{{values.get('name','')|f}}"/></li>
@@ -76,7 +76,7 @@
     </tr>
 	{% for r in records %}
 		<tr class="data_table_tr {{ loop.cycle('data_table_tr_odd', 'data_table_tr_even') }}">
-			<td><a href="{{url_for('.view', action = 'customer',m = 'UPDATE',id=r.id)}}">{{r}}</a></td>
+			<td><a href="{{url_for('.view', action = 'view',id=r.id)}}">{{r}}</a></td>
 			<td>{{r.no|f}}</td>
 			<td>{{r.province|f}}{{r.city|f}}</td>
 			<td>{{r.contact_person|ifFalse}}</td>

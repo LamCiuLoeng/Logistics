@@ -106,8 +106,35 @@
 				<td width="12">&nbsp;</td>
 				<td>{{mymacros.show_supplier_paid(values.get('supplier_paid',''))}}</td>
 			</tr>
+			
+			
 			<tr>
-				<td height="30" align="right">{{_('Amount')}}</td>
+				<td height="30" align="right">保险费用</td>
+				<td width="12">&nbsp;</td>
+				<td>{{values.get('insurance_charge','')|f}}</td>
+			</tr>
+			<tr>
+				<td height="30" align="right">送货费用</td>
+				<td width="12">&nbsp;</td>
+				<td>{{values.get('sendout_charge','')|f}}</td>
+			</tr>
+			<tr>
+				<td height="30" align="right">上门接货费用</td>
+				<td width="12">&nbsp;</td>
+				<td>{{values.get('receive_charge','')|f}}</td>
+			</tr>
+			<tr>
+				<td height="30" align="right">包装费用</td>
+				<td width="12">&nbsp;</td>
+				<td>{{values.get('package_charge','')|f}}</td>
+			</tr>
+			<tr>
+				<td height="30" align="right">其它费用</td>
+				<td width="12">&nbsp;</td>
+				<td>{{values.get('other_charge','')|f}}</td>
+			</tr>
+			<tr>
+				<td height="30" align="right">总费用</td>
 				<td width="12">&nbsp;</td>
 				<td>{{values.get('amount','')|f}}</td>
 			</tr>
@@ -130,7 +157,7 @@
 					<th style="width:30px">{{_('Weight')}}</th>
 					<th style="width:80px">{{_('Destination Contact')}}</th>
 					<th>{{_('Destination Tel')}}</th>
-					<th style="width:50px">费用</th>
+					<!-- <th style="width:50px">费用</th> -->
 					<th style="width:100px">{{_('Create Time')}}</th>
 					<th style="width:80px">{{_('Creator')}}</th>
 				</tr>
@@ -145,17 +172,11 @@
 					<td>{{d.order_header.weight|f}}</td>
 					<td>{{d.order_header.destination_contact|f}}</td>
 					<td>{{d.order_header.destination_tel|f}}</td>
-					<td>{{d.cost|f}}</td>
 					<td>{{d.order_header.create_time|ft}}</td>
 					<td>{{d.order_header.create_by|f}}</td>
 				</tr>
 			{% endfor %}
-				<tr class="data_table_tr">
-					<td>&nbsp;</td>
-					<td colspan="7" style="text-align:left">合计</td>
-					<td>{{details|sum_with_none(attribute='cost')}}</td>
-					<td colspan="2">&nbsp;</td>
-				</tr>
+				
 		</table>
 		
 		<br />
@@ -278,7 +299,7 @@
 						{% for t in header.system_logs %}
 							<tr class="data_table_tr">
 								<td>{{t.create_time|ft}}</td>
-								<td>{{t.remark|f}}</td>
+								<td style="text-align:left">{{t.remark|f}}</td>
 							</tr>
 						{% endfor %}
 					</tbody>

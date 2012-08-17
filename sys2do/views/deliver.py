@@ -37,6 +37,7 @@ from sys2do.setting import PAGINATE_PER_PAGE
 from sys2do.model.system import SystemLog
 
 
+
 __all__ = ['bpDeliver']
 
 
@@ -50,7 +51,8 @@ class DeliverView(BasicView):
     def index(self):
         if _g('SEARCH_SUBMIT'):  # come from search
             values = {'page' : 1}
-            for f in ['create_time_from', 'create_time_to', 'no', 'destination_province_id', 'destination_city_id', 'supplier_id', ] :
+            for f in ['create_time_from', 'create_time_to', 'no', 'destination_province_id',
+                      'destination_city_id', 'supplier_id', 'order_no', ] :
                 values[f] = _g(f)
             values['field'] = _g('field', None) or 'create_time'
             values['direction'] = _g('direction', None) or 'desc'
@@ -83,6 +85,15 @@ class DeliverView(BasicView):
             conditions.append(DeliverHeader.destination_city_id == values['destination_city_id'])
         if values.get('supplier_id', None):
             conditions.append(DeliverHeader.supplier_id == values['supplier_id'])
+
+        if values.get('order_no', None):
+            conditions.extend([
+                               DeliverDetail.header_id == DeliverHeader.id,
+                               DeliverDetail.active == 0,
+                               OrderHeader.active == 0,
+                               DeliverDetail.order_header_id == OrderHeader.id,
+                               OrderHeader.ref_no.op('like')('%%%s%%' % values['order_no']),
+                               ])
 
         # for the sort function
         field = values.get('field', 'create_time')
@@ -155,13 +166,19 @@ class DeliverView(BasicView):
     def deliver_save_new(self):
         try:
             header = DeliverHeader(no = _g('no'),
-#                                   destination_address = _g('destination_address'),
                                    destination_province_id = _g('destination_province_id'),
                                    destination_city_id = _g('destination_city_id'),
                                    supplier_id = _g('supplier_id'),
                                    supplier_contact = _g('supplier_contact'),
                                    supplier_tel = _g('supplier_tel'),
                                    expect_time = _g('expect_time'),
+                                   insurance_charge = _g('insurance_charge'),
+                                   sendout_charge = _g('sendout_charge'),
+                                   receive_charge = _g('receive_charge'),
+                                   package_charge = _g('package_charge'),
+                                   load_charge = _g('load_charge'),
+                                   unload_charge = _g('unload_charge'),
+                                   other_charge = _g('other_charge'),
                                    amount = _g('amount'),
                                    remark = _g('remark'),
                                    )
@@ -172,11 +189,18 @@ class DeliverView(BasicView):
                 DBSession.add(DeliverDetail(header = header,
                                             order_header = order_header,
                                             line_no = line_no,
-                                            cost = _g('cost_%s' % id)
+                                            amount = _g('amount_%s' % id),
+                                            insurance_charge = _g('insurance_charge_%s' % id),
+                                            sendout_charge = _g('sendout_charge_%s' % id),
+                                            receive_charge = _g('receive_charge_%s' % id),
+                                            package_charge = _g('package_charge_%s' % id),
+                                            load_charge = _g('load_charge_%s' % id),
+                                            unload_charge = _g('unload_charge_%s' % id),
+                                            other_charge = _g('other_charge_%s' % id),
                                             ))
 
                 order_header.update_status(SORTING[0])
-                order_header.cost = _g('cost_%s' % id)
+                order_header.cost = _g('amount_%s' % id),
                 order_header.deliver_header_ref = header.id
                 order_header.deliver_header_no = header.no
                 line_no += 1
@@ -231,32 +255,47 @@ class DeliverView(BasicView):
         if not id :
             flash(MSG_NO_ID_SUPPLIED, MESSAGE_ERROR)
             return redirect(self.default())
+
         try:
             header = DBSession.query(DeliverHeader).get(id)
-            _remark = []
-            for f in [
+            fields = [
                       'no', 'destination_province_id', 'destination_city_id', 'supplier_id', 'supplier_contact', 'supplier_tel',
                       'need_transfer', 'amount', 'remark', 'expect_time',
-                      ]:
+                      'insurance_charge', 'sendout_charge', 'receive_charge', 'package_charge', 'other_charge', 'load_charge', 'unload_charge'
+                      ]
 
-                old_v = getattr(header, f)
-                new_v = _g(f)
-                if unicode(old_v) != unicode(new_v) : _remark.append(_remark.append(u"[%s]'%s' 修改为 '%s'" % (f, old_v, new_v)))
-                setattr(header, f, _g(f))
+            _remark = []
+            old_info = header.serialize(fields) # to used for the history log
+            for f in fields:    setattr(header, f, _g(f))
 
             for d in header.details:
-                c = _g('cost_%s' % d.id)
-                d.cost = c
-                d.order_header.cost = c
+                d.insurance_charge = _g('insurance_charge_' % d.id)
+                d.sendout_charge = _g('sendout_charge_' % d.id)
+                d.receive_charge = _g('receive_charge_' % d.id)
+                d.package_charge = _g('package_charge_' % d.id)
+                d.load_charge = _g('load_charge_' % d.id)
+                d.unload_charge = _g('unload_charge_' % d.id)
+                d.other_charge = _g('other_charge_' % d.id)
+                d.amount = _g('amount_' % d.id)
+                d.order_header.cost = d.amount
 
-            DBSession.add(SystemLog(
-                                    type == header.__class__.__name__,
+            DBSession.commit()
+
+            try:
+                new_info = header.serialize(fields)
+                change_result = self._compareObject(old_info, new_info)
+                _remark = [u"[%s]'%s' 修改为 '%s'" % (name, ov, nv) for (name, ov, nv) in change_result['update']]
+                DBSession.add(SystemLog(
+                                    type = header.__class__.__name__,
                                     ref_id = header.id,
-                                    remark = u"%s 修改该记录。修改内容为:%s" % (session['user_profile']['name'], ";".join(_remark))
+                                    remark = u"%s 修改该记录。%s" % (session['user_profile']['name'], ";".join(_remark))
                                     ))
+                DBSession.commit()
+            except:
+                _error(traceback.print_exc())
+                DBSession.rollback()
 
             flash(MSG_SAVE_SUCC, MESSAGE_INFO)
-            DBSession.commit()
         except:
             _error(traceback.print_exc())
             DBSession.rollback()
@@ -568,6 +607,33 @@ class DeliverView(BasicView):
             _error(traceback.print_exc())
             DBSession.rollback()
             return jsonify({'code' : 1, 'msg' : MSG_SERVER_ERROR})
+
+
+    def _compareObject(self, old_obj, new_obj):
+        old_keys = old_obj.keys()
+        new_keys = new_obj.keys()
+        result = {
+                  "new" : [],
+                  "update" : [],
+                  "delete" : [],
+                  }
+
+        for key in list(set(old_keys).intersection(set(new_keys))):
+            old_val = old_obj[key][0]
+            new_val = new_obj[key][0]
+
+            if old_val != new_val:
+                result['update'].append((old_obj[key][1], old_obj[key][0], new_obj[key][0]))
+
+        for key in list(set(old_obj).difference(set(new_obj))):
+            result['delete'].append((old_obj[key][1], old_obj[key][0], None))
+
+        for key in list(set(new_obj).difference(set(old_obj))):
+            result['new'].append((old_obj[key][1], None, new_obj[key][0]))
+        return result
+
+
+
 
 bpDeliver.add_url_rule('/', view_func = DeliverView.as_view('view'), defaults = {'action':'index'})
 bpDeliver.add_url_rule('/<action>', view_func = DeliverView.as_view('view'))

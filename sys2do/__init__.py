@@ -90,6 +90,9 @@ import views.fin
 app.register_blueprint(views.fin.bpFin, url_prefix = '/fin')
 
 
+import views.customer
+app.register_blueprint(views.customer.bpCustomer, url_prefix = '/customer')
+
 import views.warehouse
 app.register_blueprint(views.warehouse.bpWarehouse, url_prefix = '/warehouse')
 

@@ -184,7 +184,7 @@ class OrderView(BasicView):
                   'ref_no', 'estimate_time', 'expect_time', 'actual_time', 'remark',
                   'payment_id', 'pickup_type_id', 'pack_type_id', 'qty', 'qty_ratio', 'vol', 'vol_ratio',
                   'weight', 'weight_ratio', 'weight_ratio', 'amount', 'insurance_charge', 'sendout_charge', 'receive_charge',
-                  'package_charge', 'other_charge', 'note_id', 'note_no',
+                  'package_charge', 'other_charge', 'load_charge', 'unload_charge', 'proxy_charge', 'note_id', 'note_no',
                   'source_sms', 'destination_sms',
                   ]:
             params[k] = _g(k)
@@ -552,8 +552,8 @@ class OrderView(BasicView):
                        'destination_company_id', 'destination_address', 'destination_contact', 'destination_tel', 'destination_mobile',
                       'estimate_time', 'expect_time', 'actual_time', 'qty_ratio', 'weight_ratio', 'vol_ratio', 'amount', 'cost', 'remark',
                       'pickup_type_id', 'pack_type_id',
-                      'insurance_charge', 'sendout_charge', 'receive_charge', 'package_charge', 'other_charge',
-                      'note_id', 'note_no',
+                      'insurance_charge', 'sendout_charge', 'receive_charge', 'package_charge', 'other_charge', 'load_charge', 'unload_charge',
+                      'proxy_charge', 'note_id', 'note_no',
                       'source_sms', 'destination_sms',
                       ]
             _remark = []
