@@ -19,7 +19,7 @@ from flask.templating import render_template
 from sys2do.views import BasicView
 from sys2do.util.decorator import templated, login_required, tab_highlight
 from sys2do.model.master import Customer, CustomerTarget, Province, \
-    CustomerSource, CustomerContact
+    CustomerSource, CustomerContact, CustomerPricelist
 from sys2do.model import DBSession
 from sys2do.util.common import _g, getMasterAll, _error, _info
 from sys2do.constant import MESSAGE_INFO, MSG_SAVE_SUCC, MSG_UPDATE_SUCC, \
@@ -336,11 +336,76 @@ class CustomerView(BasicView):
 
     def pricelist(self):
         method = _g('m', 'LIST')
+        _action = 'pricelist'
+
         if method not in ['LIST', 'NEW', 'UPDATE', 'DELETE', 'SAVE_NEW', 'SAVE_UPDATE', ]:
             flash(MSG_NO_SUCH_ACTION, MESSAGE_ERROR)
             return redirect(url_for('.view', action = 'index'))
 
+        if method == 'LIST':
+            id = _g('id')
+            c = DBSession.query(Customer).get(id)
+            result = DBSession.query(CustomerPricelist).filter(and_(CustomerPricelist.active == 0,
+                                                                    CustomerPricelist.customer_id == c.id,
+                                                        )).order_by(CustomerPricelist.province_id)
 
+            page = _g('page', 1)
+            def url_for_page(**params): return url_for('.view', action = _action, m = 'LIST', page = params['page'])
+
+            records = paginate.Page(result, page, show_if_single_page = True, items_per_page = PAGINATE_PER_PAGE, url = url_for_page)
+            return render_template("customer/customer_pricelist_index.html", records = records, customer = c)
+        elif method == 'NEW':
+            customer_id = _g('customer_id')
+            return render_template("customer/customer_pricelist_new.html", customer_id = customer_id)
+        elif method == 'SAVE_NEW':
+            try:
+                params = {}
+                for f in ['customer_id', 'province_id', 'city_id', 'qty_ratio', 'weight_ratio', 'vol_ratio', 'remark'] :
+                    params[f] = _g(f)
+                obj = CustomerPricelist(**params)
+                DBSession.add(obj)
+                DBSession.commit()
+                flash(MSG_SAVE_SUCC, MESSAGE_INFO)
+            except:
+                DBSession.rollback()
+                flash(MSG_SERVER_ERROR, MESSAGE_ERROR)
+            return redirect(url_for('.view', action = _action, id = obj.customer_id))
+        elif method == 'UPDATE':
+            obj = DBSession.query(CustomerPricelist).get(_g('id'))
+            if obj.province_id:
+                cities = obj.province.children()
+            else:
+                cities = []
+            return render_template("customer/customer_pricelist_update.html", cities = cities, obj = obj)
+
+        elif method == 'SAVE_UPDATE':
+            id = _g('id', None)
+            if not id :
+                flash(MSG_NO_ID_SUPPLIED, MESSAGE_ERROR)
+                return redirect(url_for('.view', action = _action))
+            obj = DBSession.query(CustomerPricelist).get(id)
+            if not obj :
+                flash(MSG_RECORD_NOT_EXIST, MESSAGE_ERROR)
+                return redirect(url_for('.view', action = _action))
+            for f in ['province_id', 'city_id', 'qty_ratio', 'weight_ratio', 'vol_ratio', 'remark'] :
+                setattr(obj, f, _g(f))
+            DBSession.commit()
+            flash(MSG_UPDATE_SUCC, MESSAGE_INFO)
+            return redirect(url_for('.view', action = _action, id = obj.customer_id))
+
+        elif method == 'DELETE':
+            id = _g('id', None)
+            if not id :
+                flash(MSG_NO_ID_SUPPLIED, MESSAGE_ERROR)
+                return redirect(url_for('.view', action = _action))
+            obj = DBSession.query(CustomerPricelist).get(id)
+            if not obj :
+                flash(MSG_RECORD_NOT_EXIST, MESSAGE_ERROR)
+                return redirect(url_for('.view', action = _action))
+            obj.active = 1
+            DBSession.commit()
+            flash(MSG_DELETE_SUCC, MESSAGE_INFO)
+            return redirect(url_for('.view', action = _action))
 
 
 

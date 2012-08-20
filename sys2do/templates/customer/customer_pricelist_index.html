@@ -1,0 +1,61 @@
+{% extends "master.html" %}
+
+{% block subtitle %} - 客户价格列表管理{% endblock %}
+
+{% block extJS %}
+<script language="JavaScript" type="text/javascript">
+//<![CDATA[
+	
+//]]>
+</script>
+{% endblock %}
+
+
+{% block inner_menu %}
+<div class="inner_menu">
+	<ul>
+		<li><a href="{{url_for('.view', action = 'view',id=customer.id)}}"><img width="71" height="21" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image1','','/static/images/system/order_manage_h_25.jpg',1)" id="Image1" src="/static/images/system/order_manage_25.jpg"/></a></li>
+		{% if 'UPDATE_CUSTOMER' is get_permission%}
+        <li><a href="{{url_for('.view',action='pricelist',m='NEW',customer_id=customer.id)}}"><img src="/static/images/system/order_manage_31.jpg" width="77" height="21" id="Image2" onmouseover="MM_swapImage('Image2','','/static/images/system/order_manage_h_31.jpg',1)" onmouseout="MM_swapImgRestore()" /></a></li>
+        {% endif %}
+    </ul>
+</div>
+{% endblock %}
+
+
+{% block content %}
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+	<tr><td class="title_fonts_display">&middot; 客户价格列表管理 - ({{customer.name}})</td></tr>
+</table>
+<br /><br />
+<table  border="0" cellspacing="0" cellpadding="0" style="width:850px;">
+    <tr class="field_head">
+      <th align="center" style="width:100px;">发往地区</th>
+      <th align="center" style="width:100px;">数量费率</th>
+      <th align="center" style="width:100px;">重量费率</th>
+      <th align="center" style="width:100px;">体积费率</th>
+      <th align="center" style="width:100px;">{{_('Create Time')}}</th>
+      <th align="center" style="width:100px;">{{_('Creator')}}</th>
+      <th align="center" style="width:100px;">{{_('Update Time')}}</th>
+      <th align="center" style="width:150px;">{{_('Last Updator')}}</th>
+    </tr>
+	{% for r in records %}
+		<tr class="data_table_tr {{ loop.cycle('data_table_tr_odd', 'data_table_tr_even') }}">
+			<td><a href="{{url_for('.view', action = 'pricelist',m='UPDATE',id=r.id)}}">{{r.province|f}}{{r.city|f}}</a></td>
+			<td>{{r.qty_ratio|f}}</td>
+			<td>{{r.weight_ratio|f}}</td>
+			<td>{{r.vol_ratio|f}}</td>
+			<td>{{r.create_time|ft}}</td>
+			<td>{{r.create_by|f}}</td>
+			<td>{{r.update_time|ft}}</td>
+			<td>{{r.update_by|f}}</td>
+		</tr>
+	{% endfor %}
+	<tr class="data_table_tr">
+	    <td colspan="100" style="text-align:right">{{mymacros.mypaginate(records)}}</td>
+	</tr>
+  </table>
+  
+  <br /><br />
+  
+{% endblock %}
