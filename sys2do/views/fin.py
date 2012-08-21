@@ -6,14 +6,18 @@
 #  Description:
 ###########################################
 '''
+import os
+import random
+import shutil
 from datetime import datetime as dt, timedelta
 import traceback
 from werkzeug.utils import redirect
 from sqlalchemy.sql.expression import and_, desc
 from flask.blueprints import Blueprint
-from flask.helpers import flash, jsonify, url_for
+from flask.helpers import flash, jsonify, url_for, send_file
 from flask import session
 from webhelpers import paginate
+
 
 from sys2do.views import BasicView
 from sys2do.util.decorator import templated, login_required
@@ -22,10 +26,11 @@ from sys2do.model.master import Customer, CustomerTarget, Province, \
 from sys2do.model import DBSession
 from sys2do.util.common import _g, getMasterAll, _error
 from sys2do.constant import MESSAGE_INFO, MSG_SAVE_SUCC, MSG_UPDATE_SUCC, \
-    MSG_SERVER_ERROR
-from sys2do.model.logic import OrderHeader
-from sys2do.setting import PAGINATE_PER_PAGE
+    MSG_SERVER_ERROR, SYSTEM_DATE_FORMAT
+from sys2do.model.logic import OrderHeader, DeliverHeader, DeliverDetail
+from sys2do.setting import PAGINATE_PER_PAGE, TMP_FOLDER, TEMPLATE_FOLDER
 from sys2do.model.system import SystemLog
+from sys2do.util.excel_helper import ProfitReport
 
 
 
@@ -168,6 +173,85 @@ class FinView(BasicView):
             _error(traceback.print_exc())
             DBSession.rollback()
             return jsonify({'code' : 1, 'msg' : MSG_SERVER_ERROR})
+
+
+    @templated('fin/report.html')
+    def report(self):
+        return {}
+
+    def export(self):
+        values = {}
+        for f in ['create_time_from', 'create_time_to', 'ref_no',
+                  'customer_id', 'source_company_id',
+                  'destination_province_id', 'destination_city_id',
+                  'supplier_id', 'deliver_header_no',
+                  ] :
+            values[f] = _g(f)
+
+        conditions = [OrderHeader.active == 0,
+                       DeliverHeader.active == 0,
+                       DeliverDetail.active == 0,
+                       DeliverHeader.id == DeliverDetail.header_id,
+                       DeliverDetail.order_header_id == OrderHeader.id,
+                      ]
+
+        if values.get('create_time_from', None):       conditions.append(OrderHeader.create_time > values['create_time_from'])
+        if values.get('create_time_to', None):         conditions.append(OrderHeader.create_time < '%s 23:59' % values['create_time_to'])
+        if values.get('ref_no', None):                 conditions.append(OrderHeader.ref_no.op('like')('%%%s%%' % values['ref_no']))
+        if values.get('customer_id', None):            conditions.append(OrderHeader.customer_id == values['customer_id'])
+        if values.get('destination_province_id', None):            conditions.append(OrderHeader.destination_province_id == values['destination_province_id'])
+        if values.get('destination_city_id', None):            conditions.append(OrderHeader.destination_city_id == values['destination_city_id'])
+        if values.get('deliver_header_no', None):            conditions.append(OrderHeader.deliver_header_no.op('like')('%%%s%%' % values['destination_city_id']))
+        if values.get('supplier_id', None):            conditions.extend(DeliverHeader.supplier_id == values['supplier_id'])
+
+        data = []
+        index = 1
+        total_qty = total_weight = total_amount = total_cost = 0
+        for (oheader, dheader) in DBSession.query(OrderHeader, DeliverHeader).filter(and_(*conditions)).order_by(OrderHeader.create_time):
+            row = [
+                   index, oheader.create_time.strftime(SYSTEM_DATE_FORMAT), oheader.customer, oheader.source_company, oheader.ref_no,
+                   unicode(oheader.destination_province) + unicode(oheader.destination_city or '') , oheader.qty or '', oheader.weight or '',
+                   oheader.amount, dheader.supplier, dheader.no,
+                   ]
+            if oheader.cost:
+                row.extend([oheader.cost, (oheader.amount - oheader.cost), "%.2f%%" % (oheader.cost * 100 / oheader.amount), "%.2f%%" % (100 - oheader.cost * 100 / oheader.amount), ])
+            else:
+                row.extend(['', '', ''])
+
+            data.append(map(lambda v : unicode(v), row))
+            index += 1
+            total_qty += oheader.qty or 0
+            total_weight += oheader.weight or 0
+            total_amount += oheader.amount or 0
+            if oheader.cost : total_cost += oheader.cost
+
+        if total_amount:
+            data.append([
+                    u'合计', '', '', '', '', '', total_qty, total_weight, total_amount, '', '', total_cost, (total_amount - total_cost),
+                    "%.2f%%" % (total_cost * 100 / total_amount), "%.2f%%" % (100 - total_cost * 100 / total_amount),
+                   ])
+        else:
+            data.append([
+                    u'合计', '', '', '', '', '', 0, 0, 0, '', '', total_cost, (total_amount - total_cost), "", "",
+                   ])
+
+        if not os.path.exists(TMP_FOLDER): os.makedirs(TMP_FOLDER)
+        current = dt.now()
+        templatePath = os.path.join(TEMPLATE_FOLDER, "profit_template.xls")
+        tempFileName = os.path.join(TMP_FOLDER, "report_tmp_%s_%d.xls" % (current.strftime("%Y%m%d%H%M%S"), random.randint(0, 1000)))
+        realFileName = os.path.join(TMP_FOLDER, "profit_report_%s.xls" % (dt.now().strftime("%Y%m%d%H%M%S")))
+        shutil.copy(templatePath, tempFileName)
+        report_xls = ProfitReport(templatePath = tempFileName, destinationPath = realFileName)
+
+        report_xls.inputData(data = data)
+        report_xls.outputData()
+        try:
+            os.remove(tempFileName)
+        except:
+            pass
+        return send_file(realFileName, as_attachment = True)
+
+
 
 
 bpFin.add_url_rule('/', view_func = FinView.as_view('view'), defaults = {'action':'index'})

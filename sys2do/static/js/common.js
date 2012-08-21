@@ -125,3 +125,9 @@ function check_mobile(v){
     var pattern = /^1\d{10}$/;
     return pattern.test(v);
 }
+
+
+function check_number(v){
+    var pattern = /^[\d\.]+$/;
+    return pattern.test(v); 
+}

@@ -100,7 +100,6 @@ class OrderHeader(DeclarativeBase, SysMixin, CRUDMixin):
     qty_ratio = Column(Float, default = None, doc = u'件数费率')
     weight_ratio = Column(Float, default = None, doc = u'重量费率')
     vol_ratio = Column(Float, default = None, doc = u'体积费率')
-    cost = Column(Float, default = 0, doc = u'')
 
     insurance_charge = Column(Float, default = 0, doc = u'保险费用')
     sendout_charge = Column(Float, default = 0, doc = u'送货费用')
@@ -111,6 +110,7 @@ class OrderHeader(DeclarativeBase, SysMixin, CRUDMixin):
     proxy_charge = Column(Float, default = 0, doc = u'代理费用')
     other_charge = Column(Float, default = 0, doc = u'其它费用')
     amount = Column(Float, default = 0, doc = u'金额(元)')
+    cost = Column(Float, default = 0, doc = u'')
 
     receiver_contact_id = Column(Integer, ForeignKey('master_receiver.id'), doc = u'')
     receiver_contact = relation(Receiver, backref = backref("orders", order_by = id), primaryjoin = "and_(Receiver.id == OrderHeader.receiver_contact_id, OrderHeader.active == 0)")
@@ -310,6 +310,7 @@ class DeliverHeader(DeclarativeBase, SysMixin, CRUDMixin):
     other_charge = Column(Float, default = 0, doc = u'其它费用')
     load_charge = Column(Float, default = 0, doc = u'装货费用')
     unload_charge = Column(Float, default = 0, doc = u'卸货费用')
+    proxy_charge = Column(Float, default = 0, doc = u'代理费用')
     amount = Column(Float, default = 0, doc = u'总费用')
 
     supplier_paid = Column(Integer, default = 0, doc = u'') # 0 is not paid to supplier, 1 is paid to supplier
@@ -344,6 +345,7 @@ class DeliverHeader(DeclarativeBase, SysMixin, CRUDMixin):
                 'receive_charge' : self.receive_charge ,
                 'package_charge' : self.package_charge ,
                 'other_charge' : self.other_charge ,
+                'proxy_charge' : self.proxy_charge,
                 'amount' : self.amount,
                 'supplier_paid' : self.supplier_paid,
                 'remark' : self.remark,
@@ -396,6 +398,7 @@ class DeliverDetail(DeclarativeBase, SysMixin):
     other_charge = Column(Float, default = 0, doc = u'其它费用')
     load_charge = Column(Float, default = 0, doc = u'装货费用')
     unload_charge = Column(Float, default = 0, doc = u'卸货费用')
+    proxy_charge = Column(Float, default = 0, doc = u'代理费用')
     amount = Column(Float, default = 0, doc = u'单笔总费用')
 
     remark = Column(Text, doc = u'备注')

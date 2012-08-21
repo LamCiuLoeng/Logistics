@@ -150,7 +150,14 @@ class DeliverView(BasicView):
             ids = [_g('order_ids'), ]
 
         order_headers = DBSession.query(OrderHeader).filter(OrderHeader.id.in_(ids))
-
+        if order_headers.count() == 1:
+            h = order_headers[0]
+            destination_province_id = h.destination_province_id
+            destination_city_id = h.destination_city_id
+            cities = h.destination_province.children()
+        else:
+            destination_province_id = destination_city_id = None
+            cities = []
         for h in order_headers:
             if h.status >= SORTING[0]:
                 flash(MSG_ORDER_NOT_FIT_FOR_DELIVER, MESSAGE_ERROR)
@@ -158,9 +165,14 @@ class DeliverView(BasicView):
                     return redirect(request.referrer)
                 else:
                     return redirect(self.default())
-
         suppliers = getMasterAll(Supplier)
-        return {'result' : order_headers, 'suppliers' : suppliers, }
+
+        return {'result' : order_headers,
+                'suppliers' : suppliers,
+                'destination_province_id' : destination_province_id,
+                'destination_city_id' : destination_city_id,
+                'cities' : cities,
+                }
 
 
     def deliver_save_new(self):
@@ -179,6 +191,7 @@ class DeliverView(BasicView):
                                    load_charge = _g('load_charge'),
                                    unload_charge = _g('unload_charge'),
                                    other_charge = _g('other_charge'),
+                                   proxy_charge = _g('proxy_charge'),
                                    amount = _g('amount'),
                                    remark = _g('remark'),
                                    )
@@ -189,7 +202,6 @@ class DeliverView(BasicView):
                 DBSession.add(DeliverDetail(header = header,
                                             order_header = order_header,
                                             line_no = line_no,
-                                            amount = _g('amount_%s' % id),
                                             insurance_charge = _g('insurance_charge_%s' % id),
                                             sendout_charge = _g('sendout_charge_%s' % id),
                                             receive_charge = _g('receive_charge_%s' % id),
@@ -197,6 +209,8 @@ class DeliverView(BasicView):
                                             load_charge = _g('load_charge_%s' % id),
                                             unload_charge = _g('unload_charge_%s' % id),
                                             other_charge = _g('other_charge_%s' % id),
+                                            proxy_charge = _g('proxy_charge_%s' % id),
+                                            amount = _g('amount_%s' % id),
                                             ))
 
                 order_header.update_status(SORTING[0])
@@ -261,7 +275,8 @@ class DeliverView(BasicView):
             fields = [
                       'no', 'destination_province_id', 'destination_city_id', 'supplier_id', 'supplier_contact', 'supplier_tel',
                       'need_transfer', 'amount', 'remark', 'expect_time',
-                      'insurance_charge', 'sendout_charge', 'receive_charge', 'package_charge', 'other_charge', 'load_charge', 'unload_charge'
+                      'insurance_charge', 'sendout_charge', 'receive_charge', 'package_charge', 'other_charge',
+                      'load_charge', 'unload_charge', 'proxy_charge',
                       ]
 
             _remark = []
@@ -276,6 +291,7 @@ class DeliverView(BasicView):
                 d.load_charge = _g('load_charge_' % d.id)
                 d.unload_charge = _g('unload_charge_' % d.id)
                 d.other_charge = _g('other_charge_' % d.id)
+                d.proxy_charge = _g('proxy_charge_' % d.id)
                 d.amount = _g('amount_' % d.id)
                 d.order_header.cost = d.amount
 

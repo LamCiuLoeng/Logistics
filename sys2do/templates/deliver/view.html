@@ -129,6 +129,11 @@
 				<td>{{values.get('package_charge','')|f}}</td>
 			</tr>
 			<tr>
+				<td height="30" align="right">代理费用</td>
+				<td width="12">&nbsp;</td>
+				<td>{{values.get('proxy_charge','')|f}}</td>
+			</tr>
+			<tr>
 				<td height="30" align="right">其它费用</td>
 				<td width="12">&nbsp;</td>
 				<td>{{values.get('other_charge','')|f}}</td>
@@ -163,7 +168,7 @@
 				</tr>
 			</thead>
 			{% for d in details %}
-				<tr class="data_table_tr {{ loop.cycle('data_table_tr_odd', 'data_table_tr_even') }}">
+				<tr class="data_table_tr data_table_tr_odd">
 					<th><a href="{{url_for('bpOrder.view',action='revise',id=d.order_header_id)}}">{{d.order_header.ref_no}}</a></th>
 					<td>{{d.order_header.source_province}}{{d.order_header.source_city}}</td>
 					<td>{{d.order_header.destination_province}}{{d.order_header.destination_city}}</td>
@@ -175,6 +180,36 @@
 					<td>{{d.order_header.create_time|ft}}</td>
 					<td>{{d.order_header.create_by|f}}</td>
 				</tr>
+				<tr class="data_table_tr data_table_tr_even">
+					<td colspan="20">
+						<table style="width:900px;float:right;">
+							<tr>
+								<td>保险费用</td>
+								<td>送货费用</td>
+								<td>上门接货费用</td>
+								<td>包装费用</td>
+								<td>装货费用</td>
+								<td>卸货费用</td>
+								<td>其它费用</td>
+								<td>代理费用</td>
+								<td>单笔总费用</td>
+							</tr>
+							<tr class="sub_charge_tr">
+								<td style="width:100px">{{d.insurance_charge|f}}</td>
+								<td style="width:100px">{{d.sendout_charge|f}}</td>
+								<td style="width:100px">{{d.receive_charge|f}}</td>
+								<td style="width:100px">{{d.package_charge|f}}</td>
+								<td style="width:100px">{{d.load_charge|f}}</td>
+								<td style="width:100px">{{d.unload_charge|f}}</td>
+								<td style="width:100px">{{d.other_charge|f}}</td>
+								<td style="width:100px">{{d.proxy_charge|f}}</td>
+								<td style="width:100px">{{d.amount|f}}</td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+				
+				
 			{% endfor %}
 				
 		</table>

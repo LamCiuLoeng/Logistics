@@ -401,9 +401,7 @@ class CustomerDiquRatio(DeclarativeBase, SysMixin, CRUDMixin):
     qty_ratio = Column(Float, default = 0, doc = u'数量费率')
     weight_ratio = Column(Float, default = 0, doc = u'重量费率')
     vol_ratio = Column(Float, default = 0, doc = u'体积费率')
-
-
-
+    remark = Column(Text)
 
 
 class CustomerTarget(DeclarativeBase, SysMixin):
@@ -511,22 +509,7 @@ class CustomerContact(DeclarativeBase, SysMixin):
 
 
 
-class CustomerPricelist(DeclarativeBase, SysMixin):
-    __tablename__ = 'master_customer_pricelist'
 
-    id = Column(Integer, autoincrement = True, primary_key = True)
-
-    customer_id = Column(Integer, ForeignKey('master_customer.id'))
-    customer = relation(Customer, backref = backref("pricelist", order_by = id))
-    province_id = Column(Integer, ForeignKey('master_province.id'))
-    province = relation(Province)
-    city_id = Column(Integer, ForeignKey('master_city.id'))
-    city = relation(City)
-    qty_ratio = Column(Float, default = None, doc = u'件数费率')
-    weight_ratio = Column(Float, default = None, doc = u'重量费率')
-    vol_ratio = Column(Float, default = None, doc = u'体积费率')
-
-    remark = Column(Text)
 
 
 class CustomerProfile(DeclarativeBase, SysMixin):

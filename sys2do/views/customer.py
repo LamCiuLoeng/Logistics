@@ -19,7 +19,7 @@ from flask.templating import render_template
 from sys2do.views import BasicView
 from sys2do.util.decorator import templated, login_required, tab_highlight
 from sys2do.model.master import Customer, CustomerTarget, Province, \
-    CustomerSource, CustomerContact, CustomerPricelist
+    CustomerSource, CustomerContact, CustomerDiquRatio
 from sys2do.model import DBSession
 from sys2do.util.common import _g, getMasterAll, _error, _info
 from sys2do.constant import MESSAGE_INFO, MSG_SAVE_SUCC, MSG_UPDATE_SUCC, \
@@ -345,9 +345,9 @@ class CustomerView(BasicView):
         if method == 'LIST':
             id = _g('id')
             c = DBSession.query(Customer).get(id)
-            result = DBSession.query(CustomerPricelist).filter(and_(CustomerPricelist.active == 0,
-                                                                    CustomerPricelist.customer_id == c.id,
-                                                        )).order_by(CustomerPricelist.province_id)
+            result = DBSession.query(CustomerDiquRatio).filter(and_(CustomerDiquRatio.active == 0,
+                                                                    CustomerDiquRatio.customer_id == c.id,
+                                                        )).order_by(CustomerDiquRatio.province_id)
 
             page = _g('page', 1)
             def url_for_page(**params): return url_for('.view', action = _action, m = 'LIST', page = params['page'])
@@ -362,7 +362,7 @@ class CustomerView(BasicView):
                 params = {}
                 for f in ['customer_id', 'province_id', 'city_id', 'qty_ratio', 'weight_ratio', 'vol_ratio', 'remark'] :
                     params[f] = _g(f)
-                obj = CustomerPricelist(**params)
+                obj = CustomerDiquRatio(**params)
                 DBSession.add(obj)
                 DBSession.commit()
                 flash(MSG_SAVE_SUCC, MESSAGE_INFO)
@@ -371,7 +371,7 @@ class CustomerView(BasicView):
                 flash(MSG_SERVER_ERROR, MESSAGE_ERROR)
             return redirect(url_for('.view', action = _action, id = obj.customer_id))
         elif method == 'UPDATE':
-            obj = DBSession.query(CustomerPricelist).get(_g('id'))
+            obj = DBSession.query(CustomerDiquRatio).get(_g('id'))
             if obj.province_id:
                 cities = obj.province.children()
             else:
@@ -383,7 +383,7 @@ class CustomerView(BasicView):
             if not id :
                 flash(MSG_NO_ID_SUPPLIED, MESSAGE_ERROR)
                 return redirect(url_for('.view', action = _action))
-            obj = DBSession.query(CustomerPricelist).get(id)
+            obj = DBSession.query(CustomerDiquRatio).get(id)
             if not obj :
                 flash(MSG_RECORD_NOT_EXIST, MESSAGE_ERROR)
                 return redirect(url_for('.view', action = _action))
@@ -398,7 +398,7 @@ class CustomerView(BasicView):
             if not id :
                 flash(MSG_NO_ID_SUPPLIED, MESSAGE_ERROR)
                 return redirect(url_for('.view', action = _action))
-            obj = DBSession.query(CustomerPricelist).get(id)
+            obj = DBSession.query(CustomerDiquRatio).get(id)
             if not obj :
                 flash(MSG_RECORD_NOT_EXIST, MESSAGE_ERROR)
                 return redirect(url_for('.view', action = _action))

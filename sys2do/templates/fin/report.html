@@ -1,0 +1,94 @@
+{% extends "master.html" %}
+{% block subtitle %} - 财务报表{% endblock %}
+
+{% block extCSS %}
+
+{% endblock %}
+
+
+{% block extJS %}
+<script src="{{url_for('static', filename='js/customer/order_todo.js')}}" type="text/javascript"></script>
+<script language="JavaScript" type="text/javascript">
+//<![CDATA[
+	$(document).ready(function(){
+	    $("#destination_province_id").change(function(){
+	        province_change(this,'#destination_city_id');
+	    });
+	    
+	    $("#customer_id").change(customer_change);
+	});
+	
+
+
+	function customer_change(){
+		$("#source_company_id").empty();
+		$.getJSON('/ajax_master',{
+			't' : nowstr(),
+			'm' : 'source',
+			'id' : $("#customer_id").val()
+		},function(r){
+			if(r.code==0){
+				var html = "<option></option>";
+				for(var i=0;i<r.data.length;i++){
+					var t = r.data[i];
+					html += '<option value="'+t.id+'">'+t.name+'</option>';
+				}
+				$("#source_company_id").html(html);
+			}
+		});
+	}	
+	
+//]]>
+</script>
+{% endblock %}
+        
+        
+{% block inner_menu %}
+<div class="inner_menu">
+	<ul>
+		<li><a href="{{url_for('.view',action='index')}}"><img src="/static/images/system/order_manage_25.jpg" width="71" height="21" id="Image1" onmouseover="MM_swapImage('Image1','','/static/images/system/order_manage_h_25.jpg',1)" onmouseout="MM_swapImgRestore()" onclick="return toreturn();"/></a></li>
+    </ul>
+</div>
+{% endblock %}
+
+
+                
+{% block content %}
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+	<tr><td class="title_fonts_display">&middot; 财务报表</td></tr>
+</table>
+<div class="search_div">
+	<div class="search_div_header">订单搜索</div>
+    <div class="search_div_body">
+    	<form action="{{url_for('.view',action='export')}}" method="post" id="search_form">
+
+    	<ul>
+          <li style="width:100%; border-right:#E2FEFE 1px solid;"><span>起始日期</span>
+        	  <input type="text" class="datepicker" name="create_time_from" value=""/>&nbsp;&nbsp;-&nbsp;&nbsp;<input type="text" class="datepicker" name="create_time_to" value=""/>
+          </li>
+          <li><span>{{_('Order Number')}}</span><input type="text" name="ref_no" value=""/></li>
+          <li><span>送货单号</span><input type="text" name="ref_no" value=""/></li>
+          <li style="width:755px"><span>{{_('Destination Station')}}</span>
+	    	  {{mymacros.select('destination_province_id',MASTER_ALL('Province'),None,style="width:150px")}}
+	    	  {{mymacros.select('destination_city_id',[],None,style="width:150px")}}
+          </li>
+	          
+          <li style="width:755px"><span>{{_('Source Company')}}</span>
+            {{mymacros.select('customer_id',MASTER_ALL('Customer'),None,style="width:250px")}}			
+			{{mymacros.select('source_company_id',[],None,style="width:250px")}}
+          </li>			
+          <li style="width:755px"><span>{{_('Supplier')}}</span>
+            {{mymacros.select('supplier_id',MASTER_ALL('Supplier'),None,style="width:250px")}}
+          </li>
+        </ul>
+        <div class="button_div"><input type="submit" value="导出报表"/></div>
+    	</form>
+        <div style="clear:both"></div>
+    </div>
+</div>
+
+
+
+
+
+{% endblock %}
