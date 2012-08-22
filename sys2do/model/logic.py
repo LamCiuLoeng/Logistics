@@ -108,6 +108,7 @@ class OrderHeader(DeclarativeBase, SysMixin, CRUDMixin):
     load_charge = Column(Float, default = 0, doc = u'装货费用')
     unload_charge = Column(Float, default = 0, doc = u'卸货费用')
     proxy_charge = Column(Float, default = 0, doc = u'代理费用')
+    actual_proxy_charge = Column(Float, default = 0, doc = u'已退回扣')
     other_charge = Column(Float, default = 0, doc = u'其它费用')
     amount = Column(Float, default = 0, doc = u'金额(元)')
     cost = Column(Float, default = 0, doc = u'')

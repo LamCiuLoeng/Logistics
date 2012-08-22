@@ -815,9 +815,14 @@ class OrderView(BasicView):
 
         _info(ids)
 
+        def _f(obj):
+            if obj.destination_city_id:
+                return "".join(map(lambda v : unicode(v), [obj.destination_province, obj.destination_city]))
+            return unicode(obj.destination_province)
+
         data = []
         for r in DBSession.query(OrderHeader).filter(OrderHeader.id.in_(ids)).order_by(OrderHeader.create_time):
-            row = [r.create_time, r.ref_no, r.destination_station, r.destination_contact, r.qty, r.weight, r.destination_tel, '', ] #A - H
+            row = [r.create_time, r.ref_no, _f(r), r.destination_contact, r.qty, r.weight, r.destination_tel, '', ] #A - H
             deliver_header = r.get_deliver_header()
             if deliver_header :
                 row.extend(['', deliver_header.no, deliver_header.sendout_time, '', '', deliver_header.expect_time, deliver_header.actual_time, '', ]) #I - P

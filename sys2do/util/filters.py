@@ -76,7 +76,12 @@ def showReturnNote(s):
 
 def sum_with_none(iterable, attribute = None):
     if attribute is not None:
-        iterable = imap(lambda item : getattr(item, attribute), iterable)
+        try:
+            m = eval(attribute)
+            iterable = imap(m, iterable)
+        except:
+            iterable = imap(lambda item : getattr(item, attribute), iterable)
+
 
     count = 0
     for k in iterable:
@@ -85,3 +90,4 @@ def sum_with_none(iterable, attribute = None):
         except:
             pass
     return count
+

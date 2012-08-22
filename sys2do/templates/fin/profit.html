@@ -1,0 +1,211 @@
+{% extends "master.html" %}
+{% block subtitle %} - 财务回扣统计{% endblock %}
+
+{% block extCSS %}
+
+{% endblock %}
+
+
+{% block extJS %}
+<script src="{{url_for('static', filename='js/customer/profit.js')}}" type="text/javascript"></script>
+<script language="JavaScript" type="text/javascript">
+//<![CDATA[
+	$(document).ready(function(){
+	    $("#destination_province_id").change(function(){
+	        province_change(this,'#destination_city_id');
+	    });
+	    
+	    $( "#dialog-form" ).dialog({
+    		modal: true,
+    		height: 300,
+    		width:500,
+    		autoOpen: false
+    	});
+	});
+		
+	function toSort(f,d){
+		$("#field").val(f);
+		$("#direction").val(d);
+		$("#search_form").submit();
+	}
+	
+//]]>
+</script>
+
+{% endblock %}
+
+
+        
+        
+        
+{% block inner_menu %}
+<div class="inner_menu">
+	<ul>	
+		<li><a href="{{url_for('.view',action='index')}}"><img src="/static/images/system/order_manage_25.jpg" width="71" height="21" id="Image1" onmouseover="MM_swapImage('Image1','','/static/images/system/order_manage_h_25.jpg',1)" onmouseout="MM_swapImgRestore()"/></a></li>
+        <li><input type="button" value="记录回扣信息" onclick="add_discount()"/></li>
+    </ul>
+</div>
+{% endblock %}
+
+
+{% block content %}
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+	<tr><td class="title_fonts_display">&middot; 财务回扣统计</td></tr>
+</table>
+<div class="search_div">
+	<div class="search_div_header">订单搜索</div>
+    <div class="search_div_body">
+    	<form action="{{url_for('.view',action='profit')}}" method="post" id="search_form">
+
+    	<ul>
+          <li style="width:100%; border-right:#E2FEFE 1px solid;"><span>起始日期</span>
+        	  <input type="text" class="datepicker" name="create_time_from" value="{{values.get('create_time_from','')|f}}"/>&nbsp;&nbsp;-&nbsp;&nbsp;<input type="text" class="datepicker" name="create_time_to" value="{{values.get('create_time_to','')|f}}"/>
+          </li>
+          <li style="width:755px"><span>{{_('Destination Station')}}</span>
+	          {% set destination_province_id = values.get('destination_province_id',None)|int  %}
+	    	  {{mymacros.select('destination_province_id',MASTER_ALL('Province'),destination_province_id,style="width:150px")}}
+          	  {% set destination_city_id = values.get('destination_city_id',None)|int  %}
+	    	  {{mymacros.select('destination_city_id',destination_cites,destination_city_id,style="width:150px")}}
+          </li>
+          <li><span>{{_('Order Number')}}</span><input type="text" name="ref_no" value="{{values.get('ref_no','')|f}}"/></li>
+          <li><span>{{_('Deliver Number')}}</span><input type="text" name="deliver_no" value="{{values.get('deliver_no','')|f}}"/></li>
+          <li><span>{{_('Supplier')}}</span>
+             {% set supplier_id = values.get('supplier_id',None)|int  %}
+          	 {{mymacros.select('supplier_id',MASTER_ALL('Supplier'),supplier_id,style="width:150px")}}  
+          </li>
+		  <li><span>付款方式</span>
+		    {% set payment_id = values.get('payment_id',None)|int  %}
+		  	{{mymacros.select(id='payment_id',list=MASTER_ALL('Payment'),value=payment_id,style="width:150px")}}
+		  </li>          
+          <li style="width:500px"><span>回扣情况</span>
+              <select name="is_discount_return" id="is_discount_return">
+                  <option value=""></option>
+                  {% for v,n in [('0','未返'),('1','已返')]%}
+                      {% if v == values.get('is_discount_return',None)%}
+                          <option value="{{v}}" selected="selected">{{n}}</option>
+                      {% else %}
+                          <option value="{{v}}">{{n}}</option>
+                      {% endif %}
+                  {% endfor %}
+              </select>
+          </li>
+        </ul>
+        <div class="button_div"><input type="submit" value="{{_('Search')}}"/></div>
+        <input type="hidden" name="SEARCH_SUBMIT" value="TRUE"/>
+        <input type="hidden" name="field" id="field" value=""/>
+        <input type="hidden" name="direction" id="direction" value=""/>
+    	</form>
+        <div style="clear:both"></div>
+    </div>
+</div>
+
+<div class="point_div"><img src="/static/images/system/order_manage_54.jpg" width="22" height="28" /><span>{{_('Input the conditions and search.')}}</span></div>
+
+
+
+
+<form method="post" action="" id="records">
+
+<table border="0" cellpadding="0" cellspacing="0"  style="width:1780px">
+  	  <tr class="data_table_tr">
+	    <td colspan="100" style="text-align:right">{{mymacros.mypaginate(records)}}</td>
+	</tr>
+  <tr class="field_head">
+    <th align="center" style="width:50px;"></th>
+    <td align="center" style="width:100px;">{{mymacros.show_direction(values,'ref_no')}}{{_('Order Number')}}</td>
+    <td align="center" style="width:100px;">送货单号</td>
+    <td align="center" style="width:100px;">{{mymacros.show_direction(values,'destination_province_id')}}{{_('Destination Station')}}</td>
+    <td align="center" style="width:150px;">{{mymacros.show_direction(values,'supplier_id')}}承运商</td>
+    <td align="center" style="width:80px;">付款方式</td>
+    <td align="center" style="width:50px;">{{mymacros.show_direction(values,'amount')}}{{_('Amount')}}(元)</td>
+    <td align="center" style="width:50px;">{{mymacros.show_direction(values,'cost')}}费用(元)</td>
+    <td align="center" style="width:100px;">回扣情况</td>
+    <td align="center" style="width:80px;">应收回扣</td>
+    <td align="center" style="width:80px;">实收回扣</td>
+    <td align="center" style="width:120px;">{{mymacros.show_direction(values,'discount_return_person_id')}}退款人员</td>
+    <td align="center" style="width:200px;">{{mymacros.show_direction(values,'discount_return_time')}}退款时间</td>
+    <td align="center" style="width:200px;">退款备注</td>
+    <td align="center" style="width:200px;">{{mymacros.show_direction(values,'create_time')}}{{_('Create Time')}}</td>
+    <td align="center" style="width:120px;">{{mymacros.show_direction(values,'create_by_id')}}{{_('Creator')}}</td>
+  </tr>
+  
+  {% for (order_d,deliver_d) in records.items %}
+		  <tr class="data_table_tr {{ loop.cycle('data_table_tr_odd', 'data_table_tr_even') }}">
+		    <th><input type="radio" name="order_ids" value="{{order_d.id}}" /></th>
+		    <td>{{order_d.ref_no|f('没有订单号')}}</td>
+		    <td>{{deliver_d.no|f}}</td>
+			<td>{{order_d.destination_province|f}}{{order_d.destination_city|f}}</td>
+			<td>{{deliver_d.supplier|f}}</td>
+			<td>{{order_d.payment|f}}</td>
+			<td>{{order_d.amount|f}}</td>
+			<td>{{order_d.cost|f}}</td>
+		    <td><span class="order_return_span">{{mymacros.show_discount(order_d.is_discount_return)}}</span></td>
+			<td>{{order_d.proxy_charge|f}}</td>
+			<td>{{order_d.actual_proxy_charge|f}}</td>
+			<td>{{order_d.discount_return_person|f}}</td>
+			<td>{{order_d.discount_return_time|f}}</td>
+			<td>{{order_d.discount_return_remark|f}}</td>
+			<td>{{order_d.create_time|ft}}</td>
+			<td>{{order_d.create_by|f}}</td>
+  {% endfor %}
+      <tr class="data_table_tr">
+      	{% set total_amount = records.items|sum_with_none(attribute='lambda (a,b): a.amount') %}
+        {% set total_cost = records.items|sum_with_none(attribute='lambda (a,b): a.cost') %}
+        {% set total_proxy_charge = records.items|sum_with_none(attribute='lambda (a,b): a.proxy_charge') %}
+        {% set total_acutal_proxy_charge = records.items|sum_with_none(attribute='lambda (a,b): a.actual_proxy_charge') %}
+      	<th>&nbsp;</th>
+      	<td colspan="5" style="text-align:left">&nbsp;合计</td>
+      	<td>{{total_amount}}</td>
+      	<td>{{total_cost}}</td>
+      	<td></td>
+      	<td>{{total_proxy_charge}}</td>
+      	<td>{{total_acutal_proxy_charge}}</td>
+      	<td colspan="100">&nbsp;</td>
+      </tr>
+      <tfoot>
+	  	 <tr class="data_table_tr">
+		    <td colspan="100" style="text-align:right">{{mymacros.mypaginate(records)}}</td>
+		</tr>
+  	</tfoot>
+</table>
+<br /><br />
+</form>
+
+
+
+
+
+
+<!-- customer source form begin -->
+
+<div id="dialog-form" title="回扣退款信息" style="background-color:white;">
+	<input type="hidden" id="order_id" value=""/>
+	<table border="0" cellpadding="0" cellspacing="0">
+		<tr>
+			<td valign="top" width="100px" align="center" height="30px">订单号码</td>
+			<td valign="top"><span id="discount_ref_no"></span></td>
+		</tr>
+		<tr>
+			<td valign="top" width="100px" align="center" height="30px">已退回扣金额</td>
+			<td valign="top"><input type="text" id="actual_proxy_charge" value="" class="order_add_div_body_input numeric must_input" style="width:150px;"/></td>
+		</tr>
+		<tr>
+			<td valign="top" width="100px" align="center" height="30px">退款人员</td>
+			<td valign="top">{{mymacros.select('discount_person_id',MASTER_ALL('User'),None,class="must_input",style="width:150px")}}</td>
+		</tr>
+		<tr>
+			<td valign="top" align="center" height="30px">退款时间</td>
+			<td valign="top"><input type="text" id="discount_return_time" value="" class="order_add_div_body_input datetimepicker must_input" style="width:150px;"/></td>
+		</tr>
+		<tr>
+		    <td valign="top" align="center" height="30px">{{_('Remark')}}</td>
+		    <td valign="top"><textarea id="discount_return_remark" style="width:250px;"></textarea></td>
+		</tr>
+	</table>
+	
+	<br />
+	<p style="text-align:right;"><input type="button" value="保存" onclick="save_discount()"/>&nbsp;<input type="button" value="取消" onclick="cancel_discount()"/></p>
+</div>
+
+<!-- customer target form end -->
+{% endblock %}
