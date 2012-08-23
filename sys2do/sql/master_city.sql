@@ -323,6 +323,7 @@ INSERT INTO "master_city" ("create_time", "create_by_id", "update_time", "update
 INSERT INTO "master_city" ("create_time", "create_by_id", "update_time", "update_by_id", "active", "name", "code", "parent_code") VALUES (NULL, NULL, NULL, NULL, 0, '崇左市', '451400', '450000');
 INSERT INTO "master_city" ("create_time", "create_by_id", "update_time", "update_by_id", "active", "name", "code", "parent_code","shixiao") VALUES (NULL, NULL, NULL, NULL, 0, '海口市', '460100', '460000',2);
 INSERT INTO "master_city" ("create_time", "create_by_id", "update_time", "update_by_id", "active", "name", "code", "parent_code","shixiao") VALUES (NULL, NULL, NULL, NULL, 0, '三亚市', '460200', '460000',3);
+INSERT INTO "master_city" ("create_time", "create_by_id", "update_time", "update_by_id", "active", "name", "code", "parent_code","shixiao") VALUES (NULL, NULL, NULL, NULL, 0, '琼海市', '571400', '460000',3);
 INSERT INTO "master_city" ("create_time", "create_by_id", "update_time", "update_by_id", "active", "name", "code", "parent_code") VALUES (NULL, NULL, NULL, NULL, 0, '成都市', '510100', '510000');
 INSERT INTO "master_city" ("create_time", "create_by_id", "update_time", "update_by_id", "active", "name", "code", "parent_code") VALUES (NULL, NULL, NULL, NULL, 0, '自贡市', '510300', '510000');
 INSERT INTO "master_city" ("create_time", "create_by_id", "update_time", "update_by_id", "active", "name", "code", "parent_code") VALUES (NULL, NULL, NULL, NULL, 0, '攀枝花市', '510400', '510000');

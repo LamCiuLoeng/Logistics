@@ -14,26 +14,26 @@
 //<![CDATA[
 	function tosave(){
 		var msg = new Array();
+		if(!$("#code").val()){
+			msg.push('请填写票本编号！');
+		}
+		if(!$("#province_id").val()){
+			msg.push('请选择站点！');
+		}
 		if(!$("#name").val()){
 			msg.push('请填写票据前缀！');
 		}
-		
-		var correct = true;
-		var count = 0
-		$(".range").each(function(){
-			var tmp = $(this);
-			var b = $("input[name^='begin_']",tmp).val();
-			var e = $("input[name^='end_']",tmp).val();
-			if(!b&&e || b&&!e){ correct = false; }
-			else if(b&&e){ count ++; }
-		});
-		
-		if(!correct){
-			msg.push('请正确填写票据范围，必须填写起始和结束数值！');
+		if(!$("#apply_person_id").val()){
+			msg.push('请选择领票人！');
 		}
-		
-		if(count<1){
-			msg.push('请填写至少一个可用的票据范围！');
+		if(!$("#operator_id").val()){
+			msg.push('请选择操作人！');
+		}
+		if(!$("#begion_no").val()){
+			msg.push('请填写票据开始编号！');
+		}
+		if(!$("#end_no").val()){
+			msg.push('请填写票据结束编号！');
 		}
 		
 		if(msg.length>0){
@@ -43,24 +43,6 @@
 		}
 	}
 	
-	var index = 2
-	
-	function add_line(obj){
-		var tmp = $(".template").clone().removeClass("template");
-		$("input[type='text']",tmp).each(function(){
-			var t = $(this);
-			var n = t.attr('name').replace("_x","_"+index);
-			t.attr("name",n);
-		})
-		
-		$($(obj).parents("li")[0]).after(tmp);
-		index ++ ;
-	}
-	
-	
-	function del_line(obj){
-		$($(obj).parents("li")[0]).remove();
-	}	
 //]]>
 </script>
 {% endblock %}
@@ -71,7 +53,6 @@
 	<ul>
     	<li><img src="/static/images/system/order_manage_25.jpg" width="71" height="21" id="Image1" onmouseover="MM_swapImage('Image1','','/static/images/system/order_manage_h_25.jpg',1)" onmouseout="MM_swapImgRestore()" onclick="redirect('{{url_for('bpAdmin.view',action=action)}}')"/></li>
         <li><input type="image" src="/static/images/system/order_manage_33.jpg" width="77" height="21" id="Image3" onmouseover="MM_swapImage('Image3','','/static/images/system/order_manage_h_33.jpg',1)" onmouseout="MM_swapImgRestore()" onclick="tosave()"/></li>
-        
     </ul>
 </div>
 {% endblock %}
@@ -80,24 +61,42 @@
 	<form action="{{url_for('.view', action = action,m='SAVE_NEW')}}" method="post">
 		<table>
 			<tr>
+				<td>票本编号</td>
+				<td><input type="text" name="code" id="code"/></td>
+			</tr>
+			<tr>
 				<td>票据前缀</td>
 				<td><input type="text" name="name" id="name"/></td>
 			</tr>
 			<tr>
-				<td>可用范围</td>
-				<td valign="top">
-					<ul id="range_list">
-						<li class="range">
-							<input type="text" name="begin_1" class="numeric"/>&nbsp;~&nbsp;<input type="text" name="end_1" class="numeric"/>
-							&nbsp;<input type="button" value="+" onclick="add_line(this)"/>
-							&nbsp;<input type="button" value="-" onclick="del_line(this)"/>
-						</li>
-						<li class="template range">
-							<input type="text" name="begin_x" class="numeric"/>&nbsp;~&nbsp;<input type="text" name="end_x" class="numeric"/>
-							&nbsp;<input type="button" value="+" onclick="add_line(this)"/>
-							&nbsp;<input type="button" value="-" onclick="del_line(this)"/>
-						</li>
-					</ul>
+				<td>站点</td>
+				<td>
+					{{mymacros.select(id='province_id',list=MASTER_ALL('Province'),value=None,class="must_input",style="width:150px")}}
+					<select name="city_id" id="city_id" style="width:150px"></select>
+				</td>
+			</tr>
+			<tr>
+				<td>开始编号</td>
+				<td><input type="text" name="begin_no" id="begin_no"/></td>
+			</tr>
+			<tr>
+				<td>结束编号</td>
+				<td><input type="text" name="end_no" id="end_no"/></td>
+			</tr>
+			<tr>
+				<td>领票时间</td>
+				<td><input type="text" name="apply_time" id="apply_time" class="datetimepicker"/></td>
+			</tr>
+			<tr>
+				<td>领票人</td>
+				<td>
+					{{mymacros.select(id='apply_person_id',list=MASTER_ALL('User'),value=None,class="must_input",style="width:150px")}}
+				</td>
+			</tr>
+			<tr>
+				<td>操作人</td>
+				<td>
+					{{mymacros.select(id='operator_id',list=MASTER_ALL('User'),value=None,class="must_input",style="width:150px")}}
 				</td>
 			</tr>
 			<tr>

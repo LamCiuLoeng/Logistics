@@ -227,7 +227,7 @@ class CustomerView(BasicView):
                                                         DBObj.customer_id == c.id)).order_by(DBObj.name)
 
             page = _g('page', 1)
-            def url_for_page(**params): return url_for('.view', action = _action, m = 'LIST', page = params['page'])
+            def url_for_page(**params): return url_for('.view', action = _action, m = 'LIST', page = params['page'], id = id)
             records = paginate.Page(result, page, show_if_single_page = True, items_per_page = PAGINATE_PER_PAGE, url = url_for_page)
             return render_template(_index_html, records = records, customer = c)
         elif method == 'NEW':

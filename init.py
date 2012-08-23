@@ -13,7 +13,7 @@ import sys
 from sys2do.model.master import CustomerProfile, Customer, \
     ItemUnit, InventoryLocation, WeightUnit, ShipmentType, Payment, Supplier, \
     SupplierProfile, Ratio, PickupType, PackType, Diqu, CustomerTarget, Receiver, \
-    Item, CustomerContact, Note, CustomerSource
+    Item, CustomerContact, Note, CustomerSource, City
 reload(sys)
 sys.setdefaultencoding('utf8')
 
@@ -243,16 +243,24 @@ def init():
         conn.execute(province_sql)
         conn.execute(city_sql)
 
-        receiver1 = Receiver(code = 'C001', name = '李司机', tel = '0755-12345671', mobile = '13800138111',)
-        receiver2 = Receiver(code = 'C002', name = '张司机', tel = '0755-12345672', mobile = '13800138222',)
-        receiver3 = Receiver(code = 'C003', name = '黄司机', tel = '0755-12345673', mobile = '13800138333',)
-        receiver4 = Receiver(code = 'C004', name = '王司机', tel = '0755-12345674', mobile = '13800138444',)
-        DBSession.add_all([receiver1, receiver2, receiver3, receiver4])
+        DBSession.commit()
 
-        note1 = Note(name = u'坚朗', range = [('1001', '2000'), ('3001', '4000')])
-        note2 = Note(name = u'味千', range = [('2001', '3000'), ('4001', '5000')])
+
+        receiver1 = Receiver(code = u'粤BIP092', name = u'黄司机', tel = None, mobile = '15976884544',)
+        receiver2 = Receiver(code = u'粤BQ4225', name = '叶司机', tel = None, mobile = '13682553458',)
+        receiver3 = Receiver(code = u'粤BJU706', name = u'张司机', tel = None, mobile = '15813808186',)
+        receiver4 = Receiver(code = u'粤BJX667', name = u'李司机', tel = None, mobile = '13590435287',)
+        receiver5 = Receiver(code = u'粤BPY286', name = u'杨司机', tel = None, mobile = '13554881765',)
+        receiver6 = Receiver(code = u'粤BVQ582', name = u'杨司机', tel = None, mobile = '13724255912',)
+        receiver7 = Receiver(code = u'粤B2X846', name = u'巍司机', tel = None, mobile = '13410189026',)
+
+        DBSession.add_all([receiver1, receiver2, receiver3, receiver4, receiver5, receiver6, receiver7])
+
+        note1 = Note(code = '0001191-1', name = u'坚朗', province_id = 19, city_id = 290, apply_person_id = 1, apply_time = '2012-08-23',
+                     begin_no = '1188000', end_no = '1188599', remark = u'坚朗专用二本')
+
         DBSession.add_all([
-                           note1, note2,
+                           note1,
                            ])
 
 
@@ -264,8 +272,7 @@ def init():
         kinlong_source1 = CustomerSource(customer = kinlong, name = u"坚朗一厂", province_id = 19, city_id = 304, payment = payment1)  #东莞
         kinlong_source2 = CustomerSource(customer = kinlong, name = u"坚朗二厂", province_id = 19, city_id = 304, payment = payment1)  #东莞
         kinlong_source3 = CustomerSource(customer = kinlong, name = u"坚朗三厂", province_id = 19, city_id = 304, payment = payment1)  #东莞
-        kinlong_target1 = CustomerTarget(customer = kinlong, name = u'盐城办', province_id = 10, city_id = 174) #盐城
-        kinlong_target2 = CustomerTarget(customer = kinlong, name = u'合肥办', province_id = 12, city_id = 190)  #合肥
+
 
         DBSession.add_all([
                            kinlong, kinlong_source1, kinlong_source2, kinlong_source3,
@@ -280,23 +287,17 @@ def init():
         kinlong_source2_c1 = CustomerContact(customer = kinlong, type = 'S', refer_id = kinlong_source2.id, name = u'王二', mobile = u'13880138113', phone = u'1234563', address = u'常平',)
         kinlong_source2_c2 = CustomerContact(customer = kinlong, type = 'S', refer_id = kinlong_source2.id, name = u'王小川', mobile = u'13880138114', phone = u'1234563', address = u'虎门',)
 
-        kinlong_source3_c1 = CustomerContact(customer = kinlong, type = 'S', refer_id = kinlong_source3.id, name = u'黄强', mobile = u'13880138115', phone = u'1234563', address = u'塘厦',)
         kinlong_source3_c2 = CustomerContact(customer = kinlong, type = 'S', refer_id = kinlong_source3.id, name = u'钟远', mobile = u'13880138116', phone = u'1234563', address = u'大岭山',)
 
-
-        kinlong_target1_c1 = CustomerContact(customer = kinlong, type = 'T', refer_id = kinlong_target1.id, name = u'李四', mobile = u'13880138117', phone = u'1234563', address = u'亭湖区先锋街道',)
-        kinlong_target1_c2 = CustomerContact(customer = kinlong, type = 'T', refer_id = kinlong_target1.id, name = u'樊五', mobile = u'13880138118', phone = u'1234563', address = u'文峰街道',)
-
-        kinlong_target2_c1 = CustomerContact(customer = kinlong, type = 'T', refer_id = kinlong_target2.id, name = u'陈先生', mobile = u'13880138119', phone = u'1234563', address = u'庐阳区三孝口',)
-        kinlong_target2_c2 = CustomerContact(customer = kinlong, type = 'T', refer_id = kinlong_target2.id, name = u'林先生', mobile = u'13880138120', phone = u'1234563', address = u'蜀山区荷叶地街道',)
-
-
         DBSession.add_all([
-                           kinlong_source1_c1, kinlong_source1_c2, kinlong_source2_c1, kinlong_source2_c2, kinlong_source3_c1, kinlong_source3_c2,
-                           kinlong_target1_c1, kinlong_target1_c2, kinlong_target2_c1, kinlong_target2_c2,
+                           kinlong_source1_c1, kinlong_source1_c2, kinlong_source2_c1, kinlong_source2_c2, kinlong_source3_c2,
+
                            ])
 
-
+        #import the kinlong target contact
+        import_kinlong_target(kinlong)
+        #import the supplier
+        import_supplier(payment1)
 
 
         DBSession.commit()
@@ -307,6 +308,113 @@ def init():
 
 
 
+
+
+def import_kinlong_target(kinlong):
+    print "insert kinlong target"
+    d = open('kinlong_contact.txt')
+    for line in d:
+        location, name, mobile = line.split("|")
+        location = unicode(location)
+        try:
+            c = DBSession.query(City).filter(City.name.op('like')('%%%s%%' % location[:2])).one()
+            t = CustomerTarget(customer = kinlong, name = location, province_id = c.parent().id, city_id = c.id)
+            DBSession.add(t)
+            DBSession.flush()
+            contact = CustomerContact(customer = kinlong, type = 'T', refer_id = t.id, name = name, mobile = mobile, phone = None, address = None)
+            DBSession.add(contact)
+        except:
+            pass
+    d.close()
+
+    hangkou = CustomerTarget(customer = kinlong, name = u'汉口办(公共)', province_id = 17, city_id = 261)
+    DBSession.flush()
+    hangkou_c = CustomerContact(customer = kinlong, type = 'T', refer_id = hangkou.id, name = u'张明洋', mobile = '13407191121', phone = None, address = u'汉口')
+    wuchang = CustomerTarget(customer = kinlong, name = u'武昌办公共、商用建筑销售部', province_id = 17, city_id = 261)
+    shanghai = CustomerTarget(customer = kinlong, name = u'上海住宅开发部', province_id = 9, city_id = None)
+    DBSession.flush()
+    shanghai_c = CustomerContact(customer = kinlong, type = 'T', refer_id = shanghai.id, name = u'李金虎', mobile = '13774413112', phone = None, address = None)
+    fuqing = CustomerTarget(customer = kinlong, name = u'福清销售点', province_id = 13, city_id = 207)
+    DBSession.flush()
+    fuqing_c = CustomerContact(customer = kinlong, type = 'T', refer_id = fuqing.id, name = u'陈文峰', mobile = '18259122060', phone = None, address = u'福清')
+    huadu = CustomerTarget(customer = kinlong, name = u'花都办', province_id = 19, city_id = 288)
+    DBSession.flush()
+    huadu_c = CustomerContact(customer = kinlong, type = 'T', refer_id = huadu.id, name = u'彭双林', mobile = '13060809011', phone = None, address = u'花都')
+    changshu = CustomerTarget(customer = kinlong, name = u'常熟办', province_id = 10, city_id = 170)
+    DBSession.flush()
+    changshu_c = CustomerContact(customer = kinlong, type = 'T', refer_id = changshu.id, name = u'梅陈赓', mobile = '15951100335', phone = None, address = u'常熟')
+    kunshang = CustomerTarget(customer = kinlong, name = u'昆山销售点', province_id = 10, city_id = 170)
+    DBSession.flush()
+    kunshang_c = CustomerContact(customer = kinlong, type = 'T', refer_id = kunshang.id, name = u'肖杰', mobile = '13616218299', phone = None, address = u'昆山')
+    wujiang = CustomerTarget(customer = kinlong, name = u'吴江销售点', province_id = 10, city_id = 170)
+    DBSession.flush()
+    wujiang_c = CustomerContact(customer = kinlong, type = 'T', refer_id = wujiang.id, name = u'向武将', mobile = '13862105593', phone = None, address = u'吴江')
+    zjg = CustomerTarget(customer = kinlong, name = u'张家港销售点', province_id = 10, city_id = 170)
+    DBSession.flush()
+    zjg_c = CustomerContact(customer = kinlong, type = 'T', refer_id = zjg.id, name = u'胡伟', mobile = '15850181896', phone = None, address = u'张家港')
+    yx = CustomerTarget(customer = kinlong, name = u'宜兴办', province_id = 10, city_id = 167)
+    DBSession.flush()
+    yx_c = CustomerContact(customer = kinlong, type = 'T', refer_id = yx.id, name = u'王伟', mobile = '13347926039', phone = None, address = u'宜兴')
+    cx = CustomerTarget(customer = kinlong, name = u'慈溪销售点', province_id = 11, city_id = 180)
+    DBSession.flush()
+    cx_c = CustomerContact(customer = kinlong, type = 'T', refer_id = cx.id, name = u'刘晓', mobile = '13566087866', phone = None, address = u'慈溪')
+    zj = CustomerTarget(customer = kinlong, name = u'诸暨销售点', province_id = 11, city_id = 184)
+    DBSession.flush()
+    zj_c = CustomerContact(customer = kinlong, type = 'T', refer_id = zj.id, name = u'叶坦', mobile = '13575559619', phone = None, address = u'诸暨')
+    cn = CustomerTarget(customer = kinlong, name = u'苍南销售点', province_id = 11, city_id = 181)
+    DBSession.flush()
+    cn_c = CustomerContact(customer = kinlong, type = 'T', refer_id = cn.id, name = u'李志坚', mobile = '13646536682', phone = None, address = u'苍南')
+    wl = CustomerTarget(customer = kinlong, name = u'温岭销售点', province_id = 11, city_id = 188)
+    DBSession.flush()
+    wl_c = CustomerContact(customer = kinlong, type = 'T', refer_id = wl.id, name = u'彭学江', mobile = '13957677975', phone = None, address = u'温岭')
+    yw = CustomerTarget(customer = kinlong, name = u'义乌销售点', province_id = 11, city_id = 185)
+    DBSession.flush()
+    yw_c = CustomerContact(customer = kinlong, type = 'T', refer_id = yw.id, name = u'贡健', mobile = '15057840176', phone = None, address = u'义乌')
+
+
+    DBSession.add_all([
+                       hangkou, hangkou_c, wuchang, shanghai, shanghai_c, fuqing, fuqing_c, huadu, huadu_c, changshu, changshu_c, kunshang, kunshang_c,
+                       wujiang, wujiang_c, zjg, zjg_c, yx, yx_c, cx, cx_c, zj, zj_c, cn, cn_c, wl, wl_c, yw, yw_c,
+                       ])
+
+
+
+def import_supplier(payment1):
+    print "insert supplier"
+    DBSession.add_all([
+               Supplier(name = u'中深翔', display_name = u'中深翔', address = u'布吉丹竹头金鹏物流园A区A栋18-20号', mobile = '13600432849', contact_person = u'全总', remark = u'上海', payment = payment1),
+               Supplier(name = u'深中联', display_name = u'深中联', address = u'布吉丹竹头金鹏物流园A栋5-6号', mobile = '13392826777,18902480211', contact_person = u'王总，丁小姐', remark = u'温州、台州、温岭、临海、黄岩', payment = payment1),
+               Supplier(name = u'旺平达', display_name = u'旺平达', address = u'龙华明治大道华通源物流中心B2栋263-266号', mobile = '15099917300', contact_person = u'李飞章', remark = u'苏州、无锡、昆山、张家港、宜兴、常熟、太仓、吴江', payment = payment1),
+               Supplier(name = u'顺福', display_name = u'顺福', address = u'丹竹头白泥坑宇达物流园3栋301-318号', phone = '89575677', mobile = '13316895558', contact_person = u'陈老板', remark = u'徐州、南通、淮安、盐城、连云港、启东', payment = payment1),
+               Supplier(name = u'鑫金叶', display_name = u'鑫金叶', address = u'布吉李朗东西干道南岭大龙山物流园G栋1-3号', mobile = '13906667228', contact_person = u'金经理        ', remark = u'温州苍南', payment = payment1),
+               Supplier(name = u'华发', display_name = u'华发', address = u'金鹏物流园B区9栋7-12号', mobile = '15999677737', contact_person = u' 陈老板', remark = u'南京、常州、扬州、泰州、镇江、靖江', payment = payment1),
+               Supplier(name = u'京鹏', display_name = u'京鹏', address = u'华通源物流中心C4栋138-152号', mobile = '13066815788,13066815788', contact_person = u'老板娘           傅总', remark = u'杭州、上虞、湖州、德清、临安、丽水、桐乡、长兴、云南省', payment = payment1),
+               Supplier(name = u'凯林瑞', display_name = u'凯林瑞', address = u'龙岗区丹竹头金鹏物流园B区D栋41-42号', phone = '0755-82432843', mobile = '', contact_person = u'杨总', remark = u'浙江嘉兴', payment = payment1),
+               Supplier(name = u'海联', display_name = u'海联', address = u'华通源物流中心', mobile = '18688838882', contact_person = u'李老板', remark = u'宁波、义乌、绍兴、衢州、诸暨、金华、慈溪、余姚、舟山、奉化', payment = payment1),
+               Supplier(name = u'荣晖', display_name = u'荣晖', address = u'金鹏A区B栋15-18号,40-42号', mobile = '13631528080', contact_person = u'胡总', remark = u'南昌、赣州、新余、吉安、九江、萍乡、宜春、鹰潭', payment = payment1),
+               Supplier(name = u'深湘', display_name = u'深湘', address = u'长城货代市场83档', mobile = '13902485137', contact_person = u'丘总', remark = u'长沙、常德、衡阳、株洲、湘阴、岳阳、怀化、湘潭', payment = payment1),
+               Supplier(name = u'澳跃', display_name = u'澳跃', address = u'金鹏', mobile = '13902311565', contact_person = u'肖总', remark = u'武汉、黄冈、黄石、荆州、咸宁、孝感、襄樊、恩施、十堰、襄阳', payment = payment1),
+               Supplier(name = u'金鹏行', display_name = u'金鹏行', address = u'', mobile = '18926534999', contact_person = u'俞总', remark = u'合肥、淮南、黄山、桐城、芜湖、宣城、安庆、铜陵、涡阳、滁州、怀远', payment = payment1),
+               Supplier(name = u'京鹏', display_name = u'京鹏', address = u'华通源物流中心C4栋138-152号', mobile = '13066815788', contact_person = u'傅小姐', remark = u'昆明、大理、曲靖、景洪', payment = payment1),
+               Supplier(name = u'鑫辉', display_name = u'鑫辉', address = u'布吉丹平路闽鹏程货运市场11栋1-4号', mobile = '13925234059', contact_person = u'刘先生', remark = u'龙岩、三明', payment = payment1),
+               Supplier(name = u'广运物流', display_name = u'广运物流', address = u'龙岗丹竹头闽鹏程货运市场5栋29-30号', mobile = '18923724600', contact_person = u'徐先生', remark = u'顺德', payment = payment1),
+               Supplier(name = u'金华航', display_name = u'金华航', address = u'华通源物流园', phone = '0755-23022756', mobile = '', contact_person = u'刘先生', remark = u'中山', payment = payment1),
+               Supplier(name = u'速速达', display_name = u'速速达', address = u'龙岗区布吉上李朗方鑫路22号速速达物流', phone = None, mobile = '13392831936', contact_person = u'王晓刚', remark = u'南宁、桂林、柳州、钦州', payment = payment1),
+               Supplier(name = u'盛丰', display_name = u'盛丰', address = u'龙岗区南湾街道吉厦社区早禾坑工业区15号A栋', phone = None, mobile = '13798363667', contact_person = u'周总', remark = u'泉州、福州、莆田、福清', payment = payment1),
+               Supplier(name = u'美泰', display_name = u'美泰', address = u'龙岗布吉大龙山物流园F栋10号美泰物流', phone = None, mobile = '18926795962', contact_person = u'毛主管', remark = u'广州', payment = payment1),
+               Supplier(name = u'凯利', display_name = u'凯利', address = u'布吉单竹头金鹏物流园B区E栋1-5号 ', phone = '61217611,61217600', mobile = '', contact_person = u'熊小姐', remark = u'三亚、海口、琼海、万宁', payment = payment1),
+               Supplier(name = u'骏兴顺', display_name = u'骏兴顺', address = u'龙华民治大道华通源物流中心C1栋58-60号', phone = None, mobile = '15914055308', contact_person = u'曾经理', remark = u'贵阳、金沙、安顺', payment = payment1),
+               Supplier(name = u'澳跃', display_name = u'澳跃', address = u'金鹏A区栋13-15号', phone = None, mobile = '18923411132', contact_person = u'李峰', remark = u'漳州', payment = payment1),
+               Supplier(name = u'勤威', display_name = u'勤威', address = u'金鹏B区C栋33号', phone = None, mobile = '13728866595', contact_person = u'石总', remark = u'厦门', payment = payment1),
+               ])
+    DBSession.commit()
+
+
+
+
 if __name__ == '__main__':
     init()
+
+#    import_kinlong_target(None)
+
 #    insert_diqu()

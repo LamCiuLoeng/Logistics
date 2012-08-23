@@ -14,7 +14,7 @@ from sys2do.model import DeclarativeBase, metadata, DBSession
 from sqlalchemy.sql.expression import and_
 
 from auth import SysMixin
-from sys2do.model.auth import CRUDMixin, Group
+from sys2do.model.auth import CRUDMixin, Group, User
 from sys2do.util.common import _gl, _gp, _info
 from sys2do.constant import SYSTEM_DATETIME_FORMAT
 from sys2do.model.system import UploadFile
@@ -224,52 +224,61 @@ class Note(DeclarativeBase, SysMixin, CRUDMixin):
     __tablename__ = 'master_note'
 
     id = Column(Integer, autoincrement = True, primary_key = True)
+    code = Column(Text)
+    province_id = Column(Integer, ForeignKey('master_province.id'))
+    province = relation(Province)
+    city_id = Column(Integer, ForeignKey('master_city.id'))
+    city = relation(City)
     name = Column(Text)
-    _range = Column('range', Text)
+    apply_person_id = Column(Integer, ForeignKey('system_user.id'), doc = u'领用人')
+    apply_person = relation(User, primaryjoin = "and_(User.id == Note.apply_person_id, Note.active == 0)")
+    apply_time = Column(Text)
+    operator_id = Column(Integer, ForeignKey('system_user.id'), doc = u'操作者')
+    operator = relation(User, primaryjoin = "and_(User.id == Note.operator_id, Note.active == 0)")
+    begin_no = Column(Text)
+    end_no = Column(Text)
+    current_no = Column(Text)
+    status = Column(Integer, default = 0) # 0 is still using, 1 is full used 
     remark = Column(Text)
 
-    def __str__(self): return self.name
-    def __repr__(self): return self.name
-    def __unicode__(self): return self.name
+#    _range = Column('range', Text)
+
+    def __str__(self): return '%s(%s)' % (self.name, self.code)
+    def __repr__(self): return '%s(%s)' % (self.name, self.code)
+    def __unicode__(self): return '%s(%s)' % (self.name, self.code)
 
     @classmethod
     def _get_fields(clz):
-        return ['name', 'range', 'remark']
+        return ['name', 'code', 'province_id', 'city_id', 'begin_no', 'end_no', 'current_no',
+                'apply_time', 'apply_person_id', 'operator_id', 'status', 'remark']
 
-    def _get_range(self):
-        if not self._range : return []
-        return map(lambda v: v.split("~"), self._range.split("|"))
-
-    def _set_range(self, ranges):
-        if not ranges: self._range = None
-        self._range = ("|").join([("~").join(r) for r in ranges])
-
-    range = synonym('_range', descriptor = property(_get_range, _set_range))
+#    def _get_range(self):
+#        if not self._range : return []
+#        return map(lambda v: v.split("~"), self._range.split("|"))
+#
+#    def _set_range(self, ranges):
+#        if not ranges: self._range = None
+#        self._range = ("|").join([("~").join(r) for r in ranges])
+#
+#    range = synonym('_range', descriptor = property(_get_range, _set_range))
 
 
     def populate(self):
-        _info(self.range)
         result = {
                   'id' : self.id,
-                  'range' : self.range,
                   }
-        for f in ['name', 'remark']:
+        for f in ['name', 'code', 'province_id', 'city_id', 'begin_no', 'end_no', 'current_no',
+                  'apply_time', 'apply_person_id', 'operator_id', 'status', 'remark']:
             result[f] = unicode(getattr(self, f) or '')
         return result
 
 
     @classmethod
     def saveAsNew(clz, v):
-
-        begins = _gp('begin_')
-        ends = _gp('end_')
-        range = map(lambda (vv1, vv2) : (vv1[1], vv2[1]), filter(lambda (v1, v2) : v1[1] and v2[1], zip(begins, ends)))
-
-        params = {
-                  'name' : v.get('name', None) or None,
-                  'range' : range,
-                  'remark' : v.get('remark', None) or None,
-                  }
+        params = {}
+        for f in ['name', 'code', 'province_id', 'city_id', 'begin_no', 'end_no',
+                  'apply_time', 'apply_person_id', 'operator_id', 'remark']:
+            params[f] = v.get(f, None) or None
 
         obj = clz(**params)
         DBSession.add(obj)
@@ -277,11 +286,8 @@ class Note(DeclarativeBase, SysMixin, CRUDMixin):
 
 
     def saveAsUpdate(self, v):
-        begins = _gp('begin_')
-        ends = _gp('end_')
-        self.range = map(lambda (vv1, vv2) : (vv1[1], vv2[1]), filter(lambda (v1, v2) : v1[1] and v2[1], zip(begins, ends)))
-
-        for f in ['name', 'remark']:
+        for f in ['name', 'code', 'province_id', 'city_id', 'begin_no', 'end_no', 'current_no',
+                  'apply_time', 'apply_person_id', 'operator_id', 'remark', 'status']:
             setattr(self, f, v.get(f, None) or None)
         return self
 

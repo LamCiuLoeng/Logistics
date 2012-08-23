@@ -8,6 +8,8 @@
 '''
 from datetime import datetime as dt
 from flaskext.babel import _
+from sqlalchemy.orm.query import aliased
+
 
 
 SYSTEM_DATE_FORMAT = "%Y-%m-%d"
@@ -125,3 +127,11 @@ def _getMaster(v):
     return getMasterAll(v)
 
 MASTER_ALL = _getMaster
+
+
+def _getRelatedCity(cid):
+    from sys2do.util.common import getRelatedCity
+    return getRelatedCity(cid)
+
+
+RELATED_CITY = _getRelatedCity

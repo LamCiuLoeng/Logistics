@@ -47,33 +47,6 @@ def showStatus(s):
     return ''
 
 
-'''
-def showApproval(s):
-    for code, msg in APPROVAL_STATUS_LIST:
-        if s == code : return msg
-    return ''
-
-
-def showPaid(s):
-    for code, msg in ORDER_PAID_STATUS_LIST:
-        if s == code : return msg
-    return ''
-
-
-def showSupplierPaid(s):
-    for code, msg in DELIVER_PAID_STATUS_LIST:
-        if s == code : return msg
-    return ''
-
-
-def showReturnNote(s):
-    for code, msg in ORDER_RETURN_STATUS_LIST:
-        if s == code : return msg
-    return ''
-'''
-
-
-
 def sum_with_none(iterable, attribute = None):
     if attribute is not None:
         try:

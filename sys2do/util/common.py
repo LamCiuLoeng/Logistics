@@ -18,6 +18,10 @@ from werkzeug import secure_filename
 from flask import current_app as app
 from flaskext import babel
 
+from sqlalchemy.orm.query import aliased
+from sqlalchemy.sql.expression import and_
+
+
 from sys2do.setting import UPLOAD_FOLDER, ALLOWED_EXTENSIONS, UPLOAD_FOLDER_URL, \
     SMS_KEY, SMS_FORMAT
 from sys2do.model import DBSession, UploadFile
@@ -25,7 +29,10 @@ from sys2do.constant import MSG_RECORD_NOT_EXIST, MSG_NO_FILE_UPLOADED, \
     MSG_INVALID_FILE_TO_UPLOAD, SYSTEM_DATE_FORMAT, SYSTEM_DATETIME_FORMAT
 
 
-__all__ = ['_g', '_gl', '_gp', '_debug', '_info', '_error', 'getOr404', 'upload', 'makeException', 'number2alphabet', 'date2text']
+
+
+__all__ = ['_g', '_gl', '_gp', '_debug', '_info', '_error', 'getOr404', 'getMasterAll', 'getRelatedCity',
+           'upload', 'makeException', 'number2alphabet', 'date2text']
 
 
 
@@ -55,6 +62,24 @@ def getMasterAll(obj, order_by = 'name'):
         import sys2do.model as mymodel
         obj = getattr(mymodel, obj)
     return DBSession.query(obj).filter(obj.active == 0).order_by(getattr(obj, order_by)).all()
+
+
+
+def getRelatedCity(cid):
+    from sys2do.model.master import City
+    if not cid : return []
+    parent_city = aliased(City, name = "pc")
+    return DBSession.query(City).filter(and_(
+                                      parent_city.id == cid,
+                                      parent_city.active == 0,
+                                      City.active == 0,
+                                      City.parent_code == parent_city.parent_code,
+                                      ))
+
+
+
+
+
 
 
 def getOr404(obj, id, redirect_url = "/index", message = MSG_RECORD_NOT_EXIST):
