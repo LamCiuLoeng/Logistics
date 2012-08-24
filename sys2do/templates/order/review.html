@@ -1,0 +1,574 @@
+{% extends "master.html" %}
+
+
+{% block extCSS %}
+
+<style type="text/css">
+
+</style>
+{% endblock %}
+
+{% block extJS %}
+<script src="{{url_for('static', filename='js/customer/order_common.js')}}" type="text/javascript"></script>
+<script src="{{url_for('static', filename='js/customer/order_review.js')}}" type="text/javascript"></script>
+<script language="JavaScript" type="text/javascript">
+//<![CDATA[
+	var header_have_update = 0;
+
+	$(document).ready(function(){
+		$(".numeric").numeric();
+		
+		$("input,select,remark",'#order_header').change(function(){
+			header_have_update = 1;
+		});
+		
+	});	
+	
+	
+	function todelete() {
+    	if(confirm('{{MSG_CONFIRM_DELETE}}')){
+    		var url = "{{url_for('.view', action = 'delete',id=header.id)|safe}}";
+    		redirect(url);
+    	}else{
+    		return false;
+    	}
+	}
+	
+	
+	function toreturn(){
+		if(header_have_update){
+			return redirect_alert('{{MSG_LEAVE_WITHOUT_SAVING}}',"{{request.referrer}}");
+		}else{
+			redirect('{{request.referrer}}');
+		}
+	}
+//]]>
+</script>
+
+{% endblock %}
+
+{% block inner_menu %}
+<div class="inner_menu">
+	<ul>
+    	<li><img src="/static/images/system/order_manage_25.jpg" width="71" height="21" id="Image1" onmouseover="MM_swapImage('Image1','','/static/images/system/order_manage_h_25.jpg',1)" onmouseout="MM_swapImgRestore()" onclick="toreturn()"/></li>
+        {% if 'UPDATE_ORDER' is get_permission%}
+        	<li><a href="{{url_for('.view',action='revise',id=header.id)}}"><img src="/static/images/system/edit.jpg" width="77" height="21" id="Image2" onmouseover="MM_swapImage('Image2','','/static/images/system/edit_h.jpg',1)" onmouseout="MM_swapImgRestore()"/></a></li>        	
+	        <li><img src="/static/images/system/order_manage_29.jpg" width="77" height="21" id="Image6" onmouseover="MM_swapImage('Image6','','/static/images/system/order_manage_h_29.jpg',1)" onmouseout="MM_swapImgRestore()" onclick="return todelete()"/></li>
+        {% endif %}
+        <li><a href="{{url_for('.view',action='print_barcode',id=header.id)}}" target="_blank"><img src="/static/images/system/order_manage_11_35.jpg" width="77" height="21" id="Image5" onmouseover="MM_swapImage('Image5','','/static/images/system/order_manage_1_35.jpg',1)" onmouseout="MM_swapImgRestore()" /></a></li>
+        {% if 'CREATE_ORDER' is get_permission%}
+        <li><a href="{{url_for('.view',action='copy',id=header.id)}}"><img src="/static/images/system/order_manage_copy.jpg" width="77" height="21" id="Image7" onmouseover="MM_swapImage('Image7','','/static/images/system/order_manage_copy_h.jpg',1)" onmouseout="MM_swapImgRestore()" /></a></li>
+        {% endif %}
+        {% if header.status < SORTING[0] and 'CREATE_DELIVER' is get_permission%}  	
+	        <li><a href="{{url_for('bpDeliver.view',action='add_deliver',order_ids=header.id)}}"><img src="/static/images/system/order_manage1_new.jpg" width="101" height="21" id="Image8" onmouseover="MM_swapImage('Image8','','/static/images/system/order_manage_new.jpg',1)" onmouseout="MM_swapImgRestore()"/></a></li>
+        {% endif %}
+    </ul>
+</div>
+{% endblock %}
+
+{% block content %}
+<input type="hidden" name="id" id="id" value="{{header.id}}">
+
+
+<div id="msg_div" style="display:none;color:red;padding-left:30px;padding-top:5px;"></div>
+
+<div class="order_add_div">
+  <div class="order_add_div_header">{{_('Order Detail')}}</div>
+    <div class="order_add_div_body">
+    
+    <div id="order_header">
+  <ul>
+    	  <li style="width:227px;"><span><sup class="warn">*</sup>&nbsp;单号</span>{{header.ref_no|f}}</li>
+    	  <li style="width:227px;"><span>&nbsp;系统编号</span>{{header.no|f}}</li>
+		  <li style="width:227px;"><span>{{_('Create Time')}}</span>{{header.create_time|ft}}</li>
+    	  <li style="width:227px;"><span>{{_('Creator')}}</span>{{header.create_by|f}}</li>
+
+    	 <li style="width:459px;"><span><sup class="warn">*</sup>&nbsp;客户</span>{{header.customer}}</li>
+  	    <li style="width:230px;"><span><sup class="warn">*</sup>&nbsp;票据前缀</span>{{header.note}}</li>
+  	    <li style="width:230px;"><span><sup class="warn">*</sup>&nbsp;票据单号</span>{{header.note_no|f}}</li>
+    
+    	  <li style="width:459px;"><span><sup class="warn">*</sup>&nbsp;{{_('Source Company')}}</span>{{header.source_company}}</li>
+    	 
+    	  <li style="width:459px;height:20px"><span><sup class="warn">*</sup>&nbsp;{{_('Destination Company')}}</span>{{header.destination_company}}</li>
+    	  <li style="width:459px;"><span><sup class="warn">*</sup>&nbsp;{{_('Source Contact')}}</span>{{header.source_contact|f}}</li>
+    	  <li style="width:459px;"><span><sup class="warn">*</sup>&nbsp;{{_('Destination Contact')}}</span>{{header.destination_contact|f}}</li>
+    	  <li style="width:459px;"><span><sup class="warn">*</sup>&nbsp;{{_('Source Station')}}</span>{{header.source_province}}{{header.source_city}}</li>    	
+    	    
+    	  <li style="width:459px;"><span><sup class="warn">*</sup>&nbsp;{{_('Destination Station')}}</span>{{header.destination_province}}{{header.destination_city}}</li>
+    	  <li style="width:459px;"><span>{{_('Source Address')}}</span>{{header.source_address|f}}</li>
+    	  <li style="width:459px;"><span>{{_('Destination Address')}}</span>{{header.destination_address|f}}</li>
+    	  <li style="width:187px;"><span>{{_('Source Phone')}}</span>{{header.source_tel|f}}</li>
+    	  <li style="width:266px;"><span>{{_('Source Mobile')}}</span>{{header.source_mobile|f}}
+    	    {% if header.source_sms %}
+    	    	<input type="checkbox" name="source_sms" value="1" style="width:20px" checked="checked" disable="true"/>
+    	    {% else %}
+    	    	<input type="checkbox" name="source_sms" value="1" style="width:20px" disable="true"/>
+    	    {% endif %}
+    	    短信通知
+  	    </li>
+  	    	
+        <li style="width:187px;"><span>{{_('Destination Phone')}}</span>{{header.destination_tel|f}}</li>
+    	  <li style="width:266px;"><span>{{_('Destination Mobile')}}</span>{{header.destination_mobile|f}}
+    	    {% if header.destination_sms %}
+    	    	<input type="checkbox" name="destination_sms" value="1" style="width:20px" checked="checked" disable="true"/>
+    	    {% else %}
+    	    	<input type="checkbox" name="destination_sms" value="1" style="width:20px" disable="true"/>
+    	    {% endif %}
+    	    短信通知
+  	    </li>
+    	
+    	  <li style="width:227px;"><span>{{_('Pickup Type')}}</span>{{header.pickup_type}}</li>
+    	  <li style="width:227px;"><span>{{_('Package Type')}}</span>{{header.pack_type}}</li>
+  	    <li style="width:226px;"><span>估计到达</span>{{header.estimate_time|fd}}</li>
+  	    <li style="width:226px;"><span>{{_('Expect Time')}}</span>{{header.expect_time|fd}}</li>
+  	    <li style="width:227px;"><span>承运商</span>{{header.get_deliver_header().supplier|f}}</li>
+    	  <li style="width:227px;"><span>送货单号</span>
+    	  	&nbsp;
+    	  	{% if header.deliver_header_no %}
+	    	  	<a href="{{url_for('bpDeliver.view',action='view_by_no',no=header.deliver_header_no)}}">{{header.deliver_header_no|f}}</a>
+    	  	{% endif %}
+    	  </li>
+    	  <li style="width:227px;"><span>{{_('Actual Time')}}</span>{{header.actual_time|fd}}</li>
+    	  <li style="width:925px;"><span>{{_('Remark')}}</span>
+    	    <div style="width:840px;height:50px">{{header.remark|f}}</div>
+  	    </li>
+      </ul>
+      
+      
+  <table width="100%" border="0" cellspacing="0" cellpadding="0" style="float:left;">
+  <tr>
+    <td width="9%" align="center">{{_('Qty')}}</td>
+    <td width="9%" align="center">{{_('Qty Ratio')}}</td>
+    <td width="9%" align="center">{{_('Weight')}}(吨)</td>
+    <td width="9%" align="center">{{_('Weight Ratio')}}</td>
+    <td width="9%" align="center">{{_('Vol')}}(米<sup>3</sup>)</td>
+    <td width="9%" align="center">{{_('Vol Ratio')}}</td>
+    <td width="9%" align="center"><sup class="warn">*</sup>&nbsp;{{_('Amount')}}(元)</td>
+    <td width="9%" align="center">{{_('Payment')}}</td>
+    </tr>
+  <tr>
+    <td height="30" align="center"><span style="width:180px;">{{header.qty|f}}</span></td>
+    <td align="center"><span style="width:180px;">{{header.qty_ratio|f}}</span></td>
+    <td align="center"><span style="width:180px;">{{header.weight|f}}</span></td>
+    <td align="center"><span style="width:180px;">{{header.weight_ratio|f}}</span></td>
+    <td align="center"><span style="width:180px;">{{header.vol|f}}</span></td>
+    <td align="center"><span style="width:180px;">{{header.vol_ratio|f}}</span></td>
+    <td align="center"><span style="width:180px;">{{header.amount|f}}</span></td>
+    <td align="center"><span style="width:180px;">{{header.payment}}</span></td>
+    </tr>
+    <tr>
+	    <td width="9%" align="center">送货费用</td>
+	    <td width="9%" align="center">上门接货费用</td>
+	    <td width="9%" align="center">包装费用</td>
+	    <td width="9%" align="center">保险费用</td>
+	    <td width="9%" align="center">装货费用</td>
+	    <td width="9%" align="center">卸货费用</td>
+	    <td width="9%" align="center">代理费用</td>
+	    <td width="9%" align="center">其它费用</td>
+	</tr>
+	<tr>
+		<td align="center" height="30"><span style="width:180px;">{{header.sendout_charge|f}}</span></td>
+	    <td align="center"><span style="width:180px;">{{header.receive_charge|f}}</span></td>
+	    <td align="center"><span style="width:180px;">{{header.package_charge|f}}</span></td>
+	    <td align="center"><span style="width:180px;">{{header.insurance_charge|f}}</span></td>
+	    <td align="center"><span style="width:180px;">{{header.load_charge|f}}</span></td>
+	    <td align="center"><span style="width:180px;">{{header.unload_charge|f}}</span></td>
+	    <td align="center"><span style="width:180px;">{{header.proxy_charge|f}}</span></td>
+	    <td align="center"><span style="width:180px;">{{header.other_charge|f}}</span></td>
+	</tr>
+</table>
+	</div>
+
+	
+	<div style="clear:both"></div> 
+
+<div class="order_add_info_tab_div">
+	<div class="order_add_info_tab_header">
+		<ul>
+			<li><a href="#tabs-1">货物详情</a></li>
+			<li><a href="#tabs-2">派遣收件人</a></li>
+			<li><a href="#tabs-3">仓存信息</a></li>
+			<li><a href="#tabs-4">运输信息</a></li>
+			<li><a href="#tabs-5">签收信息</a></li>
+			<li><a href="#tabs-6">提货信息</a></li>
+			{% if 'MANAGE_FIN' is get_permission %}
+				<li><a href="#tabs-7">财务信息</a></li>
+			{% endif %}
+			<li><a href="#tabs-8">历史记录</a></li>
+		</ul>
+	</div>
+	
+	
+	<!-- item info -->
+    <div class="order_add_info_tab_body" id="tabs-1">
+			<table style="width:800px;">
+				<thead>
+					<tr class="field_head">
+						<th align="center" style="width:150px;">{{_('Item Name')}}</th>
+						<th align="center" style="width:100px;">{{_('Qty')}}</th>
+						<th align="center" style="width:100px;">{{_('Weight')}}</th>
+						<th align="center" style="width:100px;">{{_('Vol')}}</th>
+						<th align="center" style="width:350px;">{{_('Remark')}}</th>
+					</tr>
+				</thead>
+				<tbody id="item_list">
+				{% for l in header.item_details %}
+					<tr class="data_table_tr">
+						<th>{{l.item|f}}</td>
+						<td class="item_qty_td">{{l.qty|f}}</td>
+						<td class="item_weight_td">{{l.weight|f}}</td>
+						<td class="item_vol_td">{{l.vol|f}}</td>
+						<td>{{l.remark|f}}</td>
+					</tr>
+				{% endfor %}
+			</tbody>
+			</table>
+          <div style="clear:both"><br /></div>
+	</div>
+       
+       
+ 
+  
+  <!-- receiver info -->
+  <div class="order_add_info_tab_body" id="tabs-2">
+        <!-- Update -->
+		<div id="reveiver_update_div" style="display:none">
+			<table>
+				<tr>
+					<td valign="top" width="80px"><sup class="warn">*</sup>&nbsp;收件联系人</td>
+					<td valign="top">
+						<select name="receiver_contact_id" id="receiver_contact_id" class="must_input" style="width:140px;" onchange="change_receiver(this)">
+							<option></option>
+							{% for r in MASTER_ALL('Receiver') %}
+								{% if r.id == header.receiver_contact_id %}
+									<option value="{{r.id}}" selected="selected">{{r}}</option>
+								{% else %}
+									<option value="{{r.id}}">{{r}}</option>
+								{% endif %}
+							{% endfor %}
+						</select>					
+					</td>
+					<td valign="top" width="80px" align="center">联系人电话</td>
+					<td valign="top"><input type="text" name="receiver_tel" id="receiver_tel" value="{{header.receiver_tel|f}}" class="order_add_div_body_input" style="width:120px;"/></td>
+					<td valign="top" width="80px" align="center">联系手机</td>
+					<td valign="top"><input type="text" name="receiver_mobile" id="receiver_mobile" value="{{header.receiver_mobile|f}}" class="order_add_div_body_input numeric" style="width:120px;"/></td>
+					<td valign="top" width="80px" align="center">备注</td>
+					<td valign="top"><textarea name="receiver_remark" id="receiver_remark">{{header.receiver_remark|f}}</textarea></td>
+				</tr>
+			</table>
+			{% if 'UPDATE_ORDER' is get_permission%}
+			<p><input type="button" value="确认派遣收件人" onclick="save_receiver()"/>&nbsp;&nbsp;<input type="button" value="取消" onclick="close_receiver()"/></p>
+			{% endif %}
+		</div>
+		<!-- Review -->
+		<div id="reveiver_review_div">
+			<table>
+				<tr>
+					<td valign="top" width="80px">收件联系人</td>
+					<td valign="top" width="150px">&nbsp;<span id="receiver_contact_id_span">{{header.receiver_contact|f}}</span></td>
+					<td valign="top" width="80px" align="center">联系人电话</td>
+					<td valign="top" width="150px">&nbsp;<span id="receiver_tel_span">{{header.receiver_tel|f}}</span></td>
+					<td valign="top" width="80px" align="center">联系手机</td>
+					<td valign="top" width="150px">&nbsp;<span id="receiver_mobile_span">{{header.receiver_mobile|f}}</span></td>
+					<td valign="top" width="80px" align="center">备注</td>
+					<td valign="top" width="150px"><span id="receiver_remark_span">{{header.receiver_remark|f}}</span></td>
+				</tr>
+			</table>
+			<br />
+			{% if 'UPDATE_ORDER' is get_permission%}
+			<p><input type="button" value="编辑" onclick="open_receiver()"/></p>
+			{% endif %}
+		</div>
+	</div>
+
+
+
+	<!-- warehouse info -->
+	<div class="order_add_info_tab_body" id="tabs-3">
+		{% if header.status < IN_WAREHOUSE[0] %}
+			<p>入仓信息</p>
+			<br />
+			<table>
+				<tr>
+					<td valign="top" width="80px" align="center"><sup class="warn">*</sup>{{_('Time')}}</td>
+					<td valign="top" width="150px"><input type="text" name="wh_time" id="wh_time" value="{{SYSTEM_NOW()|ft}}" class="datetimepicker must_input"/></td>
+					<td valign="top" width="80px" align="center">{{_('Remark')}}</td>
+					<td valign="top"><textarea name="wh_remark" id="wh_remark" style="width:500px;">订单: {{header.ref_no}} 确认入仓</textarea></td>
+				</tr>
+			</table>
+			{% if 'UPDATE_ORDER' is get_permission%}
+			<p><input type="button" value="确认入仓" onclick="save_warehouse('IN')"/></p>
+			{% endif %}
+			
+		{% elif  header.status < OUT_WAREHOUSE[0] %}
+			<p>出仓信息</p>
+			<br />
+			<table>
+				<tr>
+					<td valign="top" width="80px" align="center"><sup class="warn">*</sup>{{_('Time')}}</td>
+					<td valign="top" width="150px"><input type="text" name="wh_time" id="wh_time" value="{{SYSTEM_NOW()|fd}}" class="datetimepicker must_input"/></td>
+					<td valign="top" width="80px" align="center">{{_('Remark')}}</td>
+					<td valign="top"><textarea name="wh_remark" id="wh_remark" style="width:500px;">订单: {{header.ref_no}} 确认出仓</textarea></td>
+				</tr>
+			</table>
+			{% if 'UPDATE_ORDER' is get_permission%}
+			<p><input type="button" value="确认出仓" onclick="save_warehouse('OUT')"/></p>
+			{% endif %}
+		{% else %}
+			<p>货物已出仓。<p>
+		{% endif %}
+	</div>
+
+
+	<!-- transit info -->
+	<div class="order_add_info_tab_body" id="tabs-4">
+		<div>
+			{% if header.deliver_header_ref %}
+				<p>送货单 : <a href="{{url_for('bpDeliver.view',action='view',id=header.deliver_header_ref)}}">{{header.deliver_header}}</a></p>
+				<br />
+			{% endif %}
+			<table>
+				<tr>
+					<td valign="top" width="80px" align="center"><sup class="warn">*</sup>&nbsp;{{_('Time')}}</td>
+					<td valign="top"><input type="text" name="transit_action_time" id="transit_action_time" value="" class="datetimepicker must_input"/></td>
+					<td valign="top" width="80px" align="center">{{_('Remark')}}</td>
+					<td valign="top"><textarea name="transit_remark" id="transit_remark" style="width:500px;"></textarea></td>
+				</tr>
+			</table>
+			{% if 'UPDATE_ORDER' is get_permission%}
+			<p><input type="button" value="{{_('Add')}}" onclick="save_transit()"/></p>
+			{% endif %}
+		</div>
+		<br />
+		<table>
+			<thead>
+				<tr class="field_head">
+					<th align="center">{{_('Time')}}</th>
+					<th align="center" style="width:800px">{{_('Remark')}}</th>
+				</tr>
+			<thead>
+			<tbody id="transit_list">
+				{% for t in transit_logs %}
+					<tr class="data_table_tr">
+						<td>{{t.transfer_date|ft}}</td>
+						<td>{{t.remark|f}}</td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
+
+	<!-- signed info -->
+	<div class="order_add_info_tab_body" id="tabs-5">
+		<div id="signed_update_div" style="display:none">
+			<table>
+				<tr>
+					<td valign="top" width="80px"><sup class="warn">*</sup>&nbsp;签收联系人</td>
+					<td valign="top"><input type="text" name="signed_contact" id="signed_contact" value="{{header.signed_contact|f}}" class="must_input" style="width:140px;"/></td>
+					<td valign="top" width="80px" align="center"><sup class="warn">*</sup>&nbsp;签收时间</td>
+					<td valign="top"><input type="text" name="signed_time" id="signed_time" value="{{header.signed_time|f}}" class="datetimepicker must_input"/></td>
+					<td valign="top" width="80px" align="center">联系人电话</td>
+					<td valign="top"><input type="text" name="signed_tel" id="signed_tel" value="{{header.signed_tel|f}}" class="order_add_div_body_input" style="width:120px;"/></td>
+					<td valign="top" width="80px" align="center">备注</td>
+					<td valign="top"><textarea name="signed_remark" id="signed_remark">{{header.signed_remark|f}}</textarea></td>
+				</tr>
+			</table>
+			{% if 'UPDATE_ORDER' is get_permission%}
+			<p><input type="button" value="确认签收" onclick="save_signed()"/>&nbsp;&nbsp;<input type="button" value="取消" onclick="close_signed()"/></p>
+			{% endif %}
+		</div>
+		
+		<div id="signed_review_div">
+			<table>
+				<tr>
+					<td valign="top" width="80px">签收联系人</td>
+					<td valign="top" width="150px"><span id="signed_contact_span">{{header.signed_contact|f}}</span></td>
+					<td valign="top" width="80px" align="center">签收时间</td>
+					<td valign="top" width="150px"><span id="signed_time_span">{{header.signed_time|f}}</span></td>
+					<td valign="top" width="80px" align="center">联系人电话</td>
+					<td valign="top" width="150px"><span id="signed_tel_span">{{header.signed_tel|f}}</span></td>
+					<td valign="top" width="80px" align="center">备注</td>
+					<td valign="top" width="150px"><span id="signed_remark_span">{{header.signed_remark|f}}</span></td>
+				</tr>
+			</table>
+			<br />
+			{% if 'UPDATE_ORDER' is get_permission%}
+			<p><input type="button" value="编辑" onclick="open_signed()"/></p>
+			{% endif %}
+		</div>
+	</div>
+
+	<!-- pickup info -->
+	<div class="order_add_info_tab_body" id="tabs-6">
+		<div>
+			<table>
+				<tr>
+					<td valign="top" width="40px"><sup class="warn">*</sup>&nbsp;{{_('Time')}}</td>
+					<td valign="top"><input type="text" name="pickup_action_time" id="pickup_action_time" value="" class="datetimepicker must_input"/></td>
+					<td valign="top" width="80px" align="center"><sup class="warn">*</sup>&nbsp;{{_('Pickup Contact')}}</td>
+					<td valign="top"><input type="text" name="pickup_contact" id="pickup_contact" value="" class="must_input"/></td>
+					<td valign="top" width="80px" align="center">{{_('Contact Tel')}}</td>
+					<td valign="top"><input type="text" name="pickup_tel" id="pickup_tel" value="" class="order_add_div_body_input" style="width:110px;"/></td>
+					<td valign="top" width="80px" align="center"><sup class="warn">*</sup>&nbsp;{{_('Pickup Qty')}}</td>
+					<td valign="top"><input type="text" name="pickup_qty" id="pickup_qty" value="" class="numeric must_input" style="width:70px;"/></td>
+					<td valign="top" width="50px" align="center">{{_('Remark')}}</td>
+					<td valign="top"><textarea name="pickup_remark" id="pickup_remark"></textarea></td>
+				</tr>
+			</table>
+			{% if 'UPDATE_ORDER' is get_permission%}
+			<p><input type="button" value="{{_('Save')}}" onclick="save_pickup()"/></p>
+			{% endif %}
+		</div>
+		<br />
+		<table width="100%" border="0" cellspacing="0" cellpadding="0">
+			<thead>
+				<tr class="field_head">
+					<th align="center">{{_('Time')}}</th>
+					<th align="center">{{_('Pickup Contact')}}</th>
+					<th align="center">{{_('Contact Tel')}}</th>
+					<th align="center">{{_('Pickup Qty')}}</th>
+					<th align="center">{{_('Remark')}}</th>
+				</tr>
+			<thead>
+			<tbody id="pickup_list">
+				{% for t in header.pickup_details %}
+					<tr class="data_table_tr">
+						<td>{{t.action_time|f}}</td>
+						<td>{{t.contact|f}}</td>
+						<td>{{t.tel|f}}</td>
+						<td>{{t.qty|f}}</td>
+						<td>{{t.remark|f}}</td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
+
+	{% if 'MANAGE_FIN' is get_permission %}
+	<!-- fin info -->
+	<div class="order_add_info_tab_body" id="tabs-7">
+		<table>
+			<tr>
+				<td align="left" style="width:150px">订单指标</td>
+				<td style="width:150px">当前状态</td>
+				<td style="width:200px">操作</td>
+			</tr>
+			<tr>
+				<td align="left" style="width:150px">是否异常</td>
+				<td style="text-align:left;width:150px" class="exception_span">{{'是' if header.is_exception == 1 else '否'}}</td>
+				<td style="width:200px">
+		        	<select onchange="todo_exception(this);" style="width:150px">
+		        		<option>--是否异常--</option>
+		        		<option value="1">标记为异常</option>
+		        		<option value="0">取消异常标记</option>
+		        	</select/>
+				</td>
+			<tr>
+			<tr>
+				<td align="left" style="width:150px">是否少货</td>
+				<td style="text-align:left;width:150px" class="lessqty_span">{{'是' if header.is_less_qty == 1 else '否'}}</td>
+				<td style="width:200px">
+		        	<select onchange="todo_less_qty(this);" style="width:150px">
+		        		<option>--是否少货--</option>
+		        		<option value="1">标记为少货</option>
+		        		<option value="0">取消少货标记</option>
+		        	</select/>
+				</td>
+			<tr>
+			<tr>
+				<td align="left" style="width:150px">审核状态</td>
+				<td style="text-align:left;width:150px" class="approval_span">{{mymacros.show_approve(header.approve)}}</td>
+				<td style="width:200px">
+					{% if 'FIN_APPROVE' is get_permission %}
+			        	<select onchange="todo_approve(this);" style="width:150px">
+			        		<option>--审核是否通过--</option>
+			        		<option value="{{ORDER_APPROVED[0]}}">{{_(ORDER_APPROVED[1])}}</option>
+			        		<option value="{{ORDER_DISAPPROVED[0]}}">{{_(ORDER_DISAPPROVED[1])}}</option>
+			        	</select/>
+			        {% endif %}
+				</td>
+			<tr>
+			<tr>
+				<td align="left" style="width:150px">客户付款状态</td>
+				<td style="text-align:left;width:150px" class="paid_span">{{mymacros.show_paid(header.paid)}}</td>
+				<td>
+					{% if 'FIN_PAID' is get_permission %}
+			        	<select onchange="todo_paid(this);" style="width:150px">
+			        		<option>--客户是否付款--</option>
+			        		<option value="{{ORDER_NOT_PAID[0]}}">{{_(ORDER_NOT_PAID[1])}}</option>
+			        		<option value="{{ORDER_PAID[0]}}">{{_(ORDER_PAID[1])}}</option>
+			        	</select/>
+			        {% endif %}
+				</td>
+			</tr>
+			<tr>
+				<td align="left" style="width:150px">付款予承运商状态</td>
+				<td style="text-align:left;width:150px" class="paid_span">{{mymacros.show_supplier_paid(header.supplier_paid)}}</td>
+				<td>
+					{% if 'FIN_SUPPLIER_PAID' is get_permission %}
+			        	<select onchange="todo_supplier_paid(this);" style="width:150px">
+			        		<option>--是否付款予承运商--</option>
+			        		<option value="{{DELIVER_NOT_PAID[0]}}">{{_(DELIVER_NOT_PAID[1])}}</option>
+			        		<option value="{{DELIVER_PAID[0]}}">{{_(DELIVER_PAID[1])}}</option>
+			        	</select/>
+			        {% endif %}
+				</td>
+			</tr>
+			<tr>
+				<td align="left" style="width:150px">客户回单状态</td>
+				<td style="text-align:left;width:150px" class="order_return_span">{{mymacros.show_return(header.is_return_note)}}</td>
+				<td>
+		        	<select onchange="todo_order_return(this);" style="width:150px">
+		        		<option>--客户是否回单--</option>
+		        		<option value="{{ORDER_NOT_RETURN_NOTE[0]}}">{{_(ORDER_NOT_RETURN_NOTE[1])}}</option>
+		        		<option value="{{ORDER_RETURN_NOTE[0]}}">{{_(ORDER_RETURN_NOTE[1])}}</option>
+		        	</select/>
+				</td>
+			</tr>
+		</table>
+	</div>
+	{% endif %}
+	
+	<!-- history info -->
+	<div class="order_add_info_tab_body" id="tabs-8">
+		<table>
+			<tr>
+				<td width="100">{{_('Creator')}}</td>
+				<td width="100">{{header.create_by|f}}</td>
+				<td width="10">&nbsp;</td>
+				<td width="100">{{_('Create Time')}}</td>
+				<td width="150">{{header.create_time|ft}}</td>
+			</tr>
+			<tr>
+				<td>{{_('Last Updator')}}</td>
+				<td>{{header.update_by|f}}</td>
+				<td>&nbsp;</td>
+				<td>{{_('Update Time')}}</td>
+				<td>{{header.update_time|ft}}</td>
+			</tr>
+		</table>
+		<br />
+		<table>
+			<thead>
+				<tr class="field_head">
+					<th align="center">{{_('Time')}}</th>
+					<th align="center" style="width:800px">{{_('Remark')}}</th>
+				</tr>
+			<thead>
+			<tbody id="transit_list">
+				{% for t in header.system_logs %}
+					<tr class="data_table_tr">
+						<td>{{t.create_time|ft}}</td>
+						<td style="text-align:left">{{t.remark|f}}</td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
+</div>
+
+
+</div>
+</div>
+
+{% endblock %}

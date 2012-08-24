@@ -86,7 +86,7 @@
 <body>
     <div class="top_system_right">
     <p style="margin:55px 0px 0px 0px;"><table><tr><td width="30" style="padding:0px; margin:0px"><img src="/static/images/system/order_manage_14.jpg" width="20" height="27" /></td>
-			          <td width="230" class="user_display">{{session['user_profile']['name'] if session.get('user_profile',None) else ''}}</td></tr></table></p>
+			          <td width="230" class="user_display">[<a href="/change_pw">{{session['user_profile']['name'] if session.get('user_profile',None) else ''}}</a>]</td></tr></table></p>
 			          <p style="margin:3px 0px 0px 0px;"><a href="/auth/logout"><img width="56" height="29" src="/static/images/system/order_manage_22.jpg"></a></p>
 			          </div>
 	<div id="container" style="width:2000px;">

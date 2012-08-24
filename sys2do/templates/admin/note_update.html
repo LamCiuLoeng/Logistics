@@ -27,13 +27,19 @@
 		if(!$("#operator_id").val()){
 			msg.push('请选择操作人！');
 		}
-		if(!$("#begin_no").val()){
+		var begin_no = $("#begin_no").val();
+		if(!begin_no){
 			msg.push('请填写票据开始编号！');
+		}else if(!check_number(begin_no)){
+			msg.push('请正确填写票据开始编号，必须全部为数字！');
 		}
-		if(!$("#end_no").val()){
+		var end_no = $("#end_no").val();
+		if(!end_no){
 			msg.push('请填写票据结束编号！');
+		}else if(!check_number(end_no)){
+			msg.push('请正确填写票据结束编号，必须全部为数字！');
 		}
-		
+
 		if(msg.length>0){
 			alert(msg.join("\n"));
 		}else{
@@ -49,23 +55,13 @@
     		return false;
     	}
 	}
-	
-	function add_line(obj){
-		var tmp = $(".template").clone().removeClass("template");
-		$("input[type='text']",tmp).each(function(){
-			var t = $(this);
-			var n = t.attr('name').replace("_x","_"+index);
-			t.attr("name",n);
-		})
-		
-		$($(obj).parents("li")[0]).after(tmp);
-		index ++ ;
-	}
-	
-	
-	function del_line(obj){
-		$($(obj).parents("li")[0]).remove();
-	}	
+
+	$(document).ready(function(){
+		$("#province_id").change(function(){
+	        province_change(this,'#city_id');
+	    });
+	});
+
 //]]>
 </script>
 {% endblock %}
@@ -87,42 +83,45 @@
 		<table>
 			<tr>
 				<td>票本编号</td>
-				<td><input type="text" name="code" id="code" value="{{v['code']}}"/></td>
+				<td><input type="text" name="code" id="code" value="{{v['code']}}" class="must_input"/></td>
 			</tr>
 			<tr>
 				<td>票据前缀</td>
-				<td><input type="text" id="name" name="name" value="{{v['name']|f}}"/></td>
+				<td><input type="text" id="name" name="name" value="{{v['name']|f}}" class="must_input"/></td>
 			</tr>
 			<tr>
 				<td>站点</td>
 				<td>
-					{{mymacros.select(id='province_id',list=MASTER_ALL('Province'),value=v['province_id'],class="must_input",style="width:150px")}}
-					
-					{{mymacros.select(id='city_id',list=RELATED_CITY(v['city_id']),value=v['city_id'],class="",style="width:150px")}}
+				    {% set province_id = v.get('province_id',None)|int  %}				
+					{{mymacros.select(id='province_id',list=MASTER_ALL('Province'),value=province_id,class="must_input",style="width:150px")}}
+					{% set city_id = v.get('city_id',None)|int  %}			
+					{{mymacros.select(id='city_id',list=RELATED_CITY(city_id),value=city_id,class="",style="width:150px")}}
 				</td>
 			</tr>
 			<tr>
 				<td>开始编号</td>
-				<td><input type="text" name="begin_no" id="begin_no" value="{{v['begin_no']}}"/></td>
+				<td><input type="text" name="begin_no" id="begin_no" value="{{v['begin_no']}}" class="must_input numeric"/></td>
 			</tr>
 			<tr>
 				<td>结束编号</td>
-				<td><input type="text" name="end_no" id="end_no" value="{{v['end_no']}}"/></td>
+				<td><input type="text" name="end_no" id="end_no" value="{{v['end_no']}}" class="must_input numeric"/></td>
 			</tr>
 			<tr>
 				<td>领票时间</td>
-				<td><input type="text" name="apply_time" id="apply_time" class="datetimepicker" value="{{v['apply_time']}}"/></td>
+				<td><input type="text" name="apply_time" id="apply_time" class="datepicker" value="{{v['apply_time']}}"/></td>
 			</tr>
 			<tr>
 				<td>领票人</td>
 				<td>
-					{{mymacros.select(id='apply_person_id',list=MASTER_ALL('User'),value=v['apply_person_id'],class="must_input",style="width:150px")}}
+				    {% set apply_person_id = v.get('apply_person_id',None)|int  %}				
+					{{mymacros.select(id='apply_person_id',list=MASTER_ALL('User'),value=apply_person_id,class="must_input",style="width:150px")}}
 				</td>
 			</tr>
 			<tr>
 				<td>操作人</td>
 				<td>
-					{{mymacros.select(id='operator_id',list=MASTER_ALL('User'),value=v['operator_id'],class="must_input",style="width:150px")}}
+				    {% set operator_id = v.get('operator_id',None)|int  %}
+					{{mymacros.select(id='operator_id',list=MASTER_ALL('User'),value=operator_id,class="must_input",style="width:150px")}}
 				</td>
 			</tr>
 			<tr>

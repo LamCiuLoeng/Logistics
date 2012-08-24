@@ -10,8 +10,6 @@
 <script src="{{url_for('static', filename='js/customer/order_common.js')}}" type="text/javascript"></script>
 <script language="JavaScript" type="text/javascript">
 //<![CDATA[	
-	var index = 1;
-	
 	var header_have_update = 0;
 	
 	$(document).ready(function(){
@@ -28,6 +26,12 @@
 			redirect('{{request.referrer}}');
 		}
 	}	
+	
+	
+	var item_array = new Array();
+	
+    
+	
 //]]>
 </script>
 <script src="{{url_for('static', filename='js/customer/order_add.js')}}" type="text/javascript"></script>
@@ -50,7 +54,7 @@
 
 
 <form action="{{url_for('.view', action = 'save_new')}}" method="post">
-
+<input type="hidden" name="item_json" id="item_json"/>
 <div id="msg_div" style="display:none;color:red;padding-left:30px;padding-top:5px;"></div>
 
 <div class="order_add_div">
@@ -66,11 +70,11 @@
   	    <li style="width:459px;"><span><sup class="warn">*</sup>&nbsp;客户</span>
     	    {{mymacros.select(id='customer_id',list=MASTER_ALL('Customer'),value=None,class="must_input",style="width:360px")}}
   	    </li>
-  	    <li style="width:180px;"><span><sup class="warn">*</sup>&nbsp;票据前缀</span>
-    	    {{mymacros.select(id='note_id',list=MASTER_ALL('Note'),value=None,class="must_input",style="width:100px")}}
+  	    <li style="width:230px;"><span><sup class="warn">*</sup>&nbsp;票据前缀</span>
+    	    {{mymacros.select(id='note_id',list=MASTER_ALL('Note'),value=None,class="must_input",style="width:150px")}}
   	    </li>
-  	    <li style="width:180px;"><span><sup class="warn">*</sup>&nbsp;票据单号</span>
-    	    <input name="note_no" id="note_no" type="text" class="must_input numeric" style="width:100px"/>
+  	    <li style="width:230px;"><span><sup class="warn">*</sup>&nbsp;票据单号</span>
+    	    <input name="note_no" id="note_no" type="text" class="must_input numeric" style="width:150px"/>
   	    </li>
     	  <li style="width:459px;"><span><sup class="warn">*</sup>&nbsp;{{_('Source Company')}}</span>
     	  	  {{mymacros.select(id='source_company_id',list=[],value=None,class="must_input",style="width:360px")}}
@@ -222,34 +226,7 @@
 	</div>
 	  <div class="order_add_info_tab_body" id="tabs-1">
 		<div id="item_details">
-			<table border="0" cellpadding="0" cellspacing="0">
-				<tr>
-				  <td valign="top" align="center">&nbsp;</td>
-				  <td valign="top">&nbsp;</td>
-				  <td valign="top" align="center">&nbsp;</td>
-				  <td valign="top">&nbsp;</td>
-				  <td valign="top" align="center">&nbsp;</td>
-				  <td valign="top">&nbsp;</td>
-				  <td valign="top" align="center">&nbsp;</td>
-				  <td valign="top">&nbsp;</td>
-				  <td valign="top" align="center">&nbsp;</td>
-				  <td valign="top">&nbsp;</td>
-			  </tr>
-				<tr>
-					<td valign="top" width="70px" align="center"><sup class="warn">*</sup>&nbsp;{{_('Item Name')}}</td><td valign="top">
-						<select name="item_id" id="item_id"  class="must_input" style="width:140px;">
-							<option value=""></option>
-							{% for k in MASTER_ALL('Item') %}
-								<option value="{{k.id}}">{{k}}</option>
-							{% endfor %}
-						</select>	
-					</td>
-					<td valign="top" width="70px" align="center">{{_('Qty')}}</td><td valign="top"><input type="text" name="item_qty" id="item_qty" value="" class="order_add_div_body_input numeric" style="width:80px;"></td>
-					<td valign="top" width="70px" align="center">{{_('Weight')}}</td><td valign="top"><input type="text" name="item_weight" id="item_weight" value="" class="order_add_div_body_input numeric" style="width:80px;"></td>
-					<td valign="top" width="70px" align="center">{{_('Vol')}}</td><td valign="top"><input type="text" name="item_vol" id="item_vol" value="" class="order_add_div_body_input numeric" style="width:80px;"></td>
-				    <td valign="top" width="70px" align="center">{{_('Remark')}}</td><td valign="top"><textarea name="item_remark" id="item_remark"></textarea></td>
-				</tr>
-			</table>
+			
 		  <p><input type="button" value="{{_('Add')}}" onclick="add_item()"/></p>
 		</div>
 		<br />
@@ -261,7 +238,7 @@
 					<th style="width:80px">{{_('Weight')}}</th>
 					<th style="width:80px">{{_('Vol')}}</th>
 					<th style="width:200px">{{_('Remark')}}</th>
-					<th style="width:150px">&nbsp;</th>
+					<th style="width:150px">操作</th>
 				</tr>
 			</thead>
 			<tbody id="item_list">
@@ -274,5 +251,33 @@
 
 
 </form>
+
+
+
+
+
+
+<!-- order items begin -->
+
+<div id="dialog-form" title="货物信息" style="background-color:white;">
+	<table border="0" cellpadding="0" cellspacing="0">
+		<tr>
+			<td valign="top" width="70px" align="center"><sup class="warn">*</sup>&nbsp;{{_('Item Name')}}</td><td valign="top">
+				{{mymacros.select(id='item_id',list=MASTER_ALL('Item'),value=None,class="must_input",style="width:140px;")}}
+			</td>
+			<td valign="top" width="70px" align="center">{{_('Qty')}}</td><td valign="top"><input type="text" id="item_qty" value="" class="order_add_div_body_input numeric" style="width:80px;"></td>
+			<td valign="top" width="70px" align="center">{{_('Weight')}}</td><td valign="top"><input type="text" id="item_weight" value="" class="order_add_div_body_input numeric" style="width:80px;"></td>
+			<td valign="top" width="70px" align="center">{{_('Vol')}}</td><td valign="top"><input type="text" id="item_vol" value="" class="order_add_div_body_input numeric" style="width:80px;"></td>
+		    <td valign="top" width="70px" align="center">{{_('Remark')}}</td><td valign="top"><textarea id="item_remark"></textarea></td>
+		</tr>
+	</table>
+	<br />
+	<p style="text-align:right;"><input type="button" value="保存" onclick="save_item()"/>&nbsp;<input type="button" value="取消" onclick="cancel_item()"/></p>
+</div>
+
+<!-- order items begin -->
+
+
+
 
 {% endblock %}

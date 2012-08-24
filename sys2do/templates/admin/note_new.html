@@ -29,11 +29,17 @@
 		if(!$("#operator_id").val()){
 			msg.push('请选择操作人！');
 		}
-		if(!$("#begion_no").val()){
+		var begin_no = $("#begin_no").val();
+		if(!begin_no){
 			msg.push('请填写票据开始编号！');
+		}else if(!check_number(begin_no)){
+			msg.push('请正确填写票据开始编号，必须全部为数字！');
 		}
-		if(!$("#end_no").val()){
+		var end_no = $("#end_no").val();
+		if(!end_no){
 			msg.push('请填写票据结束编号！');
+		}else if(!check_number(end_no)){
+			msg.push('请正确填写票据结束编号，必须全部为数字！');
 		}
 		
 		if(msg.length>0){
@@ -42,6 +48,13 @@
 			$('form').submit();
 		}
 	}
+	
+	
+	$(document).ready(function(){
+		$("#province_id").change(function(){
+	        province_change(this,'#city_id');
+	    });
+	});
 	
 //]]>
 </script>
@@ -62,11 +75,11 @@
 		<table>
 			<tr>
 				<td>票本编号</td>
-				<td><input type="text" name="code" id="code"/></td>
+				<td><input type="text" name="code" id="code" class="must_input"/></td>
 			</tr>
 			<tr>
 				<td>票据前缀</td>
-				<td><input type="text" name="name" id="name"/></td>
+				<td><input type="text" name="name" id="name" class="must_input"/></td>
 			</tr>
 			<tr>
 				<td>站点</td>
@@ -77,15 +90,15 @@
 			</tr>
 			<tr>
 				<td>开始编号</td>
-				<td><input type="text" name="begin_no" id="begin_no"/></td>
+				<td><input type="text" name="begin_no" id="begin_no" class="must_input numeric"/></td>
 			</tr>
 			<tr>
 				<td>结束编号</td>
-				<td><input type="text" name="end_no" id="end_no"/></td>
+				<td><input type="text" name="end_no" id="end_no" class="must_input numeric"/></td>
 			</tr>
 			<tr>
 				<td>领票时间</td>
-				<td><input type="text" name="apply_time" id="apply_time" class="datetimepicker"/></td>
+				<td><input type="text" name="apply_time" id="apply_time" class="datepicker"/></td>
 			</tr>
 			<tr>
 				<td>领票人</td>

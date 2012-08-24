@@ -17,7 +17,7 @@ from sys2do.util.common import _g, _gp, _gl, _info, _error, date2text
 from sys2do.constant import MESSAGE_ERROR, MESSAGE_INFO, MSG_NO_SUCH_ACTION, \
     MSG_SAVE_SUCC, GOODS_PICKUP, GOODS_SIGNED, OUT_WAREHOUSE, IN_WAREHOUSE, \
     MSG_RECORD_NOT_EXIST, LOG_GOODS_PICKUPED, LOG_GOODS_SIGNED, MSG_SERVER_ERROR, \
-    SYSTEM_DATE_FORMAT
+    SYSTEM_DATE_FORMAT, MSG_WRONG_PASSWORD, MSG_UPDATE_SUCC
 from sys2do.views import BasicView
 from sys2do.model.master import CustomerProfile, Customer, Supplier, \
     CustomerTarget, Receiver, CustomerContact, Province, City, Barcode, \
@@ -51,6 +51,37 @@ class RootView(BasicView):
     @templated("main.html")
     def main(self):
         return {}
+
+    @login_required
+    @tab_highlight('TAB_MAIN')
+    @templated("change_pw.html")
+    def change_pw(self):
+        return {}
+
+    @login_required
+    def save_pw(self):
+        old_pw = _g('old_pw')
+        new_pw = _g('new_pw')
+        new_repw = _g('new_repw')
+
+        msg = []
+        if not old_pw : msg.push(u'请填写原始密码')
+        if not new_pw : msg.push(u'请填写新密码')
+        if not new_repw : msg.push(u'请填写确认密码')
+        if new_pw != new_repw : msg.push(u'新密码与确认密码不相符！')
+
+        if len(msg) > 0 :
+            flash("\n".join(msg), MESSAGE_ERROR)
+            return redirect('/change_pw')
+
+        user = DBSession.query(User).get(session['user_profile']['id'])
+        if not user.validate_password(old_pw):
+            flash(u'原始密码错误！', MESSAGE_ERROR)
+            return redirect('/change_pw')
+
+        user.password = new_pw
+        flash(MSG_UPDATE_SUCC, MESSAGE_INFO)
+        return redirect('/index')
 
 
     @login_required
@@ -434,13 +465,6 @@ class RootView(BasicView):
             _error(traceback.print_exc())
             return jsonify({'code' : 1, 'msg' : MSG_RECORD_NOT_EXIST})
 
-
-    def wsdl(self):
-        f = open('aws_rtracorderstofinalize.wsdl')
-        rv = app.make_response("".join(f.readlines()))
-        f.close()
-        rv.mimetype = 'text/xml'
-        return rv
 
 bpRoot.add_url_rule('/', view_func = RootView.as_view('view'), defaults = {'action':'index'})
 bpRoot.add_url_rule('/<action>', view_func = RootView.as_view('view'))

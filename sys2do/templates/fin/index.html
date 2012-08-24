@@ -278,7 +278,7 @@
   {% for r in records.items %}
 		  <tr class="data_table_tr {{ loop.cycle('data_table_tr_odd', 'data_table_tr_even') }}">
 		    <th><input type="checkbox" name="order_ids" value="{{r.id}}" /></th>
-		    <td><a href="{{url_for('bpOrder.view', action = 'revise',id=r.id)}}">{{r.ref_no|f('没有订单号')}}</a></td>
+		    <td><a href="{{url_for('bpOrder.view', action = 'review',id=r.id)}}">{{r.ref_no|f('没有订单号')}}</a></td>
 		    <td>{{r.no|f}}</td>
 			<td>
 				&nbsp;

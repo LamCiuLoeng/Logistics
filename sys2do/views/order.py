@@ -11,7 +11,7 @@ import os
 import random
 import shutil
 import traceback
-
+import json
 from webhelpers import paginate
 from werkzeug.utils import redirect
 from flask import Blueprint, render_template, url_for, session, Response
@@ -48,13 +48,14 @@ from sys2do.model.system import SystemLog
 
 
 
+
 __all__ = ['bpOrder']
 
 bpOrder = Blueprint('bpOrder', __name__)
 
 class OrderView(BasicView):
 
-    decorators = [login_required, tab_highlight('TAB_MAIN'), ]
+#    decorators = [login_required, tab_highlight('TAB_MAIN'), ]
 
     @templated('order/index.html')
 #    @login_required
@@ -153,70 +154,52 @@ class OrderView(BasicView):
 
     def save_new(self):
         try:
-            code, header = self._save_new_process()
+            params = {}
+            for k in ['customer_id',
+                      'source_province_id', 'source_city_id', 'destination_province_id', 'destination_city_id',
+                      'source_company_id', 'source_address', 'source_contact', 'source_tel', 'source_mobile',
+                      'destination_company_id', 'destination_address', 'destination_contact', 'destination_tel', 'destination_mobile',
+                      'ref_no', 'estimate_time', 'expect_time', 'actual_time', 'remark',
+                      'payment_id', 'pickup_type_id', 'pack_type_id', 'qty', 'qty_ratio', 'vol', 'vol_ratio',
+                      'weight', 'weight_ratio', 'weight_ratio', 'amount', 'insurance_charge', 'sendout_charge', 'receive_charge',
+                      'package_charge', 'other_charge', 'load_charge', 'unload_charge', 'proxy_charge', 'note_id', 'note_no',
+                      'source_sms', 'destination_sms',
+                      ]:
+                params[k] = _g(k)
+            order = OrderHeader(**params)
+            DBSession.add(order)
+            DBSession.flush()
 
-            for nk, nv in _gp('item_id_'):
-                id = nk.split("_")[2]
+            no = _g('no')
+            b = Barcode.getOrCreate(no, order.ref_no)
+            order.barcode = b.img
+            order.no = b.value
+            b.status = 0 # mark the barcode is use
+
+            DBSession.add(TransferLog(
+                                      refer_id = order.id,
+                                      transfer_date = dt.now().strftime(SYSTEM_DATETIME_FORMAT),
+                                      type = 0,
+                                      remark = LOG_CREATE_ORDER,
+                                      ))
+
+            item_json = _g('item_json', '')
+            for item in json.loads(item_json):
                 DBSession.add(ItemDetail(
-                                         header = header, item_id = nv , qty = _g("item_qty_%s" % id) ,
-                                         vol = _g("item_vol_%s" % id), weight = _g("item_weight_%s" % id)
+                                         header = order, item_id = item['item_id'], qty = item['qty'],
+                                         vol = item['vol'], weight = item['weight'],
+                                         remark = item['remark']
                                          ))
+
             DBSession.commit()
             flash(MSG_SAVE_SUCC, MESSAGE_INFO)
+            return redirect(url_for('.view', action = 'review', id = order.id))
         except:
             _error(traceback.print_exc())
             flash(MSG_SERVER_ERROR, MESSAGE_ERROR)
             DBSession.rollback()
+            return redirect(self.default())
 
-        return redirect(url_for('.view', action = 'index'))
-
-
-
-
-    def _save_new_process(self):
-        params = {}
-        for k in [
-#                  'source_station', 'destination_station',
-                  'customer_id',
-                  'source_province_id', 'source_city_id', 'destination_province_id', 'destination_city_id',
-                  'source_company_id', 'source_address', 'source_contact', 'source_tel', 'source_mobile',
-                  'destination_company_id', 'destination_address', 'destination_contact', 'destination_tel', 'destination_mobile',
-                  'ref_no', 'estimate_time', 'expect_time', 'actual_time', 'remark',
-                  'payment_id', 'pickup_type_id', 'pack_type_id', 'qty', 'qty_ratio', 'vol', 'vol_ratio',
-                  'weight', 'weight_ratio', 'weight_ratio', 'amount', 'insurance_charge', 'sendout_charge', 'receive_charge',
-                  'package_charge', 'other_charge', 'load_charge', 'unload_charge', 'proxy_charge', 'note_id', 'note_no',
-                  'source_sms', 'destination_sms',
-                  ]:
-            params[k] = _g(k)
-        order = OrderHeader(**params)
-        DBSession.add(order)
-        DBSession.flush()
-
-        no = _g('no')
-        b = Barcode.getOrCreate(no, order.ref_no)
-        order.barcode = b.img
-        order.no = b.value
-        b.status = 0 # mark the barcode is use
-
-        DBSession.add(TransferLog(
-                                  refer_id = order.id,
-                                  transfer_date = dt.now().strftime(SYSTEM_DATETIME_FORMAT),
-                                  type = 0,
-                                  remark = LOG_CREATE_ORDER,
-                                  ))
-        return (0, order)
-
-#
-#
-#
-#    @templated('order/review.html')
-#    def review(self):
-#        header = getOr404(OrderHeader, _g('id'))
-#        if header.status in [ASSIGN_PICKER[0], ]:
-#            locations = DBSession.query(InventoryLocation).filter(InventoryLocation.active == 0).order_by(InventoryLocation.full_path)
-#        else:
-#            locations = []
-#        return {'header' : header , 'details' : header.details, 'locations' : locations}
 
 
     def revise_by_barcode(self):
@@ -229,9 +212,8 @@ class OrderView(BasicView):
             return redirect(url_for("bpRoot.view", action = "index"))
 
 
-
-    @templated('order/revise.html')
-    def revise(self):
+    @templated('order/review.html')
+    def review(self):
         id = _g('id') or None
         if not id :
             flash(MSG_NO_ID_SUPPLIED, MESSAGE_ERROR)
@@ -247,30 +229,131 @@ class OrderView(BasicView):
             for f in deliver_heaer.get_logs() : _info(f.remark)
             logs.extend(deliver_heaer.get_logs())
         except:
-#            _error(traceback.print_exc())
             pass
         logs = sorted(logs, cmp = lambda x, y: cmp(x.transfer_date, y.transfer_date))
-
-#        if header.source_company_id:
-#            targets = header.source_company.targets
-#        else:
-#            targets = {}
-
-        if header.source_province_id:
-            source_cites = header.source_province.children()
-        else: source_cites = []
-
-        if header.destination_province_id:
-            destination_cites = header.destination_province.children()
-        else: destination_cites = []
 
         return {
                 'header' : header ,
                 'transit_logs' : logs,
-#                'targets' : targets,
-                'source_cites' : source_cites,
-                'destination_cites' : destination_cites,
                 }
+
+
+
+    @templated('order/revise.html')
+    def revise(self):
+        id = _g('id') or None
+        if not id :
+            flash(MSG_NO_ID_SUPPLIED, MESSAGE_ERROR)
+            return redirect(self.default())
+        header = DBSession.query(OrderHeader).get(id)
+
+        item_json = []
+        for c in header.item_details:
+            item_json.append({
+                                "id" : "old_%s" % c.id,
+                                "item_id" : c.item_id,
+                                "qty" : c.qty,
+                                "weight" : c.weight,
+                                "vol" : c.vol,
+                                "remark" : c.remark,
+                                })
+        return {'header' : header , 'item_json' : json.dumps(item_json)}
+
+
+    def save_update(self):
+        id = _g("id")
+        if not id:
+            flash(MSG_NO_ID_SUPPLIED, MESSAGE_ERROR)
+            return redirect(self.default())
+        header = DBSession.query(OrderHeader).get(id)
+        fields = [
+                  'customer_id',
+                  'source_province_id', 'source_city_id', 'destination_province_id', 'destination_city_id',
+                  'ref_no', 'source_company_id', 'source_address', 'source_contact', 'source_tel', 'source_mobile',
+                  'payment_id', 'qty', 'weight', 'vol', 'shipment_type_id',
+                   'destination_company_id', 'destination_address', 'destination_contact', 'destination_tel', 'destination_mobile',
+                  'estimate_time', 'expect_time', 'actual_time', 'qty_ratio', 'weight_ratio', 'vol_ratio', 'amount', 'cost', 'remark',
+                  'pickup_type_id', 'pack_type_id',
+                  'insurance_charge', 'sendout_charge', 'receive_charge', 'package_charge', 'other_charge', 'load_charge', 'unload_charge',
+                  'proxy_charge', 'note_id', 'note_no',
+                  'source_sms', 'destination_sms',
+                  ]
+        _remark = []
+        old_info = header.serialize(fields) # to used for the history log
+
+        checkbox_fields = ['source_sms', 'destination_sms', ]
+        try:
+            for f in fields: setattr(header, f, _g(f))
+
+            for f in checkbox_fields:
+                vs = _gl(f)
+                if vs : setattr(header, f, vs[0])
+                else : setattr(header, f, None)
+            no = _g('no')
+            if no != header.no:
+                try:
+                    old_barcode = DBSession.query(Barcode).filter(Barcode.value == header.no).one()
+                    old_barcode.status = 1 # mark the old barcode to be reserved
+                except:
+                    pass
+                try:
+                    new_barcode = DBSession.query(Barcode).filter(Barcode.value == no).one()
+                    new_barcode.status = 0 #mark the new barcode to be used
+                except NoResultFound :
+                    DBSession.add(Barcode(value = no))
+                except:
+                    pass
+                header.no = no
+                header.barcode = generate_barcode_file(header.no)
+
+            if header.status == -2 : header.status = 0
+
+            item_ids = [c.id for c in header.item_details]
+            item_json = _g('item_json', '')
+            for c in json.loads(item_json):
+                if not c.get('id', None) : continue
+                if isinstance(c['id'], basestring) and c['id'].startswith("old_"):  #existing item
+                    cid = c['id'].split("_")[1]
+                    t = DBSession.query(ItemDetail).get(cid)
+                    t.item_id = c.get('item_id', None)
+                    t.qty = c.get('qty', None)
+                    t.weight = c.get('weight', None)
+                    t.vol = c.get('vol', None)
+                    t.remark = c.get('remark', None)
+                    item_ids.remove(t.id)
+                else:
+                    DBSession.add(ItemDetail(
+                                                header = header,
+                                                item_id = c.get('item_id', None),
+                                                qty = c.get('qty', None),
+                                                weight = c.get('weight', None),
+                                                vol = c.get('vol', None),
+                                                remark = c.get('remark', None),
+                                                  ))
+
+            DBSession.query(ItemDetail).filter(ItemDetail.id.in_(item_ids)).update({'active' : 1}, False)
+            DBSession.commit()
+            try:
+                new_info = header.serialize(fields)
+                change_result = self._compareObject(old_info, new_info)
+                _remark = [u"[%s]'%s' 修改为 '%s'" % (name, ov, nv) for (name, ov, nv) in change_result['update']]
+                DBSession.add(SystemLog(
+                                        type = header.__class__.__name__,
+                                        ref_id = header.id,
+                                        remark = u"%s 修改该记录。%s" % (session['user_profile']['name'], ";".join(_remark))
+                                        ))
+                DBSession.commit()
+            except:
+                _error(traceback.print_exc())
+                DBSession.rollback()
+            flash(MSG_UPDATE_SUCC, MESSAGE_INFO)
+        except:
+            _error(traceback.print_exc())
+            DBSession.rollback()
+            flash(MSG_SERVER_ERROR, MESSAGE_ERROR)
+        return redirect(url_for('.view', action = 'review', id = header.id))
+
+
 
 
     @templated('order/copy.html')
@@ -282,71 +365,22 @@ class OrderView(BasicView):
 
         header = DBSession.query(OrderHeader).get(id)
 
-        logs = []
-        logs.extend(header.get_logs())
-        try:
-            deliver_detail = DBSession.query(DeliverDetail).filter(and_(DeliverDetail.active == 0, DeliverDetail.order_header_id == header.id)).one()
-            deliver_heaer = deliver_detail.header
-            for f in deliver_heaer.get_logs() : _info(f.remark)
-            logs.extend(deliver_heaer.get_logs())
-        except:
-            pass
-
-        sorted(logs, cmp = lambda x, y: cmp(x.transfer_date, y.transfer_date))
-
-        if header.source_company_id:
-            targets = header.source_company.targets
-        else:
-            targets = {}
-
-        if header.source_province_id:
-            source_cites = header.source_province.children()
-        else: source_cites = []
-
-        if header.destination_province_id:
-            destination_cites = header.destination_province.children()
-        else: destination_cites = []
-
-        return {
-                'header' : header ,
-                'transit_logs' : logs,
-                'targets' : targets,
-                'source_cites' : source_cites,
-                'destination_cites' : destination_cites,
-                }
-
-
-#
-#    def save_update(self):
-#        id = _g('id') or None
-#        if not id :
-#            flash(MSG_NO_ID_SUPPLIED, MESSAGE_ERROR)
-#            return redirect(self.default())
-#
-#        header = DBSession.query(OrderHeader).get(id)
-#        try:
-#            for k in ['source_station', 'source_company', 'source_address', 'source_contact', 'source_tel', 'source_mobile',
-#                  'destination_station', 'destination_company', 'destination_address', 'destination_contact', 'destination_tel', 'destination_mobile',
-#                  'no', 'order_time', 'item', 'expect_time', 'remark',
-#                 'payment_id', 'qty', 'qty_ratio', 'vol', 'vol_ratio',
-#                  'weight', 'weight_ratio', 'weight_ratio', 'amount',
-#                  ]:
-#                setattr(header, k, _g(k) or None)
-#
-#            DBSession.commit()
-#        except:
-#            flash(MSG_SERVER_ERROR, MESSAGE_ERROR)
-#            DBSession.rollback()
-#        else:
-#            flash(MSG_UPDATE_SUCC, MESSAGE_INFO)
-#            return redirect(url_for('.view', action = 'index'))
+        item_json = []
+        for c in header.item_details:
+            item_json.append({
+                                "id" : "old_%s" % c.id,
+                                "item_id" : c.item_id,
+                                "qty" : c.qty,
+                                "weight" : c.weight,
+                                "vol" : c.vol,
+                                "remark" : c.remark,
+                                })
+        return {'header' : header , 'item_json' : json.dumps(item_json)}
 
 
 
     def delete(self):
         header = getOr404(OrderHeader, _g('id'), redirect_url = self.default())
-#        header.status = ORDER_CANCELLED[0]
-
         header.active = 1
         DBSession.add(SystemLog(
                                 type == header.__class__.__name__,
@@ -538,76 +572,12 @@ class OrderView(BasicView):
     def ajax_save(self):
         type = _g('form_type')
         id = _g("id")
-        if type not in ['order_header', 'item_detail', 'receiver', 'warehouse' , 'transit', 'signed', 'pickup']:
+        if type not in ['item_detail', 'receiver', 'warehouse' , 'transit', 'signed', 'pickup']:
             return jsonify({'code' :-1, 'msg' : unicode(MSG_NO_SUCH_ACTION)})
 
         header = DBSession.query(OrderHeader).get(id)
 
-        if type == 'order_header':
-            fields = [
-                      'customer_id',
-                      'source_province_id', 'source_city_id', 'destination_province_id', 'destination_city_id',
-                      'ref_no', 'source_company_id', 'source_address', 'source_contact', 'source_tel', 'source_mobile',
-                      'payment_id', 'qty', 'weight', 'vol', 'shipment_type_id',
-                       'destination_company_id', 'destination_address', 'destination_contact', 'destination_tel', 'destination_mobile',
-                      'estimate_time', 'expect_time', 'actual_time', 'qty_ratio', 'weight_ratio', 'vol_ratio', 'amount', 'cost', 'remark',
-                      'pickup_type_id', 'pack_type_id',
-                      'insurance_charge', 'sendout_charge', 'receive_charge', 'package_charge', 'other_charge', 'load_charge', 'unload_charge',
-                      'proxy_charge', 'note_id', 'note_no',
-                      'source_sms', 'destination_sms',
-                      ]
-            _remark = []
-            old_info = header.serialize(fields) # to used for the history log
-
-            checkbox_fields = ['source_sms', 'destination_sms', ]
-            try:
-                for f in fields: setattr(header, f, _g(f))
-
-                for f in checkbox_fields:
-                    vs = _gl(f)
-                    if vs : setattr(header, f, vs[0])
-                    else : setattr(header, f, None)
-                no = _g('no')
-                if no != header.no:
-                    try:
-                        old_barcode = DBSession.query(Barcode).filter(Barcode.value == header.no).one()
-                        old_barcode.status = 1 # mark the old barcode to be reserved
-                    except:
-                        pass
-                    try:
-                        new_barcode = DBSession.query(Barcode).filter(Barcode.value == no).one()
-                        new_barcode.status = 0 #mark the new barcode to be used
-                    except NoResultFound :
-                        DBSession.add(Barcode(value = no))
-                    except:
-                        pass
-                    header.no = no
-                    header.barcode = generate_barcode_file(header.no)
-
-                if header.status == -2 : header.status = 0
-                DBSession.commit()
-
-                try:
-                    new_info = header.serialize(fields)
-                    change_result = self._compareObject(old_info, new_info)
-                    _remark = [u"[%s]'%s' 修改为 '%s'" % (name, ov, nv) for (name, ov, nv) in change_result['update']]
-                    DBSession.add(SystemLog(
-                                            type = header.__class__.__name__,
-                                            ref_id = header.id,
-                                            remark = u"%s 修改该记录。%s" % (session['user_profile']['name'], ";".join(_remark))
-                                            ))
-                    DBSession.commit()
-                except:
-                    _error(traceback.print_exc())
-                    DBSession.rollback()
-                return jsonify({'code' : 0 , 'msg' : unicode(MSG_SAVE_SUCC)})
-            except:
-                _error(traceback.print_exc())
-                DBSession.rollback()
-                return jsonify({'code' : 1 , 'msg' : unicode(MSG_SERVER_ERROR)})
-
-
-        elif type == 'item_detail':
+        if type == 'item_detail':
             action_type = _g('action_type')
             if action_type not in ['ADD', 'DELETE']: return jsonify({'code' :-1, 'msg' : unicode(MSG_NO_SUCH_ACTION)})
             if action_type == 'ADD' :
@@ -871,13 +841,10 @@ class OrderView(BasicView):
             note_id = _g('note_id')
             note_no = _g('note_no')
             note = DBSession.query(Note).get(note_id)
-            for (b, e) in note.range:
-                _info(b)
-                _info(e)
-                _info(note_no)
-                if b <= note_no <= e:
-                    return jsonify({'code' : 0 , 'result' : 0})
-            return jsonify({'code' : 0 , 'result' : 1})
+            note_no = int(note_no)
+            if int(note.begin_no) <= int(note_no) <= int(note.end_no):
+                return jsonify({'code' : 0 , 'result' : 0})
+            return jsonify({'code' : 0 , 'result' : 1, 'msg' : u'该票据不在可用范围内(%s~%s)，请修改！' % (note.begin_no, note.end_no)})
         except:
             _error(traceback.print_exc())
             return jsonify({'code' : 1 , 'msg' : MSG_SERVER_ERROR})

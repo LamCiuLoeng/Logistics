@@ -317,14 +317,14 @@ class User(DeclarativeBase, SysMixin, CRUDMixin):
     @classmethod
     def saveAsNew(clz, v):
         params = {}
-        for f in ['name', 'password', 'email', 'first_name', 'last_name', 'image_url', 'phone', ]:
+        for f in ['name', 'password', 'email', 'image_url', 'phone', 'mobile', ]:
             params[f] = v.get(f, None) or None
         one = clz(**params)
         DBSession.add(one)
         return one
 
     def saveAsUpdate(self, v):
-        for f in ['name', 'password', 'email', 'first_name', 'last_name', 'image_url', 'phone']:
+        for f in ['name', 'password', 'email', 'image_url', 'phone', 'mobile']:
             setattr(self, f, v.get(f, None) or None)
         return self
 

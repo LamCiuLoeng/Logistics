@@ -12,7 +12,7 @@
 		
 		for(var i=0;i<l.list.length;i++){
 		   var tmp = l.list[i];
-		   html += '<li class="level_two item_line"><a href="/order/revise?id='+tmp.id+'">'+tmp.ref_no+'</a></li>';
+		   html += '<li class="level_two item_line"><a href="/order/review?id='+tmp.id+'">'+tmp.ref_no+'</a></li>';
 		}
 		$(id+'_count').text(l.count);
 		e.after(html);

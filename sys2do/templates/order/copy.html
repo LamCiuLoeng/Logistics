@@ -4,6 +4,7 @@
 
 {% block extJS %}
 <script src="{{url_for('static', filename='js/customer/order_common.js')}}" type="text/javascript"></script>
+<script src="{{url_for('static', filename='js/customer/order_add.js')}}" type="text/javascript"></script>
 <script language="JavaScript" type="text/javascript">
 //<![CDATA[
 	var index = {{header.item_details|length}} + 1;
@@ -24,10 +25,12 @@
 			redirect("{{request.referrer}}");
 		}
 	}	
+	
+	var item_array = JSON.parse('{{item_json|safe}}');
 
 //]]>
 </script>
-<script src="{{url_for('static', filename='js/customer/order_add.js')}}" type="text/javascript"></script>
+
 
 {% endblock %}
 
@@ -47,6 +50,7 @@
 
 
 <form action="{{url_for('.view', action = 'save_new')}}" method="post">
+<input type="hidden" name="item_json" id="item_json"/>
 
 <div id="msg_div" style="display:none;color:red;padding-left:30px;padding-top:5px;"></div>
 
@@ -57,17 +61,22 @@
     	 <li style="width:180px;"><span><sup class="warn">*</sup>&nbsp;单号</span>
     	    <input name="ref_no" id="ref_no" type="text" class="must_input" style="width:100px" value="{{header.ref_no|f}}"/>
   	    </li>
+  	    <li style="width:740px;"><span>&nbsp;系统编号</span><input type="text" name="no" id="no" value="" class="numeric" style="width:100px" readonly="true"/></li>
+  	    <li style="width:459px;"><span><sup class="warn">*</sup>&nbsp;客户</span>
+    	    {{mymacros.select(id='customer_id',list=MASTER_ALL('Customer'),value=header.customer_id,class="must_input",style="width:360px")}}
+  	    </li>
+  	    
   	    <li style="width:180px;"><span><sup class="warn">*</sup>&nbsp;票据前缀</span>
     	    {{mymacros.select(id='note_id',list=MASTER_ALL('Note'),value=header.note_id,class="must_input",style="width:100px")}}
   	    </li>
   	    <li style="width:180px;"><span><sup class="warn">*</sup>&nbsp;票据单号</span>
-    	    <input name="note_no" id="note_no" type="text" class="must_input numeric" style="width:100px" value="{{header.note_no|f}}"/>
+    	    <input name="note_no" id="note_no" type="text" class="must_input numeric" style="width:100px" value=""/>
   	    </li>
     	  <li style="width:459px;"><span><sup class="warn">*</sup>&nbsp;{{_('Source Company')}}</span>
-    	     {{mymacros.select(id='source_company_id',list=MASTER_ALL('Customer'),value=header.source_company_id,class="must_input",style="width:360px")}}
+    	     {{mymacros.select(id='source_company_id',list=header.customer.sources,value=header.source_company_id,class="must_input",style="width:360px")}}
     	  </li>
     	  <li style="width:459px;"><span><sup class="warn">*</sup>&nbsp;{{_('Destination Company')}}</span>
-    	  	{{mymacros.select(id='destination_company_id',list=targets,value=header.destination_company_id,class="must_input",style="width:360px")}}
+    	  	{{mymacros.select(id='destination_company_id',list=header.customer.targets,value=header.destination_company_id,class="must_input",style="width:360px")}}
     	  </li>
     	  <br style="clear:both"/>
     	  <li style="width:459px;"><span><sup class="warn">*</sup>&nbsp;{{_('Source Contact')}}</span>
@@ -78,12 +87,12 @@
     	  </li>
     	  <li style="width:459px;"><span><sup class="warn">*</sup>&nbsp;{{_('Source Station')}}</span>
     	  {{mymacros.select(id='source_province_id',list=MASTER_ALL('Province'),value=header.source_province_id,class="must_input",style="width:150px")}}
-    	  {{mymacros.select(id='source_city_id',list=source_cites,value=header.source_city_id,class="",style="width:150px")}}
+    	  {{mymacros.select(id='source_city_id',list=RELATED_CITY(header.source_city_id),value=header.source_city_id,class="",style="width:150px")}}
     	</li>    	
     	    
     	  <li style="width:459px;"><span><sup class="warn">*</sup>&nbsp;{{_('Destination Station')}}</span>
 	    	  {{mymacros.select(id='destination_province_id',list=MASTER_ALL('Province'),value=header.destination_province_id,class="must_input",style="width:150px")}}
-	    	  {{mymacros.select(id='destination_city_id',list=destination_cites,value=header.destination_city_id,class="",style="width:150px")}}	      
+	    	  {{mymacros.select(id='destination_city_id',list=RELATED_CITY(header.destination_city_id),value=header.destination_city_id,class="",style="width:150px")}}	      
    	      </li>
     	  <li style="width:459px;"><span>{{_('Source Address')}}</span>
     	    <input name="source_address" id="source_address" type="text" style="width:360px" value="{{header.source_address|f}}"/>
@@ -124,10 +133,10 @@
   	    </li>
   	    
   	    <li style="width:226px;"><span>估计到达</span>
-    	    <input type="text" style="width:140px" id="estimate_time" name="estimate_time"  readonly="true"/>
+    	    <input type="text" style="width:140px" id="estimate_time" name="estimate_time"  readonly="true" value="{{header.estimate_time|fd}}"/>
   	    </li>
   	    <li style="width:226px;"><span>期望到达</span>
-    	    <input type="text" style="width:140px" id="expect_time" name="expect_time" class="datepicker"/>
+    	    <input type="text" style="width:140px" id="expect_time" name="expect_time" class="datepicker" value="{{header.expect_time|fd}}"/>
   	    </li>
     	  <li style="width:925px;"><span>{{_('Remark')}}</span>
     	  	<textarea name="remark" id="remark" style="width:840px">{{header.remark|f}}</textarea>   
@@ -220,56 +229,31 @@
 	</div>
 	  <div class="order_add_info_tab_body" id="tabs-1">
 		<div id="item_details">
-			<table border="0" cellpadding="0" cellspacing="0">
-				<tr>
-				  <td valign="top" align="center">&nbsp;</td>
-				  <td valign="top">&nbsp;</td>
-				  <td valign="top" align="center">&nbsp;</td>
-				  <td valign="top">&nbsp;</td>
-				  <td valign="top" align="center">&nbsp;</td>
-				  <td valign="top">&nbsp;</td>
-				  <td valign="top" align="center">&nbsp;</td>
-				  <td valign="top">&nbsp;</td>
-				  <td valign="top" align="center">&nbsp;</td>
-				  <td valign="top">&nbsp;</td>
-			  </tr>
-				<tr>
-					<td valign="top" width="70px" align="center"><sup class="warn">*</sup>&nbsp;{{_('Item Name')}}</td><td valign="top">
-						<select name="item_id" id="item_id"  class="must_input" style="width:140px;">
-							<option value=""></option>
-							{% for k in MASTER_ALL('Item') %}
-								<option value="{{k.id}}">{{k}}</option>
-							{% endfor %}
-						</select>	
-					</td>
-					<td valign="top" width="70px" align="center">{{_('Qty')}}</td><td valign="top"><input type="text" name="item_qty" id="item_qty" value="" class="order_add_div_body_input numeric" style="width:80px;"></td>
-					<td valign="top" width="70px" align="center">{{_('Vol')}}</td><td valign="top"><input type="text" name="item_vol" id="item_vol" value="" class="order_add_div_body_input numeric" style="width:80px;"></td>
-					<td valign="top" width="70px" align="center">{{_('Weight')}}</td><td valign="top"><input type="text" name="item_weight" id="item_weight" value="" class="order_add_div_body_input numeric" style="width:80px;"></td>
-				    <td valign="top" width="70px" align="center">{{_('Remark')}}</td><td valign="top"><textarea name="item_remark" id="item_remark"></textarea></td>
-				</tr>
-			</table>
 		  <p><input type="button" value="{{_('Add')}}" onclick="add_item()"/></p>
 		</div>
 		<br />
 		<table>
 			<thead>
 				<tr class="field_head">
-					<th>{{_('Item Name')}}</th>
-					<th>{{_('Qty')}}</th>
-					<th>{{_('Vol')}}</th>
-					<th>{{_('Weight')}}</th>
-					<th>{{_('Remark')}}</th><td>&nbsp;</td>
+					<th align="center" style="width:150px;">{{_('Item Name')}}</th>
+					<th align="center" style="width:100px;">{{_('Qty')}}</th>
+					<th align="center" style="width:100px;">{{_('Weight')}}</th>
+					<th align="center" style="width:100px;">{{_('Vol')}}</th>
+					<th align="center" style="width:350px;">{{_('Remark')}}</th>
+					<th align="center" style="width:150px;">操作</th>
 				</tr>
 			</thead>
 			<tbody id="item_list">
 			{% for l in header.item_details %}
-					<tr class="data_table_tr">
-						<th>{{l.item|f}}<input type="hidden" name="item_id_{{loop.index}}" value="{{l.item_id|f}}"/></td>
-						<td>{{l.qty|f}}<input type="hidden" name="item_qty_{{loop.index}}" value="{{l.qty|f}}"/></td>
-						<td>{{l.vol|f}}<input type="hidden" name="item_vol_{{loop.index}}" value="{{l.vol|f}}"/></td>
-						<td>{{l.weight|f}}<input type="hidden" name="item_weight_{{loop.index}}" value="{{l.weight|f}}"/></td>
-						<td>{{l.remark|f}}<input type="hidden" name="item_remark_{{loop.index}}" value="{{l.remark|f}}"/></td>
-						<td><input type="button" value="{{_('Del')}}" onclick="del_item({{l.id}},this)"/></td>
+					<tr class="data_table_tr" id="item_tr_old_{{l.id}}">
+						<td>{{l.item|f}}</td>
+						<td>{{l.qty|f}}</td>
+						<td>{{l.vol|f}}</td>
+						<td>{{l.weight|f}}</td>
+						<td>{{l.remark|f}}</td>
+						<td>
+							<input type="button" value="删除" onclick="del_item({{l.id}},this)"/>&nbsp;<input type="button" value="编辑" onclick="edit_item('{{'old_%s'%l.id}}')"/>
+						</td>
 					</tr>
 				{% endfor %}
 			</tbody>
@@ -277,9 +261,27 @@
 	  <div style="clear:both"></div>
 	</div>
 </div>
-
-
-
 </form>
+
+
+<!-- order items begin -->
+
+<div id="dialog-form" title="货物信息" style="background-color:white;">
+	<table border="0" cellpadding="0" cellspacing="0">
+		<tr>
+			<td valign="top" width="70px" align="center"><sup class="warn">*</sup>&nbsp;{{_('Item Name')}}</td><td valign="top">
+				{{mymacros.select(id='item_id',list=MASTER_ALL('Item'),value=None,class="must_input",style="width:140px;")}}
+			</td>
+			<td valign="top" width="70px" align="center">{{_('Qty')}}</td><td valign="top"><input type="text" id="item_qty" value="" class="order_add_div_body_input numeric" style="width:80px;"></td>
+			<td valign="top" width="70px" align="center">{{_('Weight')}}</td><td valign="top"><input type="text" id="item_weight" value="" class="order_add_div_body_input numeric" style="width:80px;"></td>
+			<td valign="top" width="70px" align="center">{{_('Vol')}}</td><td valign="top"><input type="text" id="item_vol" value="" class="order_add_div_body_input numeric" style="width:80px;"></td>
+		    <td valign="top" width="70px" align="center">{{_('Remark')}}</td><td valign="top"><textarea id="item_remark"></textarea></td>
+		</tr>
+	</table>
+	<br />
+	<p style="text-align:right;"><input type="button" value="保存" onclick="save_item()"/>&nbsp;<input type="button" value="取消" onclick="cancel_item()"/></p>
+</div>
+
+<!-- order items begin -->
 
 {% endblock %}

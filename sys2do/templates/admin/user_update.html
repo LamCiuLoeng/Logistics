@@ -5,7 +5,25 @@
 <script language="JavaScript" type="text/javascript">
 //<![CDATA[
 	function tosave(){
-		$('form').submit();
+		var msg = Array();
+		if(!$("#name").val()){
+			msg.push('请填写用户名！');
+		}
+		if(!$("#password").val()){
+			msg.push('请填写密码！');
+		}
+		if(!$("#repassword").val()){
+			msg.push('请填写确认密码！');
+		}
+		if($("#password").val()!=$("#repassword").val()){
+			msg.push('密码与确认密码不相符！');
+		}
+		
+		if(msg.length > 0){
+			alert(msg.join('\n'));
+		}else{
+			$('form').submit();		
+		}
 	}
 	
 	function todelete() {
@@ -41,15 +59,15 @@
 		<table>
 			<tr>
 				<td>{{_('User Name')}}</td>
-				<td><input type="text" name="name" value="{{v['name']}}"/></td>
+				<td><input type="text" name="name" id="name" value="{{v['name']}}" class="must_input"/></td>
 			</tr>
 			<tr>
 				<td>{{_('Password')}}</td>
-				<td><input type="password" name="password" value="{{v['password']}}"/></td>
+				<td><input type="password" name="password" id="password" value="{{v['password']}}" class="must_input"/></td>
 			</tr>
 			<tr>
 				<td>{{_('Confirm Password')}}</td>
-				<td><input type="password" name="repassword" value="{{v['password']}}"/></td>
+				<td><input type="password" name="repassword" id="repassword" value="{{v['password']}}" class="must_input"/></td>
 			</tr>
 			<tr>
 				<td>{{_('E-mail')}}</td>
@@ -58,6 +76,10 @@
 			<tr>
 				<td>{{_('Phone')}}</td>
 				<td><input type="text" name="phone" value="{{v['phone']|ifFalse}}"/></td>
+			</tr>
+			<tr>
+				<td>{{_('Mobile')}}</td>
+				<td><input type="text" name="phone" value="{{v['mobile']|ifFalse}}"/></td>
 			</tr>
 			<tr>
 				<td>{{_('Group')}}</td>
