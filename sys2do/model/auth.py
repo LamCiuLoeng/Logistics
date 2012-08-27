@@ -13,7 +13,7 @@ import os
 import sys
 from sqlalchemy.sql.expression import desc, and_
 from sys2do.constant import SYSTEM_DATETIME_FORMAT, SYSTEM_DATE_FORMAT
-
+from sqlalchemy.ext.declarative import declared_attr
 
 
 try:
@@ -22,6 +22,8 @@ except ImportError:
     sys.exit('ImportError: No module named hashlib\n'
              'If you are on python2.4 this library is not part of python. '
              'Please install it. Example: easy_install hashlib')
+
+
 
 from flask import session
 from sqlalchemy import Table, ForeignKey, Column
@@ -43,7 +45,9 @@ class SysMixin(object):
     create_by_id = Column(Integer, default = getUserID)
     update_time = Column(DateTime, default = dt.now, onupdate = dt.now)
     update_by_id = Column(Integer, default = getUserID, onupdate = getUserID)
+    _attachment = Column('attachment', Text)
     active = Column(Integer, default = 0) # 0 is active ,1 is inactive
+
 
     @property
     def create_by(self):
@@ -58,6 +62,35 @@ class SysMixin(object):
             return DBSession.query(User).get(self.update_by_id)
         except:
             return None
+
+
+    def compare(self, old_obj, new_obj):
+        old_keys = old_obj.keys()
+        new_keys = new_obj.keys()
+        result = {
+                  "new" : [],
+                  "update" : [],
+                  "delete" : [],
+                  }
+
+        for key in list(set(old_keys).intersection(set(new_keys))):
+            old_val = old_obj[key][0]
+            new_val = new_obj[key][0]
+
+            if old_val != new_val:
+                result['update'].append((old_obj[key][1], old_obj[key][0], new_obj[key][0]))
+
+        for key in list(set(old_obj).difference(set(new_obj))):
+            result['delete'].append((old_obj[key][1], old_obj[key][0], None))
+
+        for key in list(set(new_obj).difference(set(old_obj))):
+            result['new'].append((old_obj[key][1], None, new_obj[key][0]))
+        return result
+
+
+    def insert_system_logs(self, comare_result):
+        pass
+
 
     @property
     def system_logs(self):
@@ -93,6 +126,30 @@ class SysMixin(object):
                 result[cname] = (v, colClz.doc or cname)
         _info(result)
         return result
+
+
+    def _get_attachment(self):
+        try:
+            from sys2do.model.system import UploadFile
+            return DBSession.query(UploadFile).filter(and_(UploadFile.active == 0, UploadFile.id.in_(self._attachment.split("|")))).order_by(UploadFile.id)
+        except:
+            return []
+
+
+    def _set_attachment(self, v):
+        ids = None
+        if v :
+            if type(v) == list:
+                ids = "|".join(map(unicode, v))
+            elif isinstance(v, basestring):
+                ids = v
+        self._attachment = ids
+
+
+    @declared_attr
+    def attachment(self):
+        return synonym('_attachment', descriptor = property(self._get_attachment, self._set_attachment))
+
 
 
 class CRUDMixin(object):

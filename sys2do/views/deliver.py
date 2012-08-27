@@ -193,6 +193,7 @@ class DeliverView(BasicView):
                                    other_charge = _g('other_charge'),
                                    proxy_charge = _g('proxy_charge'),
                                    amount = _g('amount'),
+                                   payment_id = _g('payment_id'),
                                    remark = _g('remark'),
                                    )
             DBSession.flush()
@@ -276,7 +277,7 @@ class DeliverView(BasicView):
                       'no', 'destination_province_id', 'destination_city_id', 'supplier_id', 'supplier_contact', 'supplier_tel',
                       'need_transfer', 'amount', 'remark', 'expect_time',
                       'insurance_charge', 'sendout_charge', 'receive_charge', 'package_charge', 'other_charge',
-                      'load_charge', 'unload_charge', 'proxy_charge',
+                      'load_charge', 'unload_charge', 'proxy_charge', 'payment_id',
                       ]
 
             _remark = []
@@ -284,32 +285,22 @@ class DeliverView(BasicView):
             for f in fields:    setattr(header, f, _g(f))
 
             for d in header.details:
-                d.insurance_charge = _g('insurance_charge_' % d.id)
-                d.sendout_charge = _g('sendout_charge_' % d.id)
-                d.receive_charge = _g('receive_charge_' % d.id)
-                d.package_charge = _g('package_charge_' % d.id)
-                d.load_charge = _g('load_charge_' % d.id)
-                d.unload_charge = _g('unload_charge_' % d.id)
-                d.other_charge = _g('other_charge_' % d.id)
-                d.proxy_charge = _g('proxy_charge_' % d.id)
-                d.amount = _g('amount_' % d.id)
+                d.insurance_charge = _g('insurance_charge_%s' % d.id)
+                d.sendout_charge = _g('sendout_charge_%s' % d.id)
+                d.receive_charge = _g('receive_charge_%s' % d.id)
+                d.package_charge = _g('package_charge_%s' % d.id)
+                d.load_charge = _g('load_charge_%s' % d.id)
+                d.unload_charge = _g('unload_charge_%s' % d.id)
+                d.other_charge = _g('other_charge_%s' % d.id)
+                d.proxy_charge = _g('proxy_charge_%s' % d.id)
+                d.amount = _g('amount_%s' % d.id)
                 d.order_header.cost = d.amount
 
             DBSession.commit()
 
-            try:
-                new_info = header.serialize(fields)
-                change_result = self._compareObject(old_info, new_info)
-                _remark = [u"[%s]'%s' 修改为 '%s'" % (name, ov, nv) for (name, ov, nv) in change_result['update']]
-                DBSession.add(SystemLog(
-                                    type = header.__class__.__name__,
-                                    ref_id = header.id,
-                                    remark = u"%s 修改该记录。%s" % (session['user_profile']['name'], ";".join(_remark))
-                                    ))
-                DBSession.commit()
-            except:
-                _error(traceback.print_exc())
-                DBSession.rollback()
+            new_info = header.serialize(fields)
+            change_result = header.compare(old_info, new_info)
+            header.insert_system_logs(change_result)
 
             flash(MSG_SAVE_SUCC, MESSAGE_INFO)
         except:
@@ -625,31 +616,11 @@ class DeliverView(BasicView):
             return jsonify({'code' : 1, 'msg' : MSG_SERVER_ERROR})
 
 
-    def _compareObject(self, old_obj, new_obj):
-        old_keys = old_obj.keys()
-        new_keys = new_obj.keys()
-        result = {
-                  "new" : [],
-                  "update" : [],
-                  "delete" : [],
-                  }
-
-        for key in list(set(old_keys).intersection(set(new_keys))):
-            old_val = old_obj[key][0]
-            new_val = new_obj[key][0]
-
-            if old_val != new_val:
-                result['update'].append((old_obj[key][1], old_obj[key][0], new_obj[key][0]))
-
-        for key in list(set(old_obj).difference(set(new_obj))):
-            result['delete'].append((old_obj[key][1], old_obj[key][0], None))
-
-        for key in list(set(new_obj).difference(set(old_obj))):
-            result['new'].append((old_obj[key][1], None, new_obj[key][0]))
-        return result
-
-
-
+    @templated('deliver/form.html')
+    def form(self):
+        id = _g('id')
+        obj = DBSession.query(DeliverHeader).get(id)
+        return {'obj' : obj}
 
 bpDeliver.add_url_rule('/', view_func = DeliverView.as_view('view'), defaults = {'action':'index'})
 bpDeliver.add_url_rule('/<action>', view_func = DeliverView.as_view('view'))

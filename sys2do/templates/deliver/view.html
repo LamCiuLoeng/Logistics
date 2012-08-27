@@ -44,6 +44,10 @@
         {% if header.status < SEND_OUT[0] and 'DELETE_DELIVER' is get_permission %}
         	<li class="delete_li"><img src="/static/images/system/order_manage_29.jpg" width="77" height="21" id="Image6" onmouseover="MM_swapImage('Image6','','/static/images/system/order_manage_h_29.jpg',1)" onmouseout="MM_swapImgRestore()" onclick="return todelete()"/></li>
     	{% endif %}
+    	
+    	
+    	<li><a href="{{url_for('.view', action = 'form',id=header.id)}}">打印送货单</a></li>
+    	
     </ul>
 </div>
 {% endblock %}
@@ -106,42 +110,45 @@
 				<td width="12">&nbsp;</td>
 				<td>{{mymacros.show_supplier_paid(values.get('supplier_paid',''))}}</td>
 			</tr>
-			
-			
 			<tr>
 				<td height="30" align="right">保险费用</td>
 				<td width="12">&nbsp;</td>
-				<td>{{values.get('insurance_charge','')|f}}</td>
+				<td>{{values.get('insurance_charge','')|f(0)}}</td>
 			</tr>
 			<tr>
 				<td height="30" align="right">送货费用</td>
 				<td width="12">&nbsp;</td>
-				<td>{{values.get('sendout_charge','')|f}}</td>
+				<td>{{values.get('sendout_charge','')|f(0)}}</td>
 			</tr>
 			<tr>
 				<td height="30" align="right">上门接货费用</td>
 				<td width="12">&nbsp;</td>
-				<td>{{values.get('receive_charge','')|f}}</td>
+				<td>{{values.get('receive_charge','')|f(0)}}</td>
 			</tr>
 			<tr>
 				<td height="30" align="right">包装费用</td>
 				<td width="12">&nbsp;</td>
-				<td>{{values.get('package_charge','')|f}}</td>
+				<td>{{values.get('package_charge','')|f(0)}}</td>
 			</tr>
 			<tr>
 				<td height="30" align="right">代理费用</td>
 				<td width="12">&nbsp;</td>
-				<td>{{values.get('proxy_charge','')|f}}</td>
+				<td>{{values.get('proxy_charge','')|f(0)}}</td>
 			</tr>
 			<tr>
 				<td height="30" align="right">其它费用</td>
 				<td width="12">&nbsp;</td>
-				<td>{{values.get('other_charge','')|f}}</td>
+				<td>{{values.get('other_charge','')|f(0)}}</td>
 			</tr>
 			<tr>
 				<td height="30" align="right">总费用</td>
 				<td width="12">&nbsp;</td>
-				<td>{{values.get('amount','')|f}}</td>
+				<td>{{values.get('amount','')|f(0)}}</td>
+			</tr>
+			<tr>
+				<td height="30" align="right">付款方式</td>
+				<td width="12">&nbsp;</td>
+			    <td>{{values.get('payment','')|f}}</td>
 			</tr>
 			<tr>
 				<td height="30" align="right">{{_('Remark')}}</td>
@@ -158,23 +165,22 @@
 					<th style="width:50px">{{_('Source Station')}}</th>
 					<th style="width:50px">{{_('Destination Station')}}</th>
 					<th style="width:30px">{{_('Qty')}}</th>
-					<th style="width:30px">{{_('Vol')}}</th>
-					<th style="width:30px">{{_('Weight')}}</th>
+					<th style="width:30px">{{_('Vol')}}(米<sup>3</sup>)</th>
+					<th style="width:30px">{{_('Weight')}}(吨)</th>
 					<th style="width:80px">{{_('Destination Contact')}}</th>
 					<th>{{_('Destination Tel')}}</th>
-					<!-- <th style="width:50px">费用</th> -->
 					<th style="width:100px">{{_('Create Time')}}</th>
 					<th style="width:80px">{{_('Creator')}}</th>
 				</tr>
 			</thead>
 			{% for d in details %}
 				<tr class="data_table_tr data_table_tr_odd">
-					<th><a href="{{url_for('bpOrder.view',action='revise',id=d.order_header_id)}}">{{d.order_header.ref_no}}</a></th>
+					<th><a href="{{url_for('bpOrder.view',action='review',id=d.order_header_id)}}">{{d.order_header.ref_no}}</a></th>
 					<td>{{d.order_header.source_province}}{{d.order_header.source_city}}</td>
 					<td>{{d.order_header.destination_province}}{{d.order_header.destination_city}}</td>
-					<td>{{d.order_header.qty|f}}</td>
-					<td>{{d.order_header.vol|f}}</td>
-					<td>{{d.order_header.weight|f}}</td>
+					<td>{{d.order_header.qty|f(0)}}</td>
+					<td>{{d.order_header.vol|f(0)}}</td>
+					<td>{{d.order_header.weight|f(0)}}</td>
 					<td>{{d.order_header.destination_contact|f}}</td>
 					<td>{{d.order_header.destination_tel|f}}</td>
 					<td>{{d.order_header.create_time|ft}}</td>
@@ -195,15 +201,15 @@
 								<td>单笔总费用</td>
 							</tr>
 							<tr class="sub_charge_tr">
-								<td style="width:100px">{{d.insurance_charge|f}}</td>
-								<td style="width:100px">{{d.sendout_charge|f}}</td>
-								<td style="width:100px">{{d.receive_charge|f}}</td>
-								<td style="width:100px">{{d.package_charge|f}}</td>
-								<td style="width:100px">{{d.load_charge|f}}</td>
-								<td style="width:100px">{{d.unload_charge|f}}</td>
-								<td style="width:100px">{{d.other_charge|f}}</td>
-								<td style="width:100px">{{d.proxy_charge|f}}</td>
-								<td style="width:100px">{{d.amount|f}}</td>
+								<td style="width:100px">{{d.insurance_charge|f(0)}}</td>
+								<td style="width:100px">{{d.sendout_charge|f(0)}}</td>
+								<td style="width:100px">{{d.receive_charge|f(0)}}</td>
+								<td style="width:100px">{{d.package_charge|f(0)}}</td>
+								<td style="width:100px">{{d.load_charge|f(0)}}</td>
+								<td style="width:100px">{{d.unload_charge|f(0)}}</td>
+								<td style="width:100px">{{d.other_charge|f(0)}}</td>
+								<td style="width:100px">{{d.proxy_charge|f(0)}}</td>
+								<td style="width:100px">{{d.amount|f(0)}}</td>
 							</tr>
 						</table>
 					</td>

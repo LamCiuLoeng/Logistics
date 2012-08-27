@@ -259,6 +259,9 @@ def init():
         note1 = Note(code = '0001191-1', name = u'坚朗', province_id = 19, city_id = 290, apply_person_id = 1, apply_time = '2012-08-23',
                      begin_no = '1188000', end_no = '1188599', remark = u'坚朗专用二本')
 
+        note2 = Note(code = '1001191-1', name = u'味千', province_id = 19, city_id = 290, apply_person_id = 1, apply_time = '2012-08-23',
+                     begin_no = '2188000', end_no = '2188599', remark = u'味千专用一本')
+
         DBSession.add_all([
                            note1,
                            ])
@@ -291,7 +294,6 @@ def init():
 
         DBSession.add_all([
                            kinlong_source1_c1, kinlong_source1_c2, kinlong_source2_c1, kinlong_source2_c2, kinlong_source3_c2,
-
                            ])
 
         #import the kinlong target contact
@@ -299,6 +301,25 @@ def init():
         #import the supplier
         import_supplier(payment1)
 
+
+        weiqian = Customer(name = u"味千(中国)控投有限公司", display_name = u'味千', province_id = 19, city_id = 290,
+                           address = u"福田区金田路3037号金中环商务大厦主楼23号", phone = "0755-8280 5333", contact_person = None,
+                           mobile = None, note = note2)
+
+        weiqian_source1 = CustomerSource(customer = weiqian, name = u"味千一厂", province_id = 19, city_id = 290, payment = payment1)
+
+        DBSession.add_all([
+                           weiqian, weiqian_source1
+                           ])
+
+        DBSession.flush()
+
+        weiqian_source1_c1 = CustomerContact(customer = weiqian, type = 'S', refer_id = weiqian_source1.id, name = u'陆先生', mobile = u'13880138111', phone = u'1234561', address = u'福田', is_default = 1)
+        DBSession.add_all([
+                           weiqian_source1_c1,
+                           ])
+
+        import_weiqian_targets(weiqian)
 
         DBSession.commit()
         print "finish init!"
@@ -375,6 +396,77 @@ def import_kinlong_target(kinlong):
     DBSession.add_all([
                        hangkou, hangkou_c, wuchang, shanghai, shanghai_c, fuqing, fuqing_c, huadu, huadu_c, changshu, changshu_c, kunshang, kunshang_c,
                        wujiang, wujiang_c, zjg, zjg_c, yx, yx_c, cx, cx_c, zj, zj_c, cn, cn_c, wl, wl_c, yw, yw_c,
+                       ])
+
+
+
+def import_weiqian_targets(weiqian):
+    print 'import weiqian targets'
+    t1 = CustomerTarget(customer = weiqian, name = u'深圳市味来道贸易有限公司Ａ', province_id = 19, city_id = 290)
+    DBSession.flush()
+    t1_c = CustomerContact(customer = weiqian, type = 'T', refer_id = t1.id, name = u'邓梦成', mobile = '13410716458', phone = '0755-89538779,83742178', address = u'南山区沙河西路深宝路交界处白沙物流旁（深圳市粮食集团曙光冷库）', remark = u'深圳代理商')
+
+    t2 = CustomerTarget(customer = weiqian, name = u'广州白云沪苏贸易经营部', province_id = 19, city_id = 290)
+    DBSession.flush()
+    t2_c = CustomerContact(customer = weiqian, type = 'T', refer_id = t2.id, name = u'吴煌龙', mobile = '13798313454', phone = '0755-28273934', address = u'布吉莲花路莲山庄五村内围42号', remark = u'深圳代理商')
+
+    t3 = CustomerTarget(customer = weiqian, name = u'香港港丰控股有限公司', province_id = 33, city_id = None)
+    DBSession.flush()
+    t3_c = CustomerContact(customer = weiqian, type = 'T', refer_id = t3.id, name = u'刘德基', mobile = None, phone = '0085292678917,0085225167033', email = 'newtongroupholdings@gmail.com', address = u'新界将军澳工业村 骏光街9号（惠康超市）- 牛奶公司冷藏货收货区', remark = u'香港代理商')
+
+    t4 = CustomerTarget(customer = weiqian, name = u'深圳市味来道贸易有限公司Ｂ', province_id = 19, city_id = 290)
+    DBSession.flush()
+    t4_c = CustomerContact(customer = weiqian, type = 'T', refer_id = t4.id, name = u'邓梦成', mobile = None, phone = '0755-89538779,83472178', email = None, address = u'龙岗区坪山镇坑梓工业园沃尔玛中心配送仓', remark = u'深圳代理商')
+
+    t5 = CustomerTarget(customer = weiqian, name = u'深圳市农批华兴经营部', province_id = 19, city_id = 290)
+    DBSession.flush()
+    t5_c = CustomerContact(customer = weiqian, type = 'T', refer_id = t5.id, name = u'邓老板', mobile = '13823636826', phone = None, email = None, address = u'龙岗区布路布吉警署后松园新村', remark = u'深圳代理商')
+
+    t6 = CustomerTarget(customer = weiqian, name = u'深圳市金满源贸易有限公司', province_id = 19, city_id = 290)
+    DBSession.flush()
+    t6_c1 = CustomerContact(customer = weiqian, type = 'T', refer_id = t6.id, name = u'罗发财', mobile = '18926455915', phone = None, email = None, address = u'布吉镇坂田街道岗头风门坳村亚洲工业园15号', remark = u'深圳代理商')
+    t6_c2 = CustomerContact(customer = weiqian, type = 'T', refer_id = t6.id, name = u'王进云', mobile = '13423967408', phone = '0755-29001027', email = 'wembnc118@163.com', address = u'布吉镇坂田街道岗头风门坳村亚洲工业园15号', remark = u'深圳代理商')
+
+    t7 = CustomerTarget(customer = weiqian, name = u'成都永盛食品有限责任公司', province_id = 23, city_id = 326)
+    DBSession.flush()
+    t7_c = CustomerContact(customer = weiqian, type = 'T', refer_id = t7.id, name = u'蒋志英', mobile = '18980019806', phone = '028-85354318', email = '410137392@qq.com', address = u'锦江区琉璃场径天中路上东家园77路公交车总站', remark = u'成都代理商')
+
+    t8 = CustomerTarget(customer = weiqian, name = u'湘潭市兴盛贸易有限公司', province_id = 18, city_id = 27)
+    DBSession.flush()
+    t8_c1 = CustomerContact(customer = weiqian, type = 'T', refer_id = t8.id, name = u'谭冰艳', mobile = '18608489007', phone = None, email = None, address = u'雨湖区草塘路61号', remark = u'湘潭代现商')
+    t8_c2 = CustomerContact(customer = weiqian, type = 'T', refer_id = t8.id, name = u'周卫星', mobile = '13317425511', phone = '0731-55578399', email = None, address = u'雨湖区草塘路61号', remark = u'湘潭代现商')
+
+
+    t9 = CustomerTarget(customer = weiqian, name = u'惠州市三林贸易有限公司', province_id = 19, city_id = 298)
+    DBSession.flush()
+    t9_c1 = CustomerContact(customer = weiqian, type = 'T', refer_id = t9.id, name = u'张君', mobile = None, phone = '0752-2695370', email = None, address = u'惠城区镇隆镇皇后村委斜对面', remark = u'惠州代理商')
+    t9_c2 = CustomerContact(customer = weiqian, type = 'T', refer_id = t9.id, name = u'徐三林', mobile = '18688335596', phone = '0752-2695370', email = 'hzssl2008@163.com', address = u'惠城区镇隆镇皇后村委斜对面', remark = u'惠州代理商')
+
+    t10 = CustomerTarget(customer = weiqian, name = u'佛山顺德区瑞驰贸易有限公司', province_id = 19, city_id = 293)
+    DBSession.flush()
+    t10_c1 = CustomerContact(customer = weiqian, type = 'T', refer_id = t10.id, name = u'梁友鸿', mobile = '13702622982', phone = '0757-2229201', email = None, address = u'顺德区大良大门小湾村为民街8号', remark = u'顺德代理商')
+    t10_c2 = CustomerContact(customer = weiqian, type = 'T', refer_id = t10.id, name = u'温风涛', mobile = None, phone = None, email = None, address = u'顺德区大良大门小湾村为民街8号', remark = u'顺德代理商')
+
+    t11 = CustomerTarget(customer = weiqian, name = u'东莞市良云贸易有限公司', province_id = 19, city_id = 304)
+    DBSession.flush()
+    t11_c1 = CustomerContact(customer = weiqian, type = 'T', refer_id = t11.id, name = u'钟丽情', mobile = '13431268281', phone = '0769-22467285', email = None, address = u'南城区白马翠园街西二环巷8号', remark = u'东莞代理商')
+    t11_c2 = CustomerContact(customer = weiqian, type = 'T', refer_id = t11.id, name = u'朱小毛', mobile = '13728275577', phone = '0769-76922467285', email = '729518726@qq.com', address = u'南城区白马翠园街西二环巷8号', remark = u'东莞代理商')
+
+    t12 = CustomerTarget(customer = weiqian, name = u'厦门恒顺联商贸有限公司', province_id = 19, city_id = 288)
+    DBSession.flush()
+    t12_c = CustomerContact(customer = weiqian, type = 'T', refer_id = t12.id, name = u'朱蔚', mobile = '18927843611', phone = None, email = '653009253@qq.com', address = u'白云区沙太北路大源南路自编33号', remark = u'广州代理商')
+
+    t13 = CustomerTarget(customer = weiqian, name = u'广州市领隆贸易有限公司', province_id = 19, city_id = 288)
+    DBSession.flush()
+    t13_c = CustomerContact(customer = weiqian, type = 'T', refer_id = t13.id, name = u'曹领', mobile = '15989152636', phone = '020-84265759', email = '653009253@qq.com', address = u'广州市白云区沙太北路大源南路自编33号', remark = u'广州代理商')
+
+    t14 = CustomerTarget(customer = weiqian, name = u'广州沃奥贸易有限公司', province_id = 19, city_id = 288)
+    DBSession.flush()
+    t14_c = CustomerContact(customer = weiqian, type = 'T', refer_id = t14.id, name = u'林奇峰', mobile = '15989152636', phone = '020-81795981', email = None, address = u'白云区增槎路东旺市场南二排42档', remark = u'广州代理商')
+
+    DBSession.add_all([
+                       t1, t1_c, t2, t2_c, t3, t3_c, t4, t4_c, t5, t5_c, t6, t6_c1, t6_c2, t7, t7_c, t8, t8_c1, t8_c2, t9, t9_c1, t9_c2, t10, t10_c1, t10_c2,
+                       t11, t11_c1, t11_c2, t12, t12_c, t13, t13_c, t14, t14_c
                        ])
 
 

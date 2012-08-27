@@ -6,11 +6,13 @@
 #  Description:
 ###########################################
 '''
+import traceback
 from datetime import datetime as dt
 from sqlalchemy import Table, Column, ForeignKey
 from sqlalchemy.types import Unicode, Integer, DateTime, Float, Date, Text
 from sqlalchemy.orm import relation, backref, synonym
 from sqlalchemy.sql.expression import and_
+from flask import session
 
 
 from sys2do.model import DeclarativeBase, metadata, DBSession
@@ -19,11 +21,8 @@ from sys2do.model.master import Customer, Supplier, ItemUnit, ShipmentType, \
     WeightUnit, InventoryLocation, Payment, PickupType, PackType, CustomerTarget, \
     Receiver, Item, Note, Province, City, CustomerSource
 from sys2do.model.auth import CRUDMixin, User
-from sys2do.model.system import UploadFile
-
-
-
-
+from sys2do.model.system import UploadFile, SystemLog
+from sys2do.util.common import _error
 
 
 
@@ -179,8 +178,7 @@ class OrderHeader(DeclarativeBase, SysMixin, CRUDMixin):
 
     def update_status(self, status):
         self.status = status
-#        for d in self.details :
-#            if d.status < self.status : d.status = status
+
 
     def get_logs(self):
         return DBSession.query(TransferLog).filter(and_(
@@ -206,7 +204,18 @@ class OrderHeader(DeclarativeBase, SysMixin, CRUDMixin):
             return None
 
 
-
+    def insert_system_logs(self, comare_result):
+        try:
+            _remark = [u"[%s]'%s' 修改为 '%s'" % (name, ov, nv) for (name, ov, nv) in comare_result['update']]
+            DBSession.add(SystemLog(
+                                    type = self.__class__.__name__,
+                                    ref_id = self.id,
+                                    remark = u"%s 修改该记录。%s" % (session['user_profile']['name'], ";".join(_remark))
+                                    ))
+            DBSession.commit()
+        except:
+            DBSession.rollback()
+            _error(traceback.print_exc())
 
 
 class ItemDetail(DeclarativeBase, SysMixin):
@@ -279,28 +288,28 @@ class DeliverHeader(DeclarativeBase, SysMixin, CRUDMixin):
     __tablename__ = 'deliver_header'
 
     id = Column(Integer, autoincrement = True, primary_key = True)
-    no = Column(Text, doc = u'')
+    no = Column(Text, doc = u'送货单号码')
 
-    destination_province_id = Column(Integer, ForeignKey('master_province.id'), doc = u'')
+    destination_province_id = Column(Integer, ForeignKey('master_province.id'), doc = u'目的地')
     destination_provice = relation(Province)
-    destination_city_id = Column(Integer, ForeignKey('master_city.id'), doc = u'')
+    destination_city_id = Column(Integer, ForeignKey('master_city.id'), doc = u'目的地')
     destination_city = relation(City)
 
 #    destination_address = Column(Text)
-    supplier_id = Column(Integer, ForeignKey('master_supplier.id'), doc = u'')
+    supplier_id = Column(Integer, ForeignKey('master_supplier.id'), doc = u'第三方承运商')
     supplier = relation(Supplier)
 
-    supplier_contact = Column(Text, doc = u'')
-    supplier_tel = Column(Text, doc = u'')
+    supplier_contact = Column(Text, doc = u'承运商联系人')
+    supplier_tel = Column(Text, doc = u'承运商电话')
 
-    need_transfer = Column(Text, doc = u'')
+#    need_transfer = Column(Text, doc = u'')
 
 #    send_out_remark = Column(Text)
 #    arrived_remark = Column(Text)
 
-    sendout_time = Column(Text, doc = u'')
-    expect_time = Column(Text, doc = u'')
-    actual_time = Column(Text, doc = u'')
+    sendout_time = Column(Text, doc = u'发货时间')
+    expect_time = Column(Text, doc = u'到达预期')
+    actual_time = Column(Text, doc = u'实际到达')
 
 
 
@@ -318,7 +327,7 @@ class DeliverHeader(DeclarativeBase, SysMixin, CRUDMixin):
     payment_id = Column(Integer, ForeignKey('master_payment.id'), doc = u'付款方式')
     payment = relation(Payment)
 
-    remark = Column(Text, doc = u'')
+    remark = Column(Text, doc = u'备注')
     _status = Column('status', Integer, default = 0)
 
 
@@ -349,6 +358,8 @@ class DeliverHeader(DeclarativeBase, SysMixin, CRUDMixin):
                 'proxy_charge' : self.proxy_charge,
                 'amount' : self.amount,
                 'supplier_paid' : self.supplier_paid,
+                'payment_id' : self.payment_id,
+                'payment' : self.payment,
                 'remark' : self.remark,
                 'status' : self.status,
                 'create_time' : self.create_time,
@@ -374,6 +385,20 @@ class DeliverHeader(DeclarativeBase, SysMixin, CRUDMixin):
                                                 TransferLog.type == 1,
                                                 TransferLog.refer_id == self.id
                                                 )).order_by(TransferLog.id)
+
+
+    def insert_system_logs(self, comare_result):
+        try:
+            _remark = [u"[%s]'%s' 修改为 '%s'" % (name, ov, nv) for (name, ov, nv) in comare_result['update']]
+            DBSession.add(SystemLog(
+                                    type = self.__class__.__name__,
+                                    ref_id = self.id,
+                                    remark = u"%s 修改该记录。%s" % (session['user_profile']['name'], ";".join(_remark))
+                                    ))
+            DBSession.commit()
+        except:
+            DBSession.rollback()
+            _error(traceback.print_exc())
 
 #    @property
 #    def destination_full_address(self):

@@ -55,10 +55,9 @@ bpOrder = Blueprint('bpOrder', __name__)
 
 class OrderView(BasicView):
 
-#    decorators = [login_required, tab_highlight('TAB_MAIN'), ]
+    decorators = [login_required, tab_highlight('TAB_MAIN'), ]
 
     @templated('order/index.html')
-#    @login_required
     def index(self):
         if _g('SEARCH_SUBMIT'):  # come from search
             values = {'page' : 1}
@@ -186,9 +185,9 @@ class OrderView(BasicView):
             item_json = _g('item_json', '')
             for item in json.loads(item_json):
                 DBSession.add(ItemDetail(
-                                         header = order, item_id = item['item_id'], qty = item['qty'],
-                                         vol = item['vol'], weight = item['weight'],
-                                         remark = item['remark']
+                                         header = order, item_id = item['item_id'], qty = item['qty'] or None,
+                                         vol = item['vol'] or None, weight = item['weight'] or None,
+                                         remark = item['remark'] or None
                                          ))
 
             DBSession.commit()
@@ -226,7 +225,7 @@ class OrderView(BasicView):
         try:
             deliver_detail = DBSession.query(DeliverDetail).filter(and_(DeliverDetail.active == 0, DeliverDetail.order_header_id == header.id)).one()
             deliver_heaer = deliver_detail.header
-            for f in deliver_heaer.get_logs() : _info(f.remark)
+#            for f in deliver_heaer.get_logs() : _info(f.remark)
             logs.extend(deliver_heaer.get_logs())
         except:
             pass
@@ -333,19 +332,11 @@ class OrderView(BasicView):
 
             DBSession.query(ItemDetail).filter(ItemDetail.id.in_(item_ids)).update({'active' : 1}, False)
             DBSession.commit()
-            try:
-                new_info = header.serialize(fields)
-                change_result = self._compareObject(old_info, new_info)
-                _remark = [u"[%s]'%s' 修改为 '%s'" % (name, ov, nv) for (name, ov, nv) in change_result['update']]
-                DBSession.add(SystemLog(
-                                        type = header.__class__.__name__,
-                                        ref_id = header.id,
-                                        remark = u"%s 修改该记录。%s" % (session['user_profile']['name'], ";".join(_remark))
-                                        ))
-                DBSession.commit()
-            except:
-                _error(traceback.print_exc())
-                DBSession.rollback()
+
+            #handle the system log
+            new_info = header.serialize(fields)
+            change_result = header.compare(old_info, new_info)
+            header.insert_system_logs(change_result)
             flash(MSG_UPDATE_SUCC, MESSAGE_INFO)
         except:
             _error(traceback.print_exc())
@@ -934,6 +925,11 @@ class OrderView(BasicView):
         return result
 
 
+    @templated('order/form.html')
+    def form(self):
+        id = _g('id')
+        header = DBSession.query(OrderHeader).get(id)
+        return {'obj' : header}
 
 bpOrder.add_url_rule('/', view_func = OrderView.as_view('view'), defaults = {'action':'index'})
 bpOrder.add_url_rule('/<action>', view_func = OrderView.as_view('view'))
