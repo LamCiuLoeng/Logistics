@@ -218,24 +218,28 @@ class OrderView(BasicView):
             flash(MSG_NO_ID_SUPPLIED, MESSAGE_ERROR)
             return redirect(self.default())
 
-        header = DBSession.query(OrderHeader).get(id)
-
-        logs = []
-        logs.extend(header.get_logs())
         try:
-            deliver_detail = DBSession.query(DeliverDetail).filter(and_(DeliverDetail.active == 0, DeliverDetail.order_header_id == header.id)).one()
-            deliver_heaer = deliver_detail.header
-#            for f in deliver_heaer.get_logs() : _info(f.remark)
-            logs.extend(deliver_heaer.get_logs())
+            header = DBSession.query(OrderHeader).get(id)
+
+            logs = []
+            logs.extend(header.get_logs())
+            try:
+                deliver_detail = DBSession.query(DeliverDetail).filter(and_(DeliverDetail.active == 0, DeliverDetail.order_header_id == header.id)).one()
+                deliver_heaer = deliver_detail.header
+    #            for f in deliver_heaer.get_logs() : _info(f.remark)
+                logs.extend(deliver_heaer.get_logs())
+            except:
+                pass
+            logs = sorted(logs, cmp = lambda x, y: cmp(x.transfer_date, y.transfer_date))
+
+            return {
+                    'header' : header ,
+                    'transit_logs' : logs,
+                    }
         except:
-            pass
-        logs = sorted(logs, cmp = lambda x, y: cmp(x.transfer_date, y.transfer_date))
-
-        return {
-                'header' : header ,
-                'transit_logs' : logs,
-                }
-
+            _error(traceback.print_exc())
+            flash(MSG_SERVER_ERROR, MESSAGE_ERROR)
+            return  redirect(self.default())
 
 
     @templated('order/revise.html')

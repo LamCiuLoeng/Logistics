@@ -9,16 +9,11 @@
 import datetime
 from itertools import imap, ifilter
 from jinja2.filters import do_default
-from sys2do.constant import STATUS_LIST, SYSTEM_DATE_FORMAT, SYSTEM_DATETIME_FORMAT, \
-    APPROVAL_STATUS_LIST, ORDER_PAID_STATUS_LIST, DELIVER_PAID_STATUS_LIST, \
-    ORDER_RETURN_STATUS_LIST
-#from flask import current_app as app
-#from sys2do import app
+from sys2do.constant import STATUS_LIST, SYSTEM_DATE_FORMAT, SYSTEM_DATETIME_FORMAT
 
-__all__ = ['ft', 'fd', 'ifFalse', 'f', 'showStatus',
-#           'showApproval', 'showPaid', 'showSupplierPaid',
-#           'showReturnNote', 
-           'sum_with_none']
+
+
+__all__ = ['ft', 'fd', 'fn', 'ifFalse', 'f', 'showStatus', 'sum_with_none']
 
 
 def ft(t, f = SYSTEM_DATETIME_FORMAT):
@@ -33,6 +28,10 @@ def fd(d, f = SYSTEM_DATE_FORMAT):
         return d.strftime(f)
     except:
         return '' if not d else str(d)
+
+
+def fn(d, f = '%.2f'): return f % (d or 0)
+
 
 
 def ifFalse(v, default = u""):

@@ -27,8 +27,8 @@ class Payment(DeclarativeBase, SysMixin, CRUDMixin):
     __tablename__ = 'master_payment'
 
     id = Column(Integer, autoincrement = True, primary_key = True)
-    name = Column(Text)
-    remark = Column(Text)
+    name = Column(Text, doc = u'名称')
+    remark = Column(Text, doc = u'备注')
 
 
     def __str__(self): return self.name
@@ -45,8 +45,8 @@ class ShipmentType(DeclarativeBase, SysMixin, CRUDMixin):
     __tablename__ = 'master_shipment_type'
 
     id = Column(Integer, autoincrement = True, primary_key = True)
-    name = Column(Text)
-    remark = Column(Text)
+    name = Column(Text, doc = u'名称')
+    remark = Column(Text, doc = u'备注')
 
     def __str__(self): return self.name
     def __repr__(self): return self.name
@@ -61,8 +61,8 @@ class PickupType(DeclarativeBase, SysMixin, CRUDMixin):
     __tablename__ = 'master_pickup_type'
 
     id = Column(Integer, autoincrement = True, primary_key = True)
-    name = Column(Text)
-    remark = Column(Text)
+    name = Column(Text, doc = u'名称')
+    remark = Column(Text, doc = u'备注')
 
     def __str__(self): return self.name
     def __repr__(self): return self.name
@@ -79,8 +79,8 @@ class PackType(DeclarativeBase, SysMixin, CRUDMixin):
     __fields = ['name', 'remark']
 
     id = Column(Integer, autoincrement = True, primary_key = True)
-    name = Column(Text)
-    remark = Column(Text)
+    name = Column(Text, doc = u'名称')
+    remark = Column(Text, doc = u'备注')
 
     def __str__(self): return self.name
     def __repr__(self): return self.name
@@ -112,11 +112,11 @@ class Receiver(DeclarativeBase, SysMixin, CRUDMixin):
 
     id = Column(Integer, autoincrement = True, primary_key = True)
 
-    code = Column(Text)
-    name = Column(Text)
-    tel = Column(Text)
-    mobile = Column(Text)
-    remark = Column(Text)
+    code = Column(Text, doc = u'车牌号')
+    name = Column(Text, doc = u'收件人')
+    tel = Column(Text, doc = u'电话')
+    mobile = Column(Text, doc = u'手机')
+    remark = Column(Text, doc = u'备注')
 
     def __str__(self): return self.name
     def __repr__(self): return self.name
@@ -224,22 +224,22 @@ class Note(DeclarativeBase, SysMixin, CRUDMixin):
     __tablename__ = 'master_note'
 
     id = Column(Integer, autoincrement = True, primary_key = True)
-    code = Column(Text)
+    code = Column(Text, doc = u'票据编号')
     province_id = Column(Integer, ForeignKey('master_province.id'))
     province = relation(Province)
     city_id = Column(Integer, ForeignKey('master_city.id'))
     city = relation(City)
-    name = Column(Text)
+    name = Column(Text, doc = u'票据前缀')
     apply_person_id = Column(Integer, ForeignKey('system_user.id'), doc = u'领用人')
     apply_person = relation(User, primaryjoin = "and_(User.id == Note.apply_person_id, Note.active == 0)")
-    apply_time = Column(Text)
+    apply_time = Column(Text, doc = u'申请时间')
     operator_id = Column(Integer, ForeignKey('system_user.id'), doc = u'操作者')
     operator = relation(User, primaryjoin = "and_(User.id == Note.operator_id, Note.active == 0)")
-    begin_no = Column(Text)
-    end_no = Column(Text)
+    begin_no = Column(Text, doc = u'开始编号')
+    end_no = Column(Text, doc = u'结束编号')
     current_no = Column(Text)
     status = Column(Integer, default = 0) # 0 is still using, 1 is full used 
-    remark = Column(Text)
+    remark = Column(Text, doc = u'备注')
 
 #    _range = Column('range', Text)
 
@@ -250,7 +250,7 @@ class Note(DeclarativeBase, SysMixin, CRUDMixin):
     @classmethod
     def _get_fields(clz):
         return ['name', 'code', 'province_id', 'city_id', 'begin_no', 'end_no', 'current_no',
-                'apply_time', 'apply_person_id', 'operator_id', 'status', 'remark']
+                'apply_time', 'apply_person_id', 'operator_id', 'remark']
 
 #    def _get_range(self):
 #        if not self._range : return []
@@ -302,23 +302,23 @@ class Customer(DeclarativeBase, SysMixin, CRUDMixin):
 
     id = Column(Integer, autoincrement = True, primary_key = True)
     no = Column(Text)
-    name = Column(Text)
+    name = Column(Text, doc = u'客户名称')
     display_name = Column(Text)
     province_id = Column(Integer, ForeignKey('master_province.id'))
     province = relation(Province)
     city_id = Column(Integer, ForeignKey('master_city.id'))
     city = relation(City)
 
-    address = Column(Text)
-    contact_person = Column(Text)
-    mobile = Column(Text)
-    phone = Column(Text)
-    email = Column(Text)
+    address = Column(Text, doc = u'地址')
+    contact_person = Column(Text, doc = u'联系人')
+    mobile = Column(Text, doc = u'手机')
+    phone = Column(Text, doc = u'电话')
+    email = Column(Text, doc = u'电子邮箱')
 
     note_id = Column(Integer, ForeignKey('master_note.id'), doc = u'票据前缀')
     note = relation(Note)
 
-    remark = Column(Text)
+    remark = Column(Text, doc = u'备注')
 
 
     def __str__(self): return self.name
@@ -542,8 +542,8 @@ class Supplier(DeclarativeBase, SysMixin, CRUDMixin):
     __tablename__ = 'master_supplier'
 
     id = Column(Integer, autoincrement = True, primary_key = True)
-    no = Column(Text)
-    name = Column(Text)
+    no = Column(Text, doc = u'承运商编号')
+    name = Column(Text, doc = u'承运商名称')
     display_name = Column(Text)
 #    province_id = Column(Integer, ForeignKey('master_province.id'))
 #    provice = relation(Province)
@@ -551,13 +551,13 @@ class Supplier(DeclarativeBase, SysMixin, CRUDMixin):
 #    city = relation(City)
 #    district_id = Column(Integer, ForeignKey('master_district.id'))
 #    district = relation(District)
-    address = Column(Text)
-    phone = Column(Text)
-    mobile = Column(Text)
-    email = Column(Text)
-    contact_person = Column(Text)
-    remark = Column(Text)
-    payment_id = Column(Integer, ForeignKey('master_payment.id'))
+    address = Column(Text, doc = u'地址编号')
+    phone = Column(Text, doc = u'电话')
+    mobile = Column(Text, doc = u'手提电话')
+    email = Column(Text, doc = u'邮件')
+    contact_person = Column(Text, doc = u'联系人')
+    remark = Column(Text, doc = u'备注')
+    payment_id = Column(Integer, ForeignKey('master_payment.id'), doc = u'付款方式')
     payment = relation(Payment)
 
     def __str__(self): return self.name
@@ -595,8 +595,8 @@ class Item(DeclarativeBase, SysMixin, CRUDMixin):
     __tablename__ = 'master_item'
 
     id = Column(Integer, autoincrement = True, primary_key = True)
-    name = Column(Text)
-    remark = Column(Text)
+    name = Column(Text, doc = u'货物名称')
+    remark = Column(Text , doc = u'备注')
 
     def __str__(self): return self.name
     def __repr__(self): return self.name

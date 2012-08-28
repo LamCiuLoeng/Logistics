@@ -125,7 +125,7 @@
     	  <li style="width:227px;"><span>送货单号</span>
     	  	&nbsp;
     	  	{% if header.deliver_header_no %}
-	    	  	<a href="{{url_for('bpDeliver.view',action='view_by_no',no=header.deliver_header_no)}}">{{header.deliver_header_no|f}}</a>
+	    	  	<a href="{{url_for('bpDeliver.view',action='view',id=header.deliver_header_ref)}}">{{header.deliver_header_no|f}}</a>
     	  	{% endif %}
     	  </li>
     	  <li style="width:227px;"><span>{{_('Actual Time')}}</span>{{header.actual_time|fd}}</li>
@@ -147,13 +147,13 @@
     <td width="9%" align="center">{{_('Payment')}}</td>
     </tr>
   <tr>
-    <td height="30" align="center"><span style="width:180px;">{{header.qty|f(0)}}</span></td>
-    <td align="center"><span style="width:180px;">{{header.qty_ratio|f(0)}}</span></td>
-    <td align="center"><span style="width:180px;">{{header.weight|f(0)}}</span></td>
-    <td align="center"><span style="width:180px;">{{header.weight_ratio|f(0)}}</span></td>
-    <td align="center"><span style="width:180px;">{{header.vol|f(0)}}</span></td>
-    <td align="center"><span style="width:180px;">{{header.vol_ratio|f(0)}}</span></td>
-    <td align="center"><span style="width:180px;">{{header.amount|f(0)}}</span></td>
+    <td height="30" align="center"><span style="width:180px;">{{header.qty|fn}}</span></td>
+    <td align="center"><span style="width:180px;">{{header.qty_ratio|fn}}</span></td>
+    <td align="center"><span style="width:180px;">{{header.weight|fn}}</span></td>
+    <td align="center"><span style="width:180px;">{{header.weight_ratio|fn}}</span></td>
+    <td align="center"><span style="width:180px;">{{header.vol|fn}}</span></td>
+    <td align="center"><span style="width:180px;">{{header.vol_ratio|fn}}</span></td>
+    <td align="center"><span style="width:180px;color:red;font-weight:bold;">{{header.amount|fn}}</span></td>
     <td align="center"><span style="width:180px;">{{header.payment|f}}</span></td>
     </tr>
     <tr>
@@ -167,14 +167,14 @@
 	    <td width="9%" align="center">其它费用</td>
 	</tr>
 	<tr>
-		<td align="center" height="30"><span style="width:180px;">{{header.sendout_charge|f(0)}}</span></td>
-	    <td align="center"><span style="width:180px;">{{header.receive_charge|f(0)}}</span></td>
-	    <td align="center"><span style="width:180px;">{{header.package_charge|f(0)}}</span></td>
-	    <td align="center"><span style="width:180px;">{{header.insurance_charge|f(0)}}</span></td>
-	    <td align="center"><span style="width:180px;">{{header.load_charge|f(0)}}</span></td>
-	    <td align="center"><span style="width:180px;">{{header.unload_charge|f(0)}}</span></td>
-	    <td align="center"><span style="width:180px;">{{header.proxy_charge|f(0)}}</span></td>
-	    <td align="center"><span style="width:180px;">{{header.other_charge|f(0)}}</span></td>
+		<td align="center" height="30"><span style="width:180px;">{{header.sendout_charge|fn}}</span></td>
+	    <td align="center"><span style="width:180px;">{{header.receive_charge|fn}}</span></td>
+	    <td align="center"><span style="width:180px;">{{header.package_charge|fn}}</span></td>
+	    <td align="center"><span style="width:180px;">{{header.insurance_charge|fn}}</span></td>
+	    <td align="center"><span style="width:180px;">{{header.load_charge|fn}}</span></td>
+	    <td align="center"><span style="width:180px;">{{header.unload_charge|fn}}</span></td>
+	    <td align="center"><span style="width:180px;">{{header.proxy_charge|fn}}</span></td>
+	    <td align="center"><span style="width:180px;">{{header.other_charge|fn}}</span></td>
 	</tr>
 </table>
 	</div>
@@ -215,9 +215,9 @@
 				{% for l in header.item_details %}
 					<tr class="data_table_tr">
 						<th>{{l.item|f}}</td>
-						<td class="item_qty_td">{{l.qty|f(0)}}</td>
-						<td class="item_weight_td">{{l.weight|f(0)}}</td>
-						<td class="item_vol_td">{{l.vol|f(0)}}</td>
+						<td class="item_qty_td">{{l.qty|fn}}</td>
+						<td class="item_weight_td">{{l.weight|fn}}</td>
+						<td class="item_vol_td">{{l.vol|fn}}</td>
 						<td>{{l.remark|f}}</td>
 					</tr>
 				{% endfor %}

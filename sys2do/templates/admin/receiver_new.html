@@ -5,7 +5,28 @@
 <script language="JavaScript" type="text/javascript">
 //<![CDATA[
 	function tosave(){
-		$('form').submit();
+		var msg = Array();
+		
+		if(!$('#name').val()){
+			msg.push('请填写收件人！');
+		}
+		
+		if( !$('#tel').val() && !$('#mobile').val() ){
+			msg.push('请填写收件人的电话或者手机！');
+		}
+		
+		var mobile = $('#mobile').val();
+		if( mobile && !check_mobile(mobile)){
+			msg.push('请正确填写收件人手机！');
+		}
+		
+		if(msg.length>0){
+			alert(msg.join('\n'));
+		}else{
+			$('form').submit();
+		
+		}
+		
 	}
 //]]>
 </script>
@@ -27,20 +48,20 @@
 	<form action="{{url_for('.view', action = action,m='SAVE_NEW')}}" method="post">
 		<table>
 			<tr>
-				<td>{{_('Code')}}</td>
+				<td>车牌号</td>
 				<td><input type="text" name="code"/></td>
 			</tr>
 			<tr>
-				<td>{{_('Name')}}</td>
-				<td><input type="text" name="name"/></td>
+				<td>收件人</td>
+				<td><input type="text" name="name" id="name"/></td>
 			</tr>
 			<tr>
 				<td>{{_('Tel')}}</td>
-				<td><input type="text" name="tel"/></td>
+				<td><input type="text" name="tel" id="tel"/></td>
 			</tr>
 			<tr>
 				<td>{{_('Mobile')}}</td>
-				<td><input type="text" name="mobile"/></td>
+				<td><input type="text" name="mobile" id="mobile" class="numeric"/></td>
 			</tr>
 			<tr>
 				<td>{{_('Remark')}}</td>

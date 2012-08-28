@@ -4,7 +4,16 @@
 <script language="JavaScript" type="text/javascript">
 //<![CDATA[
 	function tosave(){
-		$('form').submit();
+		var msg = Array();
+		if(!$('#name').val()){
+			msg.push('请填写名称！');
+		}
+		
+		if(msg.length>0){
+			alert(msg.join('\n'));
+		}else{
+			$('form').submit();	
+		}
 	}
 	
 	function todelete() {
@@ -34,12 +43,27 @@
 </div>
 {% endblock %}
 {% block content %}
+<div class="order_add_div">
+	<div class="order_add_div_header">
+		{% if action == 'item' %}
+			货物详细信息	
+		{% elif action == 'note'%}
+			票据详细信息
+		{% elif action == 'packtype'%}
+			包装方式详细信息
+		{% elif action == 'pickuptype'%}
+			提货方式详细信息
+		{% elif action == 'payment'%}
+			付款方式详细信息
+		{% endif %}
+	</div>
+	<div class="order_add_div_body">
 	<form action="{{url_for('.view', action = action,m='SAVE_UPDATE')}}" method="post">
 		<input type="hidden" name="id" value="{{v['id']}}"/>
 		<table>
 			<tr>
-				<td>{{_('Name')}}</td>
-				<td><input type="text" name="name" value="{{v['name']|f}}"/></td>
+				<td>名称</td>
+				<td><input type="text" name="name" value="{{v['name']|f}}" id="name" class="must_input"/></td>
 			</tr>
 			<tr>
 				<td>{{_('Remark')}}</td>
@@ -47,5 +71,29 @@
 			</tr>
 		</table>
 	</form>
+	
+	<div style="clear:both"></div>
+  </div>
+  
+  <div class="order_add_div_header">历史记录</div>
+  <div class="order_add_div_body">
+  	<table>
+		<thead>
+			<tr class="field_head">
+				<th align="center">{{_('Time')}}</th>
+				<th align="center" style="width:800px">{{_('Remark')}}</th>
+			</tr>
+		<thead>
+		<tbody id="transit_list">
+			{% for t in obj.system_logs %}
+				<tr class="data_table_tr">
+					<td>{{t.create_time|ft}}</td>
+					<td style="text-align:left">{{t.remark|f}}</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+	<br /><br />
+  </div>
 	
 {% endblock %}

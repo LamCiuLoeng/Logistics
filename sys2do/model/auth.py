@@ -16,6 +16,8 @@ from sys2do.constant import SYSTEM_DATETIME_FORMAT, SYSTEM_DATE_FORMAT
 from sqlalchemy.ext.declarative import declared_attr
 
 
+
+
 try:
     from hashlib import sha1
 except ImportError:
@@ -89,7 +91,19 @@ class SysMixin(object):
 
 
     def insert_system_logs(self, comare_result):
-        pass
+        from sys2do.model.system import SystemLog
+        from sys2do.util.common import _error
+        try:
+            _remark = [u"[%s]'%s' 修改为 '%s'" % (name, ov, nv) for (name, ov, nv) in comare_result['update']]
+            DBSession.add(SystemLog(
+                                    type = self.__class__.__name__,
+                                    ref_id = self.id,
+                                    remark = u"%s 修改该记录。%s" % (session['user_profile']['name'], ";".join(_remark))
+                                    ))
+            DBSession.commit()
+        except:
+            DBSession.rollback()
+            _error(traceback.print_exc())
 
 
     @property
@@ -194,6 +208,10 @@ class CRUDMixin(object):
         for f in self._get_fields():
             setattr(self, f, v.get(f, None) or None)
         return self
+
+
+
+
 
 #{ Association tables
 

@@ -18,8 +18,8 @@ __all__ = ['getDeliverNo', ]
 
 
 
-def getDeliverNo():
-    return 'DL%s%s' % (dt.now().strftime('%Y%m%d%H%M%S'), random.randint(0, 999))
+def getDeliverNo(id):
+    return 'DL%s%06d' % (dt.now().strftime('%y%m%d'), (id % 1000000))
 
 
 

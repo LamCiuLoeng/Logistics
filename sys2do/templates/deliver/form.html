@@ -1,0 +1,228 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>无标题文档</title>
+<style type="text/css">
+body,td,th {
+	font-family:"微软雅黑";
+	font-size: 14px;
+}
+body {
+	margin-left: 0px;
+	margin-top: 0px;
+	margin-right: 0px;
+	margin-bottom: 0px;
+}
+</style>
+</head>
+
+<body>
+<table width="1000" border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td align="left"><h1>深圳市深福合力物流有限公司</h1></td>
+    <td align="right"><h3>No:&nbsp;{{obj.no}}</h3></td>
+  </tr>
+</table>
+<table width="1000" border="1" cellspacing="0" cellpadding="0" style="border:#333 solid 1px;">
+  <tr>
+    <td width="50%" align="left" valign="top"><table width="100%" border="0" cellspacing="0" cellpadding="0">
+      <tr>
+        <td width="20%">始发站：</td>
+        <td width="30%">深圳市</td>
+        <td width="20%">目的站：</td>
+        <td width="30%">{{obj.destination_city if obj.destination_city_id else obj.destination_province}}</td>
+      </tr>
+    </table></td>
+    <td width="50%" align="left" valign="top"><table width="100%" border="0" cellspacing="0" cellpadding="0">
+      <tr>
+        <td width="50%">托运日期：{{obj.create_time|fd('%Y 年 %m 月 %d 日')}}</td>
+        <td width="50%">运输类型</td>
+      </tr>
+    </table></td>
+  </tr>
+  <tr>
+    <td colspan="2"><table width="100%" border="0" cellspacing="0" cellpadding="0">
+      <tr>
+        <td width="20%">提货方式：</td>
+        <td width="40%">
+			{% for p in MASTER_ALL('PickupType') %}
+	    		{% if p.id == obj.pickup_type_id %}
+	    			&radic;
+	    		{% endif %}
+	    		{{p}}&nbsp;&nbsp;&nbsp;
+	    	{% endfor %}
+		</td>
+      </tr>
+    </table></td>
+  </tr>
+  <tr>
+    <td><table width="100%" border="0" cellspacing="0" cellpadding="0">
+      <tr>
+        <td width="20%">发货人姓名：</td>
+        <td>&nbsp;深福合力</td>
+      </tr>
+    </table></td>
+    <td><table width="100%" border="0" cellspacing="0" cellpadding="0">
+      <tr>
+        <td width="20%">收货人姓名：</td>
+        <td>{{obj.destination_contact|f}}</td>
+      </tr>
+    </table></td>
+  </tr>
+  <tr>
+    <td><table width="100%" border="0" cellspacing="0" cellpadding="0">
+      <tr>
+        <td width="20%">发货人地址：</td>
+        <td>&nbsp;</td>
+      </tr>
+    </table></td>
+    <td><table width="100%" border="0" cellspacing="0" cellpadding="0">
+      <tr>
+        <td width="20%">收货人地址：</td>
+        <td>{{obj.destination_address|f}}</td>
+      </tr>
+    </table></td>
+  </tr>
+  <tr>
+    <td><table width="100%" border="0" cellspacing="0" cellpadding="0">
+      <tr>
+        <td width="50%">电话：400-888-0900</td>
+        <td width="50%">手机：</td>
+      </tr>
+    </table></td>
+    <td><table width="100%" border="0" cellspacing="0" cellpadding="0">
+      <tr>
+        <td width="50%">电话：{{obj.destination_tel|f}}</td>
+        <td width="50%">手机：{{obj.destination_mobile|f}}</td>
+      </tr>
+    </table></td>
+  </tr>
+  <tr>
+    <td valign="top"><table width="100%" border="1" cellspacing="0" cellpadding="0">
+      <tr>
+        <td width="18" align="center">货物名称</td>
+        <td width="17%" align="center">包装方式</td>
+        <td width="17%" align="center">货物数量(件)</td>
+        <td width="24%" align="center">实际体积(米<sup>3</sup>)</td>
+        <td width="24%" align="center">实际重量(吨)</td>
+      </tr>
+      {% for d in obj.details %}
+      	{% for dd in d.order_header.item_details %}
+      		<tr>
+		        <td align="center">&nbsp;{{dd.item}}</td>
+		        <td align="center">&nbsp;{{d.order_header.pack_type|f}}</td>
+		        <td align="center">&nbsp;{{dd.qty|fn}}</td>
+		        <td align="center">&nbsp;{{dd.vol|fn}}</td>
+		        <td align="center">&nbsp;{{dd.weight|fn}}</td>
+		      </tr>
+      	{% endfor %}
+      {% endfor %}
+    </table>
+		<br />
+      <table width="100%" border="1" cellspacing="0" cellpadding="0">
+        <tr>
+          <td width="25%" align="center">运费</td>
+          <td width="25%" align="center">送货费</td>
+          <td width="25%" align="center">提货费</td>
+          <td width="25%" align="center">增值服务费</td>
+        </tr>
+        <tr>
+          <td align="center">{{obj.sendout_charge|fn}}</td>
+          <td align="center">{{obj.receive_charge|fn}}</td>
+          <td align="center">{{obj.package_charge|fn}}</td>
+          <td align="center">{{obj.insurance_charge|fn}}</td>
+        </tr>
+      </table>
+      
+      <table width="100%" border="1" cellspacing="0" cellpadding="0">
+        <tr>
+          <td width="25%" align="center">运费</td>
+          <td width="25%" align="center">送货费</td>
+          <td width="25%" align="center">提货费</td>
+          <td width="25%" align="center">增值服务费</td>
+        </tr>
+        <tr>
+          <td align="center">{{obj.load_charge|fn}}</td>
+          <td align="center">{{obj.unload_charge|fn}}</td>
+          <td align="center">{{obj.proxy_charge|fn}}</td>
+          <td align="center">{{obj.other_charge|fn}}</td>
+        </tr>
+      </table>
+      <table width="100%" border="0" cellspacing="0" cellpadding="0">
+        <tr>
+          <td width="50%" style="border-bottom:2px #000 solid;">运费及保险费合计： {{obj.amount|fn}} 元</td>
+        </tr>
+    </table></td>
+    <td><table width="100%" border="0" cellspacing="0" cellpadding="0">
+      <tr>
+        <td height="140" style="border-bottom:#000 solid 2px"><table width="100%" border="0" cellspacing="0" cellpadding="0">
+          <tr>
+            <td height="30">发货人签字（签章）：</td>
+          </tr>
+          <tr>
+            <td height="80">&nbsp;</td>
+          </tr>
+          <tr>
+            <td height="30" align="right">{{obj.create_time|fd('%Y 年 %m 月 %d 日')}}&nbsp;</td>
+          </tr>
+        </table></td>
+      </tr>
+      <tr>
+        <td height="170"><table width="100%" border="0" cellspacing="0" cellpadding="0">
+          <tr>
+            <td height="30">收货人签字（签章）：</td>
+          </tr>
+          <tr>
+            <td height="80">&nbsp;</td>
+          </tr>
+          <tr>
+            <td height="30" align="right">{{obj.create_time|fd('%Y 年 %m 月 %d 日')}}&nbsp;</td>
+          </tr>
+          <tr>
+            <td height="30" align="left" style="border-top:#000 solid 2px;"><table width="100%" border="0" cellspacing="0" cellpadding="0">
+              <tr>
+                <td width="39%">身份证：</td>
+                <td width="28%">车号：</td>
+                <td width="33%">收货日期</td>
+              </tr>
+            </table></td>
+          </tr>
+        </table></td>
+      </tr>
+    </table></td>
+  </tr>
+  <tr>
+    <td>付款方式 
+		{% for p in MASTER_ALL('Payment') %}
+    		{% if p.id == obj.payment_id %}
+    			&radic;
+    		{% endif %}
+    		{{p}}&nbsp;&nbsp;&nbsp;
+    	{% endfor %}  
+	</td>
+    <td>回单要求：签回单</td>
+  </tr>
+  <tr>
+    <td colspan="2">&nbsp;</td>
+  </tr>
+  <tr>
+    <td colspan="2"><table width="100%" border="0" cellspacing="0" cellpadding="0">
+      <tr>
+        <td width="33%">发货人名字：{{obj.create_by}}</td>
+        <td width="33%">制单时间：{{SYSTEM_NOW()|ft('%Y 年 %m 月 %d 日 %H 时 %M 分')}}</td>
+        <td width="33%"><table width="100%" border="0" cellspacing="0" cellpadding="0">
+          <tr>
+            <td>营业部电话：400-888-0900</td>
+          </tr>
+        </table></td>
+      </tr>
+    </table></td>
+  </tr>
+</table>
+</body>
+</html>

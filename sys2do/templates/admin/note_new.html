@@ -71,6 +71,9 @@
 {% endblock %}
 
 {% block content %}
+<div class="order_add_div">
+	<div class="order_add_div_header">票据详情</div>
+	<div class="order_add_div_body">
 	<form action="{{url_for('.view', action = action,m='SAVE_NEW')}}" method="post">
 		<table>
 			<tr>
@@ -118,5 +121,7 @@
 			</tr>
 		</table>
 	</form>
-	
+
+
+</div>	
 {% endblock %}

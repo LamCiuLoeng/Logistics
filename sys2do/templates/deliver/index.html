@@ -93,7 +93,7 @@
 			</tr>
 			{% for r in records.items %}
 			<tr class="data_table_tr {{ loop.cycle('data_table_tr_odd', 'data_table_tr_even') }}">
-				<td><a href="{{url_for('.view', action = 'view',id=r.id)}}">{{r.no}}</a></td>
+				<td><a href="{{url_for('.view', action = 'view',id=r.id)}}">{{r.ref_no}}</a></td>
 				<td>{{r.destination_provice|f}}{{r.destination_city|f}}</td>
 				<td>{{r.supplier}}</td>
 				<td>{{r.supplier_contact}}</td>

@@ -28,10 +28,23 @@
 	function tosave(){
 		var msg = new Array();
 		
+		if(!$("#destination_contact").val()){
+			msg.push('请填写收货人！');
+		}
+		
+		if(!$("#destination_tel").val() && !$("#destination_mobile").val() ){
+			msg.push('请填写收货人电话或者手机！');
+		}
+		
+		var mobile = $("#destination_mobile").val();
+		if( mobile && !check_mobile(mobile) ){
+			msg.push('请正确填写手机号码，必须为11位数字！');
+		}
+		
 		if(!$("#supplier_id").val()){
 			msg.push('请选择承运商！');
 		}
-		if(!$("#no").val()){
+		if(!$("#ref_no").val()){
 			msg.push('请填写送货单号码！');
 		}
 		if(!$("#destination_province_id").val()){
@@ -48,6 +61,14 @@
 		}
 		if(!$("#amount").val()){
 			msg.push('请填写费用！');
+		}
+		
+		if(!$("#payment_id").val()){
+			msg.push('请选择付款方式！');
+		}
+		
+		if(!$("#pickup_type_id").val()){
+			msg.push('请选择提货方式！');
 		}
 		
 		if(msg.length>0){
@@ -97,7 +118,21 @@
 				    <td colspan="10">
 				    {{mymacros.select(id='destination_province_id',list=MASTER_ALL('Province'),value=header.destination_province_id,class="field order_add_div_body_input must_input",style="width:150px")}}
 					{{mymacros.select(id='destination_city_id',list=RELATED_CITY(header.destination_city_id),value=header.destination_city_id,class="field order_add_div_body_input",style="width:150px")}}		  
+				    <input type="text" name="destination_address" id="destination_address" class="field order_add_div_body_input" style="width:250px" value="{{header.destination_address|f}}"/>
 				  </td>
+				</tr>
+				<tr>
+					<td width="100" height="30" align="right">收货人</td>
+					<td width="12">&nbsp;</td>
+					<td><input type="text" name="destination_contact" id="destination_contact" class="field order_add_div_body_input must_input" style="width: 200px" value="{{header.destination_contact|f}}"/></td>
+					<td width="12">&nbsp;</td>
+				    <td width="100" height="30" align="right">收货人电话</td>
+					<td width="12">&nbsp;</td>
+					<td><input type="text" name="destination_tel" id="destination_tel" class="field order_add_div_body_input" style="width:200px" value="{{header.destination_tel|f}}"/></td>
+					<td width="12">&nbsp;</td>
+					<td height="30" align="right">收货人手机</td>
+					<td width="12">&nbsp;</td>
+					<td colspan="10"><input type="text" name="destination_mobile" id="destination_mobile" class="field order_add_div_body_input numeric" style="width: 200px" value="{{header.destination_mobile|f}}"/></td>
 				</tr>
 				<tr>
 					<td width="100" height="30" align="right">{{_('3rd Party Supplier')}}</td>
@@ -117,7 +152,7 @@
 				    <td width="12">&nbsp;</td>
 					<td height="30" align="right">{{_('Deliver Number')}}</td>
 					<td width="12">&nbsp;</td>
-				    <td colspan="10"><input type="text" name="no" id="no" class="field order_add_div_body_input must_input" style="width: 200px" value="{{header.no|f}}"/></td>
+				    <td colspan="10"><input type="text" name="ref_no" id="ref_no" class="field order_add_div_body_input must_input" style="width: 200px" value="{{header.ref_no|f}}"/></td>
 				</tr>
 				<tr>
 					<td height="30" align="right">{{_('Supplier Contact')}}</td>
@@ -136,47 +171,53 @@
 				<tr>
 					<td height="30" align="right">保险费用</td>
 					<td width="12">&nbsp;</td>
-				    <td><input type="text" name="insurance_charge" id="insurance_charge" class="numeric order_add_div_body_input compute number_input_right" style="width: 200px" value="{{header.insurance_charge|f(0)}}"/></td>
+				    <td><input type="text" name="insurance_charge" id="insurance_charge" class="numeric order_add_div_body_input compute number_input_right" style="width: 200px" value="{{header.insurance_charge|fn}}"/></td>
 				    <td width="12">&nbsp;</td>
 					<td height="30" align="right">送货费用</td>
 					<td width="12">&nbsp;</td>
-				    <td><input type="text" name="sendout_charge" id="sendout_charge" class="numeric order_add_div_body_input compute number_input_right" style="width: 200px" value="{{header.sendout_charge|f(0)}}"/></td>
+				    <td><input type="text" name="sendout_charge" id="sendout_charge" class="numeric order_add_div_body_input compute number_input_right" style="width: 200px" value="{{header.sendout_charge|fn}}"/></td>
 				    <td width="12">&nbsp;</td>
 					<td height="30" align="right">上门接货费用</td>
 					<td width="12">&nbsp;</td>
-				    <td><input type="text" name="receive_charge" id="receive_charge" class="numeric order_add_div_body_input compute number_input_right" style="width: 200px" value="{{header.receive_charge|f(0)}}"/></td>
+				    <td><input type="text" name="receive_charge" id="receive_charge" class="numeric order_add_div_body_input compute number_input_right" style="width: 200px" value="{{header.receive_charge|fn}}"/></td>
 				    <td width="12">&nbsp;</td>
 					<td height="30" align="right">包装费用</td>
 					<td width="12">&nbsp;</td>
-				    <td><input type="text" name="package_charge" id="package_charge" class="numeric order_add_div_body_input compute number_input_right" style="width: 200px" value="{{header.package_charge|f(0)}}"/></td>
+				    <td><input type="text" name="package_charge" id="package_charge" class="numeric order_add_div_body_input compute number_input_right" style="width: 200px" value="{{header.package_charge|fn}}"/></td>
 				</tr>
 				<tr>
 				    <td height="30" align="right">装货费用</td>
 					<td width="12">&nbsp;</td>
-                    <td><input type="text" name="load_charge" id="load_charge" class="numeric order_add_div_body_input compute number_input_right" style="width: 200px" value="{{header.load_charge|f(0)}}"/></td>
+                    <td><input type="text" name="load_charge" id="load_charge" class="numeric order_add_div_body_input compute number_input_right" style="width: 200px" value="{{header.load_charge|fn}}"/></td>
                     <td width="12">&nbsp;</td>
                     <td height="30" align="right">卸货费用</td>
 					<td width="12">&nbsp;</td>
-                    <td><input type="text" name="unload_charge" id="unload_charge" class="numeric order_add_div_body_input compute number_input_right" style="width: 200px" value="{{header.unload_charge|f(0)}}"/></td>
+                    <td><input type="text" name="unload_charge" id="unload_charge" class="numeric order_add_div_body_input compute number_input_right" style="width: 200px" value="{{header.unload_charge|fn}}"/></td>
 					<td width="12">&nbsp;</td>
 					<td height="30" align="right">其它费用</td>
 					<td width="12">&nbsp;</td>
-				    <td><input type="text" name="other_charge" id="other_charge" class="numeric order_add_div_body_input compute number_input_right" style="width: 200px" value="{{header.other_charge|f(0)}}"/></td>
+				    <td><input type="text" name="other_charge" id="other_charge" class="numeric order_add_div_body_input compute number_input_right" style="width: 200px" value="{{header.other_charge|fn}}"/></td>
 				    <td width="12">&nbsp;</td>
 				    <td height="30" align="right">代理费用</td>
 					<td width="12">&nbsp;</td>
-				    <td><input type="text" name="proxy_charge" id="proxy_charge" class="numeric order_add_div_body_input number_input_right" style="width: 200px" value="{{header.amount|f(0)}}"/></td>
+				    <td><input type="text" name="proxy_charge" id="proxy_charge" class="numeric order_add_div_body_input number_input_right" style="width: 200px" value="{{header.amount|fn}}"/></td>
 				</tr>
 				<tr>
 					<td height="30" align="right">总费用</td>
 					<td width="12">&nbsp;</td>
-				    <td><input type="text" name="amount" id="amount" class="numeric order_add_div_body_input must_input number_input_right" style="width: 200px" value="{{header.amount|f(0)}}"/></td>
+				    <td><input type="text" name="amount" id="amount" class="numeric order_add_div_body_input must_input number_input_right" style="width: 200px" value="{{header.amount|fn}}"/></td>
 				</tr>
 				<tr>
 					<td height="30" align="right">付款方式</td>
 					<td width="12">&nbsp;</td>
 				    <td>
-				    	{{mymacros.select(id='payment_id',list=MASTER_ALL('Payment'),value=header.payment_id,class="order_add_div_body_input",style="width:200px")}}
+				    	{{mymacros.select(id='payment_id',list=MASTER_ALL('Payment'),value=header.payment_id,class="order_add_div_body_input must_input",style="width:200px")}}
+				    </td>
+				    <td width="12">&nbsp;</td>
+				    <td height="30" align="right">提货方式</td>
+					<td width="12">&nbsp;</td>
+					<td>
+				    	{{mymacros.select(id='pickup_type_id',list=MASTER_ALL('PickupType'),value=header.pickup_type_id,class="order_add_div_body_input must_input",style="width:200px")}}
 				    </td>
 				</tr>
 				<tr>
@@ -232,15 +273,15 @@
 								<td>单笔总费用(元)</td>
 							</tr>
 							<tr class="sub_charge_tr">
-								<td style="width:100px"><input type="text" name="insurance_charge_{{d.id}}"  class="numeric number_field" value="{{d.insurance_charge|f(0)}}"/></td>
-								<td style="width:100px"><input type="text" name="sendout_charge_{{d.id}}"  class="numeric number_field" value="{{d.sendout_charge|f(0)}}"/></td>
-								<td style="width:100px"><input type="text" name="receive_charge_{{d.id}}"  class="numeric number_field" value="{{d.receive_charge|f(0)}}"/></td>
-								<td style="width:100px"><input type="text" name="package_charge_{{d.id}}"  class="numeric number_field" value="{{d.package_charge|f(0)}}"/></td>
-								<td style="width:100px"><input type="text" name="load_charge_{{d.id}}"  class="numeric number_field" value="{{d.load_charge|f(0)}}"/></td>
-								<td style="width:100px"><input type="text" name="unload_charge_{{d.id}}"   class="numeric number_field" value="{{d.unload_charge|f(0)}}"/></td>
-								<td style="width:100px"><input type="text" name="other_charge_{{d.id}}"  class="numeric number_field" value="{{d.other_charge|f(0)}}"/></td>
-								<td style="width:100px"><input type="text" name="proxy_charge_{{d.id}}"  class="numeric number_field" value="{{d.proxy_charge|f(0)}}"/></td>
-								<td style="width:100px"><input type="text" name="amount_{{d.id}}"  class="numeric number_input_right must_input" style="width:80px" value="{{d.amount|f(0)}}"/></td>
+								<td style="width:100px"><input type="text" name="insurance_charge_{{d.id}}"  class="numeric number_field" value="{{d.insurance_charge|fn}}"/></td>
+								<td style="width:100px"><input type="text" name="sendout_charge_{{d.id}}"  class="numeric number_field" value="{{d.sendout_charge|fn}}"/></td>
+								<td style="width:100px"><input type="text" name="receive_charge_{{d.id}}"  class="numeric number_field" value="{{d.receive_charge|fn}}"/></td>
+								<td style="width:100px"><input type="text" name="package_charge_{{d.id}}"  class="numeric number_field" value="{{d.package_charge|fn}}"/></td>
+								<td style="width:100px"><input type="text" name="load_charge_{{d.id}}"  class="numeric number_field" value="{{d.load_charge|fn}}"/></td>
+								<td style="width:100px"><input type="text" name="unload_charge_{{d.id}}"   class="numeric number_field" value="{{d.unload_charge|fn}}"/></td>
+								<td style="width:100px"><input type="text" name="other_charge_{{d.id}}"  class="numeric number_field" value="{{d.other_charge|fn}}"/></td>
+								<td style="width:100px"><input type="text" name="proxy_charge_{{d.id}}"  class="numeric number_field" value="{{d.proxy_charge|fn}}"/></td>
+								<td style="width:100px"><input type="text" name="amount_{{d.id}}"  class="numeric number_input_right must_input" style="width:80px" value="{{d.amount|fn}}"/></td>
 							</tr>
 						</table>
 					</td>

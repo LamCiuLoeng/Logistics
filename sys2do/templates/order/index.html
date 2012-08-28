@@ -216,7 +216,7 @@
 
 <form method="post" action="" id="records">
 
-<table border="0" cellpadding="0" cellspacing="0" style="width:1500px">
+<table border="0" cellpadding="0" cellspacing="0" style="width:1550px">
   <tr class="data_table_tr">
 	    <td colspan="100" style="text-align:right">{{mymacros.mypaginate(records)}}</td>
 	</tr>
@@ -231,7 +231,7 @@
     <td align="center" style="width:80px;">{{mymacros.show_direction(values,'qty')}}{{_('Qty')}}</td>
     <td align="center" style="width:80px;">{{_('Weight')}}(吨)</td>
     <td align="center" style="width:80px;">{{mymacros.show_direction(values,'amount')}}{{_('Amount')}}(元)</td>
-    <td align="center" style="width:150px;">送货单</td>
+    <td align="center" style="width:200px;">送货单</td>
     <td align="center" style="width:200px;">{{mymacros.show_direction(values,'create_time')}}{{_('Create Time')}}</td>
     <td align="center" style="width:120px;">{{mymacros.show_direction(values,'create_by_id')}}{{_('Creator')}}</td>
     <td align="center" style="width:150px;">{{_('Status')}}</td>
@@ -251,8 +251,8 @@
 		<td>{{r.destination_province|f}}{{r.destination_city|f}}</td>
 		<td>{{r.destination_company|f}}</td>
 		<td>{{r.qty|f}}</td>
-		<td>{{r.weight|f}}</td>
-		<td>{{r.amount|ft}}</td>
+		<td>{{r.weight|fn}}</td>
+		<td>{{r.amount|fn}}</td>
 		<td>
 			&nbsp;
 			{% if r.deliver_header_ref %}
@@ -272,8 +272,8 @@
 	      	<th></th>
 	      	<td colspan="6" style="text-align:left">&nbsp;合计</td>
 	      	<td>{{records.items|sum_with_none(attribute='qty')}}</td>
-	      	<td>{{records.items|sum_with_none(attribute='weight')}}</td>
-	      	<td>{{records.items|sum(attribute='amount')}}</td>
+	      	<td>{{records.items|sum_with_none(attribute='weight')|fn}}</td>
+	      	<td>{{records.items|sum(attribute='amount')|fn}}</td>
 	      	<td colspan="100">&nbsp;</td>
 	      </tr>
   <tfoot>

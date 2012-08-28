@@ -4,8 +4,35 @@
 {% block extJS %}
 <script language="JavaScript" type="text/javascript">
 //<![CDATA[
-	function todave(){
-		$("form").submit();
+	function tosave(){
+		var msg = Array();
+		if(!$("#name").val()){
+			msg.push('请填写承运商名称！');
+		}
+		
+		if(!$("#contact_person").val()){
+			msg.push('请填写承运商联系人！');
+		}
+		
+		if(!$("#mobile").val() && !$("#phone").val()){
+			msg.push('请填写联系人的电话或者手机！');
+		}
+		
+		var mobile = $("#mobile").val();
+		if( mobile && !check_mobile(mobile)){
+			msg.push('请正确填写联系人手机！');
+		}
+		
+		if(!$("#payment_id").val()){
+			msg.push('请选择付款方式！');
+		}
+		
+		if(msg.length > 0){
+			alert(msg.join('\n'));
+			return;		
+		}else{
+			$("form").submit();
+		}
 	}
 //]]>
 </script>
@@ -16,7 +43,7 @@
 	<ul>
     	<li><a href="{{url_for('.view', action = 'supplier')}}"><img width="71" height="21" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image1','','/static/images/system/order_manage_h_25.jpg',1)" id="Image1" src="/static/images/system/order_manage_25.jpg"/></a></li>
         {% if 'CREATE_SUPPLIER' is get_permission%}
-        <li><img width="77" height="21" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image3','','images/order_manage_h_33.jpg',1)" id="Image3" src="/static/images/system/order_manage_33.jpg" onclick="return todave()"/></li>
+        <li><img width="77" height="21" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image3','','images/order_manage_h_33.jpg',1)" id="Image3" src="/static/images/system/order_manage_33.jpg" onclick="return tosave()"/></li>
         {% endif %}
     </ul>
 </div>
@@ -35,8 +62,8 @@
   <div class="order_add_div_header">新建承运商</div>
     <div class="order_add_div_body">
   <ul>
-        	<li style="width:450px;"><span><sup class="warn">*</sup>{{_('Supplier Name')}}</span>
-        	  <input type="text" class="must_input" style="width:300px" name="name"/>
+        	<li style="width:450px;"><span><sup class="warn">*</sup>详细名称</span>
+        	  <input type="text" class="must_input" style="width:300px" name="name" id="name"/>
         	</li>
        	  <li style="width:180px;"><span>承运商编号</span>
     	    <input type="text" style="width:100px" name="no" />
@@ -45,26 +72,22 @@
     	    <input type="text" style="width:760px" name="address"/>
     	  </li>
     	  <li style="width:459px;"><span>{{_('Contact Person')}}</span>
-    	    <input type="text" style="width:360px" name="contact_person"/>
+    	    <input type="text" style="width:360px" name="contact_person" id="contact_person" class="must_input"/>
     	  </li>
     	  <li style="width:459px;"><span>{{_('Mobile')}}</span>
-    	    <input type="text" style="width:360px" name="mobile"/>
+    	    <input type="text" style="width:360px" name="mobile" id="mobile" class="numeric"/>
     	  </li>
     	  <li style="width:227px;"><span>{{_('Phone')}}</span>
-    	    <input type="text" style="width:140px" name="phone"/>
+    	    <input type="text" style="width:140px" name="phone" id="phone"/>
   	    </li>
     	  <li style="width:260px;"><span>公司邮箱</span>
     	    <input type="text" style="width:170px" name="email"/>
   	    </li>
     	  <li style="width:220px;">付款方式
-    	    <select name="payment_id">
-    	  		{% for p in payment %}
-    	  			<option value="{{p.id}}">{{p}}</option>
-    	  		{% endfor %}
-    	  	</select>
+    	    {{mymacros.select(id='payment_id',list=MASTER_ALL('Payment'),value=None,class="must_input",style="")}}
   	    </li>
     	  <li style="width:925px;"><span>{{_('Remark')}}</span>
-    	    <textarea class="order_add_div_body_input" style="width:840px; height:300px" name="remark"></textarea>
+    	    <textarea class="order_add_div_body_input" style="width:840px; height:100px" name="remark"></textarea>
         </li>
       </ul>
   <div style="clear:both"></div>

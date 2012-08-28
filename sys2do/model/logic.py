@@ -288,30 +288,26 @@ class DeliverHeader(DeclarativeBase, SysMixin, CRUDMixin):
     __tablename__ = 'deliver_header'
 
     id = Column(Integer, autoincrement = True, primary_key = True)
-    no = Column(Text, doc = u'送货单号码')
-
+    no = Column(Text, doc = u'系统编号')
+    ref_no = Column(Text, doc = u'送货单号码')
     destination_province_id = Column(Integer, ForeignKey('master_province.id'), doc = u'目的地')
     destination_provice = relation(Province)
     destination_city_id = Column(Integer, ForeignKey('master_city.id'), doc = u'目的地')
     destination_city = relation(City)
+    destination_address = Column(Text, doc = u'收货地址')
+    destination_contact = Column(Text, doc = u'收货人')
+    destination_tel = Column(Text, doc = u'收货人电话')
+    destination_mobile = Column(Text, doc = u'收货人手机')
 
-#    destination_address = Column(Text)
     supplier_id = Column(Integer, ForeignKey('master_supplier.id'), doc = u'第三方承运商')
     supplier = relation(Supplier)
 
     supplier_contact = Column(Text, doc = u'承运商联系人')
     supplier_tel = Column(Text, doc = u'承运商电话')
 
-#    need_transfer = Column(Text, doc = u'')
-
-#    send_out_remark = Column(Text)
-#    arrived_remark = Column(Text)
-
     sendout_time = Column(Text, doc = u'发货时间')
     expect_time = Column(Text, doc = u'到达预期')
     actual_time = Column(Text, doc = u'实际到达')
-
-
 
     insurance_charge = Column(Float, default = 0, doc = u'保险费用')
     sendout_charge = Column(Float, default = 0, doc = u'送货费用')
@@ -326,6 +322,9 @@ class DeliverHeader(DeclarativeBase, SysMixin, CRUDMixin):
     supplier_paid = Column(Integer, default = 0, doc = u'') # 0 is not paid to supplier, 1 is paid to supplier
     payment_id = Column(Integer, ForeignKey('master_payment.id'), doc = u'付款方式')
     payment = relation(Payment)
+
+    pickup_type_id = Column(Integer, ForeignKey('master_pickup_type.id'), doc = u'提货方式')
+    pickup_type = relation(PickupType)
 
     remark = Column(Text, doc = u'备注')
     _status = Column('status', Integer, default = 0)

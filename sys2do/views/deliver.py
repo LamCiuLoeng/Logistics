@@ -35,6 +35,7 @@ from sys2do.util.common import _gl, _g, _gp, getOr404, getMasterAll, _debug, \
 from sys2do.model.master import Supplier, InventoryItem, Province
 from sys2do.setting import PAGINATE_PER_PAGE
 from sys2do.model.system import SystemLog
+from sys2do.util.logic_helper import getDeliverNo
 
 
 
@@ -154,10 +155,15 @@ class DeliverView(BasicView):
             h = order_headers[0]
             destination_province_id = h.destination_province_id
             destination_city_id = h.destination_city_id
-            cities = h.destination_province.children()
+            destination_address = h.destination_address
+            destination_contact = h.destination_contact
+            destination_tel = h.destination_tel
+            destination_mobile = h.destination_mobile
+            payment_id = h.payment_id
+            pickup_type_id = h.pickup_type_id
         else:
-            destination_province_id = destination_city_id = None
-            cities = []
+            destination_province_id = destination_city_id = destination_address = destination_contact = destination_tel = destination_mobile = None
+            payment_id = pickup_type_id = None
         for h in order_headers:
             if h.status >= SORTING[0]:
                 flash(MSG_ORDER_NOT_FIT_FOR_DELIVER, MESSAGE_ERROR)
@@ -171,32 +177,29 @@ class DeliverView(BasicView):
                 'suppliers' : suppliers,
                 'destination_province_id' : destination_province_id,
                 'destination_city_id' : destination_city_id,
-                'cities' : cities,
+                'destination_address' : destination_address,
+                'destination_contact' : destination_contact,
+                'destination_tel' : destination_tel,
+                'destination_mobile' : destination_mobile,
+                'payment_id' : payment_id,
+                'pickup_type_id' : pickup_type_id,
                 }
 
 
     def deliver_save_new(self):
         try:
-            header = DeliverHeader(no = _g('no'),
-                                   destination_province_id = _g('destination_province_id'),
-                                   destination_city_id = _g('destination_city_id'),
-                                   supplier_id = _g('supplier_id'),
-                                   supplier_contact = _g('supplier_contact'),
-                                   supplier_tel = _g('supplier_tel'),
-                                   expect_time = _g('expect_time'),
-                                   insurance_charge = _g('insurance_charge'),
-                                   sendout_charge = _g('sendout_charge'),
-                                   receive_charge = _g('receive_charge'),
-                                   package_charge = _g('package_charge'),
-                                   load_charge = _g('load_charge'),
-                                   unload_charge = _g('unload_charge'),
-                                   other_charge = _g('other_charge'),
-                                   proxy_charge = _g('proxy_charge'),
-                                   amount = _g('amount'),
-                                   payment_id = _g('payment_id'),
-                                   remark = _g('remark'),
-                                   )
+            params = {}
+            for f in ['ref_no', 'destination_province_id', 'destination_city_id', 'destination_address', 'destination_contact',
+                      'destination_tel', 'destination_mobile', 'supplier_id',
+                      'supplier_contact', 'supplier_tel', 'expect_time',
+                      'insurance_charge', 'sendout_charge', 'receive_charge', 'package_charge', 'load_charge', 'unload_charge',
+                      'other_charge', 'proxy_charge', 'amount', 'payment_id', 'pickup_type_id', 'remark',
+                      ]:
+                params[f] = _g(f)
+            header = DeliverHeader(**params)
+            DBSession.add(header)
             DBSession.flush()
+            header.no = getDeliverNo(header.id)
             line_no = 1
             for k, id in _gp('detail_'):
                 order_header = DBSession.query(OrderHeader).get(id)
@@ -217,7 +220,7 @@ class DeliverView(BasicView):
                 order_header.update_status(SORTING[0])
                 order_header.cost = _g('amount_%s' % id),
                 order_header.deliver_header_ref = header.id
-                order_header.deliver_header_no = header.no
+                order_header.deliver_header_no = header.ref_no
                 line_no += 1
 
 
@@ -241,7 +244,7 @@ class DeliverView(BasicView):
     def view(self):
         id = _g('id')
         h = DBSession.query(DeliverHeader).get(id)
-        return {'header' : h, 'values' : h.populate() , 'details' : h.details}
+        return {'header' : h, }
 
 
     @templated('deliver/view.html')
@@ -274,10 +277,11 @@ class DeliverView(BasicView):
         try:
             header = DBSession.query(DeliverHeader).get(id)
             fields = [
-                      'no', 'destination_province_id', 'destination_city_id', 'supplier_id', 'supplier_contact', 'supplier_tel',
+                      'ref_no', 'destination_province_id', 'destination_city_id', 'destination_address', 'destination_contact',
+                      'destination_tel', 'destination_mobile', 'supplier_id', 'supplier_contact', 'supplier_tel',
                       'need_transfer', 'amount', 'remark', 'expect_time',
                       'insurance_charge', 'sendout_charge', 'receive_charge', 'package_charge', 'other_charge',
-                      'load_charge', 'unload_charge', 'proxy_charge', 'payment_id',
+                      'load_charge', 'unload_charge', 'proxy_charge', 'payment_id', 'pickup_type_id',
                       ]
 
             _remark = []

@@ -65,95 +65,118 @@
 			<tr>
 				<td width="100" height="30" align="right">{{_('3rd Party Supplier')}}</td>
 				<td width="12">&nbsp;</td>
-				<td width="300">{{values.get('supplier','')|f}}</td>
+				<td width="300">{{header.supplier|f}}</td>
 				<td height="30" align="right">{{_('Create Time')}}</td>
 				<td width="12">&nbsp;</td>
-				<td width="300">{{values.get('create_time','')|ft}}</td>
+				<td width="300">{{header.create_time|ft}}</td>
 			</tr>
 			<tr>
 				<td width="100" height="30" align="right">{{_('Deliver Number')}}</td>
 				<td width="12">&nbsp;</td>
-				<td>{{values.get('no','')|f}}</td>
+				<td>{{header.ref_no|f}}</td>
 				<td height="30" align="right">{{_('Creator')}}</td>
 				<td width="12">&nbsp;</td>
-				<td>{{values.get('create_by','')|f}}</td>
+				<td>{{header.create_by|f}}</td>
 			</tr>
 			<tr>
 				<td height="30" align="right">{{_('Destination')}}</td>
 				<td width="12">&nbsp;</td>
-				<td>{{values.get('destination_provice','')|f}}{{values.get('destination_city','')|f}}</td>
+				<td>{{header.destination_provice|f}}{{header.destination_city|f}}{{header.destination_address|f}}</td>
 				<td height="30" align="right">{{_('Update Time')}}</td>
 				<td width="12">&nbsp;</td>
-				<td>{{values.get('update_time','')|ft}}</td>
+				<td>{{header.update_time|ft}}</td>
+			</tr>
+			<tr>
+				<td height="30" align="right">收货联系人</td>
+				<td width="12">&nbsp;</td>
+				<td>{{header.destination_contact|f}}</td>
+				<td height="30" align="right">收货人电话</td>
+				<td width="12">&nbsp;</td>
+				<td>{{header.destination_tel|ft}}</td>
 			</tr>
 			<tr>
 				<td height="30" align="right">{{_('Supplier Contact')}}</td>
 				<td width="12">&nbsp;</td>
-				<td>{{values.get('supplier_contact','')|f}}</td>
+				<td>{{header.supplier_contact|f}}</td>
 				<td height="30" align="right">{{_('Last Updator')}}</td>
 				<td width="12">&nbsp;</td>
-				<td>{{values.get('update_by','')|f}}</td>
+				<td>{{header.update_by|f}}</td>
 			</tr>
 			<tr>
 				<td height="30" align="right">{{_('Supplier Tel')}}</td>
 				<td width="12">&nbsp;</td>
-				<td>{{values.get('supplier_tel','')|f}}</td>
+				<td>{{header.supplier_tel|f}}</td>
 				<td height="30" align="right">运输状态</td>
 				<td width="12">&nbsp;</td>
-				<td>{{values.get('status','')|showStatus}}</td>
+				<td>{{header.status|showStatus}}</td>
 			</tr>
 			<tr>
 				<td height="30" align="right">{{_('Expect Time')}}</td>
 				<td width="12">&nbsp;</td>
-				<td>{{values.get('expect_time','')|f}}</td>
+				<td>{{header.expect_time|f}}</td>
 				<td height="30" align="right">付款予承运商</td>
 				<td width="12">&nbsp;</td>
-				<td>{{mymacros.show_supplier_paid(values.get('supplier_paid',''))}}</td>
+				<td>{{mymacros.show_supplier_paid(header.supplier_paid)}}</td>
 			</tr>
 			<tr>
 				<td height="30" align="right">保险费用</td>
 				<td width="12">&nbsp;</td>
-				<td>{{values.get('insurance_charge','')|f(0)}}</td>
+				<td>{{header.insurance_charge|fn}}</td>
 			</tr>
 			<tr>
 				<td height="30" align="right">送货费用</td>
 				<td width="12">&nbsp;</td>
-				<td>{{values.get('sendout_charge','')|f(0)}}</td>
+				<td>{{header.sendout_charge|fn}}</td>
 			</tr>
 			<tr>
 				<td height="30" align="right">上门接货费用</td>
 				<td width="12">&nbsp;</td>
-				<td>{{values.get('receive_charge','')|f(0)}}</td>
+				<td>{{header.receive_charge|fn}}</td>
 			</tr>
 			<tr>
 				<td height="30" align="right">包装费用</td>
 				<td width="12">&nbsp;</td>
-				<td>{{values.get('package_charge','')|f(0)}}</td>
+				<td>{{header.package_charge|fn}}</td>
+			</tr>
+			<tr>
+				<td height="30" align="right">装货费用</td>
+				<td width="12">&nbsp;</td>
+				<td>{{header.load_charge|fn}}</td>
+			</tr>
+			<tr>
+				<td height="30" align="right">卸货费用</td>
+				<td width="12">&nbsp;</td>
+				<td>{{header.unload_charge|fn}}</td>
 			</tr>
 			<tr>
 				<td height="30" align="right">代理费用</td>
 				<td width="12">&nbsp;</td>
-				<td>{{values.get('proxy_charge','')|f(0)}}</td>
+				<td>{{header.proxy_charge|fn}}</td>
 			</tr>
 			<tr>
 				<td height="30" align="right">其它费用</td>
 				<td width="12">&nbsp;</td>
-				<td>{{values.get('other_charge','')|f(0)}}</td>
+				<td>{{header.other_charge|fn}}</td>
 			</tr>
 			<tr>
 				<td height="30" align="right">总费用</td>
 				<td width="12">&nbsp;</td>
-				<td>{{values.get('amount','')|f(0)}}</td>
+				<td>{{header.amount|fn}}</td>
 			</tr>
 			<tr>
 				<td height="30" align="right">付款方式</td>
 				<td width="12">&nbsp;</td>
-			    <td>{{values.get('payment','')|f}}</td>
+			    <td>{{header.payment|f}}</td>
+			</tr>
+			<tr>
+				<td height="30" align="right">提货方式</td>
+				<td width="12">&nbsp;</td>
+			    <td>{{header.pickup_type|f}}</td>
 			</tr>
 			<tr>
 				<td height="30" align="right">{{_('Remark')}}</td>
 				<td width="12">&nbsp;</td>
-				<td>{{values.get('remark','')|f}}</td>
+				<td>{{header.remark|f}}</td>
 			</tr>
 
 		</table>
@@ -173,14 +196,14 @@
 					<th style="width:80px">{{_('Creator')}}</th>
 				</tr>
 			</thead>
-			{% for d in details %}
+			{% for d in header.details %}
 				<tr class="data_table_tr data_table_tr_odd">
 					<th><a href="{{url_for('bpOrder.view',action='review',id=d.order_header_id)}}">{{d.order_header.ref_no}}</a></th>
 					<td>{{d.order_header.source_province}}{{d.order_header.source_city}}</td>
 					<td>{{d.order_header.destination_province}}{{d.order_header.destination_city}}</td>
-					<td>{{d.order_header.qty|f(0)}}</td>
-					<td>{{d.order_header.vol|f(0)}}</td>
-					<td>{{d.order_header.weight|f(0)}}</td>
+					<td>{{d.order_header.qty|fn}}</td>
+					<td>{{d.order_header.vol|fn}}</td>
+					<td>{{d.order_header.weight|fn}}</td>
 					<td>{{d.order_header.destination_contact|f}}</td>
 					<td>{{d.order_header.destination_tel|f}}</td>
 					<td>{{d.order_header.create_time|ft}}</td>
@@ -201,15 +224,15 @@
 								<td>单笔总费用</td>
 							</tr>
 							<tr class="sub_charge_tr">
-								<td style="width:100px">{{d.insurance_charge|f(0)}}</td>
-								<td style="width:100px">{{d.sendout_charge|f(0)}}</td>
-								<td style="width:100px">{{d.receive_charge|f(0)}}</td>
-								<td style="width:100px">{{d.package_charge|f(0)}}</td>
-								<td style="width:100px">{{d.load_charge|f(0)}}</td>
-								<td style="width:100px">{{d.unload_charge|f(0)}}</td>
-								<td style="width:100px">{{d.other_charge|f(0)}}</td>
-								<td style="width:100px">{{d.proxy_charge|f(0)}}</td>
-								<td style="width:100px">{{d.amount|f(0)}}</td>
+								<td style="width:100px">{{d.insurance_charge|fn}}</td>
+								<td style="width:100px">{{d.sendout_charge|fn}}</td>
+								<td style="width:100px">{{d.receive_charge|fn}}</td>
+								<td style="width:100px">{{d.package_charge|fn}}</td>
+								<td style="width:100px">{{d.load_charge|fn}}</td>
+								<td style="width:100px">{{d.unload_charge|fn}}</td>
+								<td style="width:100px">{{d.other_charge|fn}}</td>
+								<td style="width:100px">{{d.proxy_charge|fn}}</td>
+								<td style="width:100px">{{d.amount|fn}}</td>
 							</tr>
 						</table>
 					</td>

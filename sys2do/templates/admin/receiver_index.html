@@ -43,8 +43,8 @@
             </table>
               <table border="0" cellspacing="0" cellpadding="0" style="width:1050px;">
                 <tr class="field_head">
-                  <td align="center" style="width:50px;">{{_('Code')}}</td>
-                  <td align="center" style="width:150px;">{{_('Name')}}</td>
+                  <td align="center" style="width:150px;">收件人</td>
+                  <td align="center" style="width:50px;">车牌号</td>
                   <td align="center" style="width:100px;">{{_('Tel')}}</td>
                   <td align="center" style="width:100px;">{{_('Mobile')}}</td>
                   <td align="center" style="width:150px;">{{_('Create Time')}}</td>
@@ -54,8 +54,8 @@
                 </tr>
 				{% for r in records %}
 					<tr class="data_table_tr {{ loop.cycle('data_table_tr_odd', 'data_table_tr_even') }}">
-						<td><a href="{{url_for('.view', action = action ,m = 'UPDATE',id=r.id)}}">{{r.code|f}}</a></td>
-						<td>{{r.name}}</td>
+						<td><a href="{{url_for('.view', action = action ,m = 'UPDATE',id=r.id)}}">{{r.name|f}}</a></td>
+						<td>{{r.code|f}}</td>
 						<td>{{r.tel|f}}</td>
 						<td>{{r.mobile|ft}}</td>
 						<td>{{r.create_time|ft}}</td>

@@ -390,16 +390,32 @@ class AdminView(BasicView):
             if not id :
                 flash(MSG_NO_ID_SUPPLIED, MESSAGE_ERROR)
                 return redirect(url_for('.view', action = 'supplier'))
-            obj = DBSession.query(Supplier).get(id)
-            if not obj :
-                flash(MSG_RECORD_NOT_EXIST, MESSAGE_ERROR)
-                return redirect(url_for('.view', action = 'supplier'))
-            for f in ['no', 'name', 'address', 'phone', 'mobile', 'contact_person', 'remark', 'email', 'payment_id']:
-                setattr(obj, f, _g(f))
-            DBSession.commit()
-            flash(MSG_UPDATE_SUCC, MESSAGE_INFO)
-            return redirect(url_for('.view', action = 'supplier'))
 
+            try:
+                obj = DBSession.query(Supplier).get(id)
+                fields = ['no', 'name', 'address', 'phone', 'mobile', 'contact_person', 'remark', 'email', 'payment_id']
+                old_info = obj.serialize(fields)
+
+                if not obj :
+                    flash(MSG_RECORD_NOT_EXIST, MESSAGE_ERROR)
+                    return redirect(url_for('.view', action = 'supplier'))
+                for f in fields:
+                    setattr(obj, f, _g(f))
+                DBSession.commit()
+
+                #handle the system log
+                new_info = obj.serialize(fields)
+                change_result = obj.compare(old_info, new_info)
+                obj.insert_system_logs(change_result)
+
+
+                flash(MSG_UPDATE_SUCC, MESSAGE_INFO)
+                return redirect(url_for('.view', action = 'supplier'))
+            except:
+                _error(traceback.print_exc())
+                DBSession.rollback()
+                flash(MSG_SERVER_ERROR, MESSAGE_ERROR)
+                return redirect(url_for('.view', action = 'supplier'))
 
 
 
@@ -496,7 +512,7 @@ class AdminView(BasicView):
             if not obj :
                 flash(MSG_RECORD_NOT_EXIST, MESSAGE_ERROR)
                 return redirect(url_for('.view', action = action))
-            return render_template(update_page, v = obj.populate(), action = action)
+            return render_template(update_page, v = obj.populate(), action = action, obj = obj)
 
         elif method == 'DELETE':
             id = _g('id', None)
@@ -531,8 +547,13 @@ class AdminView(BasicView):
                 flash(MSG_RECORD_NOT_EXIST, MESSAGE_ERROR)
                 return redirect(url_for('.view', action = action))
             try:
+                old_info = obj.serialize(obj._get_fields())
                 obj.saveAsUpdate(request.values)
                 DBSession.commit()
+
+                new_info = obj.serialize(obj._get_fields())
+                change_result = obj.compare(old_info, new_info)
+                obj.insert_system_logs(change_result)
                 flash(MSG_UPDATE_SUCC, MESSAGE_INFO)
             except:
                 _error(traceback.print_exc())
