@@ -36,7 +36,7 @@
 
 
 
-	<input type="hidden" id="targets_json" name="targets_json" value=""/>
+<input type="hidden" id="targets_json" name="targets_json" value=""/>
 	
 <div class="order_add_div">
   <div class="order_add_div_header">客户基本信息</div>
@@ -72,8 +72,27 @@
         </li>
       </ul>
   <div style="clear:both"></div>
+  </div>
     	    
-  
+  <div class="order_add_div_header">历史记录</div>
+  <div class="order_add_div_body">
+  	<table>
+		<thead>
+			<tr class="field_head">
+				<th align="center">{{_('Time')}}</th>
+				<th align="center" style="width:800px">{{_('Remark')}}</th>
+			</tr>
+		<thead>
+		<tbody id="transit_list">
+			{% for t in obj.system_logs %}
+				<tr class="data_table_tr">
+					<td>{{t.create_time|ft}}</td>
+					<td style="text-align:left">{{t.remark|f}}</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+	<br /><br />
   </div>
 	
 	<br /><br />

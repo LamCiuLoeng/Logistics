@@ -36,7 +36,8 @@ from sys2do.model.logic import OrderHeader, TransferLog, DeliverDetail, \
     ItemDetail, PickupDetail
 from sys2do.model.master import CustomerProfile, InventoryLocation, Customer, \
     ItemUnit, WeightUnit, ShipmentType, InventoryItem, Payment, Ratio, PickupType, \
-    PackType, CustomerTarget, Receiver, Item, Note, City, Province, Barcode
+    PackType, CustomerTarget, Receiver, Item, Note, City, Province, Barcode, \
+    CustomerContact
 from sys2do.setting import TMP_FOLDER, TEMPLATE_FOLDER, PAGINATE_PER_PAGE
 from sys2do.util.barcode_helper import generate_barcode_file
 from sys2do.util.common import _g, getOr404, _gp, getMasterAll, _debug, _info, \
@@ -190,7 +191,50 @@ class OrderView(BasicView):
                                          remark = item['remark'] or None
                                          ))
 
+            #add the contact to the master 
+            try:
+                DBSession.query(CustomerContact).filter(and_(
+                                                         CustomerContact.active == 0,
+                                                         CustomerContact.type == "S",
+                                                         CustomerContact.refer_id == order.source_company_id,
+                                                         CustomerContact.name == order.source_contact
+                                                         )).one()
+            except:
+                #can't find the persons in source's contacts
+                DBSession.add(CustomerContact(
+                                              customer_id = order.customer_id,
+                                              type = "S",
+                                              refer_id = order.source_company_id,
+                                              name = order.source_contact,
+                                              address = order.source_address,
+                                              phone = order.source_tel,
+                                              mobile = order.source_mobile
+                                              ))
+
+
+            #add the contact to the master 
+            try:
+                DBSession.query(CustomerContact).filter(and_(
+                                                         CustomerContact.active == 0,
+                                                         CustomerContact.type == "T",
+                                                         CustomerContact.refer_id == order.destination_company_id,
+                                                         CustomerContact.name == order.destination_contact
+                                                         )).one()
+            except:
+                #can't find the persons in des's contacts
+                DBSession.add(CustomerContact(
+                                              customer_id = order.customer_id,
+                                              type = "T",
+                                              refer_id = order.destination_company_id,
+                                              name = order.destination_contact,
+                                              address = order.destination_address,
+                                              phone = order.destination_tel,
+                                              mobile = order.destination_mobile
+                                              ))
             DBSession.commit()
+
+
+
             flash(MSG_SAVE_SUCC, MESSAGE_INFO)
             return redirect(url_for('.view', action = 'review', id = order.id))
         except:

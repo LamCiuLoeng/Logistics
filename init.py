@@ -335,7 +335,7 @@ def import_kinlong_target(kinlong):
     print "insert kinlong target"
     d = open('kinlong_contact.txt')
     for line in d:
-        location, name, mobile = line.split("|")
+        location, name, mobile = line.strip().split("|")
         location = unicode(location)
         try:
             c = DBSession.query(City).filter(City.name.op('like')('%%%s%%' % location[:2])).one()

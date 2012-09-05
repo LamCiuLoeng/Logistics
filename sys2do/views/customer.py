@@ -156,12 +156,17 @@ class CustomerView(BasicView):
             flash(MSG_RECORD_NOT_EXIST, MESSAGE_ERROR)
             return redirect(url_for('.view'))
         try:
-            for f in ['no', 'name', 'display_name', 'province_id', 'city_id',
-                      'address', 'contact_person', 'mobile', 'phone', 'email', 'note_id', 'remark']:
+            fields = ['no', 'name', 'display_name', 'province_id', 'city_id',
+                      'address', 'contact_person', 'mobile', 'phone', 'email', 'note_id', 'remark']
+            old_info = obj.serialize(fields) # to used for the history log
+            for f in fields:
                 setattr(obj, f, _g(f))
             DBSession.commit()
             flash(MSG_SAVE_SUCC, MESSAGE_INFO)
 #            return redirect(url_for('.view',id=obj.id))
+            new_info = obj.serialize(fields)
+            change_result = obj.compare(old_info, new_info)
+            obj.insert_system_logs(change_result)
         except:
             _error(traceback.print_exc())
             DBSession.rollback()
