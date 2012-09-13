@@ -138,7 +138,7 @@ class SysMixin(object):
                 else: v = unicode(v)
 
                 result[cname] = (v, colClz.doc or cname)
-        _info(result)
+#        _info(result)
         return result
 
 

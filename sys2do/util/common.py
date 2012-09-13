@@ -94,15 +94,22 @@ def getOr404(obj, id, redirect_url = "/index", message = MSG_RECORD_NOT_EXIST):
 
 
 def upload(name):
+    print "*" * 20
+    print name
+    print "_" * 20
     f = request.files.get(name, None)
     if not f : raise makeException(MSG_NO_FILE_UPLOADED)
     if _allowedFile(f.filename):
         if not os.path.exists(UPLOAD_FOLDER) : os.makedirs(UPLOAD_FOLDER)
-        converted_name = "%s.%s" % (dt.now().strftime("%Y%m%d%H%M%S"), f.filename.rsplit('.', 1)[1].lower())
+
+        (pre, ext) = os.path.splitext(f.filename)
+
+        converted_name = "%s.%s" % (dt.now().strftime("%Y%m%d%H%M%S"), ext)
         path = os.path.join(UPLOAD_FOLDER, converted_name)
         f.save(path)
 
-        u = UploadFile(create_by_id = session['user_profile']['id'], name = secure_filename(f.filename), path = path, url = "/".join([UPLOAD_FOLDER_URL, converted_name]))
+        db_file_name = os.path.basename(f.filename)
+        u = UploadFile(create_by_id = session['user_profile']['id'], name = db_file_name, path = path, url = "/".join([UPLOAD_FOLDER_URL, converted_name]))
         DBSession.add(u)
         DBSession.flush()
         return u

@@ -195,6 +195,7 @@
 				<li><a href="#tabs-7">财务信息</a></li>
 			{% endif %}
 			<li><a href="#tabs-8">历史记录</a></li>
+			<li><a href="#tabs-9">附件</a></li>
 		</ul>
 	</div>
 	
@@ -565,8 +566,37 @@
 			</tbody>
 		</table>
 	</div>
-</div>
 
+
+	<!-- Attachment -->
+	<div class="order_add_info_tab_body" id="tabs-9">
+		<table>
+			<thead>
+				<tr class="field_head">
+					<th style="width:450px">文件</th>
+					<th style="width:150px">上传时间</th>
+					<th style="width:150px">上传人</th>
+				</tr>
+			</thead>
+			<tbody id="attachment_list">
+			{% for f in header.attachment %}
+				<tr class="data_table_tr">
+					<td><a href="/download?id={{f.id}}">{{f.name}}</a></td>
+					<td>{{f.create_time|ft}}</td>
+					<td>{{f.create_by}}</td>
+				</tr>
+			{% endfor %}
+			</tbody>
+		</table>
+	  <div style="clear:both"></div>
+	</div>
+
+
+
+
+
+
+</div>
 
 </div>
 </div>

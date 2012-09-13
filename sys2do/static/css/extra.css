@@ -19,3 +19,9 @@
 	cursor:pointer;
 	vertical-align:middle;
 }
+
+
+.validate_error {
+    background-color: #FFEEEE !important;
+    border: 1px solid #FF6600 !important;
+}

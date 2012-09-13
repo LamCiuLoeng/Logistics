@@ -3,54 +3,75 @@ var tmp_item = {};
 var current_item = null;
 
 function tosave(){
-    var msg = Array();
+    $(".validate_error").removeClass("validate_error");
     
+    var msg = Array();
     if(!$('#source_province_id').val()){
         msg.push('请填写始发站！');
+        $('#source_province_id').addClass("validate_error");
     }
     
     if(!$('#ref_no').val()){
         msg.push('请填写单号！');
+        $('#ref_no').addClass("validate_error");
     }
     
     if(!$('#note_id').val()){
         msg.push('请选择票据前缀！');
+        $('#note_id').addClass("validate_error");
     }
     
     if(!$('#note_no').val()){
         msg.push('请填写票据单号！');
+        $('#note_no').addClass("validate_error");
     }
     
     if(!$('#destination_province_id').val()){
         msg.push('请填写目的站！');
+        $('#destination_province_id').addClass("validate_error");
     }
     if(!$('#source_company_id').val()){
         msg.push('请填写发货公司！');
+        $('#source_company_id').addClass("validate_error");
     }
     if(!$('#source_contact').val()){
         msg.push('请填写发货人！');
+        $('#source_contact').addClass("validate_error");
     }
     
     var source_mobile = $("#source_mobile").val();
     if(source_mobile && !check_mobile(source_mobile)){
         msg.push('请正确填写发货人手机号码！');
+        $("#source_mobile").addClass("validate_error");
     }
+        
     
     if(!$('#destination_company_id').val()){
         msg.push('请填写收货公司！');
+        $('#destination_company_id').addClass("validate_error");
     }
     if(!$('#destination_contact').val()){
         msg.push('请填写收货人！');
+        $('#destination_contact').addClass("validate_error");
     }
     
     var destination_mobile = $("#destination_mobile").val();
     if(destination_mobile && !check_mobile(destination_mobile)){
         msg.push('请正确填写收货人手机号码！');
+        $("#destination_mobile").addClass("validate_error");
     }
     
     if(!$('#amount').val()){
         msg.push('请填写金额！');
+        $('#amount').addClass("validate_error");
     }
+    
+    
+    if(!$('#payment_id').val()){
+        msg.push('请填写付款方式！');
+        $('#payment_id').addClass("validate_error");
+    }
+    
     
     if(msg.length < 1){
         $.getJSON('/order/check_note',
@@ -253,6 +274,23 @@ function sum_item(){
     }
     return {'qty' : q , 'weight' : w, 'vol' : v} 
 }
+
+
+
+var attachment_index_id = 1;
+function add_attachment(){
+    attachment_index_id++;
+    var html = '<tr class="data_table_tr">';
+    html += '<td><input type="file" name="attahcment_'+attachment_index_id+'" value=""/></td>';
+    html += '<td><input type="button" value="删除" onclick="del_attachment(this);"/></td>';
+    html += '</tr>';
+    $("#attachment_list").append(html);
+}
+
+function del_attachment(obj){
+    $($(obj).parents("tr")[0]).remove();
+}
+
 
 
 $(document).ready(function(){    

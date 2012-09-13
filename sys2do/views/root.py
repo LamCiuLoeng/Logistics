@@ -11,9 +11,9 @@ from sqlalchemy import and_
 
 from sys2do import app
 from sys2do.model import DBSession, User
-from flask.helpers import jsonify, send_file
+from flask.helpers import jsonify, send_file, send_from_directory
 from sys2do.util.decorator import templated, login_required, tab_highlight
-from sys2do.util.common import _g, _gp, _gl, _info, _error, date2text
+from sys2do.util.common import _g, _gp, _gl, _info, _error, date2text, _debug
 from sys2do.constant import MESSAGE_ERROR, MESSAGE_INFO, MSG_NO_SUCH_ACTION, \
     MSG_SAVE_SUCC, GOODS_PICKUP, GOODS_SIGNED, OUT_WAREHOUSE, IN_WAREHOUSE, \
     MSG_RECORD_NOT_EXIST, LOG_GOODS_PICKUPED, LOG_GOODS_SIGNED, MSG_SERVER_ERROR, \
@@ -24,6 +24,7 @@ from sys2do.model.master import CustomerProfile, Customer, Supplier, \
     CustomerDiquRatio, CustomerSource
 from sys2do.model.logic import OrderHeader, TransferLog, PickupDetail, \
     DeliverDetail
+from sys2do.model.system import UploadFile
 
 
 
@@ -89,6 +90,18 @@ class RootView(BasicView):
     @templated("dashboard.html")
     def dashboard(self):
         return {}
+
+
+
+    def download(self):
+        id = _g("id")
+        f = DBSession.query(UploadFile).get(id)
+        _debug(f.path)
+
+        return send_file(f.path, as_attachment = True, attachment_filename = f.name)
+
+
+
 
 
     def ajax_master(self):

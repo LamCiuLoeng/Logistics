@@ -53,7 +53,7 @@
 {% block content %}
 
 
-<form action="{{url_for('.view', action = 'save_new')}}" method="post">
+<form action="{{url_for('.view', action = 'save_new')}}" method="post" enctype="multipart/form-data">
 <input type="hidden" name="item_json" id="item_json"/>
 <div id="msg_div" style="display:none;color:red;padding-left:30px;padding-top:5px;"></div>
 
@@ -173,7 +173,7 @@
     </span></td>
     <td align="center">
     	<span style="width:180px;">
-			{{mymacros.select(id='payment_id',list=MASTER_ALL('Payment'),value=None,class="order_add_div_body_input",style="width:70px")}}
+			{{mymacros.select(id='payment_id',list=MASTER_ALL('Payment'),value=None,class="order_add_div_body_input must_input",style="width:70px")}}
     	</span>
     </td>
     </tr>
@@ -222,11 +222,13 @@
 	<div class="order_add_info_tab_header">
 		<ul>
 			<li><a href="#tabs-1">{{_('Item Details')}}</a></li>
+			<li><a href="#tabs-2">附件</a></li>
 		</ul>
 	</div>
+	
+	<!-- Item info -->
 	  <div class="order_add_info_tab_body" id="tabs-1">
 		<div id="item_details">
-			
 		  <p><input type="button" value="{{_('Add')}}" onclick="add_item()"/></p>
 		</div>
 		<br />
@@ -246,6 +248,30 @@
 		</table>
 	  <div style="clear:both"></div>
 	</div>
+	
+	<!-- Attachment -->
+	<div class="order_add_info_tab_body" id="tabs-2">
+		<div>
+		  <p><input type="button" value="{{_('Add')}}" onclick="add_attachment()"/></p>
+		</div>
+		<br />
+		<table>
+			<thead>
+				<tr class="field_head">
+					<th style="width:350px">文件</th>
+					<th style="width:150px">操作</th>
+				</tr>
+			</thead>
+			<tbody id="attachment_list">
+				<tr>
+					<td><input type="file" name="attahcment_1"/></td>
+					<td><input type="button" value="删除" onclick="del_attachment(this);"/></td>
+				</tr>
+			</tbody>
+		</table>
+	  <div style="clear:both"></div>
+	</div>
+	
 </div>
 
 
