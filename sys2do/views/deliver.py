@@ -31,7 +31,7 @@ from sys2do.views import BasicView
 from sys2do.model.logic import DeliverHeader, OrderHeader, \
     DeliverDetail, TransferLog
 from sys2do.util.common import _gl, _g, _gp, getOr404, getMasterAll, _debug, \
-    _error, _info, send_sms
+    _error, _info, send_sms, upload, multiupload
 from sys2do.model.master import Supplier, InventoryItem, Province
 from sys2do.setting import PAGINATE_PER_PAGE
 from sys2do.model.system import SystemLog
@@ -193,13 +193,14 @@ class DeliverView(BasicView):
                       'destination_tel', 'destination_mobile', 'supplier_id',
                       'supplier_contact', 'supplier_tel', 'expect_time',
                       'insurance_charge', 'sendout_charge', 'receive_charge', 'package_charge', 'load_charge', 'unload_charge',
-                      'other_charge', 'proxy_charge', 'amount', 'payment_id', 'pickup_type_id', 'remark',
+                      'other_charge', 'proxy_charge', 'amount', 'payment_id', 'pickup_type_id', 'remark', 'carriage_charge',
                       ]:
                 params[f] = _g(f)
             header = DeliverHeader(**params)
             DBSession.add(header)
             DBSession.flush()
             header.no = getDeliverNo(header.id)
+            total_qty = total_vol = total_weight = 0
             line_no = 1
             for k, id in _gp('detail_'):
                 order_header = DBSession.query(OrderHeader).get(id)
@@ -214,8 +215,12 @@ class DeliverView(BasicView):
                                             unload_charge = _g('unload_charge_%s' % id),
                                             other_charge = _g('other_charge_%s' % id),
                                             proxy_charge = _g('proxy_charge_%s' % id),
+                                            carriage_charge = _g('carriage_charge_%s' % id),
                                             amount = _g('amount_%s' % id),
                                             ))
+                if order_header.qty : total_qty += order_header.qty
+                if order_header.vol : total_vol += order_header.vol
+                if order_header.weight : total_weight += order_header.weight
 
                 order_header.update_status(SORTING[0])
                 order_header.cost = _g('amount_%s' % id),
@@ -223,6 +228,9 @@ class DeliverView(BasicView):
                 order_header.deliver_header_no = header.ref_no
                 line_no += 1
 
+            header.qty = total_qty
+            header.vol = total_vol
+            header.weight = total_weight
 
             DBSession.add(TransferLog(
                                       refer_id = header.id,
@@ -230,6 +238,9 @@ class DeliverView(BasicView):
                                       type = 1,
                                       remark = LOG_GOODS_SORTED
                                       ))
+
+            #handle the upload file
+            header.attachment = multiupload()
             DBSession.commit()
         except:
             DBSession.rollback()
@@ -280,7 +291,7 @@ class DeliverView(BasicView):
                       'ref_no', 'destination_province_id', 'destination_city_id', 'destination_address', 'destination_contact',
                       'destination_tel', 'destination_mobile', 'supplier_id', 'supplier_contact', 'supplier_tel',
                       'need_transfer', 'amount', 'remark', 'expect_time',
-                      'insurance_charge', 'sendout_charge', 'receive_charge', 'package_charge', 'other_charge',
+                      'insurance_charge', 'sendout_charge', 'receive_charge', 'package_charge', 'other_charge', 'carriage_charge',
                       'load_charge', 'unload_charge', 'proxy_charge', 'payment_id', 'pickup_type_id',
                       ]
 
@@ -297,8 +308,14 @@ class DeliverView(BasicView):
                 d.unload_charge = _g('unload_charge_%s' % d.id)
                 d.other_charge = _g('other_charge_%s' % d.id)
                 d.proxy_charge = _g('proxy_charge_%s' % d.id)
+                d.carriage_charge = _g('carriage_charge_%s' % d.id)
                 d.amount = _g('amount_%s' % d.id)
                 d.order_header.cost = d.amount
+
+            #handle the file upload
+            old_attachment_ids = map(lambda (k, v) : v, _gp("old_attachment_"))
+            old_attachment_ids.extend(multiupload())
+            header.attachment = old_attachment_ids
 
             DBSession.commit()
 

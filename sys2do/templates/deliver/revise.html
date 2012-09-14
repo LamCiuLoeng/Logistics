@@ -108,7 +108,7 @@
 {% block content %}
 	<div style="background-color: #fff;padding: 10px;">
 		
-	<form method="post" action="{{url_for('.view',action='deliver_save_revise')}}">
+	<form method="post" action="{{url_for('.view',action='deliver_save_revise')}}" enctype="multipart/form-data">
 		<input type="hidden" name="id" value="{{header.id}}"/>
 		<table border="1" cellpadding="3" cellspacing="3">
 			<tbody>
@@ -203,6 +203,10 @@
 				    <td><input type="text" name="proxy_charge" id="proxy_charge" class="numeric order_add_div_body_input number_input_right" style="width: 200px" value="{{header.amount|fn}}"/></td>
 				</tr>
 				<tr>
+				    <td height="30" align="right">运费</td>
+					<td width="12">&nbsp;</td>
+                    <td><input type="text" name="carriage_charge" id="carriage_charge" class="numeric order_add_div_body_input compute number_input_right" style="width: 200px" value="{{header.carriage_charge|fn}}"/></td>
+                    <td width="12">&nbsp;</td>
 					<td height="30" align="right">总费用</td>
 					<td width="12">&nbsp;</td>
 				    <td><input type="text" name="amount" id="amount" class="numeric order_add_div_body_input must_input number_input_right" style="width: 200px" value="{{header.amount|fn}}"/></td>
@@ -260,7 +264,7 @@
 				</tr>
 				<tr class="data_table_tr data_table_tr_even">
 					<td colspan="20">
-						<table style="width:900px;float:right;">
+						<table style="width:1000px;float:right;">
 							<tr>
 								<td>保险费用(元)</td>
 								<td>送货费用(元)</td>
@@ -270,6 +274,7 @@
 								<td>卸货费用(元)</td>
 								<td>其它费用(元)</td>
 								<td>代理费用(元)</td>
+								<td>运费(元)</td>
 								<td>单笔总费用(元)</td>
 							</tr>
 							<tr class="sub_charge_tr">
@@ -281,6 +286,7 @@
 								<td style="width:100px"><input type="text" name="unload_charge_{{d.id}}"   class="numeric number_field" value="{{d.unload_charge|fn}}"/></td>
 								<td style="width:100px"><input type="text" name="other_charge_{{d.id}}"  class="numeric number_field" value="{{d.other_charge|fn}}"/></td>
 								<td style="width:100px"><input type="text" name="proxy_charge_{{d.id}}"  class="numeric number_field" value="{{d.proxy_charge|fn}}"/></td>
+								<td style="width:100px"><input type="text" name="carriage_charge_{{d.id}}"  class="numeric number_field" value="{{d.carriage_charge|fn}}"/></td>
 								<td style="width:100px"><input type="text" name="amount_{{d.id}}"  class="numeric number_input_right must_input" style="width:80px" value="{{d.amount|fn}}"/></td>
 							</tr>
 						</table>
@@ -289,6 +295,37 @@
 			{% endfor %}
 		</table>
 		<br />	
+		
+		
+		<div>
+		  <p><input type="button" value="添加附件" onclick="add_attachment()"/></p>
+		</div>
+		<br />
+		<table>
+			<thead>
+				<tr class="field_head">
+					<th style="width:550px">文件</th>
+					<th style="width:150px">操作</th>
+				</tr>
+			</thead>
+			<tbody id="attachment_list">
+			{% for f in header.attachment %}
+				<tr class="data_table_tr">
+					<td><input type="hidden" name="old_attachment_{{f.id}}" value="{{f.id}}"/>
+						{{f.name}}
+					</td>
+					<td><input type="button" value="删除" onclick="del_attachment(this);"/></td>
+				</tr>
+			{% endfor %}
+				<tr class="data_table_tr">
+					<td><input type="file" name="attahcment_1" size="60"/></td>
+					<td><input type="button" value="删除" onclick="del_attachment(this);"/></td>
+				</tr>
+			</tbody>
+		</table>
+		
+		<br /><br />
+		
 	</form>
 	</div>
 	

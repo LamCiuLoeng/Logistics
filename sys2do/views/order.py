@@ -41,7 +41,7 @@ from sys2do.model.master import CustomerProfile, InventoryLocation, Customer, \
 from sys2do.setting import TMP_FOLDER, TEMPLATE_FOLDER, PAGINATE_PER_PAGE
 from sys2do.util.barcode_helper import generate_barcode_file
 from sys2do.util.common import _g, getOr404, _gp, getMasterAll, _debug, _info, \
-    _gl, _error, upload
+    _gl, _error, upload, multiupload
 from sys2do.util.decorator import templated, login_required, tab_highlight
 from sys2do.util.excel_helper import SummaryReport
 from sys2do.views import BasicView
@@ -193,16 +193,7 @@ class OrderView(BasicView):
 
 
             #handle the upload file
-            attachment_ids = []
-            try:
-                for f in request.files:
-                    a = upload(f)
-                    attachment_ids.append(a.id)
-            except:
-                _error(traceback.print_exc())
-                pass
-
-            order.attachment = attachment_ids
+            order.attachment = multiupload()
 
             #add the contact to the master 
             try:
@@ -394,16 +385,8 @@ class OrderView(BasicView):
             DBSession.query(ItemDetail).filter(ItemDetail.id.in_(item_ids)).update({'active' : 1}, False)
 
             #handle the file upload
-            attachment_ids = []
-            for f in request.files:
-                try:
-                    a = upload(f)
-                    attachment_ids.append(a.id)
-                except:
-                    _error(traceback.print_exc())
-
             old_attachment_ids = map(lambda (k, v) : v, _gp("old_attachment_"))
-            old_attachment_ids.extend(attachment_ids)
+            old_attachment_ids.extend(multiupload())
             header.attachment = old_attachment_ids
 
             DBSession.commit()

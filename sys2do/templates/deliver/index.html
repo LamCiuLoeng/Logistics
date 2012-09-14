@@ -78,7 +78,7 @@
 
 <div class="point_div"><img src="/static/images/system/order_manage_54.jpg" width="22" height="28" /><span>{{_('Input the conditions and search.')}}</span></div>
 
-	<table border="1" cellpadding="3" cellspacing="3" style="width:1200px">
+	<table border="1" cellpadding="3" cellspacing="3" style="width:1500px">
 			<tr class="field_head">
 				<th style="width:150px">{{mymacros.show_direction(values,'no')}}{{_('Deliver Number')}}</th>
 				<th style="width:200px">{{mymacros.show_direction(values,'destination_province_id')}}{{_('Destination')}}</th>
@@ -87,6 +87,9 @@
 				<th style="width:80px">{{_('Supplier Tel')}}</th>
 				<th style="width:100px">{{mymacros.show_direction(values,'expect_time')}}{{_('Expect Time')}}</th>
 				<th style="width:100px">{{mymacros.show_direction(values,'amount')}}费用(元)</th>
+				<th style="width:100px">{{_('Qty')}}</th>
+				<th style="width:100px">{{_('Weight')}}(吨)</th>
+				<th style="width:100px">{{_('Vol')}}(米<sup>3</sup>)</th>
 				<th style="width:100px">{{mymacros.show_direction(values,'create_time')}}{{_('Create Time')}}</th>
 				<th style="width:80px">{{mymacros.show_direction(values,'create_by_id')}}{{_('Creator')}}</th>
 				<th style="width:80px">状态</th>
@@ -100,6 +103,9 @@
 				<td>{{r.supplier_tel}}</td>
 				<td>{{r.expect_time}}</td>
 				<td>{{r.amount}}</td>
+				<td>{{r.qty|fn}}</td>
+				<td>{{r.weight|fn}}</td>
+				<td>{{r.vol|fn}}</td>
 				<td>{{r.create_time|ft}}</td>
 				<td>{{r.create_by|ifFalse}}</td>
 				<td>{{r.status|showStatus}}</td>
@@ -108,8 +114,11 @@
 			<tr class="data_table_tr">
 					<td>&nbsp;</td>
 					<td colspan="5" style="text-align:left">合计</td>
-					<td>{{records.items|sum(attribute='amount')}}</td>
-					<td colspan="3">&nbsp;</td>
+					<td>{{records.items|sum_with_none(attribute='amount')}}</td>
+					<td>{{records.items|sum_with_none(attribute='qty')}}</td>
+					<td>{{records.items|sum_with_none(attribute='weight')}}</td>
+					<td>{{records.items|sum_with_none(attribute='vol')}}</td>
+					<td colspan="30">&nbsp;</td>
 				</tr>
 		  	<tr class="data_table_tr">
 			    <td colspan="100" style="text-align:right">{{mymacros.mypaginate(records)}}</td>

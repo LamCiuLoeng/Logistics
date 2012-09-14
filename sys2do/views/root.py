@@ -25,6 +25,7 @@ from sys2do.model.master import CustomerProfile, Customer, Supplier, \
 from sys2do.model.logic import OrderHeader, TransferLog, PickupDetail, \
     DeliverDetail
 from sys2do.model.system import UploadFile
+from sys2do.setting import UPLOAD_FOLDER_PREFIX
 
 
 
@@ -98,7 +99,7 @@ class RootView(BasicView):
         f = DBSession.query(UploadFile).get(id)
         _debug(f.path)
 
-        return send_file(f.path, as_attachment = True, attachment_filename = f.name)
+        return send_file(os.path.join(UPLOAD_FOLDER_PREFIX, f.path), as_attachment = True, attachment_filename = f.name)
 
 
 

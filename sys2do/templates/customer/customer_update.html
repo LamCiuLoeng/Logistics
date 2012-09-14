@@ -27,6 +27,21 @@
 		}
 	
 	}
+	
+	
+	var attachment_index_id = 1;
+	function add_attachment(){
+	    attachment_index_id++;
+	    var html = '<tr class="data_table_tr">';
+	    html += '<td><input type="file" name="attahcment_'+attachment_index_id+'" value="" size="60"/></td>';
+	    html += '<td><input type="button" value="删除" onclick="del_attachment(this);"/></td>';
+	    html += '</tr>';
+	    $("#attachment_list").append(html);
+	}
+	
+	function del_attachment(obj){
+	    $($(obj).parents("tr")[0]).remove();
+	}
 
 	$(document).ready(function(){
     	$("#province_id").change(function(){
@@ -68,7 +83,7 @@
 
 
 
-<form action="{{url_for('.view', action = 'save_update')}}" method="post">
+<form action="{{url_for('.view', action = 'save_update')}}" method="post" enctype="multipart/form-data">
 
 <input type="hidden" name="id" value="{{obj.id}}"/>
 
@@ -115,8 +130,39 @@
         <li style="width:200px;"><span>更新人</span>{{obj.update_by|f}}</li>
       </ul>
   <div style="clear:both"></div>
-  </div>
+	<br /><br />
+	<!-- Attachment -->
+		<div>
+		  <p><input type="button" value="添加附件" onclick="add_attachment()"/></p>
+		</div>
+		<br />
+		<table>
+			<thead>
+				<tr class="field_head">
+					<th style="width:550px">文件</th>
+					<th style="width:150px">操作</th>
+				</tr>
+			</thead>
+			<tbody id="attachment_list">
+				{% for f in obj.attachment %}
+				<tr class="data_table_tr">
+					<td><input type="hidden" name="old_attachment_{{f.id}}" value="{{f.id}}"/>
+						{{f.name}}
+					</td>
+					<td><input type="button" value="删除" onclick="del_attachment(this);"/></td>
+				</tr>
+			{% endfor %}
+				<tr class="data_table_tr">
+					<td><input type="file" name="attahcment_1" size="60"/></td>
+					<td><input type="button" value="删除" onclick="del_attachment(this);"/></td>
+				</tr>
+			</tbody>
+		</table>
+	  <div style="clear:both"></div>
 
+
+
+  </div>
 <br /></br >
 </form>
 

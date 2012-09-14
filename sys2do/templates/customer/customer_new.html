@@ -79,7 +79,7 @@
 
 
 
-<form action="{{url_for('.view', action = 'save_new')}}" method="post">
+<form action="{{url_for('.view', action = 'save_new')}}" method="post" enctype="multipart/form-data">
 	
 <div class="order_add_div">
   <div class="order_add_div_header">新建客户</div>
@@ -118,8 +118,28 @@
       </ul>
   <div style="clear:both"></div>
   
+	<!-- Attachment -->
+		<div>
+		  <p><input type="button" value="添加附件" onclick="add_attachment()"/></p>
+		</div>
+		<br />
+		<table>
+			<thead>
+				<tr class="field_head">
+					<th style="width:550px">文件</th>
+					<th style="width:150px">操作</th>
+				</tr>
+			</thead>
+			<tbody id="attachment_list">
+				<tr class="data_table_tr">
+					<td><input type="file" name="attahcment_1" size="60"/></td>
+					<td><input type="button" value="删除" onclick="del_attachment(this);"/></td>
+				</tr>
+			</tbody>
+		</table>
+	  <div style="clear:both"></div>
+
   </div>
-	
 
 
 </div>

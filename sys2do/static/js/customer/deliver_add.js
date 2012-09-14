@@ -30,6 +30,23 @@ function count_charge(prefix,total){
 }
 
 
+
+var attachment_index_id = 1;
+function add_attachment(){
+    attachment_index_id++;
+    var html = '<tr class="data_table_tr">';
+    html += '<td><input type="file" name="attahcment_'+attachment_index_id+'" value="" size="60"/></td>';
+    html += '<td><input type="button" value="删除" onclick="del_attachment(this);"/></td>';
+    html += '</tr>';
+    $("#attachment_list").append(html);
+}
+
+function del_attachment(obj){
+    $($(obj).parents("tr")[0]).remove();
+}
+
+
+
 $(document).ready(function(){
     $("#destination_province_id").change(function(){
         province_change(this,'#destination_city_id');
@@ -94,6 +111,10 @@ $(document).ready(function(){
     
     $("input[type='text'][name^='other_charge_']").change(function(){
         count_charge("other_charge_","#other_charge");
+    });
+    
+    $("input[type='text'][name^='carriage_charge_']").change(function(){
+        count_charge("carriage_charge_","#carriage_charge");
     });
     
     $("input[type='text'][name^='amount_']").change(function(){

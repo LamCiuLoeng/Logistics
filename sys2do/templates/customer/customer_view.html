@@ -73,7 +73,31 @@
       </ul>
   <div style="clear:both"></div>
   </div>
-    	    
+  
+  <div class="order_add_div_header">附件</div>
+  <div class="order_add_div_body">
+  	<table>
+			<thead>
+				<tr class="field_head">
+					<th style="width:450px">文件</th>
+					<th style="width:150px">上传时间</th>
+					<th style="width:150px">上传人</th>
+				</tr>
+			</thead>
+			<tbody id="attachment_list">
+			{% for f in obj.attachment %}
+				<tr class="data_table_tr">
+					<td><a href="/download?id={{f.id}}">{{f.name}}</a></td>
+					<td>{{f.create_time|ft}}</td>
+					<td>{{f.create_by}}</td>
+				</tr>
+			{% endfor %}
+			</tbody>
+		</table>
+	<br /><br />
+  </div>
+
+  	    
   <div class="order_add_div_header">历史记录</div>
   <div class="order_add_div_body">
   	<table>

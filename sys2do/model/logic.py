@@ -291,7 +291,7 @@ class DeliverHeader(DeclarativeBase, SysMixin, CRUDMixin):
     no = Column(Text, doc = u'系统编号')
     ref_no = Column(Text, doc = u'送货单号码')
     destination_province_id = Column(Integer, ForeignKey('master_province.id'), doc = u'目的地')
-    destination_provice = relation(Province)
+    destination_province = relation(Province)
     destination_city_id = Column(Integer, ForeignKey('master_city.id'), doc = u'目的地')
     destination_city = relation(City)
     destination_address = Column(Text, doc = u'收货地址')
@@ -317,7 +317,12 @@ class DeliverHeader(DeclarativeBase, SysMixin, CRUDMixin):
     load_charge = Column(Float, default = 0, doc = u'装货费用')
     unload_charge = Column(Float, default = 0, doc = u'卸货费用')
     proxy_charge = Column(Float, default = 0, doc = u'代理费用')
+    carriage_charge = Column(Float, default = 0, doc = u'运费')
     amount = Column(Float, default = 0, doc = u'总费用')
+
+    qty = Column(Float, default = None, doc = u'数量')
+    weight = Column(Float, default = None, doc = u'重量')
+    vol = Column(Float, default = None, doc = u'体积')
 
     supplier_paid = Column(Integer, default = 0, doc = u'') # 0 is not paid to supplier, 1 is paid to supplier
     payment_id = Column(Integer, ForeignKey('master_payment.id'), doc = u'付款方式')
@@ -424,6 +429,7 @@ class DeliverDetail(DeclarativeBase, SysMixin):
     load_charge = Column(Float, default = 0, doc = u'装货费用')
     unload_charge = Column(Float, default = 0, doc = u'卸货费用')
     proxy_charge = Column(Float, default = 0, doc = u'代理费用')
+    carriage_charge = Column(Float, default = 0, doc = u'运费')
     amount = Column(Float, default = 0, doc = u'单笔总费用')
 
     remark = Column(Text, doc = u'备注')

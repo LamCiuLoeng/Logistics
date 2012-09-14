@@ -23,7 +23,7 @@ from sqlalchemy.sql.expression import and_
 
 
 from sys2do.setting import UPLOAD_FOLDER, ALLOWED_EXTENSIONS, UPLOAD_FOLDER_URL, \
-    SMS_KEY, SMS_FORMAT
+    SMS_KEY, SMS_FORMAT, UPLOAD_FOLDER_PREFIX
 from sys2do.model import DBSession, UploadFile
 from sys2do.constant import MSG_RECORD_NOT_EXIST, MSG_NO_FILE_UPLOADED, \
     MSG_INVALID_FILE_TO_UPLOAD, SYSTEM_DATE_FORMAT, SYSTEM_DATETIME_FORMAT
@@ -32,7 +32,7 @@ from sys2do.constant import MSG_RECORD_NOT_EXIST, MSG_NO_FILE_UPLOADED, \
 
 
 __all__ = ['_g', '_gl', '_gp', '_debug', '_info', '_error', 'getOr404', 'getMasterAll', 'getRelatedCity',
-           'upload', 'makeException', 'number2alphabet', 'date2text']
+           'upload', 'multiupload', 'makeException', 'number2alphabet', 'date2text']
 
 
 
@@ -94,27 +94,40 @@ def getOr404(obj, id, redirect_url = "/index", message = MSG_RECORD_NOT_EXIST):
 
 
 def upload(name):
-    print "*" * 20
-    print name
-    print "_" * 20
     f = request.files.get(name, None)
     if not f : raise makeException(MSG_NO_FILE_UPLOADED)
-    if _allowedFile(f.filename):
-        if not os.path.exists(UPLOAD_FOLDER) : os.makedirs(UPLOAD_FOLDER)
 
-        (pre, ext) = os.path.splitext(f.filename)
+    dir_path = os.path.join(UPLOAD_FOLDER_PREFIX, UPLOAD_FOLDER)
 
-        converted_name = "%s.%s" % (dt.now().strftime("%Y%m%d%H%M%S"), ext)
-        path = os.path.join(UPLOAD_FOLDER, converted_name)
-        f.save(path)
+    if not os.path.exists(dir_path) : os.makedirs(dir_path)
 
-        db_file_name = os.path.basename(f.filename)
-        u = UploadFile(create_by_id = session['user_profile']['id'], name = db_file_name, path = path, url = "/".join([UPLOAD_FOLDER_URL, converted_name]))
-        DBSession.add(u)
-        DBSession.flush()
-        return u
-    else:
-        raise makeException(MSG_INVALID_FILE_TO_UPLOAD)
+    (pre, ext) = os.path.splitext(f.filename)
+
+    converted_name = "%s%s" % (dt.now().strftime("%Y%m%d%H%M%S"), ext)
+    path = os.path.join(dir_path, converted_name)
+    f.save(path)
+
+    db_file_name = os.path.basename(f.filename)
+    db_file_path = os.path.join(UPLOAD_FOLDER, converted_name)
+    u = UploadFile(create_by_id = session['user_profile']['id'], name = db_file_name, path = db_file_path, url = "/".join([UPLOAD_FOLDER_URL, converted_name]))
+    DBSession.add(u)
+    DBSession.flush()
+    return u
+
+
+def multiupload():
+    #handle the upload file
+    attachment_ids = []
+    try:
+        for f in request.files:
+            a = upload(f)
+            attachment_ids.append(a.id)
+    except:
+        _error(traceback.print_exc())
+        pass
+
+    return attachment_ids
+
 
 
 def makeException(msg):

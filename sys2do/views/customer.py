@@ -8,6 +8,7 @@
 '''
 from datetime import datetime as dt, timedelta
 import traceback
+import json
 from werkzeug.utils import redirect
 from sqlalchemy.sql.expression import and_, desc
 from flask.blueprints import Blueprint
@@ -15,20 +16,22 @@ from flask.helpers import flash, jsonify, url_for
 from flask import session
 from webhelpers import paginate
 from flask.templating import render_template
+from flask.globals import request
 
 from sys2do.views import BasicView
 from sys2do.util.decorator import templated, login_required, tab_highlight
 from sys2do.model.master import Customer, CustomerTarget, Province, \
     CustomerSource, CustomerContact, CustomerDiquRatio
 from sys2do.model import DBSession
-from sys2do.util.common import _g, getMasterAll, _error, _info
+from sys2do.util.common import _g, getMasterAll, _error, _info, upload, \
+    multiupload, _gp
 from sys2do.constant import MESSAGE_INFO, MSG_SAVE_SUCC, MSG_UPDATE_SUCC, \
     MSG_SERVER_ERROR, MESSAGE_ERROR, MSG_NO_ID_SUPPLIED, MSG_DELETE_SUCC, MSG_RECORD_NOT_EXIST, \
     MSG_NO_SUCH_ACTION
 from sys2do.model.logic import OrderHeader
 from sys2do.setting import PAGINATE_PER_PAGE
 from sys2do.model.system import SystemLog
-import json
+
 
 
 
@@ -121,6 +124,7 @@ class CustomerView(BasicView):
 #                            payment_id = _g('payment_id'),
                                 )
             DBSession.add(obj)
+            obj.attachment = multiupload()
             DBSession.commit()
             flash(MSG_SAVE_SUCC, MESSAGE_INFO)
             return redirect(url_for('.view', action = 'view', id = obj.id))
@@ -161,6 +165,12 @@ class CustomerView(BasicView):
             old_info = obj.serialize(fields) # to used for the history log
             for f in fields:
                 setattr(obj, f, _g(f))
+
+            #handle the file upload
+            old_attachment_ids = map(lambda (k, v) : v, _gp("old_attachment_"))
+            old_attachment_ids.extend(multiupload())
+            obj.attachment = old_attachment_ids
+
             DBSession.commit()
             flash(MSG_SAVE_SUCC, MESSAGE_INFO)
 #            return redirect(url_for('.view',id=obj.id))
