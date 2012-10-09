@@ -96,6 +96,9 @@ app.register_blueprint(views.customer.bpCustomer, url_prefix = '/customer')
 import views.warehouse
 app.register_blueprint(views.warehouse.bpWarehouse, url_prefix = '/warehouse')
 
+import views.inventory
+app.register_blueprint(views.inventory.bpInventory, url_prefix = '/inventory')
+
 #===============================================================================
 # import the customize filter and testing
 #===============================================================================
