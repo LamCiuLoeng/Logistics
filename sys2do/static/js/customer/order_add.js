@@ -74,11 +74,12 @@ function tosave(){
     
     
     if(msg.length < 1){
-        $.getJSON('/order/check_note',
+        $.getJSON('/order/ajax_check_before_save',
                   {
                     't' : nowstr(),
                     'note_id' : $('#note_id').val(),
-                    'note_no' : $('#note_no').val()
+                    'note_no' : $('#note_no').val().trim(),
+                    'ref_no'  : $("#ref_no").val().trim()
                   },
                   function(r){
                       if(r.code!=0){

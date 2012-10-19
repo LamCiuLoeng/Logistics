@@ -72,9 +72,9 @@ class DeliverView(BasicView):
 
         conditions = [DeliverHeader.active == 0]
         if values.get('create_time_from', None):
-            conditions.append(DeliverHeader.create_time > values['create_time_from'])
+            conditions.append(DeliverHeader.order_time > values['create_time_from'])
         if values.get('create_time_to', None):
-            conditions.append(DeliverHeader.create_time < '%s 23:59' % values['create_time_to'])
+            conditions.append(DeliverHeader.order_time < '%s 23:59' % values['create_time_to'])
         if values.get('no', None):
             conditions.append(DeliverHeader.no.op('like')('%%%s%%' % values['no']))
         if values.get('destination_province_id', None):
@@ -191,7 +191,7 @@ class DeliverView(BasicView):
             params = {}
             for f in ['ref_no', 'destination_province_id', 'destination_city_id', 'destination_address', 'destination_contact',
                       'destination_tel', 'destination_mobile', 'supplier_id',
-                      'supplier_contact', 'supplier_tel', 'expect_time',
+                      'supplier_contact', 'supplier_tel', 'expect_time', 'order_time',
                       'insurance_charge', 'sendout_charge', 'receive_charge', 'package_charge', 'load_charge', 'unload_charge',
                       'other_charge', 'proxy_charge', 'amount', 'payment_id', 'pickup_type_id', 'remark', 'carriage_charge',
                       ]:
@@ -204,9 +204,12 @@ class DeliverView(BasicView):
             line_no = 1
             for k, id in _gp('detail_'):
                 order_header = DBSession.query(OrderHeader).get(id)
-                DBSession.add(DeliverDetail(header = header,
+                d = DeliverDetail(header = header,
                                             order_header = order_header,
                                             line_no = line_no,
+                                            qty = _g('qty_%s' % id),
+                                            vol = _g('vol_%s' % id),
+                                            weight = _g('weight_%s' % id),
                                             insurance_charge = _g('insurance_charge_%s' % id),
                                             sendout_charge = _g('sendout_charge_%s' % id),
                                             receive_charge = _g('receive_charge_%s' % id),
@@ -217,10 +220,11 @@ class DeliverView(BasicView):
                                             proxy_charge = _g('proxy_charge_%s' % id),
                                             carriage_charge = _g('carriage_charge_%s' % id),
                                             amount = _g('amount_%s' % id),
-                                            ))
-                if order_header.qty : total_qty += order_header.qty
-                if order_header.vol : total_vol += order_header.vol
-                if order_header.weight : total_weight += order_header.weight
+                                            )
+                DBSession.add(d)
+                if order_header.qty : total_qty += float(d.qty)
+                if order_header.vol : total_vol += float(d.vol)
+                if order_header.weight : total_weight += float(d.weight)
 
                 order_header.update_status(SORTING[0])
                 order_header.cost = _g('amount_%s' % id),
@@ -274,7 +278,7 @@ class DeliverView(BasicView):
         header = getOr404(DeliverHeader, _g('id'), redirect_url = self.default())
 
         if header.destination_province_id:
-            destination_cites = header.destination_provice.children()
+            destination_cites = header.destination_province.children()
         else: destination_cites = []
         return {'header' : header, 'destination_cites' : destination_cites}
 
@@ -290,7 +294,7 @@ class DeliverView(BasicView):
             fields = [
                       'ref_no', 'destination_province_id', 'destination_city_id', 'destination_address', 'destination_contact',
                       'destination_tel', 'destination_mobile', 'supplier_id', 'supplier_contact', 'supplier_tel',
-                      'need_transfer', 'amount', 'remark', 'expect_time',
+                      'need_transfer', 'amount', 'remark', 'expect_time', 'order_time',
                       'insurance_charge', 'sendout_charge', 'receive_charge', 'package_charge', 'other_charge', 'carriage_charge',
                       'load_charge', 'unload_charge', 'proxy_charge', 'payment_id', 'pickup_type_id',
                       ]
@@ -299,7 +303,12 @@ class DeliverView(BasicView):
             old_info = header.serialize(fields) # to used for the history log
             for f in fields:    setattr(header, f, _g(f))
 
+            total_qty = total_vol = total_weight = 0
+
             for d in header.details:
+                d.qty = _g('qty_%s' % d.id)
+                d.vol = _g('vol_%s' % d.id)
+                d.weight = _g('weight_%s' % d.id)
                 d.insurance_charge = _g('insurance_charge_%s' % d.id)
                 d.sendout_charge = _g('sendout_charge_%s' % d.id)
                 d.receive_charge = _g('receive_charge_%s' % d.id)
@@ -311,6 +320,15 @@ class DeliverView(BasicView):
                 d.carriage_charge = _g('carriage_charge_%s' % d.id)
                 d.amount = _g('amount_%s' % d.id)
                 d.order_header.cost = d.amount
+
+                if d.qty : total_qty += float(d.qty)
+                if d.vol : total_vol += float(d.vol)
+                if d.weight : total_weight += float(d.weight)
+
+
+            header.qty = total_qty
+            header.vol = total_vol
+            header.weight = total_weight
 
             #handle the file upload
             old_attachment_ids = map(lambda (k, v) : v, _gp("old_attachment_"))

@@ -68,8 +68,8 @@ class FinView(BasicView):
 
 
         conditions = [OrderHeader.active == 0]
-        if values.get('create_time_from', None):       conditions.append(OrderHeader.create_time > values['create_time_from'])
-        if values.get('create_time_to', None):         conditions.append(OrderHeader.create_time < '%s 23:59' % values['create_time_to'])
+        if values.get('create_time_from', None):       conditions.append(OrderHeader.order_time > values['create_time_from'])
+        if values.get('create_time_to', None):         conditions.append(OrderHeader.order_time < '%s 23:59' % values['create_time_to'])
         if values.get('ref_no', None):                 conditions.append(OrderHeader.ref_no.op('like')('%%%s%%' % values['ref_no']))
         if values.get('no', None):                     conditions.append(OrderHeader.no.op('like')('%%%s%%' % values['no']))
         if values.get('source_province_id', None):
@@ -191,8 +191,8 @@ class FinView(BasicView):
                   ] :
             values[f] = _g(f)
         conditions = [OrderHeader.active == 0, ]
-        if values.get('create_time_from', None):       conditions.append(OrderHeader.create_time > values['create_time_from'])
-        if values.get('create_time_to', None):         conditions.append(OrderHeader.create_time < '%s 23:59' % values['create_time_to'])
+        if values.get('create_time_from', None):       conditions.append(OrderHeader.order_time > values['create_time_from'])
+        if values.get('create_time_to', None):         conditions.append(OrderHeader.order_time < '%s 23:59' % values['create_time_to'])
         if values.get('ref_no', None):                 conditions.append(OrderHeader.ref_no.op('like')('%%%s%%' % values['ref_no']))
         if values.get('customer_id', None):            conditions.append(OrderHeader.customer_id == values['customer_id'])
         if values.get('destination_province_id', None):            conditions.append(OrderHeader.destination_province_id == values['destination_province_id'])
@@ -216,7 +216,10 @@ class FinView(BasicView):
                    oheader.amount, sname or '', sno or '',
                    ]
             if oheader.cost:
-                row.extend([oheader.cost, (oheader.amount - oheader.cost), "%.2f%%" % (oheader.cost * 100 / oheader.amount), "%.2f%%" % (100 - oheader.cost * 100 / oheader.amount), ])
+                if oheader.amount:
+                    row.extend([oheader.cost, (oheader.amount - oheader.cost), "%.2f%%" % (oheader.cost * 100 / oheader.amount), "%.2f%%" % (100 - oheader.cost * 100 / oheader.amount), ])
+                else:
+                    row.extend(['', '', '', ''])
             else:
                 row.extend(['', '', '', ''])
 
@@ -283,8 +286,8 @@ class FinView(BasicView):
                       DeliverHeader.active == 0 , DeliverDetail.active == 0, DeliverHeader.id == DeliverDetail.header_id,
                       OrderHeader.id == DeliverDetail.order_header_id,
                       ]
-        if values.get('create_time_from', None):       conditions.append(OrderHeader.create_time > values['create_time_from'])
-        if values.get('create_time_to', None):         conditions.append(OrderHeader.create_time < '%s 23:59' % values['create_time_to'])
+        if values.get('create_time_from', None):       conditions.append(OrderHeader.order_time > values['create_time_from'])
+        if values.get('create_time_to', None):         conditions.append(OrderHeader.order_time < '%s 23:59' % values['create_time_to'])
         if values.get('ref_no', None):                 conditions.append(OrderHeader.ref_no.op('like')('%%%s%%' % values['ref_no']))
         if values.get('deliver_no', None):             conditions.append(DeliverHeader.no.op('like')('%%%s%%' % values['deliver_no']))
         if values.get('destination_province_id', None):

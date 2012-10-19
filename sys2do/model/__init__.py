@@ -23,3 +23,4 @@ DBSession.configure(bind = engine)
 from auth import User, Group, Permission
 from system import DataDictionary, SystemLog, UploadFile
 from logic import *
+from master import *

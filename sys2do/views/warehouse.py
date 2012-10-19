@@ -6,17 +6,21 @@
 #  Description:
 ###########################################
 '''
-from sys2do.views import BasicView
+from sqlalchemy.sql.expression import and_
+import traceback
+from werkzeug.utils import redirect
 from flask.blueprints import Blueprint
+from flask.helpers import flash
+
+
+from sys2do.views import BasicView
 from sys2do.util.decorator import templated, login_required
 from sys2do.model.master import InventoryLocation, InventoryItem
 from sys2do.model import DBSession
-from sys2do.util.common import _g
-from flask.helpers import flash
-from sys2do.constant import MESSAGE_INFO, MSG_SAVE_SUCC
-from werkzeug.utils import redirect
+from sys2do.util.common import _g, _error
+from sys2do.constant import MESSAGE_INFO, MSG_SAVE_SUCC, MSG_SERVER_ERROR, \
+    MESSAGE_ERROR
 
-from sqlalchemy.sql.expression import and_
 
 
 
@@ -48,25 +52,58 @@ class WarehouseView(BasicView):
                    "parent_id" : _g('parent_id'),
                   }
 
-        if params['parent_id']:
-            parent = DBSession.query(InventoryLocation).get(params['parent_id'])
-            params['full_path'] = "%s%s" % (parent.full_path, params['name'])
-            params['full_path_ids'] = parent.full_path_ids
-        else:
-            params['full_path'] = params['name']
-            params['full_path_ids'] = None
+        try:
+            obj = InventoryLocation(**params)
+            DBSession.add(obj)
+            DBSession.flush()
 
-        obj = InventoryLocation(**params)
-        DBSession.add(obj)
-        DBSession.flush()
+            if params['parent_id']:
+                parent = DBSession.query(InventoryLocation).get(params['parent_id'])
+                obj.full_path = "%s%s" % (parent.full_path, params['name'])
+                obj.full_path_ids = "%s|%s" % (parent.full_path_ids, obj.id)
+            else:
+                obj.full_path = params['name']
+                obj.full_path_ids = obj.id
 
-        if not obj.full_path_ids :
-            obj.full_path_ids = self.id
-        else:
-            obj.full_path_ids = "%s|%s" % (obj.full_path_ids, obj.id)
+            DBSession.commit()
+            flash(MSG_SAVE_SUCC, MESSAGE_INFO)
+        except:
+            DBSession.rollback()
+            _error(traceback.print_exc())
+        return redirect(self.default())
 
-        DBSession.commit()
-        flash(MSG_SAVE_SUCC, MESSAGE_INFO)
+
+    @templated("warehouse/update.html")
+    def update(self):
+        id = _g('id')
+        obj = DBSession.query(InventoryLocation).get(id)
+        locations = DBSession.query(InventoryLocation).filter(InventoryLocation.active == 0).order_by(InventoryLocation.full_path)
+        return {'obj' : obj, 'locations' : locations}
+
+
+    def save_update(self):
+        id = _g('id')
+        try:
+            obj = DBSession.query(InventoryLocation).get(id)
+            for f in ["name", "manager", "address", "remark", "parent_id"]:
+                setattr(obj, f, _g(f))
+
+            parent_id = _g('parent_id')
+            if parent_id:
+                parent = DBSession.query(InventoryLocation).get(parent_id)
+                obj.full_path = "".join([parent.full_path, obj.name])
+                obj.full_path_ids = "%s|%s" % (parent.full_path_ids, obj.id)
+            else:
+                obj.full_path = obj.name
+                obj.full_path_ids = obj.id
+
+
+            DBSession.commit()
+            flash(MSG_SAVE_SUCC, MESSAGE_INFO)
+        except:
+            DBSession.rollback()
+            _error(traceback.print_exc())
+            flash(MSG_SERVER_ERROR, MESSAGE_ERROR)
         return redirect(self.default())
 
 

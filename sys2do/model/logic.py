@@ -91,7 +91,7 @@ class OrderHeader(DeclarativeBase, SysMixin, CRUDMixin):
     destination_sms = Column(Integer, default = 0, doc = u'收货人短信通知') # 0 is no sms, 1 is send sms when the order arrive
 
 
-#    order_time = Column(Text, doc = u'')
+    order_time = Column(Text, doc = u'下单时间')
     estimate_time = Column(Text, doc = u'估计到达')
     expect_time = Column(Text, doc = u'到达预期')
     actual_time = Column(Text, doc = u'实际到达')
@@ -159,7 +159,7 @@ class OrderHeader(DeclarativeBase, SysMixin, CRUDMixin):
                 'id' : self.id,
                 'no' : self.no,
                 'customer' : self.customer,
-#                'source_provice' : self.source_provice,
+#                'source_province' : self.source_province,
 #                'source_city' : self.source_city,
 #                'source_district' : self.source_district,
                 'source_address' : self.source_address,
@@ -305,6 +305,7 @@ class DeliverHeader(DeclarativeBase, SysMixin, CRUDMixin):
     supplier_contact = Column(Text, doc = u'承运商联系人')
     supplier_tel = Column(Text, doc = u'承运商电话')
 
+    order_time = Column(Text, doc = u'下单时间')
     sendout_time = Column(Text, doc = u'发货时间')
     expect_time = Column(Text, doc = u'到达预期')
     actual_time = Column(Text, doc = u'实际到达')
@@ -347,7 +348,7 @@ class DeliverHeader(DeclarativeBase, SysMixin, CRUDMixin):
                 'id' : self.id,
                 'no' : self.no,
 #                'destination_address' : self.destination_address,
-                'destination_provice' : self.destination_provice,
+                'destination_province' : self.destination_province,
                 'destination_city' : self.destination_city,
                 'supplier_id' : self.supplier_id,
                 'supplier' : self.supplier,
@@ -406,7 +407,7 @@ class DeliverHeader(DeclarativeBase, SysMixin, CRUDMixin):
 
 #    @property
 #    def destination_full_address(self):
-#        return "".join(filter(lambda v:v, [self.destination_provice, self.destination_city, self.destination_address]))
+#        return "".join(filter(lambda v:v, [self.destination_province, self.destination_city, self.destination_address]))
 
 
 class DeliverDetail(DeclarativeBase, SysMixin):
@@ -420,6 +421,10 @@ class DeliverDetail(DeclarativeBase, SysMixin):
 
     order_header_id = Column(Integer, ForeignKey('order_header.id'))
     order_header = relation(OrderHeader)
+
+    qty = Column(Float, default = None, doc = u'数量')
+    weight = Column(Float, default = None, doc = u'重量')
+    vol = Column(Float, default = None, doc = u'体积')
 
     insurance_charge = Column(Float, default = 0, doc = u'保险费用')
     sendout_charge = Column(Float, default = 0, doc = u'送货费用')

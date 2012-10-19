@@ -1,34 +1,40 @@
 {% extends "master.html" %}
 
-{% block subtitle %} - 仓存管理{% endblock %}
+{% block subtitle %} - 仓位管理{% endblock %}
 
 {% block extJS %}
 
 {% endblock %}
 
-{% block content %}
-	
+{% block inner_menu %}
+<div class="inner_menu">	
 	<ul>
-		<li><a href="{{url_for('bpWarehouse.view',action='add')}}">新增仓库</a></li>
+		<li><a href="{{url_for('bpWarehouse.view',action='add')}}"><img src="/static/images/system/order_manage_31.jpg" width="77" height="21" id="Image71" onmouseover="MM_swapImage('Image71','','/static/images/system/order_manage_h_31.jpg',1)" onmouseout="MM_swapImgRestore()"/></a></li>
 	</ul>
+</div>
+{% endblock %}
 	
-	<table border="1" cellpadding="3" cellspacing="3">
+{% block content %}
+	<table border="0" cellpadding="0" cellspacing="0"  style="width:750px">
 		<thead>
-			<tr>
-				<td>仓存地点名称</td>
-				<td>仓库管理人</td>
-				<td>仓库地址</td>
-				<td>查看库存</td>
+			<tr class="field_head">
+				<th align="center" style="width:250px;">仓位名称</td>
+				<th align="center" style="width:150px;">仓位管理人</td>
+				<th align="center" style="width:350px;">仓位地址</td>
+				<th align="center" style="width:150px;">创建人</td>
+				<th align="center" style="width:150px;">创建时间</td>
 			</tr>
 		</thead>
 		{% for r in result %}
-			<tr>
-				<td>{{r.full_path|ifFalse}}</td>
-				<td>{{r.manager|ifFalse}}</td>
-				<td>{{r.address|ifFalse}}</td>
-				<td><a href="{{url_for('bpWarehouse.view',action='view_items',id=r.id)}}">查看</a></td>
+			<tr class="data_table_tr {{ loop.cycle('data_table_tr_odd', 'data_table_tr_even') }}">
+				<td><a href="{{url_for('.view',action='update',id=r.id)}}">{{r.name|f}}</a></td>
+				<td>{{r.manager|f}}</td>
+				<td>{{r.full_path|f}}</td>
+				<td>{{r.create_by|f}}</td>
+				<td>{{r.create_time|ft}}</td>
 			</tr>
 		{% endfor %}
 	</table>
-	
+	<br />
+	<br />
 {% endblock %}

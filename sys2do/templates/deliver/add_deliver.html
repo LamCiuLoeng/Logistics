@@ -162,13 +162,17 @@
 				<tr>
 					<td height="30" align="right">{{_('Supplier Contact')}}</td>
 					<td width="12">&nbsp;</td>
-				    <td ><input type="text" name="supplier_contact" id="supplier_contact" class="field order_add_div_body_input must_input" style="width: 200px"/></td>
+				    <td><input type="text" name="supplier_contact" id="supplier_contact" class="field order_add_div_body_input must_input" style="width: 200px"/></td>
 					<td width="12">&nbsp;</td>
 					<td height="30" align="right">{{_('Supplier Tel')}}</td>
 					<td width="12">&nbsp;</td>
 				    <td colspan="10"><input type="text" name="supplier_tel" id="supplier_tel" class="field order_add_div_body_input must_input" style="width: 200px"/></td>
 				</tr>
 				<tr>
+					<td height="30" align="right">下单时间</td>
+					<td width="12">&nbsp;</td>
+				    <td><input type="text" name="order_time" id="order_time" class="datetimepicker order_add_div_body_input must_input" style="width: 200px" value="{{SYSTEM_NOW()|ft}}"/></td>
+					<td width="12">&nbsp;</td>
 					<td height="30" align="right">{{_('Expect Time')}}</td>
 					<td width="12">&nbsp;</td>
 				    <td colspan="10"><input type="text" name="expect_time" id="expect_time" class="datepicker order_add_div_body_input must_input" style="width: 200px"/></td>
@@ -250,7 +254,7 @@
 					<th style="width:50px">{{_('Weight')}}(吨)</th>
 					<th style="width:100px">{{_('Destination Contact')}}</th>
 					<th style="width:100px">{{_('Destination Tel')}}</th>
-					<th style="width:150px">{{_('Create Time')}}</th>
+					<th style="width:150px">下单时间</th>
 					<th style="width:150px">{{_('Creator')}}</th>
 				</tr>
 			</thead>
@@ -259,12 +263,12 @@
 					<th>{{d.ref_no|f}}<input type="hidden" name="detail_{{d.id}}" value="{{d.id}}"/></th>
 					<td>{{d.source_province}}{{d.source_city}}</td>
 					<td>{{d.destination_province}}{{d.destination_city}}</td>
-					<td>{{d.qty|f}}</td>
-					<td>{{d.vol|f}}</td>
-					<td>{{d.weight|f}}</td>
+					<td><input type="text" name="qty_{{d.id}}" class="numeric number_field" value="{{d.qty|f}}"/></td>
+					<td><input type="text" name="vol_{{d.id}}" class="numeric number_field" value="{{d.vol|f}}"/></td>
+					<td><input type="text" name="weight_{{d.id}}" class="numeric number_field" value="{{d.weight|f}}"/></td>
 					<td>{{d.destination_contact|f}}</td>
 					<td>{{d.destination_tel|f}}</td>			
-					<td>{{d.create_time|ft}}</td>
+					<td>{{d.order_time}}</td>
 					<td>{{d.create_by|ifFalse}}</td>
 				</tr>
 				<tr class="data_table_tr data_table_tr_even">

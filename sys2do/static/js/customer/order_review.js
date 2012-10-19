@@ -438,7 +438,7 @@ function todo(type,flag,handler){
     $.getJSON("/order/ajax_change_flag",
              {
                 't' : nowstr(),
-                'id' : $("#id").val(),
+                'order_ids' : $("#id").val(),
                 'type' : type,
                 'flag' : flag
              },

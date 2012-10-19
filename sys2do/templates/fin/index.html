@@ -33,15 +33,6 @@
 		$("#records").submit();
 	}
 	
-	function allselect(obj){
-		var t = $(obj);
-		if(t.attr('checked')){
-			$("input[type='checkbox'][name='order_ids']").attr('checked','checked');
-		}else{
-		    $("input[type='checkbox'][name='order_ids']").removeAttr('checked');
-		}
-	}
-	
 
 	function customer_change(){
 		$("#source_company_id").empty();
@@ -163,7 +154,7 @@
 	    	  {{mymacros.select('destination_city_id',destination_cites,destination_city_id,style="width:150px")}}
           </li>
          
-          <li style="width:755px"><span>{{_('Source Company')}}</span>
+          <li style="width:755px"><span>客户</span>
           	{% set customer_id = values.get('customer_id',None)|int  %}
             {{mymacros.select('customer_id',MASTER_ALL('Customer'),customer_id,style="width:250px")}}
 			
@@ -253,7 +244,7 @@
 	    <td colspan="100" style="text-align:right">{{mymacros.mypaginate(records)}}</td>
 	</tr>
   <tr class="field_head">
-    <th align="center" style="width:50px;"><input type="checkbox" onclick="allselect(this);"/></th>
+    <th align="center" style="width:50px;"><input type="checkbox" onclick="selectall(this,'order_ids');"/></th>
     <td align="center" style="width:200px;">{{mymacros.show_direction(values,'ref_no')}}{{_('Order Number')}}</td>
     <td align="center" style="width:200px;">{{mymacros.show_direction(values,'no')}}系统编号</td>
     <td align="center" style="width:150px;">送货单</td>

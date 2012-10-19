@@ -243,9 +243,9 @@ class Note(DeclarativeBase, SysMixin, CRUDMixin):
 
 #    _range = Column('range', Text)
 
-    def __str__(self): return '%s(%s)' % (self.name, self.code)
-    def __repr__(self): return '%s(%s)' % (self.name, self.code)
-    def __unicode__(self): return '%s(%s)' % (self.name, self.code)
+    def __str__(self): return self.name
+    def __repr__(self): return self.name
+    def __unicode__(self): return self.name
 
     @classmethod
     def _get_fields(clz):
@@ -546,7 +546,7 @@ class Supplier(DeclarativeBase, SysMixin, CRUDMixin):
     name = Column(Text, doc = u'承运商名称')
     display_name = Column(Text)
 #    province_id = Column(Integer, ForeignKey('master_province.id'))
-#    provice = relation(Province)
+#    province = relation(Province)
 #    city_id = Column(Integer, ForeignKey('master_city.id'))
 #    city = relation(City)
 #    district_id = Column(Integer, ForeignKey('master_district.id'))
@@ -643,53 +643,6 @@ class WeightUnit(DeclarativeBase, SysMixin):
 
 
 
-class InventoryLocation(DeclarativeBase, SysMixin):
-    __tablename__ = 'master_inventory_location'
-
-    id = Column(Integer, autoincrement = True, primary_key = True)
-    name = Column(Text)
-    manager = Column(Text)
-    address = Column(Text)
-    remark = Column(Text)
-    full_path = Column(Text)
-    full_path_ids = Column(Text)
-    parent_id = Column(Integer, ForeignKey('master_inventory_location.id'))
-    parent = relation('InventoryLocation', backref = backref("children", remote_side = id))
-
-    def __str__(self): return self.name
-    def __repr__(self): return self.name
-    def __unicode__(self): return self.name
-
-#
-#
-#    @property
-#    def items(self):
-#        return DBSession.query(WarehouseItem).filter(and_(WarehouseItem.active == 0, WarehouseItem.warehouse_id == self.id))
-
-class InventoryItem(DeclarativeBase, SysMixin):
-    __tablename__ = 'master_inventory_item'
-
-    id = Column(Integer, autoincrement = True, primary_key = True)
-
-    item = Column(Text)
-    location_id = Column(Integer, ForeignKey('master_inventory_location.id'))
-    location = relation(InventoryLocation)
-    qty = Column(Integer, default = 0)
-    refer_order_header = Column(Text)
-#    refer_order_detail_id = Column(Integer, ForeignKey('order_detail.id'))
-    remark = Column(Text)
-
-
-#    @property
-#    def order_detail(self):
-#        from sys2do.model.logic import OrderDetail
-#        return DBSession.query(OrderDetail).get(self.refer_order_detail_id)
-
-
-
-
-
-
 class Barcode(DeclarativeBase, SysMixin, CRUDMixin):
     __tablename__ = 'master_barcode'
 
@@ -729,3 +682,163 @@ class Barcode(DeclarativeBase, SysMixin, CRUDMixin):
             return (0, b.status) #barcode exist
         except:
             return (1, None) # barcode not exist
+
+
+
+
+class InventoryLocation(DeclarativeBase, SysMixin):
+    __tablename__ = 'master_inventory_location'
+
+    id = Column(Integer, autoincrement = True, primary_key = True)
+    name = Column(Text)
+    manager = Column(Text)
+    address = Column(Text)
+    remark = Column(Text)
+    full_path = Column(Text)
+    full_path_ids = Column(Text)
+    parent_id = Column(Integer, ForeignKey('master_inventory_location.id'))
+    parent = relation('InventoryLocation', backref = backref("children", remote_side = id))
+
+    def __str__(self): return self.name
+    def __repr__(self): return self.name
+    def __unicode__(self): return self.name
+
+#
+#
+#    @property
+#    def items(self):
+#        return DBSession.query(WarehouseItem).filter(and_(WarehouseItem.active == 0, WarehouseItem.warehouse_id == self.id))
+
+class InventoryItem(DeclarativeBase, SysMixin):
+    __tablename__ = 'master_inventory_item'
+
+    id = Column(Integer, autoincrement = True, primary_key = True)
+    name = Column(Text)
+    desc = Column(Text)
+    qty = Column(Float, default = 0, doc = u'数量')
+    weight = Column(Float, default = 0, doc = u'重量')
+    area = Column(Float, default = 0, doc = u'面积')
+
+    exp_qty = Column(Float, default = 0, doc = u'预期数量')
+    exp_weight = Column(Float, default = 0, doc = u'预期重量')
+    exp_area = Column(Float, default = 0, doc = u'预期面积')
+
+    loss = Column(Float, default = 0, doc = u'损耗')
+    remark = Column(Text)
+
+    def __str__(self): return self.name
+    def __repr__(self): return self.name
+    def __unicode__(self): return self.name
+
+
+class InventoryLocationItem(DeclarativeBase, SysMixin):
+    __tablename__ = 'inventory_location_item'
+
+    id = Column(Integer, autoincrement = True, primary_key = True)
+
+    item_id = Column(Integer, ForeignKey('master_inventory_item.id'))
+    item = relation(InventoryItem)
+
+    location_id = Column(Integer, ForeignKey('master_inventory_location.id'))
+    location = relation(InventoryLocation)
+
+    qty = Column(Float, default = 0, doc = u'数量')
+    weight = Column(Float, default = 0, doc = u'重量')
+    area = Column(Float, default = 0, doc = u'面积')
+    loss = Column(Float, default = 0, doc = u'损耗')
+
+
+
+class InventoryInNote(DeclarativeBase, SysMixin):
+    __tablename__ = 'inventory_in_note'
+
+    id = Column(Integer, autoincrement = True, primary_key = True)
+    no = Column(Text, doc = u'系统编号')
+
+    location_id = Column(Integer, ForeignKey('master_inventory_location.id'))
+    location = relation(InventoryLocation)
+
+    customer_id = Column(Integer, ForeignKey('master_customer.id'), doc = u'客户')
+    customer = relation(Customer)
+
+    qty = Column(Float, default = None, doc = u'数量')
+    weight = Column(Float, default = None, doc = u'重量')
+    area = Column(Float, default = None, doc = u'面积')
+    loss = Column(Float, default = None, doc = u'损耗')
+
+    so = Column(Text)
+    po = Column(Text)
+    dn = Column(Text)
+    ref = Column(Text)
+    remark = Column(Text)
+
+    @property
+    def details(self):
+        return DBSession.query(InventoryNoteDetail).filter(and_(InventoryNoteDetail.active == 0,
+                                                                InventoryNoteDetail.type == 'IN',
+                                                                InventoryNoteDetail.header_id == self.id,
+                                                                )).order_by(InventoryNoteDetail.id)
+
+
+class InventoryOutNote(DeclarativeBase, SysMixin):
+    __tablename__ = 'inventory_out_note'
+
+    id = Column(Integer, autoincrement = True, primary_key = True)
+    no = Column(Text, doc = u'系统编号')
+#
+#    location_id = Column(Integer, ForeignKey('master_inventory_location.id'))
+#    location = relation(InventoryLocation)
+
+    customer_id = Column(Integer, ForeignKey('master_customer.id'), doc = u'客户')
+    customer = relation(Customer)
+
+    qty = Column(Float, default = None, doc = u'数量')
+    weight = Column(Float, default = None, doc = u'重量')
+    area = Column(Float, default = None, doc = u'面积')
+
+    so = Column(Text)
+    po = Column(Text)
+    dn = Column(Text)
+    ref = Column(Text)
+    status = Column(Integer, default = 0)  # 0 is new ,1 is approved
+    approver_id = Column(Integer, ForeignKey('system_user.id'), doc = u'审批人员')
+    approver = relation(User)
+    remark = Column(Text)
+
+
+
+    @property
+    def details(self):
+        return DBSession.query(InventoryNoteDetail).filter(and_(InventoryNoteDetail.active == 0,
+                                                                InventoryNoteDetail.type == 'OUT',
+                                                                InventoryNoteDetail.header_id == self.id,
+                                                                )).order_by(InventoryNoteDetail.id)
+
+
+class InventoryNoteDetail(DeclarativeBase, SysMixin):
+    __tablename__ = 'inventory_note_detail'
+
+    id = Column(Integer, autoincrement = True, primary_key = True)
+
+    header_id = Column(Integer, default = None)
+    type = Column(Text)
+    item_id = Column(Integer, ForeignKey('master_inventory_item.id'))
+    item = relation(InventoryItem)
+    desc = Column(Text)
+
+    qty = Column(Float, default = None, doc = u'数量')
+    weight = Column(Float, default = None, doc = u'重量')
+    area = Column(Float, default = None, doc = u'面积')
+
+    remark = Column(Text)
+
+    @property
+    def header(self):
+        if self.type == 'IN' :
+            obj = InventoryInNote
+        elif self.type == 'OUT':
+            obj = InventoryOutNote
+        else:
+            return None
+        return DBSession.query(obj).get(self.header_id)
+

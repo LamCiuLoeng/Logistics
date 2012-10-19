@@ -10,9 +10,9 @@ function todo_approve(obj){
                     var tmp = $(this);
                     var tr = $(tmp.parents("tr")[0]);
                     if(v=='1'){
-                        $(".approval_span",tr).text("{{_(ORDER_APPROVED[1])}}");
+                        $(".approval_span",tr).text("通过");
                     }else{
-                        $(".approval_span",tr).text("{{_(ORDER_DISAPPROVED[1])}}");
+                        $(".approval_span",tr).text("未通过");
                     }
                 });             
                 show_info(r.msg);
@@ -34,9 +34,9 @@ function todo_paid(obj){
                     var tmp = $(this);
                     var tr = $(tmp.parents("tr")[0]);
                     if(v=='0'){
-                        $(".paid_span",tr).text("{{_(ORDER_NOT_PAID[1])}}");
+                        $(".paid_span",tr).text("未付");
                     }else{
-                        $(".paid_span",tr).text("{{_(ORDER_PAID[1])}}");
+                        $(".paid_span",tr).text("已付");
                     }
                 });             
                 show_info(r.msg);
@@ -57,9 +57,9 @@ function todo_supplier_paid(obj){
                     var tmp = $(this);
                     var tr = $(tmp.parents("tr")[0]);
                     if(v=='0'){
-                        $(".supplier_paid_span",tr).text("{{_(DELIVER_NOT_PAID[1])}}");
+                        $(".supplier_paid_span",tr).text("未付");
                     }else{
-                        $(".supplier_paid_span",tr).text("{{_(DELIVER_PAID[1])}}");
+                        $(".supplier_paid_span",tr).text("已付");
                     }
                 });             
                 show_info(r.msg);
@@ -148,7 +148,7 @@ function todo(type,flag,handler){
         return false;
     }
     
-    $.getJSON("{{ url_for('.view',action='ajax_change_flag') }}",
+    $.getJSON("/order/ajax_change_flag",
              {
                 't' : nowstr(),
                 'order_ids' : ids.join('|'),

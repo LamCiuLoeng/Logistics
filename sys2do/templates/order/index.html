@@ -31,15 +31,6 @@
 		$("#records").submit();
 	}
 	
-	function allselect(obj){
-		var t = $(obj);
-		if(t.attr('checked')){
-			$("input[type='checkbox'][name='order_ids']").attr('checked','checked');
-		}else{
-		    $("input[type='checkbox'][name='order_ids']").removeAttr('checked');
-		}
-	}
-	
 	function todeliver(){
 		if($("input[name='order_ids']:checked").length < 1){
 			show_error('{{MSG_ATLEAST_ONE_ORDER_TO_CREATE_DELIVER}}');
@@ -147,9 +138,9 @@
           	  {% set destination_city_id = values.get('destination_city_id',None)|int  %}
 	    	  {{mymacros.select('destination_city_id',destination_cites,destination_city_id,style="width:150px")}}
           </li>
-          <li style="width:755px"><span>{{_('Source Company')}}</span>
-          	  {% set source_company_id = values.get('source_company_id',None)|int  %}
-          	  {{mymacros.select('source_company_id',MASTER_ALL('Customer'),source_company_id,style="width:400px")}}
+          <li style="width:755px"><span>客户</span>
+          	  {% set customer_id = values.get('customer_id',None)|int  %}
+          	  {{mymacros.select('customer_id',MASTER_ALL('Customer'),customer_id,style="width:400px")}}
           </li>
           <li><span>审核</span>
               <select name="approve" id="approve">
@@ -221,18 +212,18 @@
 	    <td colspan="100" style="text-align:right">{{mymacros.mypaginate(records)}}</td>
 	</tr>
   <tr class="field_head">
-    <th align="center" style="width:50px;"><input type="checkbox" onclick="allselect(this);"/></th>
+    <th align="center" style="width:50px;"><input type="checkbox" onclick="selectall(this,'order_ids');"/></th>
     <td align="center" style="width:200px;">{{mymacros.show_direction(values,'ref_no')}}{{_('Order Number')}}</td>
     <td align="center" style="width:200px;">{{mymacros.show_direction(values,'no')}}系统编号</td>
     <td align="center" style="width:200px;">{{mymacros.show_direction(values,'source_province_id')}}{{_('Source Station')}}</td>
-    <td align="center" style="width:300px;">{{_('Source Company')}}</td>
+    <td align="center" style="width:300px;">客户</td>
     <td align="center" style="width:200px;">{{mymacros.show_direction(values,'destination_province_id')}}{{_('Destination Station')}}</td>
     <td align="center" style="width:300px;">{{_('Destination Company')}}</td>
     <td align="center" style="width:80px;">{{mymacros.show_direction(values,'qty')}}{{_('Qty')}}</td>
     <td align="center" style="width:80px;">{{_('Weight')}}(吨)</td>
     <td align="center" style="width:80px;">{{mymacros.show_direction(values,'amount')}}{{_('Amount')}}(元)</td>
     <td align="center" style="width:200px;">送货单</td>
-    <td align="center" style="width:200px;">{{mymacros.show_direction(values,'create_time')}}{{_('Create Time')}}</td>
+    <td align="center" style="width:200px;">{{mymacros.show_direction(values,'create_time')}}下单时间</td>
     <td align="center" style="width:120px;">{{mymacros.show_direction(values,'create_by_id')}}{{_('Creator')}}</td>
     <td align="center" style="width:150px;">{{_('Status')}}</td>
     <td align="center" style="width:50px;">审核</td>
@@ -259,7 +250,7 @@
 				<a href="{{url_for('bpDeliver.view',action='view',id=r.deliver_header_ref)}}">{{r.deliver_header_no}}</a>
 			{%endif%}
 		</td>
-		<td>{{r.create_time|ft}}</td>
+		<td>{{r.order_time}}</td>
 		<td>{{r.create_by|f}}</td>
 		<td>{{r.status|showStatus}}</td>
 		<td><span class="approval_span">{{mymacros.show_approve(r.approve)}}</span></td>

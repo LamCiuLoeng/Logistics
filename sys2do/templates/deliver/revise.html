@@ -164,6 +164,10 @@
 				    <td colspan="10"><input type="text" name="supplier_tel" id="supplier_tel" class="field order_add_div_body_input must_input" style="width: 200px" value="{{header.supplier_tel|f}}"/></td>
 				</tr>
 				<tr>
+					<td height="30" align="right">下单时间</td>
+					<td>&nbsp;</td>
+				    <td><input type="text" name="order_time" id="order_time" class="datetimepicker order_add_div_body_input must_input" style="width: 200px" value="{{header.order_time}}"/></td>
+					<td>&nbsp;</td>
 					<td height="30" align="right">{{_('Expect Time')}}</td>
 					<td>&nbsp;</td>
 				  <td><input type="text" name="expect_time" id="expect_time" class="datepicker order_add_div_body_input must_input" style="width: 200px" value="{{header.expect_time|f}}"/></td>
@@ -245,7 +249,7 @@
 					<th style="width:50px">{{_('Weight')}}(吨)</th>
 					<th style="width:100px">{{_('Destination Contact')}}</th>
 					<th style="width:100px">{{_('Destination Tel')}}</th>
-					<th style="width:150px">{{_('Create Time')}}</th>
+					<th style="width:150px">下单时间</th>
 					<th style="width:150px">{{_('Creator')}}</th>
 				</tr>
 			</thead>
@@ -254,9 +258,9 @@
 					<th>{{d.order_header.ref_no|f}}<input type="hidden" name="detail_{{d.id}}" value="{{d.id}}"/></th>
 					<td>{{d.order_header.source_province}}{{d.source_city}}</td>
 					<td>{{d.order_header.destination_province}}{{d.destination_city}}</td>
-					<td>{{d.order_header.qty|f}}</td>
-					<td>{{d.order_header.vol|f}}</td>
-					<td>{{d.order_header.weight|f}}</td>
+					<td><input type="text" name="qty_{{d.id}}" value="{{d.qty|fn}}"/></td>
+					<td><input type="text" name="vol_{{d.id}}" value="{{d.vol|fn}}"/></td>
+					<td><input type="text" name="weight_{{d.id}}" value="{{d.weight|fn}}"/></td>
 					<td>{{d.order_header.destination_contact|f}}</td>
 					<td>{{d.order_header.destination_tel|f}}</td>
 					<td>{{d.order_header.create_time|ft}}</td>

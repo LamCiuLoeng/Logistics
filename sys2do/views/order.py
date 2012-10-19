@@ -64,8 +64,7 @@ class OrderView(BasicView):
             values = {'page' : 1}
             for f in ['no', 'create_time_from', 'create_time_to', 'ref_no',
                       'source_province_id', 'source_city_id', 'destination_province_id', 'destination_city_id',
-                      'source_company_id', 'destination_company_id',
-                      'approve', 'paid', 'is_exception', 'is_less_qty'] :
+                      'customer_id', 'approve', 'paid', 'is_exception', 'is_less_qty'] :
                 values[f] = _g(f)
             values['field'] = _g('field', None) or 'create_time'
             values['direction'] = _g('direction', None) or 'desc'
@@ -83,9 +82,9 @@ class OrderView(BasicView):
 
         conditions = [OrderHeader.active == 0]
         if values.get('create_time_from', None):
-            conditions.append(OrderHeader.create_time > values['create_time_from'])
+            conditions.append(OrderHeader.order_time > values['create_time_from'])
         if values.get('create_time_to', None):
-            conditions.append(OrderHeader.create_time < '%s 23:59' % values['create_time_to'])
+            conditions.append(OrderHeader.order_time < '%s 23:59' % values['create_time_to'])
         if values.get('ref_no', None):
             conditions.append(OrderHeader.ref_no.op('like')('%%%s%%' % values['ref_no']))
         if values.get('no', None):
@@ -105,11 +104,8 @@ class OrderView(BasicView):
         if values.get('destination_city_id', None):
             conditions.append(OrderHeader.destination_city_id == values['destination_city_id'])
 
-        if values.get('source_company_id', None):
-            conditions.append(OrderHeader.source_company_id == values['source_company_id'])
-            targets = DBSession.query(CustomerTarget).filter(and_(CustomerTarget.active == 0, CustomerTarget.customer_id == values['source_company_id']))
-        else:
-            targets = []
+        if values.get('customer_id', None):
+            conditions.append(OrderHeader.customer_id == values['customer_id'])
 
         if values.get('destination_company_id', None):
             conditions.append(OrderHeader.destination_company_id == values['destination_company_id'])
@@ -135,7 +131,6 @@ class OrderView(BasicView):
 
         return {
                 'values' : values ,
-                'targets' : targets,
                 'records' : records,
                 'source_cites' : source_cites,
                 'destination_cites' : destination_cites,
@@ -155,7 +150,7 @@ class OrderView(BasicView):
     def save_new(self):
         try:
             params = {}
-            for k in ['customer_id',
+            for k in ['customer_id', 'order_time',
                       'source_province_id', 'source_city_id', 'destination_province_id', 'destination_city_id',
                       'source_company_id', 'source_address', 'source_contact', 'source_tel', 'source_mobile',
                       'destination_company_id', 'destination_address', 'destination_contact', 'destination_tel', 'destination_mobile',
@@ -318,7 +313,7 @@ class OrderView(BasicView):
             return redirect(self.default())
         header = DBSession.query(OrderHeader).get(id)
         fields = [
-                  'customer_id',
+                  'customer_id', 'order_time',
                   'source_province_id', 'source_city_id', 'destination_province_id', 'destination_city_id',
                   'ref_no', 'source_company_id', 'source_address', 'source_contact', 'source_tel', 'source_mobile',
                   'payment_id', 'qty', 'weight', 'vol', 'shipment_type_id',
@@ -432,9 +427,9 @@ class OrderView(BasicView):
         header = getOr404(OrderHeader, _g('id'), redirect_url = self.default())
         header.active = 1
         DBSession.add(SystemLog(
-                                type == header.__class__.__name__,
+                                type = header.__class__.__name__,
                                 ref_id = header.id,
-                                remark = u"%s 删除该记录。" % (session['user_profile']['name']),
+                                remark = u"%s 删除该记录。" % session['user_profile']['name'],
                                 ))
         DBSession.commit()
         flash(MSG_DELETE_SUCC, MESSAGE_INFO)
@@ -841,7 +836,7 @@ class OrderView(BasicView):
 
         data = []
         for r in DBSession.query(OrderHeader).filter(OrderHeader.id.in_(ids)).order_by(OrderHeader.create_time):
-            row = [r.create_time, r.ref_no, _f(r), r.destination_contact, r.qty, r.weight, r.destination_tel, '', ] #A - H
+            row = [r.order_time, r.ref_no, _f(r), unicode(r.destination_company), r.destination_contact, r.qty, r.weight, r.destination_tel, '', ] #A - H
             deliver_header = r.get_deliver_header()
             if deliver_header :
                 row.extend(['', deliver_header.no, deliver_header.sendout_time, '', '', deliver_header.expect_time, deliver_header.actual_time, '', ]) #I - P
@@ -885,15 +880,20 @@ class OrderView(BasicView):
 
 
 
-    def check_note(self):
+    def ajax_check_before_save(self):
         try:
             note_id = _g('note_id')
             note_no = _g('note_no')
             note = DBSession.query(Note).get(note_id)
             note_no = int(note_no)
-            if int(note.begin_no) <= int(note_no) <= int(note.end_no):
-                return jsonify({'code' : 0 , 'result' : 0})
-            return jsonify({'code' : 0 , 'result' : 1, 'msg' : u'该票据不在可用范围内(%s~%s)，请修改！' % (note.begin_no, note.end_no)})
+            if not (int(note.begin_no) <= int(note_no) <= int(note.end_no)):
+                return jsonify({'code' : 0 , 'result' : 1, 'msg' : u'该票据不在可用范围内(%s~%s)，请修改！' % (note.begin_no, note.end_no)})
+
+            ref_no = _g('ref_no')
+            if DBSession.query(OrderHeader).filter(and_(OrderHeader.active == 0, OrderHeader.ref_no == ref_no)).count() > 0:
+                return jsonify({'code' : 0 , 'result' : 1, 'msg' : u'已经存在重复的订单号码！'})
+
+            return jsonify({'code' : 0 , 'result' : 0})
         except:
             _error(traceback.print_exc())
             return jsonify({'code' : 1 , 'msg' : MSG_SERVER_ERROR})
@@ -902,52 +902,57 @@ class OrderView(BasicView):
 
     def ajax_change_flag(self):
         try:
-            id = _g('id')
+            ids = _g('order_ids')
+            if not ids : return jsonify({'code' : 1, 'msg' : MSG_NO_ID_SUPPLIED})
             flag = _g('flag')
-            type = _g('type')
+            action_type = _g('type')
             remark = None
-            r = DBSession.query(OrderHeader).get(id)
+            r = DBSession.query(OrderHeader).filter(and_(OrderHeader.active == 0, OrderHeader.id.in_(ids.split("|"))))
 
-            if type == 'APPROVE':
-                r.approve = flag
+            def _update(result, attr, value):
+                for t in result : setattr(t, attr, value)
+
+            if action_type == 'APPROVE':
+                _update(r, "approve", flag)
                 if flag == '1':  #approve
                     remark = u'%s 审核通过该订单。' % session['user_profile']['name']
                 else: #disapprove
                     remark = u'%s 审核不通过该订单。' % session['user_profile']['name']
-            elif type == 'PAID':
-                r.paid = flag
+            elif action_type == 'PAID':
+                _update(r, "paid", flag)
                 if flag == '1':
                     remark = u'%s 确认该订单为客户已付款。' % session['user_profile']['name']
                 else:
                     remark = u'%s 确认该订单为客户未付款。' % session['user_profile']['name']
-            elif type == 'SUPLLIER_PAID':
-                r.supplier_paid = flag
+            elif action_type == 'SUPLLIER_PAID':
+                _update(r, "supplier_paid", flag)
                 if flag == '1':
                     remark = u'%s 确认该订单为已付款予承运商。' % session['user_profile']['name']
                 else:
                     remark = u'%s 确认该订单为未付款予承运商。' % session['user_profile']['name']
-            elif type == 'ORDER_RETURN':
-                r.is_return_note = flag
+            elif action_type == 'ORDER_RETURN':
+                _update(r, "is_return_note", flag)
                 if flag == '1':
                     remark = u'%s 确认该订单为客户已返回单。' % session['user_profile']['name']
                 else:
                     remark = u'%s 确认该订单为客户未返回单。' % session['user_profile']['name']
-            elif type == 'EXCEPTION':
-                r.is_exception = flag
+            elif action_type == 'EXCEPTION':
+                _update(r, "is_exception", flag)
                 if flag == '1':
                     remark = u'%s 标记该订单为异常。' % session['user_profile']['name']
                 else:
                     remark = u'%s 取消该订单的异常标记。' % session['user_profile']['name']
-            elif type == 'LESS_QTY':
-                r.is_less_qty = flag
+            elif action_type == 'LESS_QTY':
+                _update(r, "is_less_qty", flag)
                 if flag == '1':
                     remark = u'%s 标记该订单为少货。' % session['user_profile']['name']
                 else:
                     remark = u'%s 取消该订单的少货标记。' % session['user_profile']['name']
 
-            DBSession.add(SystemLog(
-                                    type = r.__class__.__name__,
-                                    ref_id = r.id,
+            for t in r:
+                DBSession.add(SystemLog(
+                                    type = t.__class__.__name__,
+                                    ref_id = t.id,
                                     remark = remark
                                     ))
             DBSession.commit()

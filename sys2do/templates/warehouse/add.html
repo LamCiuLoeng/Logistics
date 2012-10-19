@@ -1,20 +1,43 @@
 {% extends "master.html" %}
 
-{% block subtitle %} - 仓存管理{% endblock %}
+{% block subtitle %} - 仓位管理{% endblock %}
 
 {% block extJS %}
-
+<script language="JavaScript" type="text/javascript">
+//<![CDATA[
+	
+	function tosave(){
+		$("form").submit();
+	}
+	
+	function toreturn(){
+			return redirect_alert("{{MSG_LEAVE_WITHOUT_SAVING}}","{{request.referrer}}");
+	}	
+//]]>
+</script>
 {% endblock %}
+
+{% block inner_menu %}
+<div class="inner_menu">
+	<ul>
+    	<li><img src="/static/images/system/order_manage_25.jpg" width="71" height="21" id="Image1" onmouseover="MM_swapImage('Image1','','/static/images/system/order_manage_h_25.jpg',1)" onmouseout="MM_swapImgRestore()" onclick="return toreturn();"/></li>
+        {% if 'CREATE_WAREHOUSE' is get_permission%}
+        <li><input type="image" src="/static/images/system/order_manage_33.jpg" width="77" height="21" id="Image3" onmouseover="MM_swapImage('Image3','','/static/images/system/order_manage_h_33.jpg',1)" onmouseout="MM_swapImgRestore()" onclick="tosave()"/></li>
+        {% endif %}
+    </ul>
+</div>
+{% endblock %}
+
 
 {% block content %}
 	
-	<form action="{{url_for('bpWarehouse.view',action='save_new')}}">
+	<form action="{{url_for('.view',action='save_new')}}" method="post">
 		<table>
-			<tr><td>仓存地点名称</td><td><input type="text" name="name" /></td></tr>
-			<tr><td>仓存地点地址</td><td><textarea name="address"></textarea></td></tr>
-			<tr><td>仓库管理人员</td><td><input type="text" name="manager"/></td></tr>
+			<tr><td>仓位名称</td><td><input type="text" name="name" /></td></tr>
+			<tr><td>仓位地址</td><td><textarea name="address"></textarea></td></tr>
+			<tr><td>仓位管理人员</td><td><input type="text" name="manager"/></td></tr>
 			<tr>
-				<td>上一级地点</td>
+				<td>上一级仓位</td>
 				<td>
 					<select id="parent_id" value="parent_id">
 						<option value=""></option>
@@ -25,7 +48,6 @@
 				</td>
 			</tr>
 			<tr><td>备注</td><td><textarea name="remark"></textarea></td></tr>
-			<tr><td colspan="2"><input type="submit" value="Submit"/></td></tr>
 		</table>
 	</form>
 	

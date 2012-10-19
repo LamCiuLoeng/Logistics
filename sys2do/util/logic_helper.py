@@ -14,12 +14,22 @@ from sqlalchemy.sql.functions import sum
 from sqlalchemy.sql.expression import and_
 from sys2do.model.master import Barcode
 
-__all__ = ['getDeliverNo', ]
+__all__ = ['getDeliverNo', 'getInNoteNo', 'getOutNo' ]
 
 
 
 def getDeliverNo(id):
     return 'DL%s%06d' % (dt.now().strftime('%y%m%d'), (id % 1000000))
+
+
+def getInNoteNo(id):
+    return 'IN%s%06d' % (dt.now().strftime('%y%m%d'), (id % 1000000))
+
+def getOutNo(id):
+    return 'OUT%s%06d' % (dt.now().strftime('%y%m%d'), (id % 1000000))
+
+
+
 
 
 

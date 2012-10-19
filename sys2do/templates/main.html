@@ -93,7 +93,7 @@
       {% if 'MANAGE_DELIVER' is get_permission%}
       <div class="nav_tab" onclick="redirect('{{url_for('bpDeliver.view')}}')">
         <div class="header_div"></div>
-        <div class="body_div"><img width="80" height="80" src="/static/images/system/img_po.jpg"><span>送货单管理</span>
+        <div class="body_div"><img width="80" height="80" src="/static/images/system/img_po.jpg"><span>配送管理</span>
           <p>关于送货单管理的一些说明。说明送货单管理功能的用法与注意事项。</p>
         </div>
       </div>
@@ -107,6 +107,15 @@
           <p>关于财务管理的一些说明。说明财务管理功能的用法与注意事项。</p>
         </div>
       </div>
+   	  {% endif %}
+   	  
+      <div class="nav_tab" onclick="redirect('{{url_for('bpInventory.view')}}')">
+        <div class="header_div"></div>
+        <div class="body_div"><img width="80" height="80" src="/static/images/system/img_cm.jpg"><span>仓储管理</span>
+          <p>关于仓储管理的一些说明。说明仓储管理功能的用法与注意事项。</p>
+        </div>
+      </div>
+   	  {% if 'MANAGE_FIN' is get_permission%}
    	  {% endif %}
      
   </tr>

@@ -81,7 +81,7 @@
 			<tr>
 				<td height="30" align="right">{{_('Destination')}}</td>
 				<td width="12">&nbsp;</td>
-				<td>{{header.destination_provice|f}}{{header.destination_city|f}}{{header.destination_address|f}}</td>
+				<td>{{header.destination_province|f}}{{header.destination_city|f}}{{header.destination_address|f}}</td>
 				<td height="30" align="right">{{_('Update Time')}}</td>
 				<td width="12">&nbsp;</td>
 				<td>{{header.update_time|ft}}</td>
@@ -206,9 +206,9 @@
 					<th><a href="{{url_for('bpOrder.view',action='review',id=d.order_header_id)}}">{{d.order_header.ref_no}}</a></th>
 					<td>{{d.order_header.source_province}}{{d.order_header.source_city}}</td>
 					<td>{{d.order_header.destination_province}}{{d.order_header.destination_city}}</td>
-					<td>{{d.order_header.qty|fn}}</td>
-					<td>{{d.order_header.vol|fn}}</td>
-					<td>{{d.order_header.weight|fn}}</td>
+					<td>{{d.qty|fn}}</td>
+					<td>{{d.vol|fn}}</td>
+					<td>{{d.weight|fn}}</td>
 					<td>{{d.order_header.destination_contact|f}}</td>
 					<td>{{d.order_header.destination_tel|f}}</td>
 					<td>{{d.order_header.create_time|ft}}</td>

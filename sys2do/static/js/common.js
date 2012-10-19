@@ -131,3 +131,19 @@ function check_number(v){
     var pattern = /^[\d\.]+$/;
     return pattern.test(v); 
 }
+
+
+function selectall(obj,name){
+    var t = $(obj);
+    if(t.attr('checked')){
+        $("input[type='checkbox'][name='"+name+"']").attr('checked','checked');
+    }else{
+        $("input[type='checkbox'][name='"+name+"']").removeAttr('checked');
+    }
+}
+
+
+if(!String.prototype.trim) {
+    //code for trim
+    String.prototype.trim=function(){return this.replace(/^\s\s*/, '').replace(/\s\s*$/, '');};
+ }

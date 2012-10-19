@@ -81,7 +81,14 @@ function save_discount(){
     },function(r){
         if(r.code==0){
             alert(r.msg);
-            //refresh();
+            
+            var tr = $($("input[@name='order_ids']:checked").parents("tr")[0]);
+            $(".td_actual_proxy_charge",tr).text($('#actual_proxy_charge').val());
+            $(".td_discount_return_person",tr).text($("#discount_person_id :selected").text());
+            $(".td_discount_return_time",tr).text($("#discount_return_time").val());
+            $(".td_discount_return_remark",tr).text($("#discount_return_remark").val());
+            
+            hide_form();
         }else{
             alert(r.msg);
             hide_form();

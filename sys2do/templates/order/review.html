@@ -80,7 +80,7 @@
   <ul>
     	  <li style="width:227px;"><span><sup class="warn">*</sup>&nbsp;单号</span>{{header.ref_no|f}}</li>
     	  <li style="width:227px;"><span>&nbsp;系统编号</span>{{header.no|f}}</li>
-		  <li style="width:227px;"><span>{{_('Create Time')}}</span>{{header.create_time|ft}}</li>
+		  <li style="width:227px;"><span>下单日期</span>{{header.order_time}}</li>
     	  <li style="width:227px;"><span>{{_('Creator')}}</span>{{header.create_by|f}}</li>
 
     	 <li style="width:459px;"><span><sup class="warn">*</sup>&nbsp;客户</span>{{header.customer}}</li>
@@ -312,7 +312,7 @@
 					<td valign="top"><textarea name="wh_remark" id="wh_remark" style="width:500px;">订单: {{header.ref_no}} 确认出仓</textarea></td>
 				</tr>
 			</table>
-			{% if 'UPDATE_ORDER' is get_permission%}
+			{% if 'UPDATE_ORDER' is get_permission and header.deliver_header_ref %}
 			<p><input type="button" value="确认出仓" onclick="save_warehouse('OUT')"/></p>
 			{% endif %}
 		{% else %}
@@ -325,7 +325,7 @@
 	<div class="order_add_info_tab_body" id="tabs-4">
 		<div>
 			{% if header.deliver_header_ref %}
-				<p>送货单 : <a href="{{url_for('bpDeliver.view',action='view',id=header.deliver_header_ref)}}">{{header.deliver_header}}</a></p>
+				<p>送货单 : <a href="{{url_for('bpDeliver.view',action='view',id=header.deliver_header_ref)}}">{{header.deliver_header_no|f}}</a></p>
 				<br />
 			{% endif %}
 			<table>
