@@ -118,7 +118,7 @@
 				    <td colspan="10">
 				    {{mymacros.select(id='destination_province_id',list=MASTER_ALL('Province'),value=header.destination_province_id,class="field order_add_div_body_input must_input",style="width:150px")}}
 					{{mymacros.select(id='destination_city_id',list=RELATED_CITY(header.destination_city_id),value=header.destination_city_id,class="field order_add_div_body_input",style="width:150px")}}		  
-				    <input type="text" name="destination_address" id="destination_address" class="field order_add_div_body_input" style="width:250px" value="{{header.destination_address|f}}"/>
+				    <input type="text" name="destination_address" id="destination_address" class="field order_add_div_body_input" style="width:550px" value="{{header.destination_address|f}}"/>
 				  </td>
 				</tr>
 				<tr>
@@ -173,6 +173,32 @@
 				  <td><input type="text" name="expect_time" id="expect_time" class="datepicker order_add_div_body_input must_input" style="width: 200px" value="{{header.expect_time|f}}"/></td>
 				</tr>
 				<tr>
+					<td height="30" align="right">件数费率(元/件)</td>
+					<td>&nbsp;</td>
+				    <td><input type="text" name="qty_ratio" id="qty_ratio" class="numeric order_add_div_body_input number_input_right" style="width: 200px" value="{{header.qty_ratio|fn}}"/></td>
+					<td>&nbsp;</td>
+					<td height="30" align="right">体积费率(元/米<sup>3</sup>)</td>
+					<td>&nbsp;</td>
+				    <td><input type="text" name="vol_ratio" id="vol_ratio" class="numeric order_add_div_body_input number_input_right" style="width: 200px" value="{{header.vol_ratio|fn}}"/></td>
+					<td>&nbsp;</td>
+					<td height="30" align="right">重量费率(元/吨)</td>
+					<td>&nbsp;</td>
+				    <td><input type="text" name="weight_ratio" id="weight_ratio" class="numeric order_add_div_body_input number_input_right" style="width: 200px" value="{{header.weight_ratio|fn}}"/></td>
+				</tr>
+				<tr>
+					<td height="30" align="right">总件数(件)</td>
+					<td>&nbsp;</td>
+				    <td><input type="text" name="qty" id="qty" class="numeric order_add_div_body_input number_input_right" style="width: 200px" value="{{header.qty|fn('%d')}}"/></td>
+					<td>&nbsp;</td>					
+					<td height="30" align="right">总体积(米<sup>3</sup>)</td>
+					<td>&nbsp;</td>
+				    <td><input type="text" name="vol" id="vol" class="numeric order_add_div_body_input number_input_right" style="width: 200px" value="{{header.vol|fn}}"/></td>
+					<td>&nbsp;</td>
+					<td height="30" align="right">总重量(吨)</td>
+					<td>&nbsp;</td>
+				    <td><input type="text" name="weight" id="weight" class="numeric order_add_div_body_input number_input_right" style="width: 200px" value="{{header.weight|fn}}"/></td>
+				</tr>
+				<tr>
 					<td height="30" align="right">保险费用</td>
 					<td width="12">&nbsp;</td>
 				    <td><input type="text" name="insurance_charge" id="insurance_charge" class="numeric order_add_div_body_input compute number_input_right" style="width: 200px" value="{{header.insurance_charge|fn}}"/></td>
@@ -204,7 +230,7 @@
 				    <td width="12">&nbsp;</td>
 				    <td height="30" align="right">代理费用</td>
 					<td width="12">&nbsp;</td>
-				    <td><input type="text" name="proxy_charge" id="proxy_charge" class="numeric order_add_div_body_input number_input_right" style="width: 200px" value="{{header.amount|fn}}"/></td>
+				    <td><input type="text" name="proxy_charge" id="proxy_charge" class="numeric order_add_div_body_input number_input_right" style="width: 200px" value="{{header.proxy_charge|fn}}"/></td>
 				</tr>
 				<tr>
 				    <td height="30" align="right">运费</td>
@@ -258,9 +284,9 @@
 					<th>{{d.order_header.ref_no|f}}<input type="hidden" name="detail_{{d.id}}" value="{{d.id}}"/></th>
 					<td>{{d.order_header.source_province}}{{d.source_city}}</td>
 					<td>{{d.order_header.destination_province}}{{d.destination_city}}</td>
-					<td><input type="text" name="qty_{{d.id}}" value="{{d.qty|fn}}"/></td>
-					<td><input type="text" name="vol_{{d.id}}" value="{{d.vol|fn}}"/></td>
-					<td><input type="text" name="weight_{{d.id}}" value="{{d.weight|fn}}"/></td>
+					<td><input type="text" name="qty_{{d.id}}" id="qty_{{d.id}}" class="numeric number_field" value="{{d.qty|fn('%d')}}"/></td>
+					<td><input type="text" name="vol_{{d.id}}" id="vol_{{d.id}}" class="numeric number_field" value="{{d.vol|fn}}"/></td>
+					<td><input type="text" name="weight_{{d.id}}" id="weight_{{d.id}}" class="numeric number_field" value="{{d.weight|fn}}"/></td>
 					<td>{{d.order_header.destination_contact|f}}</td>
 					<td>{{d.order_header.destination_tel|f}}</td>
 					<td>{{d.order_header.create_time|ft}}</td>

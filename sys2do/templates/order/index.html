@@ -241,7 +241,7 @@
 		<td>{{r.customer.display_name|f}}</td>
 		<td>{{r.destination_province|f}}{{r.destination_city|f}}</td>
 		<td>{{r.destination_company|f}}</td>
-		<td>{{r.qty|f}}</td>
+		<td>{{r.qty|fn('%d')}}</td>
 		<td>{{r.weight|fn}}</td>
 		<td>{{r.amount|fn}}</td>
 		<td>
@@ -262,7 +262,7 @@
   		<tr class="data_table_tr">
 	      	<th></th>
 	      	<td colspan="6" style="text-align:left">&nbsp;合计</td>
-	      	<td>{{records.items|sum_with_none(attribute='qty')}}</td>
+	      	<td>{{records.items|sum_with_none(attribute='qty')|fn('%d')}}</td>
 	      	<td>{{records.items|sum_with_none(attribute='weight')|fn}}</td>
 	      	<td>{{records.items|sum(attribute='amount')|fn}}</td>
 	      	<td colspan="100">&nbsp;</td>

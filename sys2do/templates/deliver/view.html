@@ -63,15 +63,15 @@
 	
 		<table border="1" cellpadding="3" cellspacing="3">
 			<tr>
-				<td width="100" height="30" align="right">{{_('3rd Party Supplier')}}</td>
+				<td width="120" height="30" align="right">{{_('3rd Party Supplier')}}</td>
 				<td width="12">&nbsp;</td>
 				<td width="300">{{header.supplier|f}}</td>
-				<td height="30" align="right">{{_('Create Time')}}</td>
+				<td width="120" height="30" align="right">{{_('Create Time')}}</td>
 				<td width="12">&nbsp;</td>
 				<td width="300">{{header.create_time|ft}}</td>
 			</tr>
 			<tr>
-				<td width="100" height="30" align="right">{{_('Deliver Number')}}</td>
+				<td height="30" align="right">{{_('Deliver Number')}}</td>
 				<td width="12">&nbsp;</td>
 				<td>{{header.ref_no|f}}</td>
 				<td height="30" align="right">{{_('Creator')}}</td>
@@ -119,72 +119,97 @@
 				<td>{{mymacros.show_supplier_paid(header.supplier_paid)}}</td>
 			</tr>
 			<tr>
-				<td height="30" align="right">保险费用</td>
-				<td width="12">&nbsp;</td>
-				<td>{{header.insurance_charge|fn}}</td>
-			</tr>
-			<tr>
-				<td height="30" align="right">送货费用</td>
-				<td width="12">&nbsp;</td>
-				<td>{{header.sendout_charge|fn}}</td>
-			</tr>
-			<tr>
-				<td height="30" align="right">上门接货费用</td>
-				<td width="12">&nbsp;</td>
-				<td>{{header.receive_charge|fn}}</td>
-			</tr>
-			<tr>
-				<td height="30" align="right">包装费用</td>
-				<td width="12">&nbsp;</td>
-				<td>{{header.package_charge|fn}}</td>
-			</tr>
-			<tr>
-				<td height="30" align="right">装货费用</td>
-				<td width="12">&nbsp;</td>
-				<td>{{header.load_charge|fn}}</td>
-			</tr>
-			<tr>
-				<td height="30" align="right">卸货费用</td>
-				<td width="12">&nbsp;</td>
-				<td>{{header.unload_charge|fn}}</td>
-			</tr>
-			<tr>
-				<td height="30" align="right">代理费用</td>
-				<td width="12">&nbsp;</td>
-				<td>{{header.proxy_charge|fn}}</td>
-			</tr>
-			<tr>
-				<td height="30" align="right">其它费用</td>
-				<td width="12">&nbsp;</td>
-				<td>{{header.other_charge|fn}}</td>
-			</tr>
-			<tr>
-				<td height="30" align="right">运费</td>
-				<td width="12">&nbsp;</td>
-				<td>{{header.carriage_charge|fn}}</td>
-			</tr>
-			<tr>
-				<td height="30" align="right">总费用</td>
-				<td width="12">&nbsp;</td>
-				<td>{{header.amount|fn}}</td>
-			</tr>
-			<tr>
 				<td height="30" align="right">付款方式</td>
 				<td width="12">&nbsp;</td>
 			    <td>{{header.payment|f}}</td>
+				<td height="30" align="right">{{_('Remark')}}</td>
+				<td width="12">&nbsp;</td>
+				<td>{{header.remark|f}}</td>
 			</tr>
 			<tr>
 				<td height="30" align="right">提货方式</td>
 				<td width="12">&nbsp;</td>
 			    <td>{{header.pickup_type|f}}</td>
 			</tr>
-			<tr>
-				<td height="30" align="right">{{_('Remark')}}</td>
-				<td width="12">&nbsp;</td>
-				<td>{{header.remark|f}}</td>
-			</tr>
+			
 
 		</table>
+		
+		
+		<br >
+		<table>
+		    <tr>
+			    <td width="120" height="30" align="right">件数费率(元/件)</td>
+			    <td width="12">&nbsp;</td>
+			    <td width="150">{{header.qty_ratio|fn}}</td>
+			    <td width="12">&nbsp;</td>
+			    <td width="120" height="30" align="right">体积费率(元/米<sup>3</sup>)</td>
+			    <td width="12">&nbsp;</td>
+			    <td width="150">{{header.vol_ratio|fn}}</td>
+			    <td width="12">&nbsp;</td>
+			    <td width="120" height="30" align="right">重量费率(元/吨)</td>
+			    <td width="12">&nbsp;</td>
+			    <td width="150">{{header.weight_ratio|fn}}</td>
+			</tr>
+			<tr>
+			    <td width="120" height="30" align="right">总件数(件)</td>
+			    <td width="12">&nbsp;</td>
+			    <td width="150">{{header.qty|fn('%d')}}</td>
+			    <td width="12">&nbsp;</td>
+			    <td width="120" height="30" align="right">总体积(米<sup>3</sup>)</td>
+			    <td width="12">&nbsp;</td>
+			    <td width="150">{{header.vol|fn}}</td>
+			    <td width="12">&nbsp;</td>
+			    <td width="120" height="30" align="right">总重量(吨)</td>
+			    <td width="12">&nbsp;</td>
+			    <td width="150">{{header.weight|fn}}</td>
+			</tr>
+			<tr>
+			    <td width="120" height="30" align="right">保险费用</td>
+			    <td width="12">&nbsp;</td>
+			    <td width="150">{{header.insurance_charge|fn}}</td>
+			    <td width="12">&nbsp;</td>
+			    <td width="120" height="30" align="right">送货费用</td>
+			    <td width="12">&nbsp;</td>
+			    <td width="150">{{header.sendout_charge|fn}}</td>
+			    <td width="12">&nbsp;</td>
+			    <td width="120" height="30" align="right">上门接货费用</td>
+			    <td width="12">&nbsp;</td>
+			    <td width="150">{{header.receive_charge|fn}}</td>
+			    <td width="12">&nbsp;</td>
+			    <td width="120" height="30" align="right">包装费用</td>
+			    <td width="12">&nbsp;</td>
+			    <td width="150">{{header.package_charge|fn}}</td>
+			</tr>
+			<tr>
+			    <td height="30" align="right">装货费用</td>
+			    <td width="12">&nbsp;</td>
+			    <td>{{header.load_charge|fn}}</td>
+			    <td width="12">&nbsp;</td>
+			    <td height="30" align="right">卸货费用</td>
+			    <td width="12">&nbsp;</td>
+			    <td>{{header.unload_charge|fn}}</td>
+			    <td width="12">&nbsp;</td>
+			    <td height="30" align="right">代理费用</td>
+			    <td width="12">&nbsp;</td>
+			    <td>{{header.proxy_charge|fn}}</td>
+			    <td width="12">&nbsp;</td>
+			    <td height="30" align="right">其它费用</td>
+			    <td width="12">&nbsp;</td>
+			    <td>{{header.other_charge|fn}}</td>
+			</tr>
+			<tr>
+			    <td height="30" align="right">运费</td>
+			    <td width="12">&nbsp;</td>
+			    <td>{{header.carriage_charge|fn}}</td>
+			    <td width="12">&nbsp;</td>
+			    <td height="30" align="right">总费用</td>
+			    <td width="12">&nbsp;</td>
+			    <td>{{header.amount|fn}}</td>
+			</tr>
+		</table>
+		
+		
 		<br />
 		<table border="1" cellpadding="5" cellspacing="5">
 			<thead>
@@ -206,12 +231,12 @@
 					<th><a href="{{url_for('bpOrder.view',action='review',id=d.order_header_id)}}">{{d.order_header.ref_no}}</a></th>
 					<td>{{d.order_header.source_province}}{{d.order_header.source_city}}</td>
 					<td>{{d.order_header.destination_province}}{{d.order_header.destination_city}}</td>
-					<td>{{d.qty|fn}}</td>
+					<td>{{d.qty|fn('%d')}}</td>
 					<td>{{d.vol|fn}}</td>
 					<td>{{d.weight|fn}}</td>
 					<td>{{d.order_header.destination_contact|f}}</td>
 					<td>{{d.order_header.destination_tel|f}}</td>
-					<td>{{d.order_header.create_time|ft}}</td>
+					<td>{{d.order_header.order_time|ft}}</td>
 					<td>{{d.order_header.create_by|f}}</td>
 				</tr>
 				<tr class="data_table_tr data_table_tr_even">

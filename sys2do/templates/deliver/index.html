@@ -103,7 +103,7 @@
 				<td>{{r.supplier_tel}}</td>
 				<td>{{r.expect_time}}</td>
 				<td>{{r.amount}}</td>
-				<td>{{r.qty|fn}}</td>
+				<td>{{r.qty|fn('%d')}}</td>
 				<td>{{r.weight|fn}}</td>
 				<td>{{r.vol|fn}}</td>
 				<td>{{r.order_time}}</td>
@@ -115,7 +115,7 @@
 					<td>&nbsp;</td>
 					<td colspan="5" style="text-align:left">合计</td>
 					<td>{{records.items|sum_with_none(attribute='amount')}}</td>
-					<td>{{records.items|sum_with_none(attribute='qty')}}</td>
+					<td>{{records.items|sum_with_none(attribute='qty')|fn('%d')}}</td>
 					<td>{{records.items|sum_with_none(attribute='weight')}}</td>
 					<td>{{records.items|sum_with_none(attribute='vol')}}</td>
 					<td colspan="30">&nbsp;</td>

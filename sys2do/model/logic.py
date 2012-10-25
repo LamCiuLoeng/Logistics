@@ -321,6 +321,10 @@ class DeliverHeader(DeclarativeBase, SysMixin, CRUDMixin):
     carriage_charge = Column(Float, default = 0, doc = u'运费')
     amount = Column(Float, default = 0, doc = u'总费用')
 
+    qty_ratio = Column(Float, default = None, doc = u'件数费率')
+    weight_ratio = Column(Float, default = None, doc = u'重量费率')
+    vol_ratio = Column(Float, default = None, doc = u'体积费率')
+
     qty = Column(Float, default = None, doc = u'数量')
     weight = Column(Float, default = None, doc = u'重量')
     vol = Column(Float, default = None, doc = u'体积')

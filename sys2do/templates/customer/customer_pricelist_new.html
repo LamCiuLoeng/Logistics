@@ -79,26 +79,26 @@
     <div class="order_add_div_body">
   <table border="0" cellpadding="0" cellspacing="0">
 		<tr>
-			<td valign="top" width="100px" align="center" height="30px">发往的省/直辖市</td>
+			<td valign="top" width="150px" align="center" height="30px">发往的省/直辖市</td>
 			<td valign="top">
 				{{mymacros.select(id='province_id',list=MASTER_ALL('Province'),value=None,class="must_input",style="width:150px")}}
 				<select name="city_id" id="city_id" style="width:150px"></select>
 			</td>
 		</tr>
 		<tr>
-			<td valign="top" width="100px" align="center" height="30px">数量费率</td>
+			<td valign="top" align="center" height="30px">数量费率(元/件)</td>
 			<td valign="top"><input type="text" name="qty_ratio" id="qty_ratio" value="" class="order_add_div_body_input numeric must_input number_input_right"/></td>
 		</tr>
 		<tr>
-			<td valign="top" width="100px" align="center" height="30px">重量费率</td>
+			<td valign="top" align="center" height="30px">重量费率(元/吨)</td>
 			<td valign="top"><input type="text" name="weight_ratio" id="weight_ratio" value="" class="order_add_div_body_input numeric must_input number_input_right"/></td>
 		</tr>
 		<tr>
-			<td valign="top" width="100px" align="center" height="30px">体积费率</td>
+			<td valign="top" align="center" height="30px">体积费率(元/米<sup>3</sup>)</td>
 			<td valign="top"><input type="text" name="vol_ratio" id="vol_ratio" value="" class="order_add_div_body_input numeric must_input number_input_right"/></td>
 		</tr>
 		<tr>
-			<td valign="top" width="100px" align="center">{{_('Remark')}}</td>
+			<td valign="top" align="center">{{_('Remark')}}</td>
 			<td valign="top"><textarea class="" style="width:550px;height:30px;" id="remark" name="remark"></textarea></td>
 		</tr>
 	</table>

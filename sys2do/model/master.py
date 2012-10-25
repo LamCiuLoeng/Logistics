@@ -591,6 +591,24 @@ class SupplierProfile(DeclarativeBase, SysMixin):
 
 
 
+
+class SupplierDiquRatio(DeclarativeBase, SysMixin, CRUDMixin):
+    __tablename__ = 'master_supplier_ditu_ratio'
+
+    id = Column(Integer, autoincrement = True, primary_key = True)
+    supplier_id = Column(Integer, ForeignKey('master_supplier.id'))
+    supplier = relation(Supplier)
+    province_id = Column(Integer, ForeignKey('master_province.id'))
+    province = relation(Province)
+    city_id = Column(Integer, ForeignKey('master_city.id'))
+    city = relation(City)
+    qty_ratio = Column(Float, default = 0, doc = u'数量费率')
+    weight_ratio = Column(Float, default = 0, doc = u'重量费率')
+    vol_ratio = Column(Float, default = 0, doc = u'体积费率')
+    remark = Column(Text)
+
+
+
 class Item(DeclarativeBase, SysMixin, CRUDMixin):
     __tablename__ = 'master_item'
 

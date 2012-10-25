@@ -32,7 +32,8 @@ from sys2do.model.logic import DeliverHeader, OrderHeader, \
     DeliverDetail, TransferLog
 from sys2do.util.common import _gl, _g, _gp, getOr404, getMasterAll, _debug, \
     _error, _info, send_sms, upload, multiupload
-from sys2do.model.master import Supplier, InventoryItem, Province
+from sys2do.model.master import Supplier, InventoryItem, Province, \
+    SupplierDiquRatio, City
 from sys2do.setting import PAGINATE_PER_PAGE
 from sys2do.model.system import SystemLog
 from sys2do.util.logic_helper import getDeliverNo
@@ -46,7 +47,7 @@ bpDeliver = Blueprint('bpDeliver', __name__)
 
 class DeliverView(BasicView):
 
-    decorators = [login_required, tab_highlight('TAB_MAIN'), ]
+#    decorators = [login_required, tab_highlight('TAB_MAIN'), ]
 
     @templated('deliver/index.html')
     def index(self):
@@ -164,6 +165,8 @@ class DeliverView(BasicView):
         else:
             destination_province_id = destination_city_id = destination_address = destination_contact = destination_tel = destination_mobile = None
             payment_id = pickup_type_id = None
+
+        total_qty = total_vol = total_weight = 0
         for h in order_headers:
             if h.status >= SORTING[0]:
                 flash(MSG_ORDER_NOT_FIT_FOR_DELIVER, MESSAGE_ERROR)
@@ -171,6 +174,12 @@ class DeliverView(BasicView):
                     return redirect(request.referrer)
                 else:
                     return redirect(self.default())
+            else:
+                total_qty += h.qty or 0
+                total_vol += h.vol or 0
+                total_weight += h.weight or 0
+
+
         suppliers = getMasterAll(Supplier)
 
         return {'result' : order_headers,
@@ -183,6 +192,9 @@ class DeliverView(BasicView):
                 'destination_mobile' : destination_mobile,
                 'payment_id' : payment_id,
                 'pickup_type_id' : pickup_type_id,
+                'total_qty' : total_qty,
+                'total_vol' : total_vol,
+                'total_weight' : total_weight,
                 }
 
 
@@ -194,6 +206,7 @@ class DeliverView(BasicView):
                       'supplier_contact', 'supplier_tel', 'expect_time', 'order_time',
                       'insurance_charge', 'sendout_charge', 'receive_charge', 'package_charge', 'load_charge', 'unload_charge',
                       'other_charge', 'proxy_charge', 'amount', 'payment_id', 'pickup_type_id', 'remark', 'carriage_charge',
+                      'qty', 'weight', 'vol', 'qty_ratio', 'weight_ratio', 'vol_ratio',
                       ]:
                 params[f] = _g(f)
             header = DeliverHeader(**params)
@@ -297,6 +310,7 @@ class DeliverView(BasicView):
                       'need_transfer', 'amount', 'remark', 'expect_time', 'order_time',
                       'insurance_charge', 'sendout_charge', 'receive_charge', 'package_charge', 'other_charge', 'carriage_charge',
                       'load_charge', 'unload_charge', 'proxy_charge', 'payment_id', 'pickup_type_id',
+                      'qty', 'weight', 'vol', 'qty_ratio', 'weight_ratio', 'vol_ratio',
                       ]
 
             _remark = []
@@ -653,6 +667,50 @@ class DeliverView(BasicView):
             _error(traceback.print_exc())
             DBSession.rollback()
             return jsonify({'code' : 1, 'msg' : MSG_SERVER_ERROR})
+
+
+
+    def ajax_compute_ratio(self):
+        province_id = _g('province_id')
+        city_id = _g('city_id')
+        supplier_id = _g('supplier_id')
+        qty_ratio = ''
+        weight_ratio = ''
+        vol_ratio = ''
+
+        q1 = DBSession.query(SupplierDiquRatio).filter(and_(SupplierDiquRatio.active == 0,
+                                                           SupplierDiquRatio.supplier_id == supplier_id,
+                                                           SupplierDiquRatio.province_id == province_id,
+                                                           SupplierDiquRatio.city_id == city_id,
+                                                           ))
+        if q1.count() == 1 :
+            t = q1.first()
+            qty_ratio, weight_ratio, vol_ratio = t.qty_ratio, t.weight_ratio, t.vol_ratio
+        else:
+            q2 = DBSession.query(SupplierDiquRatio).filter(and_(SupplierDiquRatio.active == 0,
+                                                           SupplierDiquRatio.supplier_id == supplier_id,
+                                                           SupplierDiquRatio.province_id == province_id,
+                                                           SupplierDiquRatio.city_id == None,
+                                                           ))
+            if q2.count() == 1:
+                t = q2.first()
+                qty_ratio, weight_ratio, vol_ratio = t.qty_ratio, t.weight_ratio, t.vol_ratio
+            else:
+                q3 = DBSession.query(City).filter(and_(City.active == 0, City.id == city_id))
+                if q3.count() == 1:
+                    t = q3.first()
+                    qty_ratio, weight_ratio, vol_ratio = t.qty_ratio, t.weight_ratio, t.vol_ratio
+                else:
+                    q4 = DBSession.query(Province).filter(and_(Province.active == 0, Province.id == province_id))
+                    if q4.count() == 1:
+                        t = q4.first()
+                        qty_ratio, weight_ratio, vol_ratio = t.qty_ratio, t.weight_ratio, t.vol_ratio
+
+        return jsonify({'code' : 0,
+                        'qty_ratio' : qty_ratio,
+                        'weight_ratio' : weight_ratio,
+                        'vol_ratio' : vol_ratio})
+
 
 
     @templated('deliver/form.html')

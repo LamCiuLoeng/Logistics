@@ -51,7 +51,7 @@
 {% block inner_menu %}
 <div class="inner_menu">
 	<ul>
-    	<li><a href="{{url_for('.view', action = 'pricelist',id=customer_id)}}"><img width="71" height="21" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image1','','/static/images/system/order_manage_h_25.jpg',1)" id="Image1" src="/static/images/system/order_manage_25.jpg"/></a></li>
+    	<li><a href="{{url_for('.view', action = 'pricelist',id=obj.customer_id)}}"><img width="71" height="21" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image1','','/static/images/system/order_manage_h_25.jpg',1)" id="Image1" src="/static/images/system/order_manage_25.jpg"/></a></li>
         {% if 'CREATE_CUSTOMER' is get_permission%}
         <li><img width="77" height="21" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image3','','images/order_manage_h_33.jpg',1)" id="Image3" src="/static/images/system/order_manage_33.jpg" onclick="return tosave()"/></li>
         {% endif %}
@@ -79,26 +79,26 @@
     <div class="order_add_div_body">
   <table border="0" cellpadding="0" cellspacing="0">
 		<tr>
-			<td valign="top" width="100px" align="center" height="30px">发往的省/直辖市</td>
+			<td valign="top" width="150px" align="center" height="30px">发往的省/直辖市</td>
 			<td valign="top">
 				{{mymacros.select(id='province_id',list=MASTER_ALL('Province'),value=obj.province_id,class="must_input",style="width:150px")}}
 				{{mymacros.select(id='city_id',list=cities,value=obj.city_id,class="",style="width:150px")}}
 			</td>
 		</tr>
 		<tr>
-			<td valign="top" width="100px" align="center" height="30px">数量费率</td>
+			<td valign="top" align="center" height="30px">数量费率(元/件)</td>
 			<td valign="top"><input type="text" name="qty_ratio" id="qty_ratio" value="{{obj.qty_ratio|f}}" class="order_add_div_body_input numeric must_input number_input_right"/></td>
 		</tr>
 		<tr>
-			<td valign="top" width="100px" align="center" height="30px">重量费率</td>
+			<td valign="top" align="center" height="30px">重量费率(元/吨)</td>
 			<td valign="top"><input type="text" name="weight_ratio" id="weight_ratio" value="{{obj.weight_ratio|f}}" class="order_add_div_body_input numeric must_input number_input_right"/></td>
 		</tr>
 		<tr>
-			<td valign="top" width="100px" align="center" height="30px">体积费率</td>
+			<td valign="top" align="center" height="30px">体积费率(元/米<sup>3</sup>)</td>
 			<td valign="top"><input type="text" name="vol_ratio" id="vol_ratio" value="{{obj.vol_ratio|f}}" class="order_add_div_body_input numeric must_input number_input_right"/></td>
 		</tr>
 		<tr>
-			<td valign="top" width="100px" align="center">{{_('Remark')}}</td>
+			<td valign="top" align="center">{{_('Remark')}}</td>
 			<td valign="top"><textarea class="" style="width:550px;height:30px;" id="remark" name="remark">{{obj.remark|f}}</textarea></td>
 		</tr>
 	</table>

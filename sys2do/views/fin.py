@@ -195,6 +195,7 @@ class FinView(BasicView):
         if values.get('create_time_to', None):         conditions.append(OrderHeader.order_time < '%s 23:59' % values['create_time_to'])
         if values.get('ref_no', None):                 conditions.append(OrderHeader.ref_no.op('like')('%%%s%%' % values['ref_no']))
         if values.get('customer_id', None):            conditions.append(OrderHeader.customer_id == values['customer_id'])
+        if values.get('source_company_id', None):            conditions.append(OrderHeader.source_company_id == values['source_company_id'])
         if values.get('destination_province_id', None):            conditions.append(OrderHeader.destination_province_id == values['destination_province_id'])
         if values.get('destination_city_id', None):            conditions.append(OrderHeader.destination_city_id == values['destination_city_id'])
         if values.get('deliver_header_no', None):            conditions.append(OrderHeader.deliver_header_no.op('like')('%%%s%%' % values['destination_city_id']))
@@ -307,7 +308,7 @@ class FinView(BasicView):
         else:
             result = DBSession.query(OrderHeader, DeliverHeader).filter(and_(*conditions))
 
-        def url_for_page(**params): return url_for('bpOrder.view', action = "profit", page = params['page'])
+        def url_for_page(**params): return url_for('bpFin.view', action = "profit", page = params['page'])
         records = paginate.Page(result, values['page'], show_if_single_page = True, items_per_page = PAGINATE_PER_PAGE, url = url_for_page)
 
         return {

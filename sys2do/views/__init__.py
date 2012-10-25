@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 from flask.views import View
 from flask.helpers import url_for, flash
-from sys2do.constant import MESSAGE_ERROR, MSG_NO_SUCH_ACTION
 from werkzeug.utils import redirect
+from sys2do.constant import MESSAGE_ERROR, MSG_NO_SUCH_ACTION
+from sys2do import app
+from sys2do.model import DBSession
+
 
 __all__ = ['BasicView']
 
@@ -22,3 +25,25 @@ class BasicView(View):
 #            return redirect(self.default())
 
         return getattr(self, action)()
+
+
+@app.before_request
+def before_request():  #occur before the request
+    from sys2do.util.common import _debug
+    pass
+
+
+
+
+@app.teardown_request
+def teardown_request(exception):  #if error occur on the controller
+    from sys2do.util.common import _debug
+    if exception is not None:
+        _debug("--------come into teardown_request")
+        DBSession.rollback()
+
+
+@app.after_request
+def after_request(response):  #if error occur on the controller
+    from sys2do.util.common import _debug
+    return response

@@ -48,6 +48,7 @@
 	    <li><a href="{{url_for('.view', action = 'supplier')}}"><img width="71" height="21" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image1','','/static/images/system/order_manage_h_25.jpg',1)" id="Image1" src="/static/images/system/order_manage_25.jpg"/></a></li>
         {% if 'UPDATE_SUPPLIER' is get_permission%}
         <li><input type="image" src="/static/images/system/order_manage_33.jpg" width="77" height="21" id="Image3" onmouseover="MM_swapImage('Image3','','/static/images/system/order_manage_h_33.jpg',1)" onmouseout="MM_swapImgRestore()" onclick="return tosave()"/></li>
+        <li><a href="{{url_for('.view', action = 'supplier',m='PRICE_LIST_LIST',id=obj.id)}}"><img src="/static/images/system/jgb.jpg" width="77" height="21" id="Image23" onmouseover="MM_swapImage('Image23','','/static/images/system/jgb_h.jpg',1)" onmouseout="MM_swapImgRestore()"/></a></li>
         {% endif %}
     </ul>
 </div>

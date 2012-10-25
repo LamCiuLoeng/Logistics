@@ -80,9 +80,9 @@ function todo_order_return(obj){
                     var tmp = $(this);
                     var tr = $(tmp.parents("tr")[0]);
                     if(v=='0'){
-                        $(".order_return_span").text("未返");
+                        $(".order_return_span",tr).text("未返");
                     }else{
-                        $(".order_return_span").text("已返");
+                        $(".order_return_span",tr).text("已返");
                     }   
                 });         
                 show_info(r.msg);
@@ -103,9 +103,9 @@ function todo_exception(obj){
                     var tmp = $(this);
                     var tr = $(tmp.parents("tr")[0]);
                     if(v=='1'){
-                        $(".exception_span").text("是");
+                        $(".exception_span",tr).text("是");
                     }else{
-                        $(".exception_span").text("否");
+                        $(".exception_span",tr).text("否");
                     } 
                 });                 
                 show_info(r.msg);
@@ -126,9 +126,9 @@ function todo_less_qty(obj){
                     var tmp = $(this);
                     var tr = $(tmp.parents("tr")[0]);
                     if(v=='1'){
-                        $(".lessqty_span").text("是");
+                        $(".lessqty_span",tr).text("是");
                     }else{
-                        $(".lessqty_span").text("否");
+                        $(".lessqty_span",tr).text("否");
                     } 
                 });            
                 show_info(r.msg);

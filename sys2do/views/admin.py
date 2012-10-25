@@ -28,7 +28,7 @@ from sys2do.util.common import _g, _gl, getMasterAll, _error, _gp, _info
 from sys2do.model.master import Customer, CustomerProfile, \
     SupplierProfile, Supplier, Payment, Item, PickupType, PackType, Ratio, \
     Receiver, InventoryLocation, CustomerTarget, Note, CustomerContact, \
-    Barcode, Province, City, CustomerDiquRatio
+    Barcode, Province, City, CustomerDiquRatio, SupplierDiquRatio
 from sys2do.util.barcode_helper import generate_barcode_file
 
 __all__ = ['bpAdmin']
@@ -308,7 +308,10 @@ class AdminView(BasicView):
     @tab_highlight('TAB_MASTER')
     def supplier(self):
         method = _g('m', 'LIST')
-        if method not in ['LIST', 'NEW', 'UPDATE', 'DELETE', 'SAVE_NEW', 'SAVE_UPDATE']:
+        if method not in ['LIST', 'NEW', 'UPDATE', 'DELETE', 'SAVE_NEW', 'SAVE_UPDATE',
+                          'PRICE_LIST_LIST', 'PRICE_LIST_NEW', 'PRICE_LIST_UPDATE', 'PRICE_LIST_SAVE_NEW',
+                          'PRICE_LIST_SAVE_UPDATE',
+                          ]:
             flash(MSG_NO_SUCH_ACTION, MESSAGE_ERROR);
             return redirect(url_for('.view', action = 'index'))
         if method == 'LIST':
@@ -417,6 +420,57 @@ class AdminView(BasicView):
                 flash(MSG_SERVER_ERROR, MESSAGE_ERROR)
                 return redirect(url_for('.view', action = 'supplier'))
 
+        elif method == 'PRICE_LIST_LIST':
+            id = _g('id')
+            c = DBSession.query(Supplier).get(id)
+            result = DBSession.query(SupplierDiquRatio).filter(and_(SupplierDiquRatio.active == 0,
+                                                                    SupplierDiquRatio.supplier_id == c.id,
+                                                        )).order_by(SupplierDiquRatio.province_id)
+            page = _g('page', 1)
+            def url_for_page(**params): return url_for('.view', action = "supplier", m = method, page = params['page'], id = id)
+            records = paginate.Page(result, page, show_if_single_page = True, items_per_page = PAGINATE_PER_PAGE, url = url_for_page)
+            return render_template("admin/supplier_pricelist_index.html", records = records, obj = c)
+
+        elif method == 'PRICE_LIST_NEW':
+            supplier_id = _g('supplier_id')
+            return render_template("admin/supplier_pricelist_new.html", supplier_id = supplier_id)
+
+        elif method == 'PRICE_LIST_SAVE_NEW':
+            try:
+                params = {}
+                for f in ['supplier_id', 'province_id', 'city_id', 'qty_ratio', 'weight_ratio', 'vol_ratio', 'remark'] :
+                    params[f] = _g(f)
+                obj = SupplierDiquRatio(**params)
+                DBSession.add(obj)
+                DBSession.commit()
+                flash(MSG_SAVE_SUCC, MESSAGE_INFO)
+            except:
+                DBSession.rollback()
+                flash(MSG_SERVER_ERROR, MESSAGE_ERROR)
+            return redirect(url_for('.view', action = 'supplier', m = 'PRICE_LIST_LIST', id = obj.supplier_id))
+
+        elif method == 'PRICE_LIST_UPDATE':
+            obj = DBSession.query(SupplierDiquRatio).get(_g('id'))
+            if obj.province_id:
+                cities = obj.province.children()
+            else:
+                cities = []
+            return render_template("admin/supplier_pricelist_update.html", cities = cities, obj = obj)
+
+        elif method == 'PRICE_LIST_SAVE_UPDATE':
+            id = _g('id', None)
+            if not id :
+                flash(MSG_NO_ID_SUPPLIED, MESSAGE_ERROR)
+                return redirect(url_for('.view', action = 'supplier'))
+            obj = DBSession.query(SupplierDiquRatio).get(id)
+            if not obj :
+                flash(MSG_RECORD_NOT_EXIST, MESSAGE_ERROR)
+                return redirect(url_for('.view', action = 'supplier'))
+            for f in ['province_id', 'city_id', 'qty_ratio', 'weight_ratio', 'vol_ratio', 'remark'] :
+                setattr(obj, f, _g(f))
+            DBSession.commit()
+            flash(MSG_UPDATE_SUCC, MESSAGE_INFO)
+            return redirect(url_for('.view', action = 'supplier', m = 'PRICE_LIST_LIST', id = obj.supplier_id))
 
 
 
