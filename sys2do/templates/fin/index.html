@@ -274,7 +274,7 @@
 			<td>
 				&nbsp;
 				{% if r.deliver_header_no %}
-					<a href="{{url_for('bpDeliver.view',action='view_by_no',no=r.deliver_header_no)}}">{{r.deliver_header_no}}</a>
+					<a href="{{url_for('bpDeliver.view',action='view',id=r.deliver_header_ref)}}">{{r.deliver_header_no}}</a>
 				{%endif%}
 			</td>
 			<td>{{r.source_province|f}}{{r.source_city|f}}</td>
@@ -284,7 +284,7 @@
 			<td>{{r.destination_company|f}}</td>
 			<td>{{r.amount|f}}</td>
 			<td>{{r.cost|f}}</td>
-			<td>{{r.create_time|ft}}</td>
+			<td>{{r.order_time}}</td>
 			<td>{{r.create_by|f}}</td>
 			<td><span class="approval_span">{{mymacros.show_approve(r.approve)}}</span></td>
 			<td><span class="paid_span">{{mymacros.show_paid(r.paid)}}</span></td>
@@ -301,7 +301,7 @@
       
       	<th>&nbsp;</th>
       	<td colspan="7" style="text-align:left">&nbsp;合计</td>
-      	<td colspan="3">
+      	<td colspan="5">
       		(总金额)<span style="color:green;font-weight:bold">{{total_amount}}</span>&nbsp;&nbsp;-&nbsp;&nbsp;
       		(总费用)<span style="color:orange;font-weight:bold">{{total_cost}}</span>&nbsp;&nbsp;=&nbsp;&nbsp;
       		(毛利)<span style="color:blue;font-weight:bold">{{ total_amount - total_cost }}</span>

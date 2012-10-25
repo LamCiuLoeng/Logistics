@@ -42,7 +42,7 @@ bpFin = Blueprint('bpFin', __name__)
 
 class FinView(BasicView):
 
-#    decorators = [login_required]
+    decorators = [login_required]
 
     @templated('fin/index.html')
     def index(self):
@@ -105,7 +105,7 @@ class FinView(BasicView):
         else:
             result = DBSession.query(OrderHeader).filter(and_(*conditions)).order_by(getattr(OrderHeader, field))
 
-        def url_for_page(**params): return url_for('bpOrder.view', action = "index", page = params['page'])
+        def url_for_page(**params): return url_for('bpFin.view', action = "index", page = params['page'])
         records = paginate.Page(result, values['page'], show_if_single_page = True, items_per_page = PAGINATE_PER_PAGE, url = url_for_page)
 
         return {

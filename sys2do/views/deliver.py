@@ -53,7 +53,7 @@ class DeliverView(BasicView):
     def index(self):
         if _g('SEARCH_SUBMIT'):  # come from search
             values = {'page' : 1}
-            for f in ['create_time_from', 'create_time_to', 'no', 'destination_province_id',
+            for f in ['create_time_from', 'create_time_to', 'ref_no', 'destination_province_id',
                       'destination_city_id', 'supplier_id', 'order_no', ] :
                 values[f] = _g(f)
             values['field'] = _g('field', None) or 'create_time'
@@ -76,8 +76,11 @@ class DeliverView(BasicView):
             conditions.append(DeliverHeader.order_time > values['create_time_from'])
         if values.get('create_time_to', None):
             conditions.append(DeliverHeader.order_time < '%s 23:59' % values['create_time_to'])
-        if values.get('no', None):
-            conditions.append(DeliverHeader.no.op('like')('%%%s%%' % values['no']))
+        if values.get('ref_no', None):
+            print "*" * 20
+            print values['ref_no']
+            print "_" * 20
+            conditions.append(DeliverHeader.ref_no.op('like')('%%%s%%' % values['ref_no']))
         if values.get('destination_province_id', None):
             conditions.append(DeliverHeader.destination_province_id == values['destination_province_id'])
             dp = DBSession.query(Province).get(values['destination_province_id'])
