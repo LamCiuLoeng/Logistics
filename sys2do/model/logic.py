@@ -128,8 +128,8 @@ class OrderHeader(DeclarativeBase, SysMixin, CRUDMixin):
     barcode_id = Column(Integer, ForeignKey('system_upload_file.id'), doc = u'')
     barcode = relation(UploadFile)
 
-    inventory_location_id = Column(Integer, ForeignKey('master_inventory_location.id'), doc = u'')
-    inventory_location = relation(InventoryLocation, backref = backref("items", order_by = id))
+#    inventory_location_id = Column(Integer, ForeignKey('master_inventory_location.id'), doc = u'')
+#    inventory_location = relation(InventoryLocation, backref = backref("items", order_by = id))
 
     approve = Column(Integer, default = 0, doc = u'') # 0 is undone ,1 is approved ,2 is disapprove
     paid = Column(Integer, default = 0, doc = u'') # 0 is not paid, 1 is paid

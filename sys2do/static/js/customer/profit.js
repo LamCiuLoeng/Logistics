@@ -83,6 +83,7 @@ function save_discount(){
             alert(r.msg);
             
             var tr = $($("input[@name='order_ids']:checked").parents("tr")[0]);
+            $(".order_discount_return_span",tr).text('已返 ');
             $(".td_actual_proxy_charge",tr).text($('#actual_proxy_charge').val());
             $(".td_discount_return_person",tr).text($("#discount_person_id :selected").text());
             $(".td_discount_return_time",tr).text($("#discount_return_time").val());
