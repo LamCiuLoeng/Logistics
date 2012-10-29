@@ -21,7 +21,7 @@ from sys2do.constant import MESSAGE_ERROR, MESSAGE_INFO, MSG_NO_SUCH_ACTION, \
 from sys2do.views import BasicView
 from sys2do.model.master import CustomerProfile, Customer, Supplier, \
     CustomerTarget, Receiver, CustomerContact, Province, City, Barcode, \
-    CustomerDiquRatio, CustomerSource
+    CustomerDiquRatio, CustomerSource, InventoryItem
 from sys2do.model.logic import OrderHeader, TransferLog, PickupDetail, \
     DeliverDetail
 from sys2do.model.system import UploadFile
@@ -205,6 +205,10 @@ class RootView(BasicView):
             cs = DBSession.query(City).filter(and_(City.active == 0, City.parent_code == Province.code, Province.id == _g('pid'))).order_by(City.name)
             data = [{'id' : c.id, 'name' : c.name } for c in cs]
             return jsonify({'code' : 0 , 'msg' : '' , 'data' : data})
+
+        if master == 'inventory_item':
+            t = DBSession.query(InventoryItem).get(_g('id'))
+            return jsonify({'code' : 0 , 'msg' : '' , 'data' : t.populate()})
 
         return jsonify({'code' : 1, 'msg' : 'Error', })
 
@@ -404,30 +408,59 @@ class RootView(BasicView):
         weight_ratio = ''
         vol_ratio = ''
 
-        try:
-            t = DBSession.query(CustomerDiquRatio).filter(and_(CustomerDiquRatio.active == 0,
+        q1 = DBSession.query(CustomerDiquRatio).filter(and_(CustomerDiquRatio.active == 0,
                                                            CustomerDiquRatio.customer_id == customer_id,
                                                            CustomerDiquRatio.province_id == province_id,
                                                            CustomerDiquRatio.city_id == city_id,
-                                                           )).one()
+                                                           ))
+
+        if q1.count() == 1:
+            t = q1.one()
             qty_ratio, weight_ratio, vol_ratio = t.qty_ratio, t.weight_ratio, t.vol_ratio
-        except:
-            try:
-                t = DBSession.query(CustomerDiquRatio).filter(and_(CustomerDiquRatio.active == 0,
+        else:
+            q2 = DBSession.query(CustomerDiquRatio).filter(and_(CustomerDiquRatio.active == 0,
                                                            CustomerDiquRatio.customer_id == customer_id,
                                                            CustomerDiquRatio.province_id == province_id,
                                                            CustomerDiquRatio.city_id == None,
-                                                           )).one()
+                                                           ))
+            if q2.count() == 1:
+                t = q2.one()
                 qty_ratio, weight_ratio, vol_ratio = t.qty_ratio, t.weight_ratio, t.vol_ratio
-            except:
-                try:
-                    c = DBSession.query(City).filter(and_(City.active == 0, City.id == city_id)).one()
-                    qty_ratio, weight_ratio, vol_ratio = c.qty_ratio, c.weight_ratio, c.vol_ratio
-                except:
-                    try:
-                        p = DBSession.query(Province).filter(and_(Province.active == 0, Province.id == province_id)).one()
-                        qty_ratio, weight_ratio, vol_ratio = p.qty_ratio, p.weight_ratio, p.vol_ratio
-                    except: pass
+            else:
+                q3 = DBSession.query(City).filter(and_(City.active == 0, City.id == city_id))
+                if q3.count() == 1:
+                    t = q3.one()
+                    qty_ratio, weight_ratio, vol_ratio = t.qty_ratio, t.weight_ratio, t.vol_ratio
+                else:
+                    q4 = DBSession.query(Province).filter(and_(Province.active == 0, Province.id == province_id))
+                    if q4.count() == 1:
+                        t = q4.one()
+                        qty_ratio, weight_ratio, vol_ratio = t.qty_ratio, t.weight_ratio, t.vol_ratio
+
+#        try:
+#            t = DBSession.query(CustomerDiquRatio).filter(and_(CustomerDiquRatio.active == 0,
+#                                                           CustomerDiquRatio.customer_id == customer_id,
+#                                                           CustomerDiquRatio.province_id == province_id,
+#                                                           CustomerDiquRatio.city_id == city_id,
+#                                                           )).one()
+#            qty_ratio, weight_ratio, vol_ratio = t.qty_ratio, t.weight_ratio, t.vol_ratio
+#        except:
+#            try:
+#                t = DBSession.query(CustomerDiquRatio).filter(and_(CustomerDiquRatio.active == 0,
+#                                                           CustomerDiquRatio.customer_id == customer_id,
+#                                                           CustomerDiquRatio.province_id == province_id,
+#                                                           CustomerDiquRatio.city_id == None,
+#                                                           )).one()
+#                qty_ratio, weight_ratio, vol_ratio = t.qty_ratio, t.weight_ratio, t.vol_ratio
+#            except:
+#                try:
+#                    c = DBSession.query(City).filter(and_(City.active == 0, City.id == city_id)).one()
+#                    qty_ratio, weight_ratio, vol_ratio = c.qty_ratio, c.weight_ratio, c.vol_ratio
+#                except:
+#                    try:
+#                        p = DBSession.query(Province).filter(and_(Province.active == 0, Province.id == province_id)).one()
+#                        qty_ratio, weight_ratio, vol_ratio = p.qty_ratio, p.weight_ratio, p.vol_ratio
+#                    except: pass
 
         return {'qty_ratio' : qty_ratio, 'weight_ratio' : weight_ratio, 'vol_ratio' : vol_ratio}
 

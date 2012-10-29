@@ -733,20 +733,27 @@ class InventoryItem(DeclarativeBase, SysMixin):
     id = Column(Integer, autoincrement = True, primary_key = True)
     name = Column(Text)
     desc = Column(Text)
-    qty = Column(Float, default = 0, doc = u'数量')
-    weight = Column(Float, default = 0, doc = u'重量')
-    area = Column(Float, default = 0, doc = u'面积')
-
-    exp_qty = Column(Float, default = 0, doc = u'预期数量')
-    exp_weight = Column(Float, default = 0, doc = u'预期重量')
-    exp_area = Column(Float, default = 0, doc = u'预期面积')
-
-    loss = Column(Float, default = 0, doc = u'损耗')
+#    qty = Column(Float, default = 0, doc = u'数量')
+#    weight = Column(Float, default = 0, doc = u'重量')
+#    area = Column(Float, default = 0, doc = u'面积')
+#
+#    exp_qty = Column(Float, default = 0, doc = u'预期数量')
+#    exp_weight = Column(Float, default = 0, doc = u'预期重量')
+#    exp_area = Column(Float, default = 0, doc = u'预期面积')
+#
+#    loss = Column(Float, default = 0, doc = u'损耗')
     remark = Column(Text)
 
     def __str__(self): return self.name
     def __repr__(self): return self.name
     def __unicode__(self): return self.name
+
+    def populate(self):
+        return {
+                'name' : self.name,
+                'desc' : self.desc,
+                }
+
 
 
 class InventoryLocationItem(DeclarativeBase, SysMixin):
@@ -765,6 +772,12 @@ class InventoryLocationItem(DeclarativeBase, SysMixin):
     area = Column(Float, default = 0, doc = u'面积')
     loss = Column(Float, default = 0, doc = u'损耗')
 
+    exp_qty = Column(Float, default = 0, doc = u'预期数量')
+    exp_weight = Column(Float, default = 0, doc = u'预期重量')
+    exp_area = Column(Float, default = 0, doc = u'预期面积')
+
+
+
 
 
 class InventoryInNote(DeclarativeBase, SysMixin):
@@ -779,10 +792,10 @@ class InventoryInNote(DeclarativeBase, SysMixin):
     customer_id = Column(Integer, ForeignKey('master_customer.id'), doc = u'客户')
     customer = relation(Customer)
 
-    qty = Column(Float, default = None, doc = u'数量')
-    weight = Column(Float, default = None, doc = u'重量')
-    area = Column(Float, default = None, doc = u'面积')
-    loss = Column(Float, default = None, doc = u'损耗')
+    qty = Column(Float, default = 0, doc = u'数量')
+    weight = Column(Float, default = 0, doc = u'重量')
+    area = Column(Float, default = 0, doc = u'面积')
+    loss = Column(Float, default = 0, doc = u'损耗')
 
     so = Column(Text)
     po = Column(Text)
@@ -804,15 +817,15 @@ class InventoryOutNote(DeclarativeBase, SysMixin):
     id = Column(Integer, autoincrement = True, primary_key = True)
     no = Column(Text, doc = u'系统编号')
 #
-#    location_id = Column(Integer, ForeignKey('master_inventory_location.id'))
-#    location = relation(InventoryLocation)
+    location_id = Column(Integer, ForeignKey('master_inventory_location.id'))
+    location = relation(InventoryLocation)
 
     customer_id = Column(Integer, ForeignKey('master_customer.id'), doc = u'客户')
     customer = relation(Customer)
 
-    qty = Column(Float, default = None, doc = u'数量')
-    weight = Column(Float, default = None, doc = u'重量')
-    area = Column(Float, default = None, doc = u'面积')
+    qty = Column(Float, default = 0, doc = u'数量')
+    weight = Column(Float, default = 0, doc = u'重量')
+    area = Column(Float, default = 0, doc = u'面积')
 
     so = Column(Text)
     po = Column(Text)
@@ -844,9 +857,9 @@ class InventoryNoteDetail(DeclarativeBase, SysMixin):
     item = relation(InventoryItem)
     desc = Column(Text)
 
-    qty = Column(Float, default = None, doc = u'数量')
-    weight = Column(Float, default = None, doc = u'重量')
-    area = Column(Float, default = None, doc = u'面积')
+    qty = Column(Float, default = 0, doc = u'数量')
+    weight = Column(Float, default = 0, doc = u'重量')
+    area = Column(Float, default = 0, doc = u'面积')
 
     remark = Column(Text)
 
