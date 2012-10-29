@@ -1,0 +1,132 @@
+{% extends "master.html" %}
+
+{% block subtitle %} - 出库单详情{% endblock %}
+
+{% block extJS %}
+<script language="JavaScript" type="text/javascript">
+//<![CDATA[
+	function toreturn(){
+		redirect('{{request.referrer}}');
+	}
+		
+	function todel(){
+		
+	}	
+//]]>
+</script>
+
+{% endblock %}
+
+{% block inner_menu %}
+<div class="inner_menu">
+	<ul>
+    	<li><img src="/static/images/system/order_manage_25.jpg" width="71" height="21" id="Image1" onmouseover="MM_swapImage('Image1','','/static/images/system/order_manage_h_25.jpg',1)" onmouseout="MM_swapImgRestore()" onclick="return toreturn();"/></li>
+        <li><a href="{{url_for('.view',action='in_note_update',id=obj.id)}}"><img src="/static/images/system/edit.jpg" width="77" height="21" id="Image2" onmouseover="MM_swapImage('Image2','','/static/images/system/edit_h.jpg',1)" onmouseout="MM_swapImgRestore()"/></a></li>
+        <li><img src="/static/images/system/order_manage_29.jpg" width="77" height="21" id="Image21" onmouseover="MM_swapImage('Image21','','/static/images/system/order_manage_h_29.jpg',1)" onmouseout="MM_swapImgRestore()" onclick="return todel();"/></li>
+    	<li>
+        	<select onchange="todo_approve(this);">
+        		<option>--审核是否通过--</option>
+        		<option value="1">{{_(ORDER_APPROVED[1])}}</option>
+        		<option value="2">{{_(ORDER_DISAPPROVED[1])}}</option>
+        	</select/>
+        </li>
+    </ul>
+</div>
+{% endblock %}
+
+
+{% block content %}
+<div class="order_add_div">
+	<div class="order_add_div_body">
+		<table border="1" cellpadding="3" cellspacing="3">
+			<tr>
+				<td width="150" height="30" align="right">出库单号</td>
+				<td width="12">&nbsp;</td>
+				<td>{{obj.no}}</td>
+			</tr>
+			<tr>
+				<td height="30" align="right">客户</td>
+				<td width="12">&nbsp;</td>
+				<td>{{obj.customer}}</td>
+			</tr>
+			<tr>
+				<td height="30" align="right">客户销售单号(SO)</td>
+				<td width="12">&nbsp;</td>
+				<td>{{obj.so|f}}</td>
+			</tr>
+			<tr>
+				<td height="30" align="right">客户采购单号(PO)</td>
+				<td width="12">&nbsp;</td>
+				<td>{{obj.po|f}}</td>
+			</tr>
+			<tr>
+				<td height="30" align="right">客户送货单号(DN)</td>
+				<td width="12">&nbsp;</td>
+				<td>{{obj.dn|f}}</td>
+			</tr>
+			<tr>
+				<td height="30" align="right">客户参考(REF)</td>
+				<td width="12">&nbsp;</td>
+				<td>{{obj.ref|f}}</td>
+			</tr>			
+			<tr>
+				<td height="30" align="right">备注</td>
+				<td width="12">&nbsp;</td>
+				<td>{{obj.remark|f}}</td>
+			</tr>
+			<tr>
+				<td height="30" align="right">状态</td>
+				<td width="12">&nbsp;</td>
+				<td>{{obj.status}}</td>
+			</tr>
+			<tr>
+				<td height="30" align="right">创建人</td>
+				<td width="12">&nbsp;</td>
+				<td>{{obj.create_by|f}}</td>
+			</tr>
+			<tr>
+				<td height="30" align="right">创建时间</td>
+				<td width="12">&nbsp;</td>
+				<td>{{obj.create_time|ft}}</td>
+			</tr>
+		</table>
+		
+		<br />
+		<br />
+
+		<table style="width:800px">
+			<thead>
+				<tr class="field_head">
+					<th style="width:150px">{{_('Item Name')}}</th>
+					<th style="width:80px">描述</th>
+					<th style="width:80px">{{_('Qty')}}</th>
+					<th style="width:80px">面积(米<sup>2</sup>)</th>
+					<th style="width:80px">重量(吨)</th>
+					<th style="width:200px">{{_('Remark')}}</th>
+				</tr>
+			</thead>
+			<tbody id="item_list">
+			{% for d in obj.details %}
+				<tr class="data_table_tr {{ loop.cycle('data_table_tr_odd', 'data_table_tr_even') }}">
+					<td>{{d.item}}</td>
+					<td>{{d.desc|f}}</td>
+					<td>{{d.qty|fn(f='%d')}}</td>
+					<td>{{d.weight|fn}}</td>
+					<td>{{d.area|fn}}</td>
+					<td>{{d.remark|f}}</td>
+				</tr>
+			{% endfor %}
+				<tr class="data_table_tr">
+					<td colspan="2">&nbsp;合计</td>
+					<td>{{obj.qty|fn(f='%d')}}</td>
+					<td>{{obj.area}}</td>
+					<td>{{obj.weight}}</td>
+					<td>&nbsp;</td>
+				</tr>
+			</tbody>
+		</table>
+		<br />
+		<br />
+	</div>
+</div>
+{% endblock %}

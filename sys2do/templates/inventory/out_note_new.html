@@ -1,0 +1,119 @@
+{% extends "master.html" %}
+
+{% block subtitle %} - 新建出库单{% endblock %}
+
+{% block extJS %}
+<script language="JavaScript" type="text/javascript">
+//<![CDATA[
+	$(document).ready(function(){    
+	
+	});
+	
+	function tosave(){
+		$(".validate_error").removeClass("validate_error");
+		var msg = new Array();
+		if(!$("#customer_id").val()){
+			msg.push("请填写客户！");
+		}
+		
+		var all_ok = true;
+		
+		$(".data_table_tr").each(function(){
+			var tr = $(this);
+			var qty = $("input[name^='qty_']",tr);
+			var area = $("input[name^='area_']",tr);
+			var weight = $("input[name^='weight_']",tr);
+			
+			if(!qty.val() && !area.val() && !weight.val()){
+				all_ok = false;
+				qty.addClass("validate_error");
+				area.addClass("validate_error");
+				weight.addClass("validate_error");
+			}
+		});
+		
+		if(!all_ok){ msg.push("请正确填写每一个货物的数量，重量以及平方！"); }
+	
+		if(msg.length > 0){
+			alert(msg.join("\n"));
+            return false;
+		}else{	
+			show_hold('正在保存，请稍候。。。');
+			$("form").submit();
+		}
+	}
+	
+	function toreturn(){
+			return redirect_alert("{{MSG_LEAVE_WITHOUT_SAVING}}","{{request.referrer}}");
+	}	
+
+//]]>
+</script>
+<script src="{{url_for('static', filename='js/customer/note_add.js')}}" type="text/javascript"></script>
+{% endblock %}
+
+{% block inner_menu %}
+<div class="inner_menu">
+	<ul>
+    	<li><img src="/static/images/system/order_manage_25.jpg" width="71" height="21" id="Image1" onmouseover="MM_swapImage('Image1','','/static/images/system/order_manage_h_25.jpg',1)" onmouseout="MM_swapImgRestore()" onclick="return toreturn();"/></li>
+        <li><input type="image" src="/static/images/system/order_manage_33.jpg" width="77" height="21" id="Image3" onmouseover="MM_swapImage('Image3','','/static/images/system/order_manage_h_33.jpg',1)" onmouseout="MM_swapImgRestore()" onclick="tosave()"/></li>
+        {% if 'CREATE_WAREHOUSE' is get_permission%}
+        {% endif %}
+    </ul>
+</div>
+{% endblock %}
+
+
+{% block content %}
+	
+	<form action="{{url_for('.view',action='out_note_save_new')}}" method="post">
+		<table>
+			<tr>
+				<td>客户</td>
+				<td>{{mymacros.select(id='customer_id',list=MASTER_ALL('Customer'),value=None,class="must_input",style="width:360px")}}</td>
+			</tr>
+			
+			<tr><td>客户销售单号(SO)</td><td><input type="text" name="so" /></td></tr>
+			<tr><td>客户采购单号(PO)</td><td><input type="text" name="po" /></td></tr>
+			<tr><td>客户送货单号(DN)</td><td><input type="text" name="dn"/></td></tr>
+			<tr><td>客户参考(REF)</td><td><input type="text" name="ref"/></td></tr>
+			<tr><td>仓位</td><td>
+				{{mymacros.select(id='location_id',list=MASTER_ALL('InventoryLocation'),value=location_id,class="must_input",style="width:140px;")}}
+			</td></tr>
+			<tr><td>备注</td><td><textarea name="remark"></textarea></td></tr>
+		</table>
+		
+		<br />
+		<br />
+		
+		<table style="width:800px;">
+			<thead>
+				<tr class="field_head">
+					<th style="width:150px">{{_('Item Name')}}</th>
+					<th style="width:80px">描述</th>
+					<th style="width:80px">仓位</th>
+					<th style="width:80px">{{_('Qty')}}</th>
+					<th style="width:80px">{{_('Weight')}}</th>
+					<th style="width:80px">平方</th>
+					<th style="width:200px">{{_('Remark')}}</th>
+				</tr>
+			</thead>
+			<tbody id="item_list">
+				{% for r in records %}
+					<tr class="data_table_tr {{ loop.cycle('data_table_tr_odd', 'data_table_tr_even') }}">
+						<td>{{r.item.name}}<input type="hidden" name="item_{{r.id}}" value="{{r.id}}"/></td>
+						<td>{{r.item.desc}}</td>
+						<td>{{r.location}}</td>
+						<td><input type="text" class="numeric number_input_right" style="width:80px" name="qty_{{r.id}}" value="{{r.qty|fn('%d')}}" ref="{{r.qty|fn('%d')}}"/></td>
+						<td><input type="text" class="numeric number_input_right" style="width:80px" name="weight_{{r.id}}" value="{{r.weight|fn}}" ref="{{r.weight|fn}}"/></td>
+						<td><input type="text" class="numeric number_input_right" style="width:80px" name="area_{{r.id}}" value="{{r.area|fn}}" ref="{{r.area|fn}}"/></td>
+						<td><textarea name="remark_{{r.id}}"></textarea></td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+		<br />
+		<br />
+	</form>
+
+{% endblock %}

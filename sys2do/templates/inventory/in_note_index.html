@@ -1,0 +1,110 @@
+{% extends "master.html" %}
+{% block subtitle %} - 仓储管理 - 入库单管理{% endblock %}
+
+{% block extCSS %}
+
+{% endblock %}
+
+
+{% block extJS %}
+<script src="{{url_for('static', filename='js/customer/order_todo.js')}}" type="text/javascript"></script>
+<script language="JavaScript" type="text/javascript">
+//<![CDATA[
+	
+	
+//]]>
+</script>
+
+{% endblock %}
+
+
+        
+        
+{% block inner_menu %}
+<div class="inner_menu">
+	<ul>	
+        <li><a href="{{url_for('.view',action='index')}}"><img src="/static/images/system/order_manage_25.jpg" width="71" height="21" id="Image7" onmouseover="MM_swapImage('Image7','','/static/images/system/order_manage_h_25.jpg',1)" onmouseout="MM_swapImgRestore()"/></a></li>
+		<li><a href="{{url_for('.view',action='in_note_new')}}"><img src="/static/images/system/order_manage_31.jpg" width="77" height="21" id="Image71" onmouseover="MM_swapImage('Image71','','/static/images/system/order_manage_h_31.jpg',1)" onmouseout="MM_swapImgRestore()"/></a></li>
+        
+    </ul>
+</div>
+{% endblock %}
+
+
+{% block content %}
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+	<tr><td class="title_fonts_display">&middot; 入库单管理</td></tr>
+</table>
+<div class="search_div">
+	<div class="search_div_header">入库单搜索</div>
+    <div class="search_div_body">
+    	<form action="{{url_for('.view',action='in_note')}}" method="post" id="search_form">
+
+    	<ul>
+          <li style="width:100%; border-right:#E2FEFE 1px solid;"><span>起始日期</span>
+        	  <input type="text" class="datepicker" name="create_time_from" value="{{values.get('create_time_from','')|f}}"/>&nbsp;&nbsp;-&nbsp;&nbsp;<input type="text" class="datepicker" name="create_time_to" value="{{values.get('create_time_to','')|f}}"/>
+          </li>
+          <li style="width:300px"><span>系统编号</span><input type="text" name="no" value="{{values.get('no','')|f}}"/></li>
+          <li style="width:400px"><span>客户</span>
+            {% set customer_id = values.get('customer_id',None)|int  %}
+          	{{mymacros.select(id='customer_id',list=MASTER_ALL('Customer'),value=customer_id,class="field order_add_div_body_input",style="width:300px")}}
+          </li>
+          <li style="width:300px"><span>仓位</span>
+            {% set location_id = values.get('location_id',None)|int  %}
+          	{{mymacros.select(id='location_id',list=MASTER_ALL('InventoryLocation'),value=location_id,class="field order_add_div_body_input",style="width:200px")}}
+          </li>   
+        </ul>
+        <div class="button_div"><input type="submit" value="{{_('Search')}}"/></div>
+        <input type="hidden" name="SEARCH_SUBMIT" value="TRUE"/>
+        <input type="hidden" name="field" id="field" value=""/>
+        <input type="hidden" name="direction" id="direction" value=""/>
+    	</form>
+        <div style="clear:both"></div>
+    </div>
+</div>
+
+<div class="point_div"><img src="/static/images/system/order_manage_54.jpg" width="22" height="28" /><span>{{_('Input the conditions and search.')}}</span></div>
+
+
+
+
+<form method="post" action="" id="records">
+
+<table border="0" cellpadding="0" cellspacing="0"  style="width:1150px">
+  	  <tr class="data_table_tr">
+	    <td colspan="100" style="text-align:right">{{mymacros.mypaginate(records)}}</td>
+	</tr>
+  <tr class="field_head">
+    <td align="center" style="width:200px;">{{mymacros.show_direction(values,'no')}}系统编号</td>
+    <td align="center" style="width:100px;">客户</td>
+    <td align="center" style="width:100px;">仓位</td>
+    <td align="center" style="width:100px;">数量(件)</td>
+    <td align="center" style="width:100px;">面积(米<sup>2</sup>)</td>
+    <td align="center" style="width:100px;">重量(吨)</td>
+    <td align="center" style="width:200px;">{{mymacros.show_direction(values,'create_time')}}{{_('Create Time')}}</td>
+    <td align="center" style="width:120px;">{{mymacros.show_direction(values,'create_by_id')}}{{_('Creator')}}</td>
+  </tr>
+  
+  {% for r in records.items %}
+		  <tr class="data_table_tr {{ loop.cycle('data_table_tr_odd', 'data_table_tr_even') }}">
+		    <td><a href="{{url_for('.view',action='in_note_review',id=r.id)}}">{{r.no|f}}</a></td>
+			<td>{{r.customer.display_name|f}}</td>
+			<td>{{r.location}}</td>
+			<td>{{r.qty|fn(f='%d')}}</td>
+			<td>{{r.area|fn}}</td>
+			<td>{{r.weight|fn}}</td>
+			<td>{{r.create_time|ft}}</td>
+			<td>{{r.create_by|f}}</td>
+		  </tr>
+  {% endfor %}
+      <tfoot>
+	  	 <tr class="data_table_tr">
+		    <td colspan="100" style="text-align:right">{{mymacros.mypaginate(records)}}</td>
+		</tr>
+  	</tfoot>
+</table>
+<br /><br />
+</form>
+
+
+{% endblock %}

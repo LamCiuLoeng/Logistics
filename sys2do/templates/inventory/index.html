@@ -1,0 +1,137 @@
+{% extends "master.html" %}
+{% block subtitle %} - 仓储管理{% endblock %}
+
+{% block extCSS %}
+
+{% endblock %}
+
+
+{% block extJS %}
+<script language="JavaScript" type="text/javascript">
+//<![CDATA[
+	function out_note(){
+		if($("input[name='note_ids']:checked").length < 1){
+			show_error('{{MSG_ATLEAST_ONE_ORDER_TO_CREATE_DELIVER}}');
+			return false;
+		}
+		$("form").submit();
+	}
+	
+//]]>
+</script>
+
+{% endblock %}
+
+
+        
+        
+{% block inner_menu %}
+<div class="inner_menu">
+	<ul>	
+        <li><a href="{{url_for('.view',action='in_note')}}"><img src="/static/images/system/rkd.jpg" width="94" height="21" id="Image7" onmouseover="MM_swapImage('Image7','','/static/images/system/rkd_h.jpg',1)" onmouseout="MM_swapImgRestore()"/></a></li>
+		<li><a href="{{url_for('.view',action='out_note')}}"><img src="/static/images/system/ckd.jpg" width="94" height="21" id="Image71" onmouseover="MM_swapImage('Image71','','/static/images/system/ckd_h.jpg',1)" onmouseout="MM_swapImgRestore()"/></a></li>
+		<li><a href="#" onclick="return out_note()">新建出库单</a></li>
+    </ul>
+</div>
+{% endblock %}
+
+
+{% block content %}
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+	<tr><td class="title_fonts_display">&middot; 仓储管理</td></tr>
+</table>
+<form method="post" action="{{url_for('.view',action='index')}}" id="records">
+<div class="search_div">
+	<div class="search_div_header">货物搜索</div>
+    <div class="search_div_body">
+    	<ul>
+
+          <li style="width:755px"><span>货物名称</span>
+          	{% set item_id = values.get('item_id',None)|int  %}
+            {{mymacros.select('item_id',MASTER_ALL('InventoryItem'),item_id,style="width:250px")}}        
+          </li> 
+          <li style="width:755px"><span>客户</span>
+          	{% set customer_id = values.get('customer_id',None)|int  %}
+            {{mymacros.select('customer_id',MASTER_ALL('Customer'),customer_id,style="width:250px")}}        
+          </li>
+          <li style="width:755px"><span>仓位</span>
+          	{% set location_id = values.get('location_id',None)|int  %}
+            {{mymacros.select('location_id',MASTER_ALL('InventoryLocation'),location_id,style="width:250px")}}        
+          </li>
+        </ul>
+        <div class="button_div"><input type="submit" value="{{_('Search')}}"/></div>
+        <input type="hidden" name="SEARCH_SUBMIT" value="TRUE"/>
+        <input type="hidden" name="field" id="field" value=""/>
+        <input type="hidden" name="direction" id="direction" value=""/>
+    	</form>
+        <div style="clear:both"></div>
+    </div>
+</div>
+</form>
+<div class="point_div"><img src="/static/images/system/order_manage_54.jpg" width="22" height="28" /><span>{{_('Input the conditions and search.')}}</span></div>
+
+
+
+
+<form method="post" action="{{url_for('.view',action='out_note_new')}}" id="records">
+
+<table border="0" cellpadding="0" cellspacing="0"  style="width:1400px">
+  	  <tr class="data_table_tr">
+	    <td colspan="100" style="text-align:right">{{mymacros.mypaginate(records)}}</td>
+	</tr>
+  <tr class="field_head">
+    <th align="center" style="width:50px;"><input type="checkbox" onclick="selectall(this,'note_ids');"/></th>
+    <td align="center" style="width:200px;">货物名称</td>
+    <td align="center" style="width:200px;">货物描述</td>
+    <td align="center" style="width:200px;">仓位</td>
+    <td align="center" style="width:100px;">实际数量</td>
+    <td align="center" style="width:100px;">预期数量</td>
+    <td align="center" style="width:100px;">实际面积(米<sup>2</sup>)</td>
+    <td align="center" style="width:100px;">预期面积(米<sup>2</sup>)</td>
+    <td align="center" style="width:100px;">实际重量(吨)</td>
+    <td align="center" style="width:100px;">预期重量(吨)</td>
+  </tr>
+  
+  
+  {% for r in records.items %}
+		  <tr class="data_table_tr {{ loop.cycle('data_table_tr_odd', 'data_table_tr_even') }}">
+		    <th><input type="checkbox" name="note_ids" value="{{r.id}}" /></th>
+		    <td><a href="{{url_for('.view',action='item_detail',id=r.item.id)}}">{{r.item.name|f}}</a></td>
+		    <td>{{r.item.desc|f}}</td>
+		    <td>{{r.location|f}}</td>
+			<td>{{r.qty|fn(f='%d')}}</td>
+			<td>{{r.exp_qty|fn(f='%d')}}</td>
+			<td>{{r.area|fn}}</td>
+			<td>{{r.exp_area|fn}}</td>
+			<td>{{r.weight|fn}}</td>
+			<td>{{r.exp_weight|fn}}</td>
+		  </tr>
+  {% endfor %}
+      <tr class="data_table_tr">
+      	{% set total_qty = records.items|sum_with_none(attribute='qty') %}
+        {% set total_area = records.items|sum_with_none(attribute='area') %}
+        {% set total_weight = records.items|sum_with_none(attribute='weight') %}
+        {% set total_exp_qty = records.items|sum_with_none(attribute='exp_qty') %}
+        {% set total_exp_area = records.items|sum_with_none(attribute='exp_area') %}
+        {% set total_exp_weight = records.items|sum_with_none(attribute='exp_weight') %}
+
+      	<td colspan="3" style="text-align:left">&nbsp;合计</td>
+		<td>{{total_qty|fn(f='%d')}}</td>
+		<td>{{total_exp_qty|fn(f='%d')}}</td>
+		<td>{{total_area}}</td>
+		<td>{{total_exp_area}}</td>
+		<td>{{total_weight}}</td>
+		<td>{{total_exp_weight}}</td>
+		<td colspan="10">&nbsp;</td>
+      </tr>
+      <tfoot>
+	  	 <tr class="data_table_tr">
+		    <td colspan="100" style="text-align:right">{{mymacros.mypaginate(records)}}</td>
+		</tr>
+  	</tfoot>
+</table>
+<br /><br />
+
+
+
+{% endblock %}

@@ -1,0 +1,131 @@
+{% extends "master.html" %}
+
+{% block subtitle %} - 新建入库单{% endblock %}
+
+{% block extJS %}
+<script language="JavaScript" type="text/javascript">
+//<![CDATA[
+	$(document).ready(function(){    
+	    $( "#dialog-form" ).dialog({
+	        modal: true,
+	        height: 300,
+	        width:500,
+	        autoOpen: false
+	    });
+	
+	});
+	
+	
+	function tosave(){
+		show_hold('正在保存，请稍候。。。');
+		$("#item_json").val(JSON.stringify(item_array));
+		$("form").submit();
+	}
+	
+	function toreturn(){
+			return redirect_alert("{{MSG_LEAVE_WITHOUT_SAVING}}","{{request.referrer}}");
+	}	
+	
+	
+	var item_array = new Array();
+//]]>
+</script>
+<script src="{{url_for('static', filename='js/customer/note_add.js')}}" type="text/javascript"></script>
+{% endblock %}
+
+{% block inner_menu %}
+<div class="inner_menu">
+	<ul>
+    	<li><img src="/static/images/system/order_manage_25.jpg" width="71" height="21" id="Image1" onmouseover="MM_swapImage('Image1','','/static/images/system/order_manage_h_25.jpg',1)" onmouseout="MM_swapImgRestore()" onclick="return toreturn();"/></li>
+        <li><input type="image" src="/static/images/system/order_manage_33.jpg" width="77" height="21" id="Image3" onmouseover="MM_swapImage('Image3','','/static/images/system/order_manage_h_33.jpg',1)" onmouseout="MM_swapImgRestore()" onclick="tosave()"/></li>
+        {% if 'CREATE_WAREHOUSE' is get_permission%}
+        {% endif %}
+    </ul>
+</div>
+{% endblock %}
+
+
+{% block content %}
+	
+	<form action="{{url_for('.view',action='in_note_save_new')}}" method="post">
+		<input type="hidden" id="item_json" name="item_json" value=""/>
+		<table>
+			<tr>
+				<td>客户</td>
+				<td>{{mymacros.select(id='customer_id',list=MASTER_ALL('Customer'),value=None,class="must_input",style="width:360px")}}</td>
+			</tr>
+			
+			<tr><td>客户销售单号(SO)</td><td><input type="text" name="so" /></td></tr>
+			<tr><td>客户采购单号(PO)</td><td><input type="text" name="po" /></td></tr>
+			<tr><td>客户送货单号(DN)</td><td><input type="text" name="dn"/></td></tr>
+			<tr><td>客户参考(REF)</td><td><input type="text" name="ref"/></td></tr>
+			
+			<tr>
+				<td>仓位</td>
+				<td>
+					{{mymacros.select(id='location_id',list=MASTER_ALL('InventoryLocation'),value=None,class="must_input",style="width:140px;")}}
+				</td>
+			</tr>
+			<tr><td>备注</td><td><textarea name="remark"></textarea></td></tr>
+		</table>
+		
+		<br />
+		<br />
+		
+		<div id="item_details">
+		  <p><input type="button" value="{{_('Add')}}" onclick="add_item()"/></p>
+		</div>
+		<br />
+		<table style="width:800px;">
+			<thead>
+				<tr class="field_head">
+					<th style="width:150px">{{_('Item Name')}}</th>
+					<th style="width:80px">描述</th>
+					<th style="width:80px">{{_('Qty')}}</th>
+					<th style="width:80px">{{_('Weight')}}</th>
+					<th style="width:80px">平方</th>
+					<th style="width:200px">{{_('Remark')}}</th>
+					<th style="width:150px">操作</th>
+				</tr>
+			</thead>
+			<tbody id="item_list">
+			</tbody>
+		</table>
+		<br />
+		<br />
+	</form>
+
+
+
+
+
+
+<!-- order items begin -->
+
+<div id="dialog-form" title="货物信息" style="background-color:white;">
+	<table border="0" cellpadding="0" cellspacing="0">
+		<tr>
+			<td valign="top" width="70px" align="center"><sup class="warn">*</sup>&nbsp;{{_('Item Name')}}</td><td valign="top">
+				<select id="item_id" class="must_input" style="width:140px;">
+			          <option value="">--- 新货物 ---</option>
+			          {% for o in MASTER_ALL('InventoryItem')%}
+			              <option value="{{o.id}}">{{o}}</option>
+			          {% endfor %}
+			      </select>	
+			</td>
+		</tr>
+		<tr id="new_item_tr"><td valign="top" width="70px" align="center">新货物名称</td><td valign="top"><input type="text" id="new_item_name" value="" class="order_add_div_body_input" style="width:140px;"></td></tr>
+		<tr><td valign="top" width="70px" align="center">描述</td><td valign="top"><textarea id="item_desc" style="width:140px;"></textarea></td></tr>
+		<tr><td valign="top" width="70px" align="center">{{_('Qty')}}</td><td valign="top"><input type="text" id="item_qty" value="" class="order_add_div_body_input numeric" style="width:140px;"></td></tr>
+		<tr><td valign="top" width="70px" align="center">{{_('Weight')}}</td><td valign="top"><input type="text" id="item_weight" value="" class="order_add_div_body_input numeric" style="width:140px;"></td></tr>
+		<tr><td valign="top" width="70px" align="center">平方</td><td valign="top"><input type="text" id="item_area" value="" class="order_add_div_body_input numeric" style="width:140px;"></td></tr>
+		<tr><td valign="top" width="70px" align="center">{{_('Remark')}}</td><td valign="top"><textarea id="item_remark" style="width:140px;"></textarea></td></tr>
+		</tr>
+	</table>
+	<br />
+	<p style="text-align:right;"><input type="button" value="保存" onclick="save_item()"/>&nbsp;<input type="button" value="取消" onclick="cancel_item()"/></p>
+</div>
+
+
+	
+{% endblock %}

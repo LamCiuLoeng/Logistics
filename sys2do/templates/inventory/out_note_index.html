@@ -1,0 +1,167 @@
+{% extends "master.html" %}
+{% block subtitle %} - 仓储管理 - 出库单管理{% endblock %}
+
+{% block extCSS %}
+
+{% endblock %}
+
+
+{% block extJS %}
+<script language="JavaScript" type="text/javascript">
+//<![CDATA[
+	function todo_approve(obj){ 
+	    var v = $(":selected",obj).val();
+	    $(obj).val('');
+	    if(v){
+	        return todo(v,function(r){
+	            if(r.code != 0 ){
+	                show_error(r.msg);
+	            }else{
+	                $("input[name='note_ids']:checked").each(function(){
+	                    var tmp = $(this);
+	                    var tr = $(tmp.parents("tr")[0]);
+	                    if(v=='1'){
+	                        $(".td_status",tr).text("通过");
+	                    }else{
+	                        $(".td_status",tr).text("未通过");
+	                    }
+	                });             
+	                show_info(r.msg);
+	            }   
+	        });
+	    }
+	}
+	
+	function todo(flag,handler){
+	    var ids = new Array();
+	    
+	    $("input[name='note_ids']:checked").each(function(){
+	        ids.push($(this).val());
+	    });
+	    if(ids.length < 1){
+	        show_error('请先选择记录然后再进行操作！');
+	        return false;
+	    }
+	    
+	    $.getJSON("/inventory/out_note_approve",
+	             {
+	                't' : nowstr(),
+	                'note_ids' : ids.join('|'),
+	                'flag' : flag
+	             },
+	             handler
+	    )
+	}
+	
+//]]>
+</script>
+
+{% endblock %}
+
+
+        
+        
+{% block inner_menu %}
+<div class="inner_menu">
+	<ul>
+	   <li><a href="{{url_for('.view',action='index')}}"><img src="/static/images/system/order_manage_25.jpg" width="71" height="21" id="Image7" onmouseover="MM_swapImage('Image7','','/static/images/system/order_manage_h_25.jpg',1)" onmouseout="MM_swapImgRestore()"/></a></li>
+        <li><span>审核</span>
+              <select name="approve" id="approve" onchange="todo_approve(this)">
+                  <option value=""></option>
+                  {% for v,n in [('1','审核通过'),('2','审核不通过')] %}
+                      {% if v == values.get('approve',None) %}
+                          <option value="{{v}}" selected="selected">{{n}}</option>
+                      {% else %}
+                          <option value="{{v}}">{{n}}</option>
+                      {% endif %}
+                  {% endfor %}
+              </select>
+          </li>
+    </ul>
+</div>
+{% endblock %}
+
+
+{% block content %}
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+	<tr><td class="title_fonts_display">&middot; 出库单管理</td></tr>
+</table>
+<div class="search_div">
+	<div class="search_div_header">出库单搜索</div>
+    <div class="search_div_body">
+    	<form action="{{url_for('.view',action='out_note')}}" method="post" id="search_form">
+
+    	<ul>
+          <li style="width:100%; border-right:#E2FEFE 1px solid;"><span>起始日期</span>
+        	  <input type="text" class="datepicker" name="create_time_from" value="{{values.get('create_time_from','')|f}}"/>&nbsp;&nbsp;-&nbsp;&nbsp;<input type="text" class="datepicker" name="create_time_to" value="{{values.get('create_time_to','')|f}}"/>
+          </li>
+          <li style="width:500px"><span>系统编号</span><input type="text" name="no" value="{{values.get('no','')|f}}"/></li>
+          <li style="width:755px"><span>客户</span>
+          	{% set customer_id = values.get('customer_id',None)|int  %}
+            {{mymacros.select('customer_id',MASTER_ALL('Customer'),customer_id,style="width:250px")}}        
+          </li>
+        </ul>
+        <div class="button_div"><input type="submit" value="{{_('Search')}}"/></div>
+        <input type="hidden" name="SEARCH_SUBMIT" value="TRUE"/>
+        <input type="hidden" name="field" id="field" value=""/>
+        <input type="hidden" name="direction" id="direction" value=""/>
+    	</form>
+        <div style="clear:both"></div>
+    </div>
+</div>
+
+<div class="point_div"><img src="/static/images/system/order_manage_54.jpg" width="22" height="28" /><span>{{_('Input the conditions and search.')}}</span></div>
+
+
+
+
+<form method="post" action="" id="records">
+
+<table border="0" cellpadding="0" cellspacing="0"  style="width:1050px">
+  	  <tr class="data_table_tr">
+	    <td colspan="100" style="text-align:right">{{mymacros.mypaginate(records)}}</td>
+	</tr>
+  <tr class="field_head">
+    <th align="center" style="width:50px;"><input type="checkbox" onclick="selectall(this,'note_ids');"/></th>
+    <td align="center" style="width:200px;">{{mymacros.show_direction(values,'no')}}系统编号</td>
+    <td align="center" style="width:100px;">客户</td>
+    <td align="center" style="width:100px;">数量</td>
+    <td align="center" style="width:100px;">面积(米<sup>2</sup>)</td>
+    <td align="center" style="width:100px;">重量(吨)</td>
+    <td align="center" style="width:100px;">状态</td>
+    <td align="center" style="width:200px;">{{mymacros.show_direction(values,'create_time')}}{{_('Create Time')}}</td>
+    <td align="center" style="width:120px;">{{mymacros.show_direction(values,'create_by_id')}}{{_('Creator')}}</td>
+  </tr>
+  
+  {% for r in records.items %}
+		  <tr class="data_table_tr {{ loop.cycle('data_table_tr_odd', 'data_table_tr_even') }}">
+		    <th><input type="checkbox" name="note_ids" value="{{r.id}}" /></th>
+		    <td><a href="{{url_for('.view',action='out_note_review',id=r.id)}}">{{r.no|f}}</a></td>
+			<td>{{r.customer.display_name|f}}</td>
+			<td>{{r.qty|fn}}</td>
+			<td>{{r.area|fn}}</td>
+			<td>{{r.weight|fn}}</td>
+			<td class="td_status">
+				{% if r.status == 0%}
+					新建
+				{% elif r.status == 1%}
+				    通过
+				{% elif r.status == 2%}
+				    不通过
+				{% endif %}
+			</td>
+			<td>{{r.create_time|ft}}</td>
+			<td>{{r.create_by|f}}</td>
+		  </tr>
+  {% endfor %}
+      <tfoot>
+	  	 <tr class="data_table_tr">
+		    <td colspan="100" style="text-align:right">{{mymacros.mypaginate(records)}}</td>
+		</tr>
+  	</tfoot>
+</table>
+<br /><br />
+</form>
+
+
+{% endblock %}
