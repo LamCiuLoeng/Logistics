@@ -39,8 +39,10 @@ class WarehouseView(BasicView):
 
     @templated('warehouse/add.html')
     def add(self):
-        locations = DBSession.query(InventoryLocation).filter(InventoryLocation.active == 0).order_by(InventoryLocation.full_path)
-        return {'locations' : locations}
+        root_locations = DBSession.query(InventoryLocation).filter(and_(InventoryLocation.active == 0,
+                                                       InventoryLocation.parent_id == None)).order_by(InventoryLocation.name)
+
+        return {'locations' : root_locations}
 
 
     def save_new(self):
@@ -58,8 +60,8 @@ class WarehouseView(BasicView):
             DBSession.flush()
 
             if params['parent_id']:
-                parent = DBSession.query(InventoryLocation).get(params['parent_id'])
-                obj.full_path = "%s%s" % (parent.full_path, params['name'])
+                parent = DBSession.query(InventoryLocation).get(obj.parent_id)
+                obj.full_path = "%s%s" % (parent.full_path or '', params['name'])
                 obj.full_path_ids = "%s|%s" % (parent.full_path_ids, obj.id)
             else:
                 obj.full_path = params['name']
@@ -77,8 +79,9 @@ class WarehouseView(BasicView):
     def update(self):
         id = _g('id')
         obj = DBSession.query(InventoryLocation).get(id)
-        locations = DBSession.query(InventoryLocation).filter(InventoryLocation.active == 0).order_by(InventoryLocation.full_path)
-        return {'obj' : obj, 'locations' : locations}
+        root_locations = DBSession.query(InventoryLocation).filter(and_(InventoryLocation.active == 0,
+                                                       InventoryLocation.parent_id == None)).order_by(InventoryLocation.name)
+        return {'obj' : obj, 'locations' : root_locations}
 
 
     def save_update(self):

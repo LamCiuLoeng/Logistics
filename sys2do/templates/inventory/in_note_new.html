@@ -53,19 +53,11 @@
 			<tr>
 				<td>客户</td>
 				<td>{{mymacros.select(id='customer_id',list=MASTER_ALL('Customer'),value=None,class="must_input",style="width:360px")}}</td>
-			</tr>
-			
+			</tr>	
 			<tr><td>客户销售单号(SO)</td><td><input type="text" name="so" /></td></tr>
 			<tr><td>客户采购单号(PO)</td><td><input type="text" name="po" /></td></tr>
 			<tr><td>客户送货单号(DN)</td><td><input type="text" name="dn"/></td></tr>
 			<tr><td>客户参考(REF)</td><td><input type="text" name="ref"/></td></tr>
-			
-			<tr>
-				<td>仓位</td>
-				<td>
-					{{mymacros.select(id='location_id',list=MASTER_ALL('InventoryLocation'),value=None,class="must_input",style="width:140px;")}}
-				</td>
-			</tr>
 			<tr><td>备注</td><td><textarea name="remark"></textarea></td></tr>
 		</table>
 		
@@ -76,11 +68,12 @@
 		  <p><input type="button" value="{{_('Add')}}" onclick="add_item()"/></p>
 		</div>
 		<br />
-		<table style="width:800px;">
+		<table style="width:950px;">
 			<thead>
 				<tr class="field_head">
 					<th style="width:150px">{{_('Item Name')}}</th>
 					<th style="width:80px">描述</th>
+					<th style="width:150px">仓位</th>
 					<th style="width:80px">{{_('Qty')}}</th>
 					<th style="width:80px">{{_('Weight')}}</th>
 					<th style="width:80px">平方</th>
@@ -116,6 +109,9 @@
 		</tr>
 		<tr id="new_item_tr"><td valign="top" width="70px" align="center">新货物名称</td><td valign="top"><input type="text" id="new_item_name" value="" class="order_add_div_body_input" style="width:140px;"></td></tr>
 		<tr><td valign="top" width="70px" align="center">描述</td><td valign="top"><textarea id="item_desc" style="width:140px;"></textarea></td></tr>
+		<tr><td valign="top" width="70px" align="center">仓位</td><td valign="top">
+		    {{mymacros.select(id='location_id',list=MASTER_ALL('InventoryLocation'),value=None,class="must_input",style="width:140px;")}}
+		</td></tr>
 		<tr><td valign="top" width="70px" align="center">{{_('Qty')}}</td><td valign="top"><input type="text" id="item_qty" value="" class="order_add_div_body_input numeric" style="width:140px;"></td></tr>
 		<tr><td valign="top" width="70px" align="center">{{_('Weight')}}</td><td valign="top"><input type="text" id="item_weight" value="" class="order_add_div_body_input numeric" style="width:140px;"></td></tr>
 		<tr><td valign="top" width="70px" align="center">平方</td><td valign="top"><input type="text" id="item_area" value="" class="order_add_div_body_input numeric" style="width:140px;"></td></tr>

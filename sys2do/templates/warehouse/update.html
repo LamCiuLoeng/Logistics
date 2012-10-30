@@ -31,18 +31,20 @@
 
 {% block content %}
 	
-	<form action="{{url_for('.view',action='save_new')}}" method="post">
+	<form action="{{url_for('.view',action='save_update')}}" method="post">
+		<input type="hidden" name="id" value="{{obj.id}}"/>
+	
 		<table>
-			<tr><td>仓位名称</td><td><input type="text" name="name" /></td></tr>
-			<tr><td>仓位地址</td><td><textarea name="address"></textarea></td></tr>
-			<tr><td>仓位管理人员</td><td><input type="text" name="manager"/></td></tr>
+			<tr><td>仓位名称</td><td><input type="text" name="name" value="{{obj.name}}"/></td></tr>
+			<tr><td>仓位地址</td><td><textarea name="address">{{obj.address}}</textarea></td></tr>
+			<tr><td>仓位管理人员</td><td><input type="text" name="manager" value="{{obj.manager}}"/></td></tr>
 			<tr>
 				<td>上一级仓位</td>
 				<td>
-					{{mymacros.location_select(id='parent_id',list=locations,value=None,class="field order_add_div_body_input",style="width:300px")}}
+					{{mymacros.location_select(id='parent_id',list=locations,value=obj.parent_id,class="field order_add_div_body_input",style="width:300px")}}
 				</td>
 			</tr>
-			<tr><td>备注</td><td><textarea name="remark"></textarea></td></tr>
+			<tr><td>备注</td><td><textarea name="remark">{{obj.remark|f}}</textarea></td></tr>
 		</table>
 	</form>
 	

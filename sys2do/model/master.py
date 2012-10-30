@@ -715,7 +715,7 @@ class InventoryLocation(DeclarativeBase, SysMixin):
     full_path = Column(Text)
     full_path_ids = Column(Text)
     parent_id = Column(Integer, ForeignKey('master_inventory_location.id'))
-    parent = relation('InventoryLocation', backref = backref("children", remote_side = id))
+    parent = relation('InventoryLocation', backref = backref("children"), remote_side = 'InventoryLocation.id')
 
     def __str__(self): return self.name
     def __repr__(self): return self.name
@@ -786,8 +786,8 @@ class InventoryInNote(DeclarativeBase, SysMixin):
     id = Column(Integer, autoincrement = True, primary_key = True)
     no = Column(Text, doc = u'系统编号')
 
-    location_id = Column(Integer, ForeignKey('master_inventory_location.id'))
-    location = relation(InventoryLocation)
+#    location_id = Column(Integer, ForeignKey('master_inventory_location.id'))
+#    location = relation(InventoryLocation)
 
     customer_id = Column(Integer, ForeignKey('master_customer.id'), doc = u'客户')
     customer = relation(Customer)
@@ -817,8 +817,8 @@ class InventoryOutNote(DeclarativeBase, SysMixin):
     id = Column(Integer, autoincrement = True, primary_key = True)
     no = Column(Text, doc = u'系统编号')
 #
-    location_id = Column(Integer, ForeignKey('master_inventory_location.id'))
-    location = relation(InventoryLocation)
+#    location_id = Column(Integer, ForeignKey('master_inventory_location.id'))
+#    location = relation(InventoryLocation)
 
     customer_id = Column(Integer, ForeignKey('master_customer.id'), doc = u'客户')
     customer = relation(Customer)
@@ -855,12 +855,17 @@ class InventoryNoteDetail(DeclarativeBase, SysMixin):
     type = Column(Text)
     item_id = Column(Integer, ForeignKey('master_inventory_item.id'))
     item = relation(InventoryItem)
+
+    location_id = Column(Integer, ForeignKey('master_inventory_location.id'))
+    location = relation(InventoryLocation)
+
     desc = Column(Text)
 
     qty = Column(Float, default = 0, doc = u'数量')
     weight = Column(Float, default = 0, doc = u'重量')
     area = Column(Float, default = 0, doc = u'面积')
 
+#    refer_location_id = Column(Integer, default = None)
     remark = Column(Text)
 
     @property

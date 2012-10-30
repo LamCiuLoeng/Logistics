@@ -34,7 +34,7 @@ SESSION_COOKIE_NAME = 'session'
 #config for logging
 LOGGING_FILE = True
 LOGGING_FILE_PATH = os.path.join(os.path.dirname(__file__), "..", "system_log.txt")
-LOGGING_LEVEL = logging.INFO
+LOGGING_LEVEL = logging.DEBUG
 
 
 
@@ -49,7 +49,7 @@ BABEL_DEFAULT_TIMEZONE = 'UTC'
 #SQLALCHEMY_DATABASE_URI = sqlalchemy.url=mysql://username:password@hostname:port/databasename
 #SQLALCHEMY_DATABASE_URI = 'mysql://root:admin@192.168.21.157:3306/logistics'
 #postgresql
-SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:admin@192.168.21.157:5432/logistics'
+SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:admin@192.168.21.157:5433/logistics'
 
 
 

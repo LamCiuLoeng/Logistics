@@ -119,3 +119,29 @@
           {% endfor %}
       </select>
 {%- endmacro %}
+
+
+
+{% macro location_option(location_list,value,space=0) -%}
+	{% for l in location_list %}
+		{% if l.id == value %}
+			<option value="{{l.id}}" selected="selected">{{'-' * space}}{{l.full_path}}</option>
+		{% else %}
+			<option value="{{l.id}}">{{('-' * space)|safe}}{{l.full_path}}</option>
+		{% endif %}
+		{{location_option(l.children,value,space+2)}}
+	{% endfor %}
+{%- endmacro %}
+
+
+
+{% macro location_select(id,list,value,class='',style='',blank_option=true) -%}
+	<select name="{{id}}" id="{{id}}" class="{{class}}" style="{{style}}">
+		{% if blank_option %}
+          <option value=""></option>
+        {% endif %}
+        {{location_option(list,value,0)}}
+	</select>
+{%- endmacro %}
+
+

@@ -6,10 +6,12 @@
 <script language="JavaScript" type="text/javascript">
 //<![CDATA[
 	function toreturn(){
-		
 		redirect('{{request.referrer}}');
 	}
-	
+		
+	function todelete(){
+		return confirm('确定删除该记录吗？');
+	}	
 //]]>
 </script>
 
@@ -20,6 +22,7 @@
 	<ul>
     	<li><img src="/static/images/system/order_manage_25.jpg" width="71" height="21" id="Image1" onmouseover="MM_swapImage('Image1','','/static/images/system/order_manage_h_25.jpg',1)" onmouseout="MM_swapImgRestore()" onclick="return toreturn();"/></li>
         <li><a href="{{url_for('.view',action='in_note_update',id=obj.id)}}"><img src="/static/images/system/edit.jpg" width="77" height="21" id="Image2" onmouseover="MM_swapImage('Image2','','/static/images/system/edit_h.jpg',1)" onmouseout="MM_swapImgRestore()"/></a></li>
+        <li><a href="{{url_for('.view',action='in_note_delete',id=obj.id)}}" onclick="return todelete();"><img src="/static/images/system/order_manage_29.jpg" width="77" height="21" id="Image21" onmouseover="MM_swapImage('Image21','','/static/images/system/order_manage_h_29.jpg',1)" onmouseout="MM_swapImgRestore()"/></a></li>
     </ul>
 </div>
 {% endblock %}
@@ -60,11 +63,6 @@
 				<td>{{obj.ref|f}}</td>
 			</tr>			
 			<tr>
-				<td height="30" align="right">仓位</td>
-				<td>&nbsp;</td>
-				<td>{{obj.location}}</td>
-			</tr>
-			<tr>
 				<td height="30" align="right">备注</td>
 				<td>&nbsp;</td>
 				<td>{{obj.remark|f}}</td>
@@ -84,11 +82,12 @@
 		<br />
 		<br />
 
-		<table style="width:800px">
+		<table style="width:950px">
 			<thead>
 				<tr class="field_head">
 					<th style="width:150px">{{_('Item Name')}}</th>
 					<th style="width:80px">描述</th>
+					<th style="width:150px">仓位</th>
 					<th style="width:80px">{{_('Qty')}}(件)</th>
 					<th style="width:80px">{{_('Weight')}}(吨)</th>
 					<th style="width:80px">面积(米<sup>2</sup>)</th>
@@ -100,6 +99,7 @@
 				<tr class="data_table_tr {{ loop.cycle('data_table_tr_odd', 'data_table_tr_even') }}">
 					<td>{{d.item}}</td>
 					<td>{{d.desc}}</td>
+					<td>{{d.location}}</td>
 					<td>{{d.qty|fn('%d')}}</td>
 					<td>{{d.area}}</td>
 					<td>{{d.weight}}</td>
@@ -107,7 +107,7 @@
 				</tr>
 			{% endfor %}
 				<tr class="data_table_tr">
-					<td colspan="2">合计</td>
+					<td colspan="3">合计</td>
 					<td>{{obj.details|sum_with_none(attribute='qty')|fn('%d')}}</td>
 					<td>{{obj.details|sum_with_none(attribute='area')|fn}}</td>
 					<td>{{obj.details|sum_with_none(attribute='weight')|fn}}</td>

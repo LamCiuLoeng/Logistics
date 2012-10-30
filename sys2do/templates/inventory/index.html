@@ -50,13 +50,14 @@
           	{% set item_id = values.get('item_id',None)|int  %}
             {{mymacros.select('item_id',MASTER_ALL('InventoryItem'),item_id,style="width:250px")}}        
           </li> 
-          <li style="width:755px"><span>客户</span>
-          	{% set customer_id = values.get('customer_id',None)|int  %}
-            {{mymacros.select('customer_id',MASTER_ALL('Customer'),customer_id,style="width:250px")}}        
-          </li>
           <li style="width:755px"><span>仓位</span>
           	{% set location_id = values.get('location_id',None)|int  %}
-            {{mymacros.select('location_id',MASTER_ALL('InventoryLocation'),location_id,style="width:250px")}}        
+            {{mymacros.location_select(id='location_id',list=locations,value=location_id,class="field order_add_div_body_input",style="width:250px")}}
+            {% if values.get('children_location',None) == 'Y'%}
+            	<input type="checkbox" checked="checked" name="children_location" value="Y" style="width:15px"/>
+            {% else %}
+            	<input type="checkbox" name="children_location" value="Y" style="width:15px"/>
+            {% endif %} 包括所有子仓位     
           </li>
         </ul>
         <div class="button_div"><input type="submit" value="{{_('Search')}}"/></div>
@@ -85,11 +86,11 @@
     <td align="center" style="width:200px;">货物描述</td>
     <td align="center" style="width:200px;">仓位</td>
     <td align="center" style="width:100px;">实际数量</td>
-    <td align="center" style="width:100px;">预期数量</td>
+    <td align="center" style="width:100px;">未来数量</td>
     <td align="center" style="width:100px;">实际面积(米<sup>2</sup>)</td>
-    <td align="center" style="width:100px;">预期面积(米<sup>2</sup>)</td>
+    <td align="center" style="width:100px;">未来面积(米<sup>2</sup>)</td>
     <td align="center" style="width:100px;">实际重量(吨)</td>
-    <td align="center" style="width:100px;">预期重量(吨)</td>
+    <td align="center" style="width:100px;">未来重量(吨)</td>
   </tr>
   
   
@@ -115,7 +116,7 @@
         {% set total_exp_area = records.items|sum_with_none(attribute='exp_area') %}
         {% set total_exp_weight = records.items|sum_with_none(attribute='exp_weight') %}
 
-      	<td colspan="3" style="text-align:left">&nbsp;合计</td>
+      	<td colspan="4" style="text-align:left">&nbsp;合计</td>
 		<td>{{total_qty|fn(f='%d')}}</td>
 		<td>{{total_exp_qty|fn(f='%d')}}</td>
 		<td>{{total_area}}</td>

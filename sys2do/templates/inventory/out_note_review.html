@@ -99,6 +99,7 @@
 				<tr class="field_head">
 					<th style="width:150px">{{_('Item Name')}}</th>
 					<th style="width:80px">描述</th>
+					<th style="width:80px">仓位</th>
 					<th style="width:80px">{{_('Qty')}}</th>
 					<th style="width:80px">面积(米<sup>2</sup>)</th>
 					<th style="width:80px">重量(吨)</th>
@@ -110,6 +111,7 @@
 				<tr class="data_table_tr {{ loop.cycle('data_table_tr_odd', 'data_table_tr_even') }}">
 					<td>{{d.item}}</td>
 					<td>{{d.desc|f}}</td>
+					<td>{{d.location}}</td>
 					<td>{{d.qty|fn(f='%d')}}</td>
 					<td>{{d.weight|fn}}</td>
 					<td>{{d.area|fn}}</td>
@@ -117,7 +119,7 @@
 				</tr>
 			{% endfor %}
 				<tr class="data_table_tr">
-					<td colspan="2">&nbsp;合计</td>
+					<td colspan="3">&nbsp;合计</td>
 					<td>{{obj.qty|fn(f='%d')}}</td>
 					<td>{{obj.area}}</td>
 					<td>{{obj.weight}}</td>

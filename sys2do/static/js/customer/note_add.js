@@ -55,6 +55,11 @@ function save_item(){
     var weight = $("#item_weight").val();
     var area = $("#item_area").val();
     
+    if(!$("#location_id").val()){
+        msg.push('请选择仓位！');
+    }
+    var location = $("#location_id :selected").text();
+    
     if( !qty && !weight && !area){
         msg.push('请至少填写 数量，重量，体积 中的一项！');
     }
@@ -68,6 +73,7 @@ function save_item(){
     tmp_item.item_name = item_name;
     tmp_item.desc = $("#item_desc").val();
     tmp_item.qty = qty;
+    tmp_item.location_id = $("#location_id").val();;
     tmp_item.weight = weight;
     tmp_item.area = area;
     tmp_item.remark = $("#item_remark").val();
@@ -78,6 +84,7 @@ function save_item(){
         var html = '<tr class="data_table_tr" id=item_tr_'+tmp_item.id+'>';
         html += '<td>'+tmp_item.item_name+'</td>';
         html += '<td>'+tmp_item.desc+'</td>';
+        html += '<td>'+location+'</td>';
         html += '<td>'+tmp_item.qty+'</td>';
         html += '<td>'+tmp_item.weight+'</td>';
         html += '<td>'+tmp_item.area+'</td>';
@@ -92,6 +99,7 @@ function save_item(){
         var html = '<tr class="data_table_tr" id=item_tr_'+tmp_item.id+'>';
         html += '<td>'+tmp_item.item_name+'</td>';
         html += '<td>'+tmp_item.desc+'</td>';
+        html += '<td>'+location+'</td>';
         html += '<td>'+tmp_item.qty+'</td>';
         html += '<td>'+tmp_item.weight+'</td>';
         html += '<td>'+tmp_item.area+'</td>';
@@ -118,6 +126,7 @@ function cancel_item(){
 function load_item(obj) {
     $("#item_id").val(obj.item_id);
     $("#item_desc").val(obj.desc);
+    $("#location_id").val(obj.location_id);
     $("#item_qty").val(obj.qty);
     $("#item_weight").val(obj.weight);
     $("#item_area").val(obj.area);
@@ -134,6 +143,7 @@ function load_item(obj) {
 function clear_item(){
     $("#item_id").val('');
     $("#new_item_name").val('');
+    $("#location_id").val('');
     $("#item_qty").val('');
     $("#item_desc").val('');
     $("#item_weight").val('');
