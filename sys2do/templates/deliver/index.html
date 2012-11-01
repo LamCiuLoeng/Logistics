@@ -11,12 +11,25 @@
 	    });
 	});
 
+	var search_url = "{{url_for('.view')}}";
+	var export_url = "{{url_for('.view',action='export')}}";
 	
 	function toSort(f,d){
 		$("#field").val(f);
 		$("#direction").val(d);
 		$("#search_form").submit();
 	}
+	
+	function toSearch(){
+		$("#search_form").attr("action",search_url);
+		$("#search_form").submit();
+	}
+	
+	function toExport(){
+		$("#search_form").attr("action",export_url);
+		$("#search_form").submit();
+	}
+	
 	
 //]]>
 </script>
@@ -28,6 +41,7 @@
 <div class="inner_menu">
 	<ul>
         <li><a href="{{url_for('.view',action='select_orders')}}"><img src="/static/images/system/order_manage_11_31.jpg" width="77" height="21" id="Image2" onmouseover="MM_swapImage('Image2','','/static/images/system/order_manage_1_31.jpg',1)" onmouseout="MM_swapImgRestore()" /></a></li>
+		<li><a href="#" onclick="toExport();"><img src="/static/images/system/export_deliver.jpg" width="101" height="21" id="Image21" onmouseover="MM_swapImage('Image21','','/static/images/system/export_deliver_h.jpg',1)" onmouseout="MM_swapImgRestore()" /></a></li>    
     </ul>
 </div>
 {% endblock %}
@@ -67,7 +81,7 @@
 	    	  {{mymacros.select('destination_city_id',destination_cites,destination_city_id,style="width:150px")}}
           </li>
         </ul>
-        <div class="button_div"><input type="submit" value="{{_('Search')}}"/></div>
+        <div class="button_div"><input type="button" value="{{_('Search')}}" onclick="toSearch()"/></div>
         <input type="hidden" name="SEARCH_SUBMIT" value="TRUE"/>
         <input type="hidden" name="field" id="field" value=""/>
         <input type="hidden" name="direction" id="direction" value=""/>

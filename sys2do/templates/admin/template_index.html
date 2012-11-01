@@ -1,7 +1,22 @@
 {% extends "master.html" %}
 
-{% block extJS %}
+{% if action == 'item' %}
+	{% set title = '货物'  %}
+{% elif action == 'note'%}
+	{% set title = '票据'  %}
+{% elif action == 'packtype'%}
+	{% set title = '包装'  %}
+{% elif action == 'pickuptype'%}
+	{% set title = '提货方式'  %}
+{% elif action == 'payment'%}
+	{% set title = '付款方式'  %}
+{% elif action == 'shipmenttype'%}
+	{% set title = '运输方式'  %}
+{% endif %}
 
+{% block subtitle %} - {{title}}管理{% endblock %}
+
+{% block extJS %}
 {% endblock %}
 
 {% block inner_menu %}
@@ -16,6 +31,7 @@
 
 
 {% block content %}
+
 	<table width="100%" border="0" cellspacing="0" cellpadding="0">
       <tr>
         <td>&nbsp;</td>
@@ -33,7 +49,7 @@
             <td>&nbsp;</td>
             <td><table width="100%" border="0" cellspacing="0" cellpadding="0">
               <tr>
-                <td class="title_fonts_display">管理</td>
+                <td class="title_fonts_display">{{title}}管理</td>
               </tr>
               <tr>
                 <td>&nbsp;</td>
@@ -41,7 +57,7 @@
             </table>
               <table border="0" cellspacing="0" cellpadding="0">
                 <tr class="field_head">
-                  <td align="center" style="width:200px;">名称</td>
+                  <td align="center" style="width:200px;">{{title}}名称</td>
                   <td align="center" style="width:200px;">{{_('Create Time')}}</td>
                   <td align="center" style="width:200px;">{{_('Creator')}}</td>
                   <td align="center" style="width:200px;">{{_('Update Time')}}</td>

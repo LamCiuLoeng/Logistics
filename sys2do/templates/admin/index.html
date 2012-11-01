@@ -81,7 +81,7 @@
      
      
      <td valign="top" class="main_right_td">
-
+		<div style="width:1000px">
 
       <div class="nav_tab" onclick="redirect('{{url_for('bpCustomer.view')}}')">
         <div class="header_div"></div>
@@ -126,14 +126,12 @@
           <p>关于包装方式管理的一些说明。说明包装管理功能的用法与注意事项。</p>
         </div>
       </div>
-      <!-- 
-      <div class="nav_tab" onclick="redirect('{{url_for('bpAdmin.view',action='ratio',m='UPDATE')}}')">
+      <div class="nav_tab" onclick="redirect('{{url_for('bpAdmin.view',action='shipmenttype')}}')">
         <div class="header_div"></div>
-        <div class="body_div"><img width="80" height="80" src="/static/images/system/img_ratio.jpg"><span>费率管理</span>
-          <p>关于费率管理的一些说明。说明费率管理功能的用法与注意事项。</p>
+        <div class="body_div"><img width="80" height="80" src="/static/images/system/img_ratio.jpg"><span>运输方式管理</span>
+          <p>关于运输方式管理的一些说明。说明运输方式管理功能的用法与注意事项。</p>
         </div>
       </div>
-      -->
       <div class="nav_tab" onclick="redirect('{{url_for('bpWarehouse.view',action='index')}}')">
         <div class="header_div"></div>
         <div class="body_div"><img width="80" height="80" src="/static/images/system/img_warehouse.jpg"><span>仓库管理</span>
@@ -159,6 +157,9 @@
           <p>关于地区管理的一些说明。说明地区管理功能的用法与注意事项。</p>
         </div>
       </div>
+      
+      </div>
+      </td>
   </tr>
 </tbody></table>
 

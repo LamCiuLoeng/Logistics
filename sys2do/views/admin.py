@@ -28,7 +28,7 @@ from sys2do.util.common import _g, _gl, getMasterAll, _error, _gp, _info
 from sys2do.model.master import Customer, CustomerProfile, \
     SupplierProfile, Supplier, Payment, Item, PickupType, PackType, Ratio, \
     Receiver, InventoryLocation, CustomerTarget, Note, CustomerContact, \
-    Barcode, Province, City, CustomerDiquRatio, SupplierDiquRatio
+    Barcode, Province, City, CustomerDiquRatio, SupplierDiquRatio, ShipmentType
 from sys2do.util.barcode_helper import generate_barcode_file
 
 __all__ = ['bpAdmin']
@@ -631,6 +631,14 @@ class AdminView(BasicView):
     @tab_highlight('TAB_MASTER')
     def packtype(self):
         return self._template(PackType, 'packtype')
+
+
+    @tab_highlight('TAB_MASTER')
+    def shipmenttype(self):
+        return self._template(ShipmentType, 'shipmenttype')
+
+
+
 
 
     @tab_highlight('TAB_MASTER')

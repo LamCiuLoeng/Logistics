@@ -1,12 +1,28 @@
 {% extends "master.html" %}
 
+{% if action == 'item' %}
+	{% set title = '货物'  %}
+{% elif action == 'note'%}
+	{% set title = '票据'  %}
+{% elif action == 'packtype'%}
+	{% set title = '包装'  %}
+{% elif action == 'pickuptype'%}
+	{% set title = '提货方式'  %}
+{% elif action == 'payment'%}
+	{% set title = '付款方式'  %}
+{% elif action == 'shipmenttype'%}
+	{% set title = '运输方式'  %}
+{% endif %}
+
+{% block subtitle %} - {{title}}管理 - 更新{% endblock %}
+
 {% block extJS %}
 <script language="JavaScript" type="text/javascript">
 //<![CDATA[
 	function tosave(){
 		var msg = Array();
 		if(!$('#name').val()){
-			msg.push('请填写名称！');
+			msg.push('请填写{{title}}名称！');
 		}
 		
 		if(msg.length>0){
@@ -44,25 +60,13 @@
 {% endblock %}
 {% block content %}
 <div class="order_add_div">
-	<div class="order_add_div_header">
-		{% if action == 'item' %}
-			货物详细信息	
-		{% elif action == 'note'%}
-			票据详细信息
-		{% elif action == 'packtype'%}
-			包装方式详细信息
-		{% elif action == 'pickuptype'%}
-			提货方式详细信息
-		{% elif action == 'payment'%}
-			付款方式详细信息
-		{% endif %}
-	</div>
+	<div class="order_add_div_header">{{title}}详细信息</div>
 	<div class="order_add_div_body">
 	<form action="{{url_for('.view', action = action,m='SAVE_UPDATE')}}" method="post">
 		<input type="hidden" name="id" value="{{v['id']}}"/>
 		<table>
 			<tr>
-				<td>名称</td>
+				<td>{{title}}名称</td>
 				<td><input type="text" name="name" value="{{v['name']|f}}" id="name" class="must_input"/></td>
 			</tr>
 			<tr>

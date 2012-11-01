@@ -335,6 +335,8 @@ class DeliverHeader(DeclarativeBase, SysMixin, CRUDMixin):
 
     pickup_type_id = Column(Integer, ForeignKey('master_pickup_type.id'), doc = u'提货方式')
     pickup_type = relation(PickupType)
+    shipment_type_id = Column(Integer, ForeignKey('master_shipment_type.id'), doc = u'运输方式')
+    shipment_type = relation(ShipmentType)
 
     remark = Column(Text, doc = u'备注')
     _status = Column('status', Integer, default = 0)

@@ -6,15 +6,18 @@
 #  Description:
 ###########################################
 '''
+import os
 import traceback
 from datetime import datetime as dt, timedelta
+import random
+import shutil
 
 
 from flask import session
 from flask import request
 from flask.blueprints import Blueprint
 from flask.views import View
-from flask.helpers import url_for, flash, jsonify
+from flask.helpers import url_for, flash, jsonify, send_file
 from sqlalchemy.sql.expression import and_, desc
 from werkzeug.utils import redirect
 from webhelpers import paginate
@@ -34,9 +37,10 @@ from sys2do.util.common import _gl, _g, _gp, getOr404, getMasterAll, _debug, \
     _error, _info, send_sms, upload, multiupload
 from sys2do.model.master import Supplier, InventoryItem, Province, \
     SupplierDiquRatio, City
-from sys2do.setting import PAGINATE_PER_PAGE
+from sys2do.setting import PAGINATE_PER_PAGE, TMP_FOLDER, TEMPLATE_FOLDER
 from sys2do.model.system import SystemLog
 from sys2do.util.logic_helper import getDeliverNo
+from sys2do.util.excel_helper import DeliverReport
 
 
 
@@ -77,9 +81,6 @@ class DeliverView(BasicView):
         if values.get('create_time_to', None):
             conditions.append(DeliverHeader.order_time < '%s 23:59' % values['create_time_to'])
         if values.get('ref_no', None):
-            print "*" * 20
-            print values['ref_no']
-            print "_" * 20
             conditions.append(DeliverHeader.ref_no.op('like')('%%%s%%' % values['ref_no']))
         if values.get('destination_province_id', None):
             conditions.append(DeliverHeader.destination_province_id == values['destination_province_id'])
@@ -209,7 +210,7 @@ class DeliverView(BasicView):
                       'supplier_contact', 'supplier_tel', 'expect_time', 'order_time',
                       'insurance_charge', 'sendout_charge', 'receive_charge', 'package_charge', 'load_charge', 'unload_charge',
                       'other_charge', 'proxy_charge', 'amount', 'payment_id', 'pickup_type_id', 'remark', 'carriage_charge',
-                      'qty', 'weight', 'vol', 'qty_ratio', 'weight_ratio', 'vol_ratio',
+                      'qty', 'weight', 'vol', 'qty_ratio', 'weight_ratio', 'vol_ratio', 'shipment_type_id',
                       ]:
                 params[f] = _g(f)
             header = DeliverHeader(**params)
@@ -313,7 +314,7 @@ class DeliverView(BasicView):
                       'need_transfer', 'amount', 'remark', 'expect_time', 'order_time',
                       'insurance_charge', 'sendout_charge', 'receive_charge', 'package_charge', 'other_charge', 'carriage_charge',
                       'load_charge', 'unload_charge', 'proxy_charge', 'payment_id', 'pickup_type_id',
-                      'qty', 'weight', 'vol', 'qty_ratio', 'weight_ratio', 'vol_ratio',
+                      'qty', 'weight', 'vol', 'qty_ratio', 'weight_ratio', 'vol_ratio', 'shipment_type_id',
                       ]
 
             _remark = []
@@ -721,6 +722,72 @@ class DeliverView(BasicView):
         id = _g('id')
         obj = DBSession.query(DeliverHeader).get(id)
         return {'obj' : obj}
+
+
+    def export(self):
+        values = {}
+        for f in ['create_time_from', 'create_time_to', 'ref_no', 'order_no',
+                  'destination_province_id', 'destination_city_id', 'supplier_id',
+                  ] :
+            values[f] = _g(f)
+
+        conditions = [DeliverHeader.active == 0]
+        if values.get('create_time_from', None):
+            conditions.append(DeliverHeader.order_time > values['create_time_from'])
+        if values.get('create_time_to', None):
+            conditions.append(DeliverHeader.order_time < '%s 23:59' % values['create_time_to'])
+        if values.get('ref_no', None):
+            conditions.append(DeliverHeader.ref_no.op('like')('%%%s%%' % values['ref_no']))
+        if values.get('destination_province_id', None):
+            conditions.append(DeliverHeader.destination_province_id == values['destination_province_id'])
+        if values.get('destination_city_id', None):
+            conditions.append(DeliverHeader.destination_city_id == values['destination_city_id'])
+        if values.get('supplier_id', None):
+            conditions.append(DeliverHeader.supplier_id == values['supplier_id'])
+
+        if values.get('order_no', None):
+            conditions.extend([
+                               DeliverDetail.header_id == DeliverHeader.id,
+                               DeliverDetail.active == 0,
+                               OrderHeader.active == 0,
+                               DeliverDetail.order_header_id == OrderHeader.id,
+                               OrderHeader.ref_no.op('like')('%%%s%%' % values['order_no']),
+                               ])
+        data = []
+        index = 1
+        total_qty = total_weight = total_amount = total_vol = 0
+
+        _f = lambda h : "/".join(map(lambda d : d.order_header.ref_no, h.details))
+        _l = lambda h : "".join(map(unicode, [h.destination_province or '', h.destination_city or '']))
+
+        q = DBSession.query(DeliverHeader).filter(and_(*conditions)).order_by(DeliverHeader.order_time)
+        for dheader in q:
+            row = [
+                   index, _f(dheader), dheader.order_time, _l(dheader), dheader.supplier, dheader.ref_no, dheader.qty, dheader.weight, dheader.vol, dheader.amount,
+                   dheader.payment, dheader.shipment_type or '',
+                   ]
+            data.append(map(lambda v : unicode(v), row))
+            index += 1
+            total_qty += dheader.qty or 0
+            total_weight += dheader.weight or 0
+            total_vol += dheader.vol or 0
+            total_amount += dheader.amount or 0
+
+        if not os.path.exists(TMP_FOLDER): os.makedirs(TMP_FOLDER)
+        current = dt.now()
+        templatePath = os.path.join(TEMPLATE_FOLDER, "deliver.xlsx")
+        tempFileName = os.path.join(TMP_FOLDER, "report_tmp_%s_%d.xlsx" % (current.strftime("%Y%m%d%H%M%S"), random.randint(0, 1000)))
+        realFileName = os.path.join(TMP_FOLDER, "deliver_report_%s.xlsx" % (dt.now().strftime("%Y%m%d%H%M%S")))
+        shutil.copy(templatePath, tempFileName)
+        report_xls = DeliverReport(templatePath = tempFileName, destinationPath = realFileName)
+        report_xls.inputData(data = data, total_qty = total_qty, total_weight = total_weight, total_vol = total_vol, total_amount = total_amount)
+        report_xls.outputData()
+        try:
+            os.remove(tempFileName)
+        except:
+            pass
+        return send_file(realFileName, as_attachment = True)
+
 
 bpDeliver.add_url_rule('/', view_func = DeliverView.as_view('view'), defaults = {'action':'index'})
 bpDeliver.add_url_rule('/<action>', view_func = DeliverView.as_view('view'))

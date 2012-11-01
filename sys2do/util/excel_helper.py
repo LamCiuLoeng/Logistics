@@ -6,7 +6,7 @@ import pythoncom
 from win32com.client import DispatchEx
 from sys2do.util.common import *
 
-__all__ = ["ExcelBasicGenerator", ]
+__all__ = ["ExcelBasicGenerator", "SummaryReport", "ProfitReport", "DeliverReport"]
 
 
 class ExcelBasicGenerator:
@@ -104,3 +104,18 @@ class ProfitReport(ExcelBasicGenerator):
         excelSheet.Range("A%d:%s%d" % (startRow, number2alphabet(col), lastRow)).Value = data
         self._drawCellLine(excelSheet, "A", startRow, number2alphabet(col), lastRow)
 
+
+
+
+
+class DeliverReport(ExcelBasicGenerator):
+    def inputData(self, data, total_qty, total_weight, total_vol, total_amount):
+        excelSheet = self.workBook.Sheets(1)
+        startRow = 2
+        row = len(data)
+        col = len(data[0])
+        lastRow = startRow + row - 1
+        excelSheet.Range("A%d:%s%d" % (startRow, number2alphabet(col), lastRow)).Value = data
+        self._drawCellLine(excelSheet, "A", startRow, number2alphabet(col), lastRow)
+        nextRow = lastRow + 1
+        excelSheet.Range("F%d:J%d" % (nextRow, nextRow)).Value = [[u'合计', total_qty, total_weight, total_vol, total_amount], ]

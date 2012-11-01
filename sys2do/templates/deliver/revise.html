@@ -253,6 +253,12 @@
 					<td>
 				    	{{mymacros.select(id='pickup_type_id',list=MASTER_ALL('PickupType'),value=header.pickup_type_id,class="order_add_div_body_input must_input",style="width:200px")}}
 				    </td>
+				    <td width="12">&nbsp;</td>
+				    <td height="30" align="right">运输方式</td>
+					<td width="12">&nbsp;</td>
+					<td>
+				    	{{mymacros.select(id='shipment_type_id',list=MASTER_ALL('ShipmentType'),value=header.shipment_type_id,class="order_add_div_body_input",style="width:200px")}}
+				    </td>
 				</tr>
 				<tr>
 					<td height="30" align="right">{{_('Remark')}}</td>
