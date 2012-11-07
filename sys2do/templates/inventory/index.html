@@ -30,7 +30,7 @@
 	<ul>	
         <li><a href="{{url_for('.view',action='in_note')}}"><img src="/static/images/system/rkd.jpg" width="94" height="21" id="Image7" onmouseover="MM_swapImage('Image7','','/static/images/system/rkd_h.jpg',1)" onmouseout="MM_swapImgRestore()"/></a></li>
 		<li><a href="{{url_for('.view',action='out_note')}}"><img src="/static/images/system/ckd.jpg" width="94" height="21" id="Image71" onmouseover="MM_swapImage('Image71','','/static/images/system/ckd_h.jpg',1)" onmouseout="MM_swapImgRestore()"/></a></li>
-		<li><a href="#" onclick="return out_note()">新建出库单</a></li>
+		<li><a href="#" onclick="return out_note()"><img src="/static/images/system/add_out_note.jpg" width="101" height="21" id="Image17" onmouseover="MM_swapImage('Image17','','/static/images/system/add_out_note_h.jpg',1)" onmouseout="MM_swapImgRestore()"/></a></li>
     </ul>
 </div>
 {% endblock %}
@@ -85,12 +85,12 @@
     <td align="center" style="width:200px;">货物名称</td>
     <td align="center" style="width:200px;">货物描述</td>
     <td align="center" style="width:200px;">仓位</td>
-    <td align="center" style="width:100px;">实际数量</td>
-    <td align="center" style="width:100px;">未来数量</td>
-    <td align="center" style="width:100px;">实际面积(米<sup>2</sup>)</td>
-    <td align="center" style="width:100px;">未来面积(米<sup>2</sup>)</td>
+    <td align="center" style="width:100px;">实际数量(件)</td>
+    <td align="center" style="width:100px;">未来数量(件)</td>
     <td align="center" style="width:100px;">实际重量(吨)</td>
     <td align="center" style="width:100px;">未来重量(吨)</td>
+    <td align="center" style="width:100px;">实际面积(米<sup>2</sup>)</td>
+    <td align="center" style="width:100px;">未来面积(米<sup>2</sup>)</td>
   </tr>
   
   
@@ -99,13 +99,13 @@
 		    <th><input type="checkbox" name="note_ids" value="{{r.id}}" /></th>
 		    <td><a href="{{url_for('.view',action='item_detail',id=r.item.id)}}">{{r.item.name|f}}</a></td>
 		    <td>{{r.item.desc|f}}</td>
-		    <td>{{r.location|f}}</td>
+		    <td>{{r.location.full_path|f}}</td>
 			<td>{{r.qty|fn(f='%d')}}</td>
 			<td>{{r.exp_qty|fn(f='%d')}}</td>
-			<td>{{r.area|fn}}</td>
-			<td>{{r.exp_area|fn}}</td>
 			<td>{{r.weight|fn}}</td>
 			<td>{{r.exp_weight|fn}}</td>
+			<td>{{r.area|fn}}</td>
+			<td>{{r.exp_area|fn}}</td>
 		  </tr>
   {% endfor %}
       <tr class="data_table_tr">
@@ -119,10 +119,10 @@
       	<td colspan="4" style="text-align:left">&nbsp;合计</td>
 		<td>{{total_qty|fn(f='%d')}}</td>
 		<td>{{total_exp_qty|fn(f='%d')}}</td>
-		<td>{{total_area}}</td>
-		<td>{{total_exp_area}}</td>
 		<td>{{total_weight}}</td>
 		<td>{{total_exp_weight}}</td>
+		<td>{{total_area}}</td>
+		<td>{{total_exp_area}}</td>
 		<td colspan="10">&nbsp;</td>
       </tr>
       <tfoot>

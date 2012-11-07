@@ -7,6 +7,30 @@
 //<![CDATA[
 	
 	function tosave(){
+		var msg = new Array();
+		
+		if(!$("#name").val()){
+			msg.push("请输入仓位名称！");
+		}
+		
+		var op = $("#parent_id :selected");
+		var obj_id = $("#id").val();
+		var cids = $("#current_full_path_ids").val();
+		var r = new RegExp("^"+cids.replace('|','\\|')+"\\|");
+		alert(r);
+		if(op.val() == obj_id){
+			msg.push("请不要选择当前自身仓位作为上一级仓位！");
+		}
+		if(r.test(op.attr('full_ids'))){
+			msg.push("请不要选择当前仓位的下属仓位作为上一级仓位！");
+		}
+		
+		
+		if(msg.length>0){
+			alert(msg.join("\n"));
+			return false;
+		}
+		
 		$("form").submit();
 	}
 	
@@ -32,12 +56,12 @@
 {% block content %}
 	
 	<form action="{{url_for('.view',action='save_update')}}" method="post">
-		<input type="hidden" name="id" value="{{obj.id}}"/>
-	
+		<input type="hidden" name="id" id="id" value="{{obj.id}}"/>
+		<input type="hidden" id="current_full_path_ids" value="{{obj.full_path_ids}}"/>
 		<table>
-			<tr><td>仓位名称</td><td><input type="text" name="name" value="{{obj.name}}"/></td></tr>
-			<tr><td>仓位地址</td><td><textarea name="address">{{obj.address}}</textarea></td></tr>
-			<tr><td>仓位管理人员</td><td><input type="text" name="manager" value="{{obj.manager}}"/></td></tr>
+			<tr><td>仓位名称</td><td><input type="text" name="name" id="name" value="{{obj.name|f}}" class="must_input"/></td></tr>
+			<tr><td>仓位地址</td><td><textarea name="address">{{obj.address|f}}</textarea></td></tr>
+			<tr><td>仓位管理人员</td><td><input type="text" name="manager" value="{{obj.manager|f}}"/></td></tr>
 			<tr>
 				<td>上一级仓位</td>
 				<td>

@@ -95,12 +95,12 @@
           <li style="width:100%; border-right:#E2FEFE 1px solid;"><span>起始日期</span>
         	  <input type="text" class="datepicker" name="create_time_from" value="{{values.get('create_time_from','')|f}}"/>&nbsp;&nbsp;-&nbsp;&nbsp;<input type="text" class="datepicker" name="create_time_to" value="{{values.get('create_time_to','')|f}}"/>
           </li>
-          <li style="width:500px"><span>系统编号</span><input type="text" name="no" value="{{values.get('no','')|f}}"/></li>
+          <li style="width:755px"><span>系统编号</span><input type="text" name="no" value="{{values.get('no','')|f}}"/></li>
           <li style="width:755px"><span>客户</span>
           	{% set customer_id = values.get('customer_id',None)|int  %}
             {{mymacros.select('customer_id',MASTER_ALL('Customer'),customer_id,style="width:250px")}}        
           </li>
-          <li style="width:300px"><span>仓位</span>
+          <li style="width:755px"><span>仓位</span>
             {% set location_id = values.get('location_id',None)|int  %}
           	{{mymacros.location_select(id='location_id',list=locations,value=location_id,class="field order_add_div_body_input",style="width:250px")}}
           </li>
@@ -122,7 +122,7 @@
 
 <form method="post" action="" id="records">
 
-<table border="0" cellpadding="0" cellspacing="0"  style="width:1150px">
+<table border="0" cellpadding="0" cellspacing="0"  style="width:1050px">
   	  <tr class="data_table_tr">
 	    <td colspan="100" style="text-align:right">{{mymacros.mypaginate(records)}}</td>
 	</tr>
@@ -130,7 +130,6 @@
     <th align="center" style="width:50px;"><input type="checkbox" onclick="selectall(this,'note_ids');"/></th>
     <td align="center" style="width:200px;">{{mymacros.show_direction(values,'no')}}系统编号</td>
     <td align="center" style="width:100px;">客户</td>
-    <td align="center" style="width:100px;">仓位</td>
     <td align="center" style="width:100px;">数量</td>
     <td align="center" style="width:100px;">面积(米<sup>2</sup>)</td>
     <td align="center" style="width:100px;">重量(吨)</td>
@@ -144,7 +143,6 @@
 		    <th><input type="checkbox" name="note_ids" value="{{r.id}}" /></th>
 		    <td><a href="{{url_for('.view',action='out_note_review',id=r.id)}}">{{r.no|f}}</a></td>
 			<td>{{r.customer.display_name|f}}</td>
-			<td>{{r.location}}</td>
 			<td>{{r.qty|fn(f='%d')}}</td>
 			<td>{{r.area|fn}}</td>
 			<td>{{r.weight|fn}}</td>

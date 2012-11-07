@@ -1,6 +1,6 @@
 {% extends "master.html" %}
 
-{% block subtitle %} - 新建入库单{% endblock %}
+{% block subtitle %} - 修改入库单{% endblock %}
 
 {% block extJS %}
 <script language="JavaScript" type="text/javascript">
@@ -27,7 +27,7 @@
 	}	
 	
 	
-	var item_array = new Array();
+	var item_array = JSON.parse('{{item_json|safe}}');
 //]]>
 </script>
 <script src="{{url_for('static', filename='js/customer/note_add.js')}}" type="text/javascript"></script>
@@ -47,18 +47,20 @@
 
 {% block content %}
 	
-	<form action="{{url_for('.view',action='in_note_save_new')}}" method="post">
+	<form action="{{url_for('.view',action='in_note_save_update')}}" method="post">
+		<input type="hidden" id="id" name="id" value="{{obj.id}}"/>
 		<input type="hidden" id="item_json" name="item_json" value=""/>
 		<table>
+		    <tr><td>入库单号</td><td>{{obj.no}}</td></tr>
 			<tr>
 				<td>客户</td>
-				<td>{{mymacros.select(id='customer_id',list=MASTER_ALL('Customer'),value=None,class="must_input",style="width:360px")}}</td>
+				<td>{{mymacros.select(id='customer_id',list=MASTER_ALL('Customer'),value=obj.customer_id,class="must_input",style="width:360px")}}</td>
 			</tr>	
-			<tr><td>客户销售单号(SO)</td><td><input type="text" name="so" /></td></tr>
-			<tr><td>客户采购单号(PO)</td><td><input type="text" name="po" /></td></tr>
-			<tr><td>客户送货单号(DN)</td><td><input type="text" name="dn"/></td></tr>
-			<tr><td>客户参考(REF)</td><td><input type="text" name="ref"/></td></tr>
-			<tr><td>备注</td><td><textarea name="remark"></textarea></td></tr>
+			<tr><td>客户销售单号(SO)</td><td><input type="text" name="so" value="{{obj.so|f}}"/></td></tr>
+			<tr><td>客户采购单号(PO)</td><td><input type="text" name="po" value="{{obj.po|f}}"/></td></tr>
+			<tr><td>客户送货单号(DN)</td><td><input type="text" name="dn" value="{{obj.dn|f}}"/></td></tr>
+			<tr><td>客户参考(REF)</td><td><input type="text" name="ref" value="{{obj.ref|f}}"/></td></tr>
+			<tr><td>备注</td><td><textarea name="remark">{{obj.remark|f}}</textarea></td></tr>
 		</table>
 		
 		<br />
@@ -82,6 +84,20 @@
 				</tr>
 			</thead>
 			<tbody id="item_list">
+				{% for d in obj.details %}
+					<tr class="data_table_tr" id="item_tr_old_{{d.id}}">
+						<td>{{d.item}}</td>
+						<td>{{d.desc}}</td>
+						<td>{{d.location}}</td>
+						<td>{{d.qty|fn(f='%d')}}</td>
+						<td>{{d.weight|fn}}</td>
+						<td>{{d.area|fn}}</td>
+						<td>{{d.remark}}</td>
+						<td>
+							<input type="button" value="删除" onclick="del_item('old_{{d.id}}',this)"/>&nbsp;<input type="button" value="编辑" onclick="edit_item('old_{{d.id}}')"/>
+						</td>
+					</tr>
+				{% endfor %}
 			</tbody>
 		</table>
 		<br />
@@ -106,8 +122,8 @@
 			          {% endfor %}
 			      </select>	
 			</td>
-		</tr>	    
-		<tr id="new_item_tr"><td valign="top" width="70px" align="center">新货物名称</td><td valign="top"><input type="text" id="new_item_name" value="" class="order_add_div_body_input" style="width:300px;"></td></tr>
+		</tr>		    
+		<tr id="new_item_tr"><td valign="top" align="center">新货物名称</td><td valign="top"><input type="text" id="new_item_name" value="" class="order_add_div_body_input" style="width:300px;"></td></tr>
 		<tr><td valign="top" align="center">描述</td><td valign="top"><textarea id="item_desc" style="width:300px;"></textarea></td></tr>
 		<tr><td valign="top" align="center">仓位</td><td valign="top">
 		   	{{mymacros.location_select(id='location_id',list=locations,value=None,class="must_input",style="width:300px;")}}

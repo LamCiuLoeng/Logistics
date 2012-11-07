@@ -101,16 +101,16 @@
 					<td>{{d.desc}}</td>
 					<td>{{d.location}}</td>
 					<td>{{d.qty|fn('%d')}}</td>
-					<td>{{d.area}}</td>
 					<td>{{d.weight}}</td>
+					<td>{{d.area}}</td>
 					<td>{{d.remark}}</td>
 				</tr>
 			{% endfor %}
 				<tr class="data_table_tr">
 					<td colspan="3">合计</td>
 					<td>{{obj.details|sum_with_none(attribute='qty')|fn('%d')}}</td>
-					<td>{{obj.details|sum_with_none(attribute='area')|fn}}</td>
 					<td>{{obj.details|sum_with_none(attribute='weight')|fn}}</td>
+					<td>{{obj.details|sum_with_none(attribute='area')|fn}}</td>
 					<td>&nbsp;</td>
 				</tr>
 			</tbody>

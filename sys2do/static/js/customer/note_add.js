@@ -81,7 +81,7 @@ function save_item(){
     if(current_item){
         var result = search_item(tmp_item.id);
         item_array.splice(result.index,1,tmp_item);
-        var html = '<tr class="data_table_tr" id=item_tr_'+tmp_item.id+'>';
+        var html = '<tr class="data_table_tr" id="item_tr_'+tmp_item.id+'">';
         html += '<td>'+tmp_item.item_name+'</td>';
         html += '<td>'+tmp_item.desc+'</td>';
         html += '<td>'+location+'</td>';

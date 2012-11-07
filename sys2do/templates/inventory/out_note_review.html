@@ -9,8 +9,8 @@
 		redirect('{{request.referrer}}');
 	}
 		
-	function todel(){
-		
+	function todelete(){
+		return confirm('确定删除该记录吗？');
 	}	
 //]]>
 </script>
@@ -21,8 +21,8 @@
 <div class="inner_menu">
 	<ul>
     	<li><img src="/static/images/system/order_manage_25.jpg" width="71" height="21" id="Image1" onmouseover="MM_swapImage('Image1','','/static/images/system/order_manage_h_25.jpg',1)" onmouseout="MM_swapImgRestore()" onclick="return toreturn();"/></li>
-        <li><a href="{{url_for('.view',action='in_note_update',id=obj.id)}}"><img src="/static/images/system/edit.jpg" width="77" height="21" id="Image2" onmouseover="MM_swapImage('Image2','','/static/images/system/edit_h.jpg',1)" onmouseout="MM_swapImgRestore()"/></a></li>
-        <li><img src="/static/images/system/order_manage_29.jpg" width="77" height="21" id="Image21" onmouseover="MM_swapImage('Image21','','/static/images/system/order_manage_h_29.jpg',1)" onmouseout="MM_swapImgRestore()" onclick="return todel();"/></li>
+        <li><a href="{{url_for('.view',action='out_note_update',id=obj.id)}}"><img src="/static/images/system/edit.jpg" width="77" height="21" id="Image2" onmouseover="MM_swapImage('Image2','','/static/images/system/edit_h.jpg',1)" onmouseout="MM_swapImgRestore()"/></a></li>
+        <li><a href="{{url_for('.view',action='out_note_delete',id=obj.id)}}" onclick="return todelete();"><img src="/static/images/system/order_manage_29.jpg" width="77" height="21" id="Image21" onmouseover="MM_swapImage('Image21','','/static/images/system/order_manage_h_29.jpg',1)" onmouseout="MM_swapImgRestore()"/></a></li>
     	<li>
         	<select onchange="todo_approve(this);">
         		<option>--审核是否通过--</option>

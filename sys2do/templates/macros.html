@@ -125,11 +125,11 @@
 {% macro location_option(location_list,value,space=0) -%}
 	{% for l in location_list %}
 		{% if l.id == value %}
-			<option value="{{l.id}}" selected="selected">{{'-' * space}}{{l.full_path}}</option>
+			<option value="{{l.id}}" selected="selected" full_ids="{{l.full_path_ids}}">{{('&nbsp;' * space)|safe}}{{l.name}}</option>
 		{% else %}
-			<option value="{{l.id}}">{{('-' * space)|safe}}{{l.full_path}}</option>
+			<option value="{{l.id}}" full_ids="{{l.full_path_ids}}">{{('&nbsp;' * space)|safe}}{{l.name}}</option>
 		{% endif %}
-		{{location_option(l.children,value,space+2)}}
+		{{location_option(l.children,value,space+3)}}
 	{% endfor %}
 {%- endmacro %}
 

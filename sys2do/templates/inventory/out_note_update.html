@@ -1,6 +1,6 @@
 {% extends "master.html" %}
 
-{% block subtitle %} - 新建出库单{% endblock %}
+{% block subtitle %} - 更新出库单{% endblock %}
 
 {% block extJS %}
 <script language="JavaScript" type="text/javascript">
@@ -66,18 +66,19 @@
 
 {% block content %}
 	
-	<form action="{{url_for('.view',action='out_note_save_new')}}" method="post">
+	<form action="{{url_for('.view',action='out_note_save_update')}}" method="post">
+		<input type="hidden" name="id" value="{{obj.id}}"/>
 		<table>
 			<tr>
 				<td>客户</td>
-				<td>{{mymacros.select(id='customer_id',list=MASTER_ALL('Customer'),value=None,class="must_input",style="width:360px")}}</td>
+				<td>{{mymacros.select(id='customer_id',list=MASTER_ALL('Customer'),value=obj.customer_id,class="must_input",style="width:360px")}}</td>
 			</tr>
 			
-			<tr><td>客户销售单号(SO)</td><td><input type="text" name="so" /></td></tr>
-			<tr><td>客户采购单号(PO)</td><td><input type="text" name="po" /></td></tr>
-			<tr><td>客户送货单号(DN)</td><td><input type="text" name="dn"/></td></tr>
-			<tr><td>客户参考(REF)</td><td><input type="text" name="ref"/></td></tr>
-			<tr><td>备注</td><td><textarea name="remark"></textarea></td></tr>
+			<tr><td>客户销售单号(SO)</td><td><input type="text" name="so" value="{{obj.so|f}}"/></td></tr>
+			<tr><td>客户采购单号(PO)</td><td><input type="text" name="po" value="{{obj.po|f}}"/></td></tr>
+			<tr><td>客户送货单号(DN)</td><td><input type="text" name="dn" value="{{obj.dn|f}}"/></td></tr>
+			<tr><td>客户参考(REF)</td><td><input type="text" name="ref" value="{{obj.ref|f}}"/></td></tr>
+			<tr><td>备注</td><td><textarea name="remark">{{obj.remark|f}}</textarea></td></tr>
 		</table>
 		
 		<br />
@@ -96,17 +97,15 @@
 				</tr>
 			</thead>
 			<tbody id="item_list">
-				{% for r in records %}
+				{% for r in obj.details %}
 					<tr class="data_table_tr {{ loop.cycle('data_table_tr_odd', 'data_table_tr_even') }}">
-						<td>{{r.item.name}}
-							<input type="hidden" name="item_{{r.id}}" value="{{r.id}}"/>
-						</td>
+						<td>{{r.item}}</td>
 						<td>{{r.item.desc}}</td>
 						<td>{{r.location.full_path}}</td>
 						<td><input type="text" class="numeric number_input_right" style="width:80px" name="qty_{{r.id}}" value="{{r.qty|fn('%d')}}" ref="{{r.qty|fn('%d')}}"/></td>
 						<td><input type="text" class="numeric number_input_right" style="width:80px" name="weight_{{r.id}}" value="{{r.weight|fn}}" ref="{{r.weight|fn}}"/></td>
 						<td><input type="text" class="numeric number_input_right" style="width:80px" name="area_{{r.id}}" value="{{r.area|fn}}" ref="{{r.area|fn}}"/></td>
-						<td><textarea name="remark_{{r.id}}" style="width:150px;height:50px"></textarea></td>
+						<td><textarea name="remark_{{r.id}}" style="width:150px;height:50px">{{r.remark|f}}</textarea></td>
 					</tr>
 				{% endfor %}
 			</tbody>
