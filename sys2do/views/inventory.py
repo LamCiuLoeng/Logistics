@@ -625,7 +625,7 @@ class InventoryView(BasicView):
             flash(MSG_NO_ID_SUPPLIED, MESSAGE_ERROR)
             return redirect(url_for(".view", action = "out_note"))
         obj = DBSession.query(InventoryOutNote).get(id)
-        for f in ['', ] : setattr(obj, f, _g(f))
+        for f in ['customer_id', 'so', 'po', 'dn', 'ref', 'remark' ] : setattr(obj, f, _g(f))
 
         total_qty = total_weight = total_area = 0
         details_mapping = {}
@@ -644,17 +644,18 @@ class InventoryView(BasicView):
             total_area += area
             total_weight += weight
 
-            #update the locaion-item relation
-            t = DBSession.query(InventoryLocationItem).filter(and_(InventoryLocationItem.location_id == d.location_id,
-                                                               InventoryLocationItem.item_id == d.item_id)).with_lockmode("update").one()
+            if obj.status != 2:
+                #update the locaion-item relation
+                t = DBSession.query(InventoryLocationItem).filter(and_(InventoryLocationItem.location_id == d.location_id,
+                                                                   InventoryLocationItem.item_id == d.item_id)).with_lockmode("update").one()
 
-            if obj.status == 1: #if the record is approved,update the real qty/weight/area
-                t.qty -= qty - d.qty
-                t.weight -= weight - d.weight
-                t.area -= area - d.area
-            t.exp_qty -= qty - d.qty
-            t.exp_weight -= weight - d.weight
-            t.exp_area -= area - d.area
+                if obj.status == 1: #if the record is approved,update the real qty/weight/area
+                    t.qty -= qty - d.qty
+                    t.weight -= weight - d.weight
+                    t.area -= area - d.area
+                t.exp_qty -= qty - d.qty
+                t.exp_weight -= weight - d.weight
+                t.exp_area -= area - d.area
 
             d.qty = qty
             d.weight = weight

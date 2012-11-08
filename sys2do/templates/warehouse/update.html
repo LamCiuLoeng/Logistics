@@ -54,22 +54,25 @@
 
 
 {% block content %}
-	
+<div class="order_add_div">
+	<div class="order_add_div_body">		
 	<form action="{{url_for('.view',action='save_update')}}" method="post">
 		<input type="hidden" name="id" id="id" value="{{obj.id}}"/>
 		<input type="hidden" id="current_full_path_ids" value="{{obj.full_path_ids}}"/>
 		<table>
-			<tr><td>仓位名称</td><td><input type="text" name="name" id="name" value="{{obj.name|f}}" class="must_input"/></td></tr>
-			<tr><td>仓位地址</td><td><textarea name="address">{{obj.address|f}}</textarea></td></tr>
-			<tr><td>仓位管理人员</td><td><input type="text" name="manager" value="{{obj.manager|f}}"/></td></tr>
+			<tr><td width="150" height="30" align="right">仓位名称</td><td width="12">&nbsp;</td><td><input type="text" name="name" id="name" value="{{obj.name|f}}" class="must_input" style="width:300px"/></td></tr>
+			<tr><td height="30" align="right">仓位地址</td><td>&nbsp;</td><td><textarea name="address" style="width:300px">{{obj.address|f}}</textarea></td></tr>
+			<tr><td height="30" align="right">仓位管理人员</td><td>&nbsp;</td><td><input type="text" name="manager" value="{{obj.manager|f}}" style="width:300px"/></td></tr>
 			<tr>
-				<td>上一级仓位</td>
+				<td height="30" align="right">上一级仓位</td>
+				<td>&nbsp;</td>
 				<td>
 					{{mymacros.location_select(id='parent_id',list=locations,value=obj.parent_id,class="field order_add_div_body_input",style="width:300px")}}
 				</td>
 			</tr>
-			<tr><td>备注</td><td><textarea name="remark">{{obj.remark|f}}</textarea></td></tr>
+			<tr><td height="30" align="right">备注</td><td>&nbsp;</td><td><textarea name="remark" style="width:300px">{{obj.remark|f}}</textarea></td></tr>
 		</table>
 	</form>
-	
+	</div>
+</div>		
 {% endblock %}

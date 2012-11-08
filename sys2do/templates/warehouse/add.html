@@ -40,20 +40,23 @@
 
 
 {% block content %}
-	
+<div class="order_add_div">
+	<div class="order_add_div_body">		
 	<form action="{{url_for('.view',action='save_new')}}" method="post">
 		<table>
-			<tr><td>仓位名称</td><td><input type="text" name="name" id="name" class="must_input"/></td></tr>
-			<tr><td>仓位地址</td><td><textarea name="address"></textarea></td></tr>
-			<tr><td>仓位管理人员</td><td><input type="text" name="manager"/></td></tr>
+			<tr><td width="150" height="30" align="right">仓位名称</td><td width="12">&nbsp;</td><td><input type="text" name="name" id="name" class="must_input" style="width:300px"/></td></tr>
+			<tr><td height="30" align="right">仓位地址</td><td>&nbsp;</td><td><textarea name="address" style="width:300px"></textarea></td></tr>
+			<tr><td height="30" align="right">仓位管理人员</td><td>&nbsp;</td><td><input type="text" name="manager" style="width:300px"/></td></tr>
 			<tr>
-				<td>上一级仓位</td>
+				<td height="30" align="right">上一级仓位</td>
+				<td>&nbsp;</td>
 				<td>
 					{{mymacros.location_select(id='parent_id',list=locations,value=None,class="field order_add_div_body_input",style="width:300px")}}
 				</td>
 			</tr>
-			<tr><td>备注</td><td><textarea name="remark"></textarea></td></tr>
+			<tr><td height="30" align="right">备注</td><td>&nbsp;</td><td><textarea name="remark" style="width:300px"></textarea></td></tr>
 		</table>
 	</form>
-	
+	</div>
+</div>	
 {% endblock %}

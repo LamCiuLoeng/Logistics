@@ -10,7 +10,7 @@
 {% block inner_menu %}
 <div class="inner_menu">
 	<ul>
-		{% if 'pCreateGroup' is get_permission%}    
+		{% if 'CREATE_GROUP' is get_permission%}    
         <li><a href="{{url_for('.view', action = 'group',m = 'NEW')}}"><img src="/static/images/system/order_manage_31.jpg" width="77" height="21" id="Image2" onmouseover="MM_swapImage('Image2','','/static/images/system/order_manage_h_31.jpg',1)" onmouseout="MM_swapImgRestore()" /></a></li>
     	{% endif %}
     </ul>

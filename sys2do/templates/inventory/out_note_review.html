@@ -77,7 +77,15 @@
 			<tr>
 				<td height="30" align="right">状态</td>
 				<td width="12">&nbsp;</td>
-				<td>{{obj.status}}</td>
+				<td>
+					{% if obj.status == 1 %}
+					审核通过
+					{% elif obj.status == 2 %}
+					审核不通过
+					{% else %}
+					未审核
+					{% endif %}
+				</td>
 			</tr>
 			<tr>
 				<td height="30" align="right">创建人</td>
@@ -94,15 +102,15 @@
 		<br />
 		<br />
 
-		<table style="width:800px">
+		<table style="width:900px">
 			<thead>
 				<tr class="field_head">
 					<th style="width:150px">{{_('Item Name')}}</th>
-					<th style="width:80px">描述</th>
+					<th style="width:200px">描述</th>
 					<th style="width:80px">仓位</th>
 					<th style="width:80px">{{_('Qty')}}</th>
-					<th style="width:80px">面积(米<sup>2</sup>)</th>
 					<th style="width:80px">重量(吨)</th>
+					<th style="width:80px">面积(米<sup>2</sup>)</th>
 					<th style="width:200px">{{_('Remark')}}</th>
 				</tr>
 			</thead>
@@ -121,8 +129,8 @@
 				<tr class="data_table_tr">
 					<td colspan="3">&nbsp;合计</td>
 					<td>{{obj.qty|fn(f='%d')}}</td>
-					<td>{{obj.area}}</td>
 					<td>{{obj.weight}}</td>
+					<td>{{obj.area}}</td>
 					<td>&nbsp;</td>
 				</tr>
 			</tbody>

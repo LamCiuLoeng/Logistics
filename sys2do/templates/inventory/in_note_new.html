@@ -17,9 +17,27 @@
 	
 	
 	function tosave(){
-		show_hold('正在保存，请稍候。。。');
-		$("#item_json").val(JSON.stringify(item_array));
-		$("form").submit();
+		var msg = new Array();
+		if(!$("#customer_id").val()){
+			msg.push("请选择客户！");
+		}
+		
+		if(item_array.length<1){
+			msg.push("请添加至少一个货物！");
+		}
+		
+		if(msg.length>0){
+		    var s = "<ul>";
+		    for(var i=0;i<msg.length;i++){
+		    	s += "<li>" + msg[i] + "</li>";
+		    }
+		    s += "</ul>";
+			show_error(s);
+		}else{
+			show_hold('正在保存，请稍候。。。');
+			$("#item_json").val(JSON.stringify(item_array));
+			$("form").submit();
+		}
 	}
 	
 	function toreturn(){
@@ -46,19 +64,21 @@
 
 
 {% block content %}
-	
+<div class="order_add_div">
+	<div class="order_add_div_body">	
 	<form action="{{url_for('.view',action='in_note_save_new')}}" method="post">
 		<input type="hidden" id="item_json" name="item_json" value=""/>
 		<table>
 			<tr>
-				<td>客户</td>
+				<td width="150" height="30" align="right">客户</td>
+				<td width="12">&nbsp;</td>
 				<td>{{mymacros.select(id='customer_id',list=MASTER_ALL('Customer'),value=None,class="must_input",style="width:360px")}}</td>
 			</tr>	
-			<tr><td>客户销售单号(SO)</td><td><input type="text" name="so" /></td></tr>
-			<tr><td>客户采购单号(PO)</td><td><input type="text" name="po" /></td></tr>
-			<tr><td>客户送货单号(DN)</td><td><input type="text" name="dn"/></td></tr>
-			<tr><td>客户参考(REF)</td><td><input type="text" name="ref"/></td></tr>
-			<tr><td>备注</td><td><textarea name="remark"></textarea></td></tr>
+			<tr><td height="30" align="right">客户销售单号(SO)</td><td>&nbsp;</td><td><input type="text" style="width:360px" name="so" /></td></tr>
+			<tr><td height="30" align="right">客户采购单号(PO)</td><td>&nbsp;</td><td><input type="text" style="width:360px" name="po" /></td></tr>
+			<tr><td height="30" align="right">客户送货单号(DN)</td><td>&nbsp;</td><td><input type="text" style="width:360px" name="dn"/></td></tr>
+			<tr><td height="30" align="right">客户参考(REF)</td><td>&nbsp;</td><td><input type="text" style="width:360px" name="ref"/></td></tr>
+			<tr><td height="30" align="right">备注</td><td>&nbsp;</td><td><textarea name="remark" style="width:360px"></textarea></td></tr>
 		</table>
 		
 		<br />
@@ -122,6 +142,7 @@
 	<p style="text-align:right;"><input type="button" value="保存" onclick="save_item()"/>&nbsp;<input type="button" value="取消" onclick="cancel_item()"/></p>
 </div>
 
-
+	</div>
+</div>
 	
 {% endblock %}

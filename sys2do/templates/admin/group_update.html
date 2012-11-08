@@ -36,29 +36,35 @@
 {% endblock %}
 
 {% block content %}
+<div class="order_add_div">
+	<div class="order_add_div_body">	
 	<form action="{{url_for('.view', action = 'group',m='SAVE_UPDATE')}}" method="post">
 		<input type="hidden" name="id" value="{{v['id']}}"/>
 		<table>
 			<tr>
-				<td>{{_('Group Name')}}</td>
+				<td width="150" height="30" align="right">{{_('Group Name')}}</td>
+				<td width="12">&nbsp;</td>
 				<td>
 					{% if v['type'] != 0 %}
-						<input type="text" name="name" value="{{v['name']}}"/>
+						<input type="text" name="name" value="{{v['name']}}" class="must_input"/>
 					{% else %}
 						{{v['name']}} <input type="hidden" name="name" value="{{v['name']}}"/>
 					{% endif %}
 				</td>
 			</tr>
 			<tr>
-				<td>{{_('Display Name')}}</td>
+				<td height="30" align="right">{{_('Display Name')}}</td>
+				<td>&nbsp;</td>
 				<td><input type="text" name="display_name" value="{{v['display_name']}}"/></td>
 			</tr>
 			<tr>
-				<td>{{_('Description')}}</td>
-				<td><textarea name="desc">{{v['desc']}}</textarea></td>
+				<td height="30" align="right">{{_('Description')}}</td>
+				<td>&nbsp;</td>
+				<td><textarea name="desc">{{v['desc']|f}}</textarea></td>
 			</tr>
 			<tr>
-				<td>{{_('User')}}</td>
+				<td height="30" align="right">{{_('User')}}</td>
+				<td>&nbsp;</td>
 				<td>
 					<table>
 						<tr>
@@ -80,7 +86,8 @@
 				</td>
 			</tr>
 			<tr>
-				<td>{{_('Permission')}}</td>
+				<td height="30" align="right">{{_('Permission')}}</td>
+				<td>&nbsp;</td>
 				<td>
 					<table>
 						<tr>
@@ -95,7 +102,7 @@
 										<input class="onebox" type="checkbox" name="pids" value="{{p.id}}"/>
 									{% endif %}
 								</td>
-								<td>{{p}}</td>
+								<td width="200">{{p}}</td>
 								<td>{{p.desc|ifFalse}}</td>
 							</tr>
 						{% endfor %}
@@ -104,5 +111,6 @@
 			</tr>
 		</table>
 	</form>
-	
+	</div>
+</div>		
 {% endblock %}

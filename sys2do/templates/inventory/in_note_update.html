@@ -46,21 +46,23 @@
 
 
 {% block content %}
-	
+<div class="order_add_div">
+	<div class="order_add_div_body">	
 	<form action="{{url_for('.view',action='in_note_save_update')}}" method="post">
 		<input type="hidden" id="id" name="id" value="{{obj.id}}"/>
 		<input type="hidden" id="item_json" name="item_json" value=""/>
 		<table>
-		    <tr><td>入库单号</td><td>{{obj.no}}</td></tr>
+		    <tr><td width="150" height="30" align="right">入库单号</td><td width="12">&nbsp;</td><td>{{obj.no}}</td></tr>
 			<tr>
-				<td>客户</td>
+				<td width="150" height="30" align="right">客户</td>
+				<td width="12">&nbsp;</td>
 				<td>{{mymacros.select(id='customer_id',list=MASTER_ALL('Customer'),value=obj.customer_id,class="must_input",style="width:360px")}}</td>
 			</tr>	
-			<tr><td>客户销售单号(SO)</td><td><input type="text" name="so" value="{{obj.so|f}}"/></td></tr>
-			<tr><td>客户采购单号(PO)</td><td><input type="text" name="po" value="{{obj.po|f}}"/></td></tr>
-			<tr><td>客户送货单号(DN)</td><td><input type="text" name="dn" value="{{obj.dn|f}}"/></td></tr>
-			<tr><td>客户参考(REF)</td><td><input type="text" name="ref" value="{{obj.ref|f}}"/></td></tr>
-			<tr><td>备注</td><td><textarea name="remark">{{obj.remark|f}}</textarea></td></tr>
+			<tr><td height="30" align="right">客户销售单号(SO)</td><td>&nbsp;</td><td><input type="text" name="so" style="width:360px" value="{{obj.so|f}}"/></td></tr>
+			<tr><td height="30" align="right">客户采购单号(PO)</td><td>&nbsp;</td><td><input type="text" name="po" style="width:360px" value="{{obj.po|f}}"/></td></tr>
+			<tr><td height="30" align="right">客户送货单号(DN)</td><td>&nbsp;</td><td><input type="text" name="dn" style="width:360px" value="{{obj.dn|f}}"/></td></tr>
+			<tr><td height="30" align="right">客户参考(REF)</td><td>&nbsp;</td><td><input type="text" name="ref" style="width:360px" value="{{obj.ref|f}}"/></td></tr>
+			<tr><td height="30" align="right">备注</td><td>&nbsp;</td><td><textarea name="remark" style="width:360px">{{obj.remark|f}}</textarea></td></tr>
 		</table>
 		
 		<br />
@@ -138,6 +140,7 @@
 	<p style="text-align:right;"><input type="button" value="保存" onclick="save_item()"/>&nbsp;<input type="button" value="取消" onclick="cancel_item()"/></p>
 </div>
 
-
+	</div>
+</div>
 	
 {% endblock %}

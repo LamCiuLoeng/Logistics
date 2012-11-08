@@ -34,26 +34,32 @@
 {% block inner_menu %}
 <div class="inner_menu">
 	<ul>
-    	<li><img src="/static/images/system/order_manage_25.jpg" width="71" height="21" id="Image1" onmouseover="MM_swapImage('Image1','','/static/images/system/order_manage_h_25.jpg',1)" onmouseout="MM_swapImgRestore()" onclick="redirect('{{url_for('bpAdmin.view',action='user')}}')"/></li>       
+    	<li><img src="/static/images/system/order_manage_25.jpg" width="71" height="21" id="Image1" onmouseover="MM_swapImage('Image1','','/static/images/system/order_manage_h_25.jpg',1)" onmouseout="MM_swapImgRestore()" onclick="redirect('{{url_for('.view', action = 'barcode')}}')"/></li>       
     </ul>
 </div>
 {% endblock %}
 
 
 {% block content %}
+<div class="order_add_div">
+	<div class="order_add_div_body">	
 	<form action="{{url_for('.view', action = 'barcode',m='SAVE_NEW')}}" method="post">
 		<input type="hidden" name="type" id="type" value=""/>
 		<table>
 			<tr>
-				<td>数量</td>
+				<td width="150" height="30" align="right">数量</td>
+				<td width="12">&nbsp;</td>
 				<td><input type="text" name="qty" id="qty" class="numeric"/></td>
 			</tr>
 			<tr>
-				<td colspan="2"><input type="button" value="创建" onclick="tocreate();"/>&nbsp;
+				<td colspan="3" align="right"><input type="button" value="创建" onclick="tocreate();"/>&nbsp;
 				<input type="button" value="创建并打印" onclick="tocreate_print();"/></td>
 			</tr>
 
 		</table>
 	</form>
 	<br /><br />
+	
+	</div>
+</div>	
 {% endblock %}

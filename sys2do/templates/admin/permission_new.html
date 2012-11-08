@@ -5,7 +5,18 @@
 <script language="JavaScript" type="text/javascript">
 //<![CDATA[
 	function tosave(){
-		$('form').submit();
+		
+		var msg = new Array();
+		if(!$("#name").val()){
+			msg.push("请填写权限名！");
+		}
+		
+		if(msg.length>0){
+			show_error(msg.join("\n"));
+			return false;	
+		}else{
+			$('form').submit();
+		}
 	}
 //]]>
 </script>
@@ -24,18 +35,23 @@
 {% endblock %}
 
 {% block content %}
+<div class="order_add_div">
+	<div class="order_add_div_body">	
 	<form action="{{url_for('.view', action = 'permission',m='SAVE_NEW')}}" method="post">
 		<table>
 			<tr>
-				<td>{{_('Permission Name')}}</td>
-				<td><input type="text" name="name"/></td>
+				<td width="150" height="30" align="right">{{_('Permission Name')}}</td>
+				<td width="12">&nbsp;</td>
+				<td><input type="text" name="name" id="name" class="must_input"/></td>
 			</tr>
 			<tr>
-				<td>{{_('Description')}}</td>
+				<td height="30" align="right">{{_('Description')}}</td>
+				<td>&nbsp;</td>
 				<td><textarea name="desc"></textarea></td>
 			</tr>
 			<tr>
-				<td>{{_('Group')}}</td>
+				<td height="30" align="right">{{_('Group')}}</td>
+				<td>&nbsp;</td>
 				<td>
 					<table>
 						<tr>
@@ -51,10 +67,9 @@
 					</table>
 				</td>
 			</tr>
-			<tr>
-				<td colspan="2"><input type="submit" value="{{_('Submit')}}"/>&nbsp;&nbsp;&nbsp;<input type="button" value="{{_('Cancel')}}" onclick="redirect('{{url_for('.view', action = 'permission')}}')"/></td>
-			</tr>
 		</table>
 	</form>
-	
+	<br /><br />
+	</div>
+</div>		
 {% endblock %}
