@@ -18,12 +18,12 @@ babel = Babel(app)
 
 @babel.localeselector
 def get_locale():
-    return None  #force the system to use the default setting, zh_CN
+    return None  # force the system to use the default setting, zh_CN
     return request.accept_languages.best_match(['zh_CN', 'zh_HK', 'en'])
 
 
 
-#if not app.debug:
+# if not app.debug:
 #    import logging
 #    from themodule import TheHandlerYouWant
 #    file_handler = TheHandlerYouWant(...)
@@ -54,19 +54,19 @@ for error_code in [403, 404, 500] : app.error_handler_spec[None][error_code] = s
 #===============================================================================
 # root.py
 #===============================================================================
-#import views.root as r
-#app.add_url_rule("/", view_func = r.index, methods = ['GET', 'POST'])
-#app.add_url_rule("/index", view_func = r.index, methods = ['GET', 'POST'])
+# import views.root as r
+# app.add_url_rule("/", view_func = r.index, methods = ['GET', 'POST'])
+# app.add_url_rule("/index", view_func = r.index, methods = ['GET', 'POST'])
 
 
 
 #===============================================================================
 # access.py
 #===============================================================================
-#import views.access as a
-#app.add_url_rule("/user", view_func = a.userHandler, methods = ['GET', 'POST'])
-#app.add_url_rule("/group", view_func = a.groupHandler, methods = ['GET', 'POST'])
-#app.add_url_rule("/permission", view_func = a.permissionHandler, methods = ['GET', 'POST'])
+# import views.access as a
+# app.add_url_rule("/user", view_func = a.userHandler, methods = ['GET', 'POST'])
+# app.add_url_rule("/group", view_func = a.groupHandler, methods = ['GET', 'POST'])
+# app.add_url_rule("/permission", view_func = a.permissionHandler, methods = ['GET', 'POST'])
 
 import views.root
 app.register_blueprint(views.root.bpRoot)
@@ -107,6 +107,7 @@ for f in filters.__all__ : app.jinja_env.filters[f] = getattr(filters, f)
 
 import util.tests as tests
 for t in tests.__all__ : app.jinja_env.tests[t] = getattr(tests, t)
+
 
 
 #===============================================================================
