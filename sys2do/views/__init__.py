@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from flask import g
 from flask.views import View
 from flask.helpers import url_for, flash
 from werkzeug.utils import redirect
@@ -28,22 +29,15 @@ class BasicView(View):
 
 
 @app.before_request
-def before_request():  #occur before the request
-    from sys2do.util.common import _debug
-    pass
-
-
+def before_request():  # occur before the request
+    DBSession()
 
 
 @app.teardown_request
-def teardown_request(exception):  #if error occur on the controller
-    from sys2do.util.common import _debug
-    if exception is not None:
-        _debug("--------come into teardown_request")
-        DBSession.rollback()
+def teardown_request(param):  # if error occur on the controller
+    DBSession.remove()  # to cleare the nested rollback
 
 
 @app.after_request
-def after_request(response):  #if error occur on the controller
-    from sys2do.util.common import _debug
+def after_request(response):
     return response

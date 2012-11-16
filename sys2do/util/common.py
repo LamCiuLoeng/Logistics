@@ -27,6 +27,7 @@ from sys2do.setting import UPLOAD_FOLDER, ALLOWED_EXTENSIONS, UPLOAD_FOLDER_URL,
 from sys2do.model import DBSession, UploadFile
 from sys2do.constant import MSG_RECORD_NOT_EXIST, MSG_NO_FILE_UPLOADED, \
     MSG_INVALID_FILE_TO_UPLOAD, SYSTEM_DATE_FORMAT, SYSTEM_DATETIME_FORMAT
+from contextlib import contextmanager
 
 
 
@@ -55,6 +56,8 @@ _debug = lambda msg : app.logger.debug(msg)
 _info = lambda msg : app.logger.debug(msg)
 
 _error = lambda msg : app.logger.debug(msg)
+
+
 
 
 def getMasterAll(obj, order_by = 'name'):
@@ -116,7 +119,7 @@ def upload(name):
 
 
 def multiupload():
-    #handle the upload file
+    # handle the upload file
     attachment_ids = []
     try:
         for f in request.files:
@@ -172,7 +175,7 @@ def number2alphabet(n):
 def check_mobile(no):
     if not no or not isinstance(no, basestring): return False
     if not no.isdigit() : return False
-    if len(no) != 11 : return False #china mobile is 11 length
+    if len(no) != 11 : return False  # china mobile is 11 length
     if  no[:2] not in ['13', '15'] : return False
     return True
 

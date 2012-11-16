@@ -48,7 +48,7 @@ if app.config.get("LOGGING_FILE", True):
 # sys.py
 #===============================================================================
 import views.sys as s
-for error_code in [403, 404, 500] : app.error_handler_spec[None][error_code] = s.error_page(error_code)
+for error_code in [403, 404] : app.error_handler_spec[None][error_code] = s.error_page(error_code)
 
 
 #===============================================================================

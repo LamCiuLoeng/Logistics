@@ -27,12 +27,13 @@ class T(object):
     def __repr__(self): return _(self.msg)
 
 
-#alert messages
+# alert messages
 MSG_NO_SUCH_ACTION = u'没有该操作！'
 MSG_SAVE_SUCC = u'成功保存记录！'
 MSG_UPDATE_SUCC = u'成功更新记录！'
 MSG_DELETE_SUCC = u'成功删除记录！'
 MSG_SERVER_ERROR = u'该服务暂时不可用，请稍后再试，或者联系系统管理员！'
+MSG_FORBIDDEN_ACCESS = u'禁止访问！'
 MSG_NO_ID_SUPPLIED = u'没有提供记录的ID！'
 MSG_RECORD_NOT_EXIST = u'该记录不存在！'
 MSG_RECORD_ALREADY_EXIST = u'该记录已经存在！'
@@ -58,7 +59,7 @@ LOG_GOODS_ARRIVAL = u'货物已到达目的地。'
 LOG_GOODS_SIGNED = u'货物已签收。'
 LOG_GOODS_PICKUPED = u'货物已提货。'
 
-#order status
+# order status
 ORDER_DRAFT = (-2, u'草稿')
 ORDER_CANCELLED = (-1, u'已取消')
 ORDER_NEW = (0, u'新建')
@@ -82,7 +83,7 @@ STATUS_LIST = [
 
 
 
-#validate status
+# validate status
 ORDER_NOT_MAKE_APPROVAL = (0, u'未审核')
 ORDER_APPROVED = (1, u'审核通过')
 ORDER_DISAPPROVED = (2, u'审核不通过')
@@ -91,7 +92,7 @@ ORDER_DISAPPROVED = (2, u'审核不通过')
 APPROVAL_STATUS_LIST = [ORDER_NOT_MAKE_APPROVAL, ORDER_APPROVED, ORDER_DISAPPROVED]
 
 
-#paid status
+# paid status
 ORDER_NOT_PAID = (0, u'客户未付款')
 ORDER_PAID = (1, u'客户已付款')
 ORDER_PAID_STATUS_LIST = [ORDER_NOT_PAID, ORDER_PAID]
@@ -108,7 +109,7 @@ ORDER_RETURN_STATUS_LIST = [ORDER_NOT_RETURN_NOTE, ORDER_RETURN_NOTE ]
 
 
 
-#button label
+# button label
 BTN_SAVE = T('Save')
 BTN_INPUT = T('Input')
 BTN_REVISE = T('Revise')

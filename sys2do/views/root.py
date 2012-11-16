@@ -13,7 +13,8 @@ from sys2do import app
 from sys2do.model import DBSession, User
 from flask.helpers import jsonify, send_file, send_from_directory
 from sys2do.util.decorator import templated, login_required, tab_highlight
-from sys2do.util.common import _g, _gp, _gl, _info, _error, date2text, _debug
+from sys2do.util.common import _g, _gp, _gl, _info, _error, date2text, _debug, \
+    with_session, use_db_session, mywith
 from sys2do.constant import MESSAGE_ERROR, MESSAGE_INFO, MSG_NO_SUCH_ACTION, \
     MSG_SAVE_SUCC, GOODS_PICKUP, GOODS_SIGNED, OUT_WAREHOUSE, IN_WAREHOUSE, \
     MSG_RECORD_NOT_EXIST, LOG_GOODS_PICKUPED, LOG_GOODS_SIGNED, MSG_SERVER_ERROR, \
@@ -26,6 +27,7 @@ from sys2do.model.logic import OrderHeader, TransferLog, PickupDetail, \
     DeliverDetail
 from sys2do.model.system import UploadFile
 from sys2do.setting import UPLOAD_FOLDER_PREFIX
+
 
 
 
@@ -246,7 +248,7 @@ class RootView(BasicView):
             try:
                 b = DBSession.query(Barcode).filter(and_(Barcode.active == 0, Barcode.value == barcode)).one()
 
-                if b.status == 0 : # the barcode is used in a order
+                if b.status == 0 :  # the barcode is used in a order
                     try:
                         h = DBSession.query(OrderHeader).filter(OrderHeader.no == barcode).one()
                         params = {
@@ -267,7 +269,7 @@ class RootView(BasicView):
                           'destination_company' : '',
                           'status' : ''
                           }
-                elif b.status == 1 : # the barcode is reserved ,could be created a new order
+                elif b.status == 1 :  # the barcode is reserved ,could be created a new order
                     params = {
                           'no' : 'BARCODE_AVAILABLE',
                           'source_station' : '',
@@ -276,7 +278,7 @@ class RootView(BasicView):
                           'destination_company' : '',
                           'status' : '-2'
                           }
-                else: # the barcode is cancel ,equal not existed
+                else:  # the barcode is cancel ,equal not existed
                     params = {
                           'no' : unicode(MSG_RECORD_NOT_EXIST),
                           'source_station' : '',
@@ -303,7 +305,7 @@ class RootView(BasicView):
                 action_type = _g('action_type')
                 action_type = int(action_type)
 
-                #create a draft order by the handheld
+                # create a draft order by the handheld
                 if action_type == -2:
                     no = _g('barcode')
                     ref_no = _g('orderno')
@@ -375,9 +377,9 @@ class RootView(BasicView):
         city_id = _g('city_id')
         customer_id = _g('customer_id')
 
-        #count the ratio
+        # count the ratio
         ratio_result = self._compute_ratio(customer_id, province_id, city_id)
-        #count the day
+        # count the day
         day_result = self._compute_day(province_id, city_id)
 
         ratio_result.update(day_result)
