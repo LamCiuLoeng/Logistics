@@ -20,7 +20,7 @@ from webhelpers import paginate
 
 
 from sys2do.views import BasicView
-from sys2do.util.decorator import templated, login_required
+from sys2do.util.decorator import templated, login_required, mark_path
 from sys2do.model.master import Customer, CustomerTarget, Province, \
     CustomerSource, Supplier
 from sys2do.model import DBSession
@@ -32,6 +32,7 @@ from sys2do.model.logic import OrderHeader, DeliverHeader, DeliverDetail
 from sys2do.setting import PAGINATE_PER_PAGE, TMP_FOLDER, TEMPLATE_FOLDER
 from sys2do.model.system import SystemLog
 from sys2do.util.excel_helper import ProfitReport
+from sys2do.model.auth import User
 
 
 
@@ -45,6 +46,7 @@ class FinView(BasicView):
     decorators = [login_required]
 
     @templated('fin/index.html')
+    @mark_path('FIN_INDEX')
     def index(self):
         if _g('SEARCH_SUBMIT'):  # come from search
             values = {'page' : 1}
@@ -54,7 +56,7 @@ class FinView(BasicView):
                 values[f] = _g(f)
                 values['field'] = _g('field', None) or 'create_time'
                 values['direction'] = _g('direction', None) or 'desc'
-        else: #come from paginate or return
+        else:  # come from paginate or return
             values = session.get('fin_values', {})
             if _g('page') : values['page'] = int(_g('page'))
             elif 'page' not in values : values['page'] = 1
@@ -67,7 +69,11 @@ class FinView(BasicView):
         session['fin_values'] = values
 
 
-        conditions = [OrderHeader.active == 0]
+        conditions = [OrderHeader.active == 0,
+                      OrderHeader.customer_id == Customer.id,
+                      OrderHeader.source_company_id == CustomerSource.id,
+                      OrderHeader.destination_company_id == CustomerTarget.id,
+                      OrderHeader.create_by_id == User.id, ]
         if values.get('create_time_from', None):       conditions.append(OrderHeader.order_time > values['create_time_from'])
         if values.get('create_time_to', None):         conditions.append(OrderHeader.order_time < '%s 23:59' % values['create_time_to'])
         if values.get('ref_no', None):                 conditions.append(OrderHeader.ref_no.op('like')('%%%s%%' % values['ref_no']))
@@ -101,9 +107,11 @@ class FinView(BasicView):
         # for the sort function
         field = values.get('field', 'create_time')
         if values.get('direction', 'desc') == 'desc':
-            result = DBSession.query(OrderHeader).filter(and_(*conditions)).order_by(desc(getattr(OrderHeader, field)))
+            result = DBSession.query(OrderHeader, Customer, CustomerSource, CustomerTarget, User)\
+            .filter(and_(*conditions)).order_by(desc(getattr(OrderHeader, field)))
         else:
-            result = DBSession.query(OrderHeader).filter(and_(*conditions)).order_by(getattr(OrderHeader, field))
+            result = DBSession.query(OrderHeader, Customer, CustomerSource, CustomerTarget, User)\
+            .filter(and_(*conditions)).order_by(getattr(OrderHeader, field))
 
         def url_for_page(**params): return url_for('bpFin.view', action = "index", page = params['page'])
         records = paginate.Page(result, values['page'], show_if_single_page = True, items_per_page = PAGINATE_PER_PAGE, url = url_for_page)
@@ -127,9 +135,9 @@ class FinView(BasicView):
             for r in DBSession.query(OrderHeader).filter(OrderHeader.id.in_(ids)).order_by(OrderHeader.create_time):
                 if type == 'APPROVE':
                     r.approve = flag
-                    if flag == '1':  #approve
+                    if flag == '1':  # approve
                         remark = u'%s 审核通过该订单。' % session['user_profile']['name']
-                    else: #disapprove
+                    else:  # disapprove
                         remark = u'%s 审核不通过该订单。' % session['user_profile']['name']
                 elif type == 'PAID':
                     r.paid = flag
@@ -270,7 +278,7 @@ class FinView(BasicView):
                 values[f] = _g(f)
                 values['field'] = _g('field', None) or 'create_time'
                 values['direction'] = _g('direction', None) or 'desc'
-        else: #come from paginate or return
+        else:  # come from paginate or return
             values = session.get('fin_profit_values', {})
             if _g('page') : values['page'] = int(_g('page'))
             elif 'page' not in values : values['page'] = 1

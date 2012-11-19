@@ -113,7 +113,7 @@
   <tr class="field_head">
     <th align="center" style="width:50px;"></th>
     <td align="center" style="width:100px;">{{mymacros.show_direction(values,'ref_no')}}{{_('Order Number')}}</td>
-    <td align="center" style="width:100px;">送货单号</td>
+    <td align="center" style="width:100px;">送货单系统编号</td>
     <td align="center" style="width:100px;">{{mymacros.show_direction(values,'destination_province_id')}}{{_('Destination Station')}}</td>
     <td align="center" style="width:150px;">{{mymacros.show_direction(values,'supplier_id')}}承运商</td>
     <td align="center" style="width:80px;">付款方式</td>
@@ -134,7 +134,7 @@
 		    <th><input type="radio" name="order_ids" value="{{order_d.id}}" /></th>
 		    <td>{{order_d.ref_no|f('没有订单号')}}</td>
 		    <td>{{deliver_d.no|f}}</td>
-			<td>{{order_d.destination_province|f}}{{order_d.destination_city|f}}</td>
+			<td>{{order_d.destination_province_id|map_province}}{{order_d.destination_city_id|map_city}}</td>
 			<td>{{deliver_d.supplier|f}}</td>
 			<td>{{order_d.payment|f}}</td>
 			<td>{{order_d.amount|f}}</td>

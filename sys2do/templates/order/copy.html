@@ -20,9 +20,9 @@
 	
 	function toreturn(){
 		if(header_have_update){
-			return redirect_alert("{{MSG_LEAVE_WITHOUT_SAVING}}","{{request.referrer}}");
+			return redirect_alert("{{MSG_LEAVE_WITHOUT_SAVING}}","{{url_for(".view",action="review",id=header.id)}}");
 		}else{
-			redirect("{{request.referrer}}");
+			redirect('{{url_for(".view",action="review",id=header.id)}}');
 		}
 	}	
 	

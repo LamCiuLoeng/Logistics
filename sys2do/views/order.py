@@ -37,15 +37,17 @@ from sys2do.model.logic import OrderHeader, TransferLog, DeliverDetail, \
 from sys2do.model.master import CustomerProfile, InventoryLocation, Customer, \
     ItemUnit, WeightUnit, ShipmentType, InventoryItem, Payment, Ratio, PickupType, \
     PackType, CustomerTarget, Receiver, Item, Note, City, Province, Barcode, \
-    CustomerContact
+    CustomerContact, CustomerSource
 from sys2do.setting import TMP_FOLDER, TEMPLATE_FOLDER, PAGINATE_PER_PAGE
 from sys2do.util.barcode_helper import generate_barcode_file
 from sys2do.util.common import _g, getOr404, _gp, getMasterAll, _debug, _info, \
     _gl, _error, upload, multiupload
-from sys2do.util.decorator import templated, login_required, tab_highlight
+from sys2do.util.decorator import templated, login_required, tab_highlight, \
+    mark_path
 from sys2do.util.excel_helper import SummaryReport
 from sys2do.views import BasicView
 from sys2do.model.system import SystemLog
+from sys2do.model.auth import User
 
 
 
@@ -59,6 +61,7 @@ class OrderView(BasicView):
     decorators = [login_required, tab_highlight('TAB_MAIN'), ]
 
     @templated('order/index.html')
+    @mark_path('ORDER_INDEX')
     def index(self):
         if _g('SEARCH_SUBMIT'):  # come from search
             values = {'page' : 1}
@@ -69,7 +72,7 @@ class OrderView(BasicView):
             values['field'] = _g('field', None) or 'create_time'
             values['direction'] = _g('direction', None) or 'desc'
 
-        else: #come from paginate or return
+        else:  # come from paginate or return
             values = session.get('order_values', {})
             if _g('page') : values['page'] = int(_g('page'))
             elif 'page' not in values : values['page'] = 1
@@ -80,7 +83,12 @@ class OrderView(BasicView):
 
         session['order_values'] = values
 
-        conditions = [OrderHeader.active == 0]
+        conditions = [OrderHeader.active == 0,
+                      Customer.id == OrderHeader.customer_id,
+                      CustomerSource.id == OrderHeader.source_company_id,
+                      CustomerTarget.id == OrderHeader.destination_company_id,
+                      User.id == OrderHeader.create_by_id,
+                      ]
         if values.get('create_time_from', None):
             conditions.append(OrderHeader.order_time > values['create_time_from'])
         if values.get('create_time_to', None):
@@ -122,9 +130,11 @@ class OrderView(BasicView):
         # for the sort function
         field = values.get('field', 'create_time')
         if values.get('direction', 'desc') == 'desc':
-            result = DBSession.query(OrderHeader).filter(and_(*conditions)).order_by(desc(getattr(OrderHeader, field)))
+            result = DBSession.query(OrderHeader, Customer, CustomerSource, CustomerTarget, User)\
+            .filter(and_(*conditions)).order_by(desc(getattr(OrderHeader, field)))
         else:
-            result = DBSession.query(OrderHeader).filter(and_(*conditions)).order_by(getattr(OrderHeader, field))
+            result = DBSession.query(OrderHeader, Customer, CustomerSource, CustomerTarget, User)\
+            .filter(and_(*conditions)).order_by(getattr(OrderHeader, field))
 
         def url_for_page(**params): return url_for('bpOrder.view', action = "index", page = params['page'])
         records = paginate.Page(result, values['page'], show_if_single_page = True, items_per_page = PAGINATE_PER_PAGE, url = url_for_page)
@@ -169,7 +179,7 @@ class OrderView(BasicView):
             b = Barcode.getOrCreate(no, order.ref_no)
             order.barcode = b.img
             order.no = b.value
-            b.status = 0 # mark the barcode is use
+            b.status = 0  # mark the barcode is use
 
             DBSession.add(TransferLog(
                                       refer_id = order.id,
@@ -187,10 +197,10 @@ class OrderView(BasicView):
                                          ))
 
 
-            #handle the upload file
+            # handle the upload file
             order.attachment = multiupload()
 
-            #add the contact to the master 
+            # add the contact to the master
             try:
                 DBSession.query(CustomerContact).filter(and_(
                                                          CustomerContact.active == 0,
@@ -199,7 +209,7 @@ class OrderView(BasicView):
                                                          CustomerContact.name == order.source_contact
                                                          )).one()
             except:
-                #can't find the persons in source's contacts
+                # can't find the persons in source's contacts
                 DBSession.add(CustomerContact(
                                               customer_id = order.customer_id,
                                               type = "S",
@@ -211,7 +221,7 @@ class OrderView(BasicView):
                                               ))
 
 
-            #add the contact to the master 
+            # add the contact to the master
             try:
                 DBSession.query(CustomerContact).filter(and_(
                                                          CustomerContact.active == 0,
@@ -220,7 +230,7 @@ class OrderView(BasicView):
                                                          CustomerContact.name == order.destination_contact
                                                          )).one()
             except:
-                #can't find the persons in des's contacts
+                # can't find the persons in des's contacts
                 DBSession.add(CustomerContact(
                                               customer_id = order.customer_id,
                                               type = "T",
@@ -325,7 +335,7 @@ class OrderView(BasicView):
                   'source_sms', 'destination_sms',
                   ]
         _remark = []
-        old_info = header.serialize(fields) # to used for the history log
+        old_info = header.serialize(fields)  # to used for the history log
 
         checkbox_fields = ['source_sms', 'destination_sms', ]
         try:
@@ -339,12 +349,12 @@ class OrderView(BasicView):
             if no != header.no:
                 try:
                     old_barcode = DBSession.query(Barcode).filter(Barcode.value == header.no).one()
-                    old_barcode.status = 1 # mark the old barcode to be reserved
+                    old_barcode.status = 1  # mark the old barcode to be reserved
                 except:
                     pass
                 try:
                     new_barcode = DBSession.query(Barcode).filter(Barcode.value == no).one()
-                    new_barcode.status = 0 #mark the new barcode to be used
+                    new_barcode.status = 0  # mark the new barcode to be used
                 except NoResultFound :
                     DBSession.add(Barcode(value = no))
                 except:
@@ -358,7 +368,7 @@ class OrderView(BasicView):
             item_json = _g('item_json', '')
             for c in json.loads(item_json):
                 if not c.get('id', None) : continue
-                if isinstance(c['id'], basestring) and c['id'].startswith("old_"):  #existing item
+                if isinstance(c['id'], basestring) and c['id'].startswith("old_"):  # existing item
                     cid = c['id'].split("_")[1]
                     t = DBSession.query(ItemDetail).get(cid)
                     t.item_id = c.get('item_id', None)
@@ -379,14 +389,14 @@ class OrderView(BasicView):
 
             DBSession.query(ItemDetail).filter(ItemDetail.id.in_(item_ids)).update({'active' : 1}, False)
 
-            #handle the file upload
+            # handle the file upload
             old_attachment_ids = map(lambda (k, v) : v, _gp("old_attachment_"))
             old_attachment_ids.extend(multiupload())
             header.attachment = old_attachment_ids
 
             DBSession.commit()
 
-            #handle the system log
+            # handle the system log
             new_info = header.serialize(fields)
             change_result = header.compare(old_info, new_info)
             header.insert_system_logs(change_result)
@@ -836,12 +846,12 @@ class OrderView(BasicView):
 
         data = []
         for r in DBSession.query(OrderHeader).filter(OrderHeader.id.in_(ids)).order_by(OrderHeader.create_time):
-            row = [r.order_time, r.ref_no, _f(r), unicode(r.destination_company), r.destination_contact, r.qty, r.weight, r.destination_tel, '', ] #A - H
+            row = [r.order_time, r.ref_no, _f(r), unicode(r.destination_company), r.destination_contact, r.qty, r.weight, r.destination_tel, '', ]  # A - H
             deliver_header = r.get_deliver_header()
             if deliver_header :
-                row.extend(['', deliver_header.no, deliver_header.sendout_time, '', '', deliver_header.expect_time, deliver_header.actual_time, '', ]) #I - P
+                row.extend(['', deliver_header.no, deliver_header.sendout_time, '', '', deliver_header.expect_time, deliver_header.actual_time, '', ])  # I - P
             else:
-                row.extend(['', '', '', '', '', '', '', '', ]) #I - P
+                row.extend(['', '', '', '', '', '', '', '', ])  # I - P
 
             pickup_info = ['', '', '', '', '', '0.5', '', '', ]
             tmp_count = 0
@@ -851,11 +861,11 @@ class OrderView(BasicView):
                     pickup_info[index + 1] = d.qty
                     tmp_count += d.qty
             pickup_info[4] = r.qty - tmp_count
-            row.extend(pickup_info) #Q - X
+            row.extend(pickup_info)  # Q - X
             row.extend(['', '', '',
                         'Y' if r.actual_time > r.expect_time else 'N',
                         'Y' if r.signed_time else 'N',
-                        r.signed_contact or '', r.signed_time, '', '', ]) #Y - AG
+                        r.signed_contact or '', r.signed_time, '', '', ])  # Y - AG
 
             data.append(row)
 
@@ -914,9 +924,9 @@ class OrderView(BasicView):
 
             if action_type == 'APPROVE':
                 _update(r, "approve", flag)
-                if flag == '1':  #approve
+                if flag == '1':  # approve
                     remark = u'%s 审核通过该订单。' % session['user_profile']['name']
-                else: #disapprove
+                else:  # disapprove
                     remark = u'%s 审核不通过该订单。' % session['user_profile']['name']
             elif action_type == 'PAID':
                 _update(r, "paid", flag)

@@ -28,7 +28,8 @@ from sys2do.constant import MESSAGE_ERROR, MSG_NO_SUCH_ACTION, MESSAGE_INFO, \
     GOODS_ARRIVED, IN_TRAVEL, GOODS_SIGNED, MSG_SERVER_ERROR, LOG_GOODS_SORTED, \
     LOG_GOODS_SENT_OUT, LOG_GOODS_ARRIVAL, MSG_NO_ID_SUPPLIED, \
     SYSTEM_DATETIME_FORMAT, MSG_ORDER_NOT_FIT_FOR_DELIVER
-from sys2do.util.decorator import templated, login_required, tab_highlight
+from sys2do.util.decorator import templated, login_required, tab_highlight, \
+    mark_path
 from sys2do.model import DBSession
 from sys2do.views import BasicView
 from sys2do.model.logic import DeliverHeader, OrderHeader, \
@@ -41,6 +42,7 @@ from sys2do.setting import PAGINATE_PER_PAGE, TMP_FOLDER, TEMPLATE_FOLDER
 from sys2do.model.system import SystemLog
 from sys2do.util.logic_helper import getDeliverNo
 from sys2do.util.excel_helper import DeliverReport
+from sys2do.model.auth import User
 
 
 
@@ -51,9 +53,10 @@ bpDeliver = Blueprint('bpDeliver', __name__)
 
 class DeliverView(BasicView):
 
-#    decorators = [login_required, tab_highlight('TAB_MAIN'), ]
+    decorators = [login_required, tab_highlight('TAB_MAIN'), ]
 
     @templated('deliver/index.html')
+    @mark_path('DELIVER_INDEX')
     def index(self):
         if _g('SEARCH_SUBMIT'):  # come from search
             values = {'page' : 1}
@@ -63,7 +66,7 @@ class DeliverView(BasicView):
             values['field'] = _g('field', None) or 'create_time'
             values['direction'] = _g('direction', None) or 'desc'
 
-        else: #come from paginate or return
+        else:  # come from paginate or return
             values = session.get('deliver_values', {})
             if _g('page') : values['page'] = int(_g('page'))
             elif 'page' not in values : values['page'] = 1
@@ -75,7 +78,9 @@ class DeliverView(BasicView):
 
         session['deliver_values'] = values
 
-        conditions = [DeliverHeader.active == 0]
+        conditions = [DeliverHeader.active == 0,
+                      Supplier.id == DeliverHeader.supplier_id,
+                      User.id == DeliverHeader.create_by_id]
         if values.get('create_time_from', None):
             conditions.append(DeliverHeader.order_time > values['create_time_from'])
         if values.get('create_time_to', None):
@@ -104,9 +109,9 @@ class DeliverView(BasicView):
         # for the sort function
         field = values.get('field', 'create_time')
         if values.get('direction', 'desc') == 'desc':
-            result = DBSession.query(DeliverHeader).filter(and_(*conditions)).order_by(desc(getattr(DeliverHeader, field)))
+            result = DBSession.query(DeliverHeader, Supplier, User).filter(and_(*conditions)).order_by(desc(getattr(DeliverHeader, field)))
         else:
-            result = DBSession.query(DeliverHeader).filter(and_(*conditions)).order_by(getattr(DeliverHeader, field))
+            result = DBSession.query(DeliverHeader, Supplier, User).filter(and_(*conditions)).order_by(getattr(DeliverHeader, field))
 
 
         def url_for_page(**params): return url_for('bpDeliver.view', action = "index", page = params['page'])
@@ -260,7 +265,7 @@ class DeliverView(BasicView):
                                       remark = LOG_GOODS_SORTED
                                       ))
 
-            #handle the upload file
+            # handle the upload file
             header.attachment = multiupload()
             DBSession.commit()
         except:
@@ -318,7 +323,7 @@ class DeliverView(BasicView):
                       ]
 
             _remark = []
-            old_info = header.serialize(fields) # to used for the history log
+            old_info = header.serialize(fields)  # to used for the history log
             for f in fields:    setattr(header, f, _g(f))
 
             total_qty = total_vol = total_weight = 0
@@ -348,7 +353,7 @@ class DeliverView(BasicView):
             header.vol = total_vol
             header.weight = total_weight
 
-            #handle the file upload
+            # handle the file upload
             old_attachment_ids = map(lambda (k, v) : v, _gp("old_attachment_"))
             old_attachment_ids.extend(multiupload())
             header.attachment = old_attachment_ids

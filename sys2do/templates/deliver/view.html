@@ -9,7 +9,7 @@
 	});	
 	
 	function toreturn(){
-		redirect("{{request.referrer}}");
+		redirect("{{url_for('bpRoot.view',action='dispatch_index')}}");
 	}
 	
 	function todelete() {
@@ -81,7 +81,7 @@
 			<tr>
 				<td height="30" align="right">{{_('Destination')}}</td>
 				<td width="12">&nbsp;</td>
-				<td>{{header.destination_province|f}}{{header.destination_city|f}}{{header.destination_address|f}}</td>
+				<td>{{header.destination_province_id|map_province}}{{header.destination_city_id|map_city}}{{header.destination_address|f}}</td>
 				<td height="30" align="right">{{_('Update Time')}}</td>
 				<td width="12">&nbsp;</td>
 				<td>{{header.update_time|ft}}</td>

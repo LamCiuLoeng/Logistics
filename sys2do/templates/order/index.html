@@ -207,7 +207,7 @@
 
 <form method="post" action="" id="records">
 
-<table border="0" cellpadding="0" cellspacing="0" style="width:1550px">
+<table border="0" cellpadding="0" cellspacing="0" style="width:1600px">
   <tr class="data_table_tr">
 	    <td colspan="100" style="text-align:right">{{mymacros.mypaginate(records)}}</td>
 	</tr>
@@ -229,18 +229,18 @@
     <td align="center" style="width:50px;">审核</td>
     <td align="center" style="width:50px;">异常</td>
     <td align="center" style="width:50px;">少货</td>
-    <td align="center" style="width:100px;">客户回单</td>
+    <td align="center" style="width:150px;">客户回单</td>
   </tr>
   
-  {% for r in records.items %}
+  {% for r,customer,customer_source,customer_target,creator in records.items %}
   	<tr class="data_table_tr {{ loop.cycle('data_table_tr_odd', 'data_table_tr_even') }}">
 	    <th><input type="checkbox" name="order_ids" value="{{r.id}}" order_status="{{r.status}}"/></th>
 	    <td><a href="{{url_for('.view', action = 'review',id=r.id)}}">{{r.ref_no|f('没有订单号')}}</a></td>
 	    <td>{{r.no|f}}</td>
-		<td>{{r.source_province|f}}{{r.source_city|f}}</td>
-		<td>{{r.customer.display_name|f}}</td>
-		<td>{{r.destination_province|f}}{{r.destination_city|f}}</td>
-		<td>{{r.destination_company|f}}</td>
+		<td>{{r.source_province_id|map_province}}{{r.source_city_id|map_city}}</td>
+		<td>{{customer.display_name|f}}</td>
+		<td>{{r.destination_province_id|map_province}}{{r.destination_city_id|map_city}}</td>
+		<td>{{customer_target|f}}</td>
 		<td>{{r.qty|fn('%d')}}</td>
 		<td>{{r.weight|fn}}</td>
 		<td>{{r.amount|fn}}</td>
@@ -251,7 +251,7 @@
 			{%endif%}
 		</td>
 		<td>{{r.order_time}}</td>
-		<td>{{r.create_by|f}}</td>
+		<td>{{creator|f}}</td>
 		<td>{{r.status|showStatus}}</td>
 		<td><span class="approval_span">{{mymacros.show_approve(r.approve)}}</span></td>
 		<td><span class="exception_span">{{mymacros.show_exception(r.is_exception)}}</span></td>
@@ -262,9 +262,9 @@
   		<tr class="data_table_tr">
 	      	<th></th>
 	      	<td colspan="6" style="text-align:left">&nbsp;合计</td>
-	      	<td>{{records.items|sum_with_none(attribute='qty')|fn('%d')}}</td>
-	      	<td>{{records.items|sum_with_none(attribute='weight')|fn}}</td>
-	      	<td>{{records.items|sum(attribute='amount')|fn}}</td>
+	      	<td>{{records.items|sum_with_none(attribute='lambda tmp:tmp[0].qty')|fn('%d')}}</td>
+	      	<td>{{records.items|sum_with_none(attribute='lambda tmp:tmp[0].weight')|fn}}</td>
+	      	<td>{{records.items|sum_with_none(attribute='lambda tmp:tmp[0].amount')|fn}}</td>
 	      	<td colspan="100">&nbsp;</td>
 	      </tr>
   <tfoot>

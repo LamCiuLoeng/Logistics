@@ -58,8 +58,6 @@ _info = lambda msg : app.logger.debug(msg)
 _error = lambda msg : app.logger.debug(msg)
 
 
-
-
 def getMasterAll(obj, order_by = 'name'):
     if isinstance(obj, basestring) :
         import sys2do.model as mymodel

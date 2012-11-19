@@ -94,7 +94,6 @@ class RootView(BasicView):
         return {}
 
 
-
     def download(self):
         id = _g("id")
         f = DBSession.query(UploadFile).get(id)
@@ -103,6 +102,19 @@ class RootView(BasicView):
         return send_file(os.path.join(UPLOAD_FOLDER_PREFIX, f.path), as_attachment = True, attachment_filename = f.name)
 
 
+    def dispatch_index(self):
+        c = session.get('CURRENT_PATH', None)
+        if c:
+            if c == 'ORDER_INDEX':
+                return redirect(url_for("bpOrder.view", action = "index"))
+            if c == 'DELIVER_INDEX':
+                return redirect(url_for("bpDeliver.view", action = "index"))
+            if c == 'FIN_INDEX':
+                return redirect(url_for("bpFin.view", action = "index"))
+            if c == 'INVENTORY_INDEX':
+                return redirect(url_for("bpInventory.view", action = "index"))
+        else:
+            return redirect(url_for("bpRoot.view", action = "index"))
 
 
 

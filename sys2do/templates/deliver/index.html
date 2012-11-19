@@ -108,11 +108,11 @@
 				<th style="width:80px">{{mymacros.show_direction(values,'create_by_id')}}{{_('Creator')}}</th>
 				<th style="width:80px">状态</th>
 			</tr>
-			{% for r in records.items %}
+			{% for r,supplier,creator in records.items %}
 			<tr class="data_table_tr {{ loop.cycle('data_table_tr_odd', 'data_table_tr_even') }}">
 				<td><a href="{{url_for('.view', action = 'view',id=r.id)}}">{{r.ref_no}}</a></td>
-				<td>{{r.destination_province|f}}{{r.destination_city|f}}</td>
-				<td>{{r.supplier}}</td>
+				<td>{{r.destination_province_id|map_province}}{{r.destination_city_id|map_city}}</td>
+				<td>{{supplier}}</td>
 				<td>{{r.supplier_contact}}</td>
 				<td>{{r.supplier_tel}}</td>
 				<td>{{r.expect_time}}</td>
@@ -121,17 +121,17 @@
 				<td>{{r.weight|fn}}</td>
 				<td>{{r.vol|fn}}</td>
 				<td>{{r.order_time}}</td>
-				<td>{{r.create_by|ifFalse}}</td>
+				<td>{{creator|ifFalse}}</td>
 				<td>{{r.status|showStatus}}</td>
 			</tr>
 			{% endfor %}
 			<tr class="data_table_tr">
 					<td>&nbsp;</td>
 					<td colspan="5" style="text-align:left">合计</td>
-					<td>{{records.items|sum_with_none(attribute='amount')}}</td>
-					<td>{{records.items|sum_with_none(attribute='qty')|fn('%d')}}</td>
-					<td>{{records.items|sum_with_none(attribute='weight')}}</td>
-					<td>{{records.items|sum_with_none(attribute='vol')}}</td>
+					<td>{{records.items|sum_with_none(attribute='lambda tmp:tmp[0].amount')}}</td>
+					<td>{{records.items|sum_with_none(attribute='lambda tmp:tmp[0].qty')|fn('%d')}}</td>
+					<td>{{records.items|sum_with_none(attribute='lambda tmp:tmp[0].weight')}}</td>
+					<td>{{records.items|sum_with_none(attribute='lambda tmp:tmp[0].vol')}}</td>
 					<td colspan="30">&nbsp;</td>
 				</tr>
 		  	<tr class="data_table_tr">

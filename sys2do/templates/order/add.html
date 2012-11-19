@@ -21,9 +21,9 @@
 	
 	function toreturn(){
 		if(header_have_update){
-			return redirect_alert("{{MSG_LEAVE_WITHOUT_SAVING}}","{{request.referrer}}");
+			return redirect_alert("{{MSG_LEAVE_WITHOUT_SAVING}}","{{url_for('bpOrder.view',action='index')}}");
 		}else{
-			redirect('{{request.referrer}}');
+			redirect("{{url_for('bpOrder.view',action='index')}}");
 		}
 	}	
 	

@@ -40,6 +40,16 @@ def tab_highlight(tab):
     return decorator
 
 
+def mark_path(flag):
+    def decorator(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            session['CURRENT_PATH'] = flag
+            return f(*args, **kwargs)
+        return decorated_function
+    return decorator
+
+
 def templated(template = None):
     def decorator(f):
         @wraps(f)

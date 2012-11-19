@@ -37,9 +37,9 @@
 	
 	function toreturn(){
 		if(header_have_update){
-			return redirect_alert('{{MSG_LEAVE_WITHOUT_SAVING}}',"{{request.referrer}}");
+			return redirect_alert('{{MSG_LEAVE_WITHOUT_SAVING}}',"{{url_for('bpRoot.view',action='dispatch_index')}}");
 		}else{
-			redirect('{{request.referrer}}');
+			redirect("{{url_for('bpRoot.view',action='dispatch_index')}}");
 		}
 	}
 //]]>
@@ -92,9 +92,9 @@
     	  <li style="width:459px;height:20px"><span><sup class="warn">*</sup>&nbsp;{{_('Destination Company')}}</span>{{header.destination_company}}</li>
     	  <li style="width:459px;"><span><sup class="warn">*</sup>&nbsp;{{_('Source Contact')}}</span>{{header.source_contact|f}}</li>
     	  <li style="width:459px;"><span><sup class="warn">*</sup>&nbsp;{{_('Destination Contact')}}</span>{{header.destination_contact|f}}</li>
-    	  <li style="width:459px;"><span><sup class="warn">*</sup>&nbsp;{{_('Source Station')}}</span>{{header.source_province}}{{header.source_city}}</li>    	
+    	  <li style="width:459px;"><span><sup class="warn">*</sup>&nbsp;{{_('Source Station')}}</span>{{header.source_province_id|map_province}}{{header.source_city_id|map_city}}</li>    	
     	    
-    	  <li style="width:459px;"><span><sup class="warn">*</sup>&nbsp;{{_('Destination Station')}}</span>{{header.destination_province}}{{header.destination_city}}</li>
+    	  <li style="width:459px;"><span><sup class="warn">*</sup>&nbsp;{{_('Destination Station')}}</span>{{header.destination_province_id|map_province}}{{header.destination_city_id|map_city}}</li>
     	  <li style="width:459px;"><span>{{_('Source Address')}}</span>{{header.source_address|f}}</li>
     	  <li style="width:459px;"><span>{{_('Destination Address')}}</span>{{header.destination_address|f}}</li>
     	  <li style="width:187px;"><span>{{_('Source Phone')}}</span>{{header.source_tel|f}}</li>

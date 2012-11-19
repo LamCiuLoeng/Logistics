@@ -266,7 +266,7 @@
     <td align="center" style="width:50px;">回扣</td>
   </tr>
   
-  {% for r in records.items %}
+  {% for r,customer,customer_source,customer_target,creator in records.items %}
 		  <tr class="data_table_tr {{ loop.cycle('data_table_tr_odd', 'data_table_tr_even') }}">
 		    <th><input type="checkbox" name="order_ids" value="{{r.id}}" /></th>
 		    <td><a href="{{url_for('bpOrder.view', action = 'review',id=r.id)}}">{{r.ref_no|f('没有订单号')}}</a></td>
@@ -277,15 +277,15 @@
 					<a href="{{url_for('bpDeliver.view',action='view',id=r.deliver_header_ref)}}">{{r.deliver_header_no}}</a>
 				{%endif%}
 			</td>
-			<td>{{r.source_province|f}}{{r.source_city|f}}</td>
-			<td>{{r.customer.display_name|f}}</td>
-			<td>{{r.source_company|f}}</td>
-			<td>{{r.destination_province|f}}{{r.destination_city|f}}</td>
-			<td>{{r.destination_company|f}}</td>
+			<td>{{r.source_province_id|map_province}}{{r.source_city_id|map_city}}</td>
+			<td>{{customer.display_name|f}}</td>
+			<td>{{customer_source|f}}</td>
+			<td>{{r.destination_province_id|map_province}}{{r.destination_city_id|map_city}}</td>
+			<td>{{customer_target|f}}</td>
 			<td>{{r.amount|f}}</td>
 			<td>{{r.cost|f}}</td>
 			<td>{{r.order_time}}</td>
-			<td>{{r.create_by|f}}</td>
+			<td>{{creator|f}}</td>
 			<td><span class="approval_span">{{mymacros.show_approve(r.approve)}}</span></td>
 			<td><span class="paid_span">{{mymacros.show_paid(r.paid)}}</span></td>
 			<td><span class="supplier_paid_span">{{mymacros.show_supplier_paid(r.supplier_paid)}}</span></td>
@@ -296,8 +296,8 @@
 		  </tr>
   {% endfor %}
       <tr class="data_table_tr">
-      	{% set total_amount = records.items|sum_with_none(attribute='amount') %}
-        {% set total_cost = records.items|sum_with_none(attribute='cost') %}
+      	{% set total_amount = records.items|sum_with_none(attribute='lambda tmp:tmp[0].amount') %}
+        {% set total_cost = records.items|sum_with_none(attribute='lambda tmp:tmp[0].cost') %}
       
       	<th>&nbsp;</th>
       	<td colspan="7" style="text-align:left">&nbsp;合计</td>
