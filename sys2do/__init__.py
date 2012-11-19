@@ -7,13 +7,16 @@
 ###########################################
 '''
 from flask import Flask, Module, request
+from flask_beaker import BeakerSession
 from flaskext.babel import Babel
+
 
 __all__ = ["app"]
 
 app = Flask(__name__, static_url_path = '/static')
 app.config.from_object("sys2do.setting")
-babel = Babel(app)
+beaker = BeakerSession(app)  # set the beader session plugin
+babel = Babel(app)  # set the babel i18n plugin
 
 
 @babel.localeselector

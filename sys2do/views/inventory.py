@@ -18,7 +18,8 @@ from sqlalchemy.sql.expression import and_, desc, or_
 
 
 from sys2do.views import BasicView
-from sys2do.util.decorator import templated, login_required
+from sys2do.util.decorator import templated, login_required, tab_highlight, \
+    mark_path
 from sys2do.model.master import InventoryLocation, InventoryItem, \
     InventoryInNote, InventoryNoteDetail, InventoryOutNote, \
     InventoryLocationItem
@@ -39,15 +40,16 @@ bpInventory = Blueprint('bpInventory', __name__)
 
 class InventoryView(BasicView):
 
-#    decorators = [login_required]
+    decorators = [login_required, tab_highlight('TAB_MAIN'), ]
 
     @templated('inventory/index.html')
+    @mark_path('INVENTORY_INDEX')
     def index(self):
         if _g('SEARCH_SUBMIT'):  # come from search
             values = {'page' : 1}
             for f in ['item_id', 'location_id', 'children_location' ] :
                 values[f] = _g(f)
-        else: #come from paginate or return
+        else:  # come from paginate or return
             values = session.get('inventory_index_values', {})
             if _g('page') : values['page'] = int(_g('page'))
             elif 'page' not in values : values['page'] = 1
@@ -91,7 +93,7 @@ class InventoryView(BasicView):
             values = {'page' : 1}
             for f in ['create_time_from', 'create_time_to', 'id'] :
                 values[f] = _g(f)
-        else: #come from paginate or return
+        else:  # come from paginate or return
             values = session.get('inventory_item_detail_values', {})
             if _g('page') : values['page'] = int(_g('page'))
             elif 'page' not in values : values['page'] = 1
@@ -124,7 +126,7 @@ class InventoryView(BasicView):
                 values[f] = _g(f)
                 values['field'] = _g('field', None) or 'create_time'
                 values['direction'] = _g('direction', None) or 'desc'
-        else: #come from paginate or return
+        else:  # come from paginate or return
             values = session.get('inventory_in_note_values', {})
             if _g('page') : values['page'] = int(_g('page'))
             elif 'page' not in values : values['page'] = 1
@@ -310,10 +312,10 @@ class InventoryView(BasicView):
                 total_weight += weight
                 total_area += area
 
-                if isinstance(d['id'], basestring) and d['id'].startswith("old_"):  #existing item
+                if isinstance(d['id'], basestring) and d['id'].startswith("old_"):  # existing item
                     did = d['id'].split("_")[1]
                     t = DBSession.query(InventoryNoteDetail).get(did)
-                    #minus the inventory of the existing record.
+                    # minus the inventory of the existing record.
                     li = DBSession.query(InventoryLocationItem).filter(and_(InventoryLocationItem.location_id == t.location_id,
                                                                        InventoryLocationItem.item_id == t.item_id)).with_lockmode("update").one()
                     li.qty -= t.qty
@@ -345,7 +347,7 @@ class InventoryView(BasicView):
                                           )
                     DBSession.add(t)
 
-                #adjust the qty/weight/area for the locaion-item mapping
+                # adjust the qty/weight/area for the locaion-item mapping
                 q = DBSession.query(InventoryLocationItem).filter(and_(InventoryLocationItem.location_id == t.location_id,
                                                                        InventoryLocationItem.item_id == t.item_id))
                 if q.count() == 1:
@@ -361,7 +363,7 @@ class InventoryView(BasicView):
                 k.exp_weight += t.weight
                 k.area += t.area
                 k.exp_area += t.area
-            #adjust the delete record's qty/weight/area
+            # adjust the delete record's qty/weight/area
             for de in DBSession.query(InventoryNoteDetail).filter(InventoryNoteDetail.id.in_(detail_ids)):
                 tmp = DBSession.query(InventoryLocationItem).filter(and_(InventoryLocationItem.location_id == de.location_id,
                                                                   InventoryLocationItem.item_id == de.item_id)).with_lockmode("update").one()
@@ -427,7 +429,7 @@ class InventoryView(BasicView):
             values = {'page' : 1}
             for f in ['no', 'customer_id', 'create_time_from', 'create_time_to', 'location_id' ] :
                 values[f] = _g(f)
-        else: #come from paginate or return
+        else:  # come from paginate or return
             values = session.get('inventory_out_note_values', {})
             if _g('page') : values['page'] = int(_g('page'))
             elif 'page' not in values : values['page'] = 1
@@ -544,11 +546,11 @@ class InventoryView(BasicView):
                 for d in r.details:
                     tmp_location_item = DBSession.query(InventoryLocationItem).filter(and_(InventoryLocationItem.item_id == d.item_id,
                                                                        InventoryLocationItem.location_id == d.location_id)).with_lockmode("update").one()
-                    if flag == "1": # approve this out note
+                    if flag == "1":  # approve this out note
                         tmp_location_item.qty -= d.qty
                         tmp_location_item.area -= d.area
                         tmp_location_item.weight -= d.weight
-                    elif flag == "2": #disapprove this out note
+                    elif flag == "2":  # disapprove this out note
                         tmp_location_item.exp_qty += d.qty
                         tmp_location_item.exp_area += d.area
                         tmp_location_item.exp_weight += d.weight
@@ -583,7 +585,7 @@ class InventoryView(BasicView):
                 location_item = DBSession.query(InventoryLocationItem).filter(and_(InventoryLocationItem.active == 0,
                                                                InventoryLocationItem.location_id == d.location_id,
                                                                InventoryLocationItem.item_id == d.item_id)).with_lockmode("update").one()
-                if note.status == 1 : # the record is not approved
+                if note.status == 1 :  # the record is not approved
                     location_item.qty += d.qty
                     location_item.area += d.area
                     location_item.weight += d.weight
@@ -645,11 +647,11 @@ class InventoryView(BasicView):
             total_weight += weight
 
             if obj.status != 2:
-                #update the locaion-item relation
+                # update the locaion-item relation
                 t = DBSession.query(InventoryLocationItem).filter(and_(InventoryLocationItem.location_id == d.location_id,
                                                                    InventoryLocationItem.item_id == d.item_id)).with_lockmode("update").one()
 
-                if obj.status == 1: #if the record is approved,update the real qty/weight/area
+                if obj.status == 1:  # if the record is approved,update the real qty/weight/area
                     t.qty -= qty - d.qty
                     t.weight -= weight - d.weight
                     t.area -= area - d.area
